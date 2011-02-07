@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!DOCTYPE project SYSTEM "build.dtd">
+<project name="parser" default="all" basedir=".">
+
+  <property file="build.properties.local"/>
+  <property file="build.properties"/>
+
+  <property name="SRC" location="src/main/java"/>
+  <property name="CLASSES" value="classes"/>
+  <property name="GRAMMAR" location="${SRC}/com/akiban/sql/parser/SQLGrammar.jj"/>
+
+  <path id="compiler.class.path">
+  </path>
+
+  <target name="all" depends="init, compile"
+          description="Compile everything."/>
+
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${CLASSES}"/>
+  </target>
+
+  <target name="compile">
+    <javacc javacchome="${JAVACC_HOME}"
+            target="${GRAMMAR}"/>
+    <javac srcdir="${SRC}" 
+           destdir="${CLASSES}"
+           includes="**/*.java" 
+           deprecation="yes"
+           includeantruntime="false"
+           debug="${DEBUG}">
+      <classpath>
+        <path refid="compiler.class.path"/>
+      </classpath>
+    </javac>
+  </target> 
+
+  <target name="dtd" depends="init"
+          description="Create DTD file.">
+    <antstructure output="build.dtd"/>
+  </target>
+
+  <path id="running.class.path">
+    <path refid="compiler.class.path"/>
+    <pathelement path="${CLASSES}"/>
+  </path>
+
+  <target name="enableJavaDebugger" if="JDWP_PORT">
+    <property name="JAVA_DEBUGGER"
+              value="-Xdebug -Xrunjdwp:server=y,suspend=y,transport=dt_socket,address=${JDWP_PORT}"/>
+  </target>
+
+  <target name="jvmargs" depends="enableJavaDebugger">
+    <property name="JAVA_DEBUGGER" value=""/>
+    <property name="JVMARGS" value="${JAVA_DEBUGGER}"/>
+  </target>
+
+  <target name="test" depends="compile, jvmargs">
+    <java classname="com.akiban.sql.parser.SQLParser" fork="yes" failonerror="yes">
+      <classpath refid="running.class.path"/>
+      <arg value="SELECT x,y FROM t WHERE z > 3.14 AND w IS NOT NULL"/>
+      <arg value="INSERT INTO t1 VALUES(1, 'foo', 3 * 10)"/>
+      <arg value="INSERT INTO t1 SELECT x,y,z FROM t"/>
+      <arg value="CREATE TABLE t2 AS (SELECT * FROM t1) WITH NO DATA"/>
+      <arg value="DELETE FROM t WHERE x in (1,2,3)"/>
+    </java>
+  </target> 
+
+  <target name="clean">
+    <delete dir="${CLASSES}"/>
+    <delete file="${SRC}/com/akiban/sql/parser/SQLGrammar.java"/>
+  </target>
+
+  <target name="dist">
+    <tar destfile="../parser.tar.gz" compression="gzip" 
+         basedir="." excludes="${CLASSES}/**/*.class"/>
+  </target>
+
+</project>
