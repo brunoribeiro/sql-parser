@@ -2726,9 +2726,9 @@ deleteBody() throws StandardException :
   {
     fromTable = (FromTable)nodeFactory.getNode(NodeTypes.FROM_VTI,
                                                javaToSQLNode.getJavaValueNode(), 
-                                               (String) null,
+                                               (String)null,
                                                null, 
-                                               (Properties) null,
+                                               (Properties)null,
                                                parserContext); 
 
     return getDeleteNode(fromTable, tableName, whereClause);
@@ -2875,7 +2875,7 @@ targetTable() throws StandardException :
                                javaToSQLNode.getJavaValueNode(), 
                                null,
                                null, 
-                               (Properties) null,
+                               (Properties)null,
                                parserContext); 
   }
 |
@@ -2917,9 +2917,9 @@ updateBody() throws StandardException :
   {
     fromTable =  (FromTable)nodeFactory.getNode(NodeTypes.FROM_VTI,
                                                 javaToSQLNode.getJavaValueNode(), 
-                                                (String) null,
+                                                (String)null,
                                                 null, 
-                                                (Properties) null,
+                                                (Properties)null,
                                                 parserContext); 
 
     return getUpdateNode(fromTable, tableName, columnList, whereClause);
@@ -3163,8 +3163,8 @@ globalTemporaryTableDeclaration() throws StandardException :
                                               tableName,
                                               tableElementList,
                                               (Properties)null,
-                                              (Boolean) declareTableClauses[1],
-                                              (Boolean) declareTableClauses[2],
+                                              (Boolean)declareTableClauses[1],
+                                              (Boolean)declareTableClauses[2],
                                               parserContext);
   }
 }
@@ -4387,7 +4387,7 @@ derivedColumn(ResultColumnList resultColumns) throws StandardException :
      * column, use the name of the column as the result column name.
      */
     if ((columnName == null) && (columnExpression instanceof ColumnReference)) {
-      columnName = ((ColumnReference) columnExpression).columnName;
+      columnName = ((ColumnReference)columnExpression).columnName;
     }
     return (ResultColumn)nodeFactory.getNode(NodeTypes.RESULT_COLUMN,
                                              columnName,
@@ -5803,8 +5803,8 @@ dataTypeScalarFunction() throws StandardException :
                                            operand,
                                            dts,
                                            parserContext);
-    ((CastNode) value).setForDataTypeFunction(true);
-    ((CastNode) value).setForExternallyGeneratedCASTnode();
+    ((CastNode)value).setForDataTypeFunction(true);
+    ((CastNode)value).setForExternallyGeneratedCASTnode();
 
     return value;
   }
@@ -5820,8 +5820,8 @@ dataTypeScalarFunction() throws StandardException :
                                            new Integer(length),
                                            parserContext);
 
-    ((CastNode) value).setForDataTypeFunction(true);
-    ((CastNode) value).setForExternallyGeneratedCASTnode();
+    ((CastNode)value).setForDataTypeFunction(true);
+    ((CastNode)value).setForExternallyGeneratedCASTnode();
     return value;
   }
 }
@@ -6317,7 +6317,7 @@ dateTimeScalarFunction() throws StandardException :
                                                          value,
                                                          DataTypeDescriptor.getBuiltInDataTypeDescriptor( Types.TIME),
                                                          parserContext);
-    ((CastNode) castValue).setForExternallyGeneratedCASTnode();
+    ((CastNode)castValue).setForExternallyGeneratedCASTnode();
     return castValue;
   }
 |
@@ -7509,7 +7509,7 @@ tableExpression(ResultColumnList selectList) throws StandardException :
                                                     Boolean.FALSE, // distinct Boolean.TRUE?
                                                     "COUNT(*)",
                                                     parserContext);
-      AggregateNode n = (AggregateNode) vn;
+      AggregateNode n = (AggregateNode)vn;
       // TODO: Needed somewhere else.
       // n.replaceAggregatesWithColumnReferences(selectList, 0);      
     }
@@ -7698,8 +7698,8 @@ tableFactor() throws StandardException :
                                                correlationName,
                                                derivedRCL, 
                                                ((optionalTableClauses != null) ? 
-                                                (Properties) optionalTableClauses[OPTIONAL_TABLE_PROPERTIES] :
-                                                (Properties) null),
+                                                (Properties)optionalTableClauses[OPTIONAL_TABLE_PROPERTIES] :
+                                                (Properties)null),
                                                parserContext); 
     return fromTable;
   }
@@ -7747,8 +7747,8 @@ tableFactor() throws StandardException :
                                                correlationName,
                                                derivedRCL,
                                                ((optionalTableClauses != null) ?
-                                                (Properties) optionalTableClauses[OPTIONAL_TABLE_PROPERTIES] :
-                                                (Properties) null),
+                                                (Properties)optionalTableClauses[OPTIONAL_TABLE_PROPERTIES] :
+                                                (Properties)null),
                                                parserContext); 
 
     return fromTable;
@@ -7908,8 +7908,8 @@ qualifiedJoin(ResultSetNode leftRSN, boolean nestedInParens) throws StandardExce
      */
 
     /* Figure out whether an ON or USING clause was used */
-    onClause = (ValueNode) onOrUsingClause[JOIN_ON];
-    usingClause = (ResultColumnList) onOrUsingClause[JOIN_USING];
+    onClause = (ValueNode)onOrUsingClause[JOIN_ON];
+    usingClause = (ResultColumnList)onOrUsingClause[JOIN_USING];
 
     if (onClause == null && usingClause == null) {
       throw new StandardException("Missing JOIN specification");
@@ -8268,7 +8268,7 @@ castSpecification() throws StandardException :
                                              value,
                                              dts,
                                              parserContext);
-    ((CastNode) treeTop).setForExternallyGeneratedCASTnode();
+    ((CastNode)treeTop).setForExternallyGeneratedCASTnode();
 
     /* We need to generate a SQL->Java conversion tree above us if
      * the dataTypeCast is a user type.
@@ -8411,13 +8411,12 @@ groupingColumnReference(GroupByList groupingCols) throws StandardException :
   columnExpression = additiveExpression()
   {
     /* Aggregates not allowed in group by */
-    /** TODO: Add back
     HasNodeVisitor visitor = new HasNodeVisitor(AggregateNode.class);
     columnExpression.accept(visitor);
     if (visitor.hasNode()) {
       throw new StandardException("Aggregate values not allowed in GROUP BY");
     }
-    **/
+
     if (columnExpression.isParameterNode()) {
       throw new StandardException("Parameters not allowed in GROUP BY");
     }
@@ -8736,16 +8735,15 @@ tableDefinition() throws StandardException :
     if (withData) {
       throw new StandardException("Not implemented WITH DATA");
     }
+
     /* Parameters not allowed in create table */
-    /** Add back
     HasNodeVisitor visitor =
       new HasNodeVisitor(ParameterNode.class);
     queryExpression.accept(visitor);
     if (visitor.hasNode()) {
       throw new StandardException("Parameters not allowed in CREATE TABLE");
     }
-    **/
-        
+
     return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_TABLE_NODE,
                                               tableName,
                                               resultColumns,
@@ -9211,7 +9209,7 @@ functionDefinition() throws StandardException :
         
     return getCreateAliasNode(
               functionName,
-              (String) functionElements[CreateAliasNode.EXTERNAL_NAME],
+              (String)functionElements[CreateAliasNode.EXTERNAL_NAME],
               functionElements,
               AliasInfo.ALIAS_TYPE_FUNCTION_AS_CHAR,
               Boolean.FALSE);
@@ -9358,14 +9356,13 @@ viewDefinition(Token beginToken) throws StandardException :
   {
     checkOptionType = CreateViewNode.NO_CHECK_OPTION;
     endToken = getToken(0);
+
     /* Parameters not allowed in create view */
-    /** TODO: Add back
     HasNodeVisitor visitor = new HasNodeVisitor(ParameterNode.class);
     queryExpression.accept(visitor);
     if (visitor.hasNode()) {
       throw new StandardException("Parameters not allowed in CREATE VIEW");
     }
-    **/
 
     return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_VIEW_NODE,
                                               tableName, 
@@ -9432,14 +9429,12 @@ triggerDefinition() throws StandardException :
       throw new StandardException("DML not allowed in BEFORE trigger");
     }
 
-    // no params in trigger action
-    /** TODO: Add back
+    // No params in trigger action.
     HasNodeVisitor visitor = new HasNodeVisitor(ParameterNode.class);
     actionNode.accept(visitor);
     if (visitor.hasNode()) {
       throw new StandardException("Parameters not allowed in trigger action");
     }
-    **/
 
     return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_TRIGGER_NODE,
                                               triggerName, 
@@ -10664,7 +10659,7 @@ caseExpression() throws StandardException :
                                                                                     parserContext),
                                                      DataTypeDescriptor.getBuiltInDataTypeDescriptor(Types.CHAR, 1),  
                                                      parserContext);
-    ((CastNode) value).setForExternallyGeneratedCASTnode();
+    ((CastNode)value).setForExternallyGeneratedCASTnode();
     return value;
   }
 |
@@ -10718,7 +10713,7 @@ thenElseExpression() throws StandardException :
                                                                                     parserContext),
                                                      DataTypeDescriptor.getBuiltInDataTypeDescriptor(Types.CHAR, 1),  
                                                      parserContext);
-    ((CastNode) value).setForExternallyGeneratedCASTnode();
+    ((CastNode)value).setForExternallyGeneratedCASTnode();
     return value;
   }
 |
@@ -11273,7 +11268,7 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
   {
     if (tableElement instanceof ColumnDefinitionNode) {
       //bug 5724 - auto increment columns not allowed in ALTER TABLE statement
-      ColumnDefinitionNode cdn = (ColumnDefinitionNode) tableElement;
+      ColumnDefinitionNode cdn = (ColumnDefinitionNode)tableElement;
       if (cdn.isAutoincrementColumn())
         throw new StandardException("Auto increment column not allowed in ALTER TABLE");
     }

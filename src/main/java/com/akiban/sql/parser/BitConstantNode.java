@@ -62,7 +62,7 @@ public class BitConstantNode extends ConstantNode
   }
 
   public void init(Object arg1, Object arg2) throws StandardException {
-    String a1 = (String) arg1;
+    String a1 = (String)arg1;
 
     byte[] nv = fromHexString(a1, 0, a1.length()); 
 

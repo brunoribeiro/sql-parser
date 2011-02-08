@@ -85,8 +85,8 @@ public class ColumnReference extends ValueNode
                    Object tableName,
                    Object tokBeginOffset,
                    Object tokEndOffset) {
-    this.columnName = (String) columnName;
-    this.tableName = (TableName) tableName;
+    this.columnName = (String)columnName;
+    this.tableName = (TableName)tableName;
     this.setBeginOffset(((Integer)tokBeginOffset).intValue());
     this.setEndOffset(((Integer)tokEndOffset).intValue());
     tableNumber = -1;

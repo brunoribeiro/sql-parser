@@ -56,7 +56,7 @@ public final class CharConstantNode extends ConstantNode
                  0);
     }
     else {
-      String val = (String) arg1;
+      String val = (String)arg1;
 
       super.init(TypeId.CHAR_ID,
                  (val == null) ? Boolean.TRUE : Boolean.FALSE,
@@ -75,7 +75,7 @@ public final class CharConstantNode extends ConstantNode
    * @exception StandardException
    */
   public void init(Object newValue, Object newLength) throws StandardException {
-    String val = (String) newValue;
+    String val = (String)newValue;
     int newLen = ((Integer)newLength).intValue();
 
     super.init(TypeId.CHAR_ID,

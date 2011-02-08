@@ -54,7 +54,7 @@ public class AllResultColumn extends ResultColumn
    * @param tableName Dot expression qualifying "*"
    */
   public void init(Object tableName) {
-    this.tableName = (TableName) tableName;
+    this.tableName = (TableName)tableName;
   }
 
   /** 

@@ -109,7 +109,7 @@ public class ColumnDefinitionNode extends TableElementNode
       assert (defaultNode == null || (defaultNode instanceof DefaultNode));
       this.defaultNode = (DefaultNode)defaultNode;
       if (autoIncrementInfo != null) {
-        long[] aii = (long[]) autoIncrementInfo;
+        long[] aii = (long[])autoIncrementInfo;
         autoincrementStart = aii[QueryTreeNode.AUTOINCREMENT_START_INDEX];
         autoincrementIncrement = aii[QueryTreeNode.AUTOINCREMENT_INC_INDEX];
         //Parser has passed the info about autoincrement column's status in the

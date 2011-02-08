@@ -99,11 +99,12 @@ public class TernaryOperatorNode extends ValueNode
       ValueClassName.DateTimeDataValue } // time2.timestampDiff(interval, time1)
   };
 
-  // TODO: enum
+  // TODO: Could be enum.
   public static final int TRIM_LEADING = 1;
   public static final int TRIM_TRAILING = 2;
   public static final int TRIM_BOTH = 3;
 
+  // TODO: Could be enum, but not how passed.
   public static final int YEAR_INTERVAL = 0;
   public static final int QUARTER_INTERVAL = 1;
   public static final int MONTH_INTERVAL = 2;

@@ -72,8 +72,8 @@ public class BaseColumnNode extends ValueNode
                    Object tableName,
                    Object dts) 
       throws StandardException {
-    this.columnName = (String) columnName;
-    this.tableName = (TableName) tableName;
+    this.columnName = (String)columnName;
+    this.tableName = (TableName)tableName;
     setType((DataTypeDescriptor)dts);
   }
 

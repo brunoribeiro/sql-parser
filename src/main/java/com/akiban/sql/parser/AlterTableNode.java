@@ -229,7 +229,7 @@ public class AlterTableNode extends DDLStatementNode
   }
 
   public String statementToString() {
-    if(truncateTable)
+    if (truncateTable)
       return "TRUNCATE TABLE";
     else
       return "ALTER TABLE";

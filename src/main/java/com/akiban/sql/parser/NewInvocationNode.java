@@ -67,8 +67,8 @@ public class NewInvocationNode extends MethodCallNode
     super.init("<init>");
     addParms((List<ValueNode>)params);
 
-    this.javaClassName = (String) javaClassName;
-    this.delimitedIdentifier = ((Boolean) delimitedIdentifier).booleanValue();
+    this.javaClassName = (String)javaClassName;
+    this.delimitedIdentifier = ((Boolean)delimitedIdentifier).booleanValue();
   }
 
   /* This version of the "init" method is used for mapping a table name

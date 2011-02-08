@@ -111,7 +111,7 @@ public class CoalesceFunctionNode extends ValueNode
   void acceptChildren(Visitor v) throws StandardException {
     super.acceptChildren(v);
 
-    argumentsList = (ValueNodeList) argumentsList.accept(v);
+    argumentsList = (ValueNodeList)argumentsList.accept(v);
   }
 
 }

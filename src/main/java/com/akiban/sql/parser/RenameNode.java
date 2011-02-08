@@ -95,7 +95,7 @@ public class RenameNode extends DDLStatementNode
 
     switch (this.renamingWhat) {
     case TABLE:
-      initAndCheck((TableName) tableName);
+      initAndCheck((TableName)tableName);
       this.newTableName =
         makeTableName(getObjectName().getSchemaName(), (String)newObjectName);
       this.oldObjectName = null;
@@ -109,7 +109,7 @@ public class RenameNode extends DDLStatementNode
        */
       TableName actingObjectName;
       if (tableName instanceof TableName)
-        actingObjectName = (TableName) tableName;
+        actingObjectName = (TableName)tableName;
       else
         actingObjectName = makeTableName(null, (String)tableName);
       initAndCheck(actingObjectName);

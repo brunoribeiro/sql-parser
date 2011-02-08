@@ -121,11 +121,11 @@ public class CreateTableNode extends DDLStatementNode
       throws StandardException {
     tableType = GLOBAL_TEMPORARY_TABLE_TYPE;
     newObjectName = tempTableSchemaNameCheck(newObjectName);
-    this.onCommitDeleteRows = ((Boolean) onCommitDeleteRows).booleanValue();
-    this.onRollbackDeleteRows = ((Boolean) onRollbackDeleteRows).booleanValue();
+    this.onCommitDeleteRows = ((Boolean)onCommitDeleteRows).booleanValue();
+    this.onRollbackDeleteRows = ((Boolean)onRollbackDeleteRows).booleanValue();
     initAndCheck(newObjectName);
-    this.tableElementList = (TableElementList) tableElementList;
-    this.properties = (Properties) properties;
+    this.tableElementList = (TableElementList)tableElementList;
+    this.properties = (Properties)properties;
 
     assert this.onRollbackDeleteRows;
   }

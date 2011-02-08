@@ -164,27 +164,26 @@ public class CreateAliasNode extends DDLStatementNode
           }
         }
 
-        Integer drso = (Integer) routineElements[DYNAMIC_RESULT_SET_COUNT];
+        Integer drso = (Integer)routineElements[DYNAMIC_RESULT_SET_COUNT];
         int drs = drso == null ? 0 : drso.intValue();
 
         short sqlAllowed;
-        Short sqlAllowedObject = (Short) routineElements[SQL_CONTROL];
+        Short sqlAllowedObject = (Short)routineElements[SQL_CONTROL];
         if (sqlAllowedObject != null)
           sqlAllowed = sqlAllowedObject.shortValue();
         else
           sqlAllowed = (this.aliasType == AliasInfo.ALIAS_TYPE_PROCEDURE_AS_CHAR ?
                         RoutineAliasInfo.MODIFIES_SQL_DATA : RoutineAliasInfo.READS_SQL_DATA);
 
-        Boolean isDeterministicO = (Boolean) routineElements[DETERMINISTIC];
+        Boolean isDeterministicO = (Boolean)routineElements[DETERMINISTIC];
         boolean isDeterministic = (isDeterministicO == null) ? false : isDeterministicO.booleanValue();
 
-        Boolean definersRightsO =
-          (Boolean) routineElements[ROUTINE_SECURITY_DEFINER];
+        Boolean definersRightsO = (Boolean)routineElements[ROUTINE_SECURITY_DEFINER];
         boolean definersRights  =
           (definersRightsO == null) ? false :
           definersRightsO.booleanValue();
 
-        Boolean calledOnNullInputO = (Boolean) routineElements[NULL_ON_NULL_INPUT];
+        Boolean calledOnNullInputO = (Boolean)routineElements[NULL_ON_NULL_INPUT];
         boolean calledOnNullInput;
         if (calledOnNullInputO == null)
           calledOnNullInput = true;
@@ -213,7 +212,7 @@ public class CreateAliasNode extends DDLStatementNode
     case AliasInfo.ALIAS_TYPE_SYNONYM_AS_CHAR:
       String targetSchema = null;
       implicitCreateSchema = true;
-      TableName t = (TableName) targetObject;
+      TableName t = (TableName)targetObject;
       if (t.getSchemaName() != null)
         targetSchema = t.getSchemaName();
       aliasInfo = new SynonymAliasInfo(targetSchema, t.getTableName());
