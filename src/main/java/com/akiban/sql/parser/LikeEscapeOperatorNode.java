@@ -109,7 +109,7 @@ public final class LikeEscapeOperatorNode extends TernaryOperatorNode
   {
     /* By convention, the method name for the like operator is "like" */
     super.init(receiver, leftOperand, rightOperand, 
-               TernaryOperatorNode.LIKE, null); 
+               TernaryOperatorNode.OperatorType.LIKE, null); 
   }
 
 }

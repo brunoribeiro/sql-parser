@@ -1254,7 +1254,8 @@ class SQLGrammar
    * to ' '.
    * @param trimSource expression to be trimmed.
    */
-  ValueNode getTrimOperatorNode(Integer trimSpec, ValueNode trimChar,
+  ValueNode getTrimOperatorNode(TernaryOperatorNode.TrimType trimSpec, 
+                                ValueNode trimChar,
                                 ValueNode trimSource) 
       throws StandardException {
     if (trimChar == null) {
@@ -1266,7 +1267,7 @@ class SQLGrammar
                                           trimSource, // receiver
                                           trimChar,   // leftOperand.
                                           null,
-                                          TernaryOperatorNode.TRIM,
+                                          TernaryOperatorNode.OperatorType.TRIM,
                                           trimSpec,
                                           parserContext);
   }
@@ -1328,7 +1329,7 @@ class SQLGrammar
                                           stringValue,
                                           startPosition,
                                           length,
-                                          TernaryOperatorNode.SUBSTRING,
+                                          TernaryOperatorNode.OperatorType.SUBSTRING,
                                           null,
                                           parserContext);
   }
@@ -5248,7 +5249,7 @@ timestampArithmeticFuncion() throws StandardException :
                                           tstamp1,
                                           intervalType,
                                           count,
-                                          TernaryOperatorNode.TIMESTAMPADD,
+                                          TernaryOperatorNode.OperatorType.TIMESTAMPADD,
                                           null,
                                           parserContext);
   }
@@ -5262,13 +5263,14 @@ timestampArithmeticFuncion() throws StandardException :
                                           tstamp2,
                                           intervalType,
                                           tstamp1,
-                                          TernaryOperatorNode.TIMESTAMPDIFF,
+                                          TernaryOperatorNode.OperatorType.TIMESTAMPDIFF,
                                           null,
                                           parserContext);
   }
 }       
 
-ValueNode jdbcIntervalType() throws StandardException :
+ValueNode
+jdbcIntervalType() throws StandardException :
 {}
 {
   <SQL_TSI_FRAC_SECOND>
@@ -5486,7 +5488,7 @@ characterValueFunction() throws StandardException :
                                           str1,
                                           str2,
                                           (value == null) ? nodeFactory.getNode(NodeTypes.INT_CONSTANT_NODE, 1, parserContext) : value,
-                                          TernaryOperatorNode.LOCATE,
+                                          TernaryOperatorNode.OperatorType.LOCATE,
                                           null,
                                           parserContext);
   }
@@ -5496,7 +5498,7 @@ ValueNode
 trimFunction() throws StandardException :
 {
   ValueNode source;
-  Integer trimType;
+  TernaryOperatorNode.TrimType trimType;
   ValueNode ansiTrimNode;
 }
 {
@@ -5514,7 +5516,7 @@ trimFunction() throws StandardException :
 ValueNode
 ansiTrim() throws StandardException  :
 {
-  Integer trimSpec = TernaryOperatorNode.TRIM_BOTH;
+  TernaryOperatorNode.TrimType trimSpec = TernaryOperatorNode.TrimType.BOTH;
   ValueNode trimChar = null;
   ValueNode trimSource = null;
 }
@@ -5553,38 +5555,38 @@ ansiTrim() throws StandardException  :
   )
 }
 
-Integer
+TernaryOperatorNode.TrimType
 ansiTrimSpec() :
 {}
 {
   <TRAILING>
   {
-    return TernaryOperatorNode.TRIM_TRAILING;
+    return TernaryOperatorNode.TrimType.TRAILING;
   }
 |
   <LEADING>
   {
-    return TernaryOperatorNode.TRIM_LEADING;
+    return TernaryOperatorNode.TrimType.LEADING;
   }
 |
   <BOTH>
   {
-    return TernaryOperatorNode.TRIM_BOTH;
+    return TernaryOperatorNode.TrimType.BOTH;
   }
 }
 
-Integer
+TernaryOperatorNode.TrimType
 trimType() :
 {}
 {
   <RTRIM>
   {
-    return TernaryOperatorNode.TRIM_TRAILING;
+    return TernaryOperatorNode.TrimType.TRAILING;
   }
 |
   <LTRIM>
   {
-    return TernaryOperatorNode.TRIM_LEADING;
+    return TernaryOperatorNode.TrimType.LEADING;
   }
 }
 
@@ -5764,7 +5766,7 @@ miscBuiltinsCore(boolean isJDBCEscape) throws StandardException :
   {
     if (isJDBCEscape)
       return (ValueNode)nodeFactory.getNode(NodeTypes.CHAR_LENGTH_OPERATOR_NODE,
-                                            getTrimOperatorNode(TernaryOperatorNode.TRIM_TRAILING,
+                                            getTrimOperatorNode(TernaryOperatorNode.TrimType.TRAILING,
                                                                 null,
                                                                 value),
                                             parserContext);

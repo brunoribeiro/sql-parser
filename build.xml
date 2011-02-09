@@ -58,7 +58,7 @@
   <target name="test" depends="compile, jvmargs">
     <java classname="com.akiban.sql.unparser.NodeToString" fork="yes" failonerror="yes">
       <classpath refid="running.class.path"/>
-      <arg value="SELECT x,y||y AS yy FROM t WHERE z > 3.14 AND w IS NOT NULL"/>
+      <arg value="SELECT x,y||y AS yy FROM t WHERE z > 3.14 AND w IS NOT NULL OR y LIKE 'f%'"/>
       <!--
       <arg value="INSERT INTO t1 VALUES(1, 'foo', 3 * 10)"/>
       <arg value="INSERT INTO t1 SELECT x,y,z FROM t"/>

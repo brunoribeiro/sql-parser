@@ -64,6 +64,8 @@ public class NodeToString
     case NodeTypes.IS_NULL_NODE:
     case NodeTypes.IS_NOT_NULL_NODE:
       return isNullnode((IsNullNode)node);
+    case NodeTypes.LIKE_OPERATOR_NODE:
+      return likeEscapeOperatorNode((LikeEscapeOperatorNode)node);
     case NodeTypes.UNTYPED_NULL_CONSTANT_NODE:
     case NodeTypes.SQL_BOOLEAN_CONSTANT_NODE:
     case NodeTypes.BOOLEAN_CONSTANT_NODE:
@@ -166,6 +168,13 @@ public class NodeToString
 
   protected String isNullnode(IsNullNode node) throws StandardException {
     return suffixUnary(node);
+  }
+
+  protected String likeEscapeOperatorNode(LikeEscapeOperatorNode node) 
+      throws StandardException {
+    return maybeParens(toString(node.getReceiver())) +
+      " " + node.getOperator().toUpperCase() + " " +
+      maybeParens(toString(node.getLeftOperand()));
   }
 
   protected String constantNode(ConstantNode node) throws StandardException {

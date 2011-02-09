@@ -45,6 +45,8 @@ package com.akiban.sql.parser;
 
 public class BinaryRelationalOperatorNode extends BinaryComparisonOperatorNode 
 {
+  // TODO: Is there any point to this?
+
   public final int EQUALS_RELOP = 1;
   public final int NOT_EQUALS_RELOP = 2;
   public final int GREATER_THAN_RELOP = 3;
@@ -103,7 +105,7 @@ public class BinaryRelationalOperatorNode extends BinaryComparisonOperatorNode
     super.init(leftOperand, rightOperand, operatorName, methodName);
   }
 
-  public int getOperator() {
+  public int getOperatorType() {
     return operatorType;
   }
 

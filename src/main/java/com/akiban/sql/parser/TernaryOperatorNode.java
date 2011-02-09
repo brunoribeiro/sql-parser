@@ -50,61 +50,71 @@ import com.akiban.sql.types.ValueClassName;
 
 public class TernaryOperatorNode extends ValueNode
 {
-  String operator;
-  String methodName;
-  int operatorType;
-  ValueNode receiver; 
+  public static enum OperatorType {
+    TRIM("trim", "ansiTrim", 
+         ValueClassName.StringDataValue, 
+         new String[] { ValueClassName.StringDataValue, 
+                        ValueClassName.StringDataValue, 
+                        "java.lang.Integer" }),
+    LOCATE("LOCATE", "locate",
+           ValueClassName.NumberDataValue,
+           new String[] { ValueClassName.StringDataValue, 
+                          ValueClassName.StringDataValue, 
+                          ValueClassName.NumberDataValue }),
+    SUBSTRING("substring" , "substring",
+              ValueClassName.ConcatableDataValue,
+              new String[] { ValueClassName.ConcatableDataValue, 
+                             ValueClassName.NumberDataValue, 
+                             ValueClassName.NumberDataValue }),
+    LIKE("like", "like",
+         ValueClassName.BooleanDataValue,
+         new String[] { ValueClassName.DataValueDescriptor, 
+                        ValueClassName.DataValueDescriptor, 
+                        ValueClassName.DataValueDescriptor }),
+    TIMESTAMPADD("TIMESTAMPADD", "timestampAdd",
+                 ValueClassName.DateTimeDataValue, 
+                 // time.timestampadd(interval, count)
+                 new String[] { ValueClassName.DateTimeDataValue, 
+                                "java.lang.Integer", 
+                                ValueClassName.NumberDataValue }),
+    TIMESTAMPDIFF("TIMESTAMPDIFF", "timestampDiff",
+                  ValueClassName.NumberDataValue,
+                  // time2.timestampDiff(interval, time1)
+                  new String[] { ValueClassName.DateTimeDataValue, 
+                                 "java.lang.Integer", 
+                                 ValueClassName.DateTimeDataValue });
 
-  ValueNode leftOperand;
-  ValueNode rightOperand;
+    String operator, methodName;
+    String resultType;
+    String[] argTypes;
+    OperatorType(String operator, String methodName,
+                 String resultType, String[] argTypes) {
+      this.operator = operator;
+      this.methodName = methodName;
+      this.resultType = resultType;
+      this.argTypes = argTypes;
+    }
+  }
 
-  String resultInterfaceType;
-  String receiverInterfaceType;
-  String leftInterfaceType;
-  String rightInterfaceType;
-  int trimType;
+  protected String operator;
+  protected String methodName;
+  protected OperatorType operatorType;
+  protected ValueNode receiver; 
 
-  public static final int TRIM = 0;
-  public static final int LOCATE = 1;
-  public static final int SUBSTRING = 2;
-  public static final int LIKE = 3;
-  public static final int TIMESTAMPADD = 4;
-  public static final int TIMESTAMPDIFF = 5;
-  static final String[] TernaryOperators = {
-    "trim", "LOCATE", "substring", "like", "TIMESTAMPADD", "TIMESTAMPDIFF"
-  };
-  static final String[] TernaryMethodNames = {
-    "ansiTrim", "locate", "substring", "like", "timestampAdd", "timestampDiff"
-  };
-  static final String[] TernaryResultType = {
-    ValueClassName.StringDataValue, 
-    ValueClassName.NumberDataValue,
-    ValueClassName.ConcatableDataValue,
-    ValueClassName.BooleanDataValue,
-    ValueClassName.DateTimeDataValue, 
-    ValueClassName.NumberDataValue
-  };
-  static final String[][] TernaryArgType = {
-    { ValueClassName.StringDataValue, ValueClassName.StringDataValue, 
-      "java.lang.Integer" },
-    { ValueClassName.StringDataValue, ValueClassName.StringDataValue, 
-      ValueClassName.NumberDataValue },
-    { ValueClassName.ConcatableDataValue, ValueClassName.NumberDataValue, 
-      ValueClassName.NumberDataValue },
-    { ValueClassName.DataValueDescriptor, ValueClassName.DataValueDescriptor, 
-      ValueClassName.DataValueDescriptor },
-    { ValueClassName.DateTimeDataValue, "java.lang.Integer", 
-      ValueClassName.NumberDataValue }, // time.timestampadd(interval, count)
-    { ValueClassName.DateTimeDataValue, "java.lang.Integer", 
-      ValueClassName.DateTimeDataValue } // time2.timestampDiff(interval, time1)
-  };
+  protected ValueNode leftOperand;
+  protected ValueNode rightOperand;
 
-  // TODO: Could be enum.
-  public static final int TRIM_LEADING = 1;
-  public static final int TRIM_TRAILING = 2;
-  public static final int TRIM_BOTH = 3;
+  protected String resultInterfaceType;
+  protected String receiverInterfaceType;
+  protected String leftInterfaceType;
+  protected String rightInterfaceType;
 
-  // TODO: Could be enum, but not how passed.
+  public static enum TrimType {
+    LEADING, TRAILING, BOTH
+  }
+  protected TrimType trimType;
+
+  // TODO: Could be enum, but note how passed as Integer constant.
   public static final int YEAR_INTERVAL = 0;
   public static final int QUARTER_INTERVAL = 1;
   public static final int MONTH_INTERVAL = 2;
@@ -132,15 +142,14 @@ public class TernaryOperatorNode extends ValueNode
     this.receiver = (ValueNode)receiver;
     this.leftOperand = (ValueNode)leftOperand;
     this.rightOperand = (ValueNode)rightOperand;
-    this.operatorType = ((Integer)operatorType).intValue();
-    this.operator = (String)TernaryOperators[this.operatorType];
-    this.methodName = (String)TernaryMethodNames[this.operatorType];
-    this.resultInterfaceType = (String)TernaryResultType[this.operatorType];
-    this.receiverInterfaceType = (String)TernaryArgType[this.operatorType][0];
-    this.leftInterfaceType = (String)TernaryArgType[this.operatorType][1];
-    this.rightInterfaceType = (String)TernaryArgType[this.operatorType][2];
-    if (trimType != null)
-      this.trimType = ((Integer)trimType).intValue();
+    this.operatorType = (OperatorType)operatorType;
+    this.operator = this.operatorType.operator;
+    this.methodName = this.operatorType.methodName;
+    this.resultInterfaceType = this.operatorType.resultType;
+    this.receiverInterfaceType = this.operatorType.argTypes[0];
+    this.leftInterfaceType = this.operatorType.argTypes[1];
+    this.rightInterfaceType = this.operatorType.argTypes[2];
+    this.trimType = (TrimType)trimType;
   }
 
   /**
@@ -184,6 +193,18 @@ public class TernaryOperatorNode extends ValueNode
       printLabel(depth, "rightOperand: ");
       rightOperand.treePrint(depth + 1);
     }
+  }
+
+  public String getOperator() {
+    return operator;
+  }
+
+  public String getMethodName() {
+    return methodName;
+  }
+
+  public ValueNode getReceiver() {
+    return receiver;
   }
 
   /**
