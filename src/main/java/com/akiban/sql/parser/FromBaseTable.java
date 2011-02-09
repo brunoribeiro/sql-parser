@@ -104,7 +104,7 @@ public class FromBaseTable extends FromTable
                    Object arg2,
                    Object arg3,
                    Object arg4) {
-    if (arg3 instanceof Integer) {
+    if (arg3 instanceof UpdateOrDelete) {
       init(arg2, null);
       this.tableName = (TableName)arg1;
       this.updateOrDelete = (UpdateOrDelete)arg3;

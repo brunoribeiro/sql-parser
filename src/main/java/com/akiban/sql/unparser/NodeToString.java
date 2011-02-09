@@ -32,6 +32,10 @@ public class NodeToString
       return selectNode((SelectNode)node);
     case NodeTypes.INSERT_NODE:
       return insertNode((InsertNode)node);
+    case NodeTypes.UPDATE_NODE:
+      return updateNode((UpdateNode)node);
+    case NodeTypes.DELETE_NODE:
+      return deleteNode((DeleteNode)node);
     case NodeTypes.RESULT_COLUMN_LIST:
       return resultColumnList((ResultColumnList)node);
     case NodeTypes.RESULT_COLUMN:
@@ -42,6 +46,8 @@ public class NodeToString
       return groupByList((GroupByList)node);
     case NodeTypes.ORDER_BY_LIST:
       return orderByList((OrderByList)node);
+    case NodeTypes.VALUE_NODE_LIST:
+      return valueNodeList((ValueNodeList)node);
     case NodeTypes.FROM_BASE_TABLE:
       return fromBaseTable((FromBaseTable)node);
     case NodeTypes.TABLE_NAME:
@@ -78,6 +84,10 @@ public class NodeToString
       return isNullnode((IsNullNode)node);
     case NodeTypes.LIKE_OPERATOR_NODE:
       return likeEscapeOperatorNode((LikeEscapeOperatorNode)node);
+    case NodeTypes.IN_LIST_OPERATOR_NODE:
+      return inListOperatorNode((InListOperatorNode)node);
+    case NodeTypes.BETWEEN_OPERATOR_NODE:
+      return betweenOperatorNode((BetweenOperatorNode)node);
     case NodeTypes.AGGREGATE_NODE:
       return aggregateNode((AggregateNode)node);
     case NodeTypes.UNTYPED_NULL_CONSTANT_NODE:
@@ -101,6 +111,8 @@ public class NodeToString
     case NodeTypes.CLOB_CONSTANT_NODE:
     case NodeTypes.XML_CONSTANT_NODE:
       return constantNode((ConstantNode)node);
+    case NodeTypes.PARAMETER_NODE:
+      return parameterNode((ParameterNode)node);
     default:
       return "**UNKNOWN(" + node.getNodeType() +")**";
     }
@@ -149,6 +161,41 @@ public class NodeToString
     if (node.getOrderByList() != null) {
       str.append(" ");
       str.append(toString(node.getOrderByList()));
+    }
+    return str.toString();
+  }
+
+  protected String updateNode(UpdateNode unode) throws StandardException {
+    // Cf. Parser's getUpdateNode().
+    SelectNode snode = (SelectNode)unode.getResultSetNode();
+    StringBuilder str = new StringBuilder("UPDATE ");
+    str.append(toString(unode.getTargetTableName()));
+    str.append(" SET ");
+    boolean first = true;
+    for (ResultColumn col : snode.getResultColumns()) {
+      if (first)
+        first = false;
+      else
+        str.append(", ");
+      str.append(toString(col.getReference()));
+      str.append(" = ");
+      str.append(maybeParens(col.getExpression()));
+    }
+    if (snode.getWhereClause() != null) {
+      str.append(" WHERE ");
+      str.append(toString(snode.getWhereClause()));
+    }
+    return str.toString();
+  }
+
+  protected String deleteNode(DeleteNode dnode) throws StandardException {
+    // Cf. Parser's getDeleteNode().
+    SelectNode snode = (SelectNode)dnode.getResultSetNode();
+    StringBuilder str = new StringBuilder("DELETE FROM ");
+    str.append(toString(dnode.getTargetTableName()));
+    if (snode.getWhereClause() != null) {
+      str.append(" WHERE ");
+      str.append(toString(snode.getWhereClause()));
     }
     return str.toString();
   }
@@ -251,9 +298,25 @@ public class NodeToString
 
   protected String likeEscapeOperatorNode(LikeEscapeOperatorNode node) 
       throws StandardException {
-    return maybeParens(toString(node.getReceiver())) +
+    return maybeParens(node.getReceiver()) +
       " " + node.getOperator().toUpperCase() + " " +
-      maybeParens(toString(node.getLeftOperand()));
+      maybeParens(node.getLeftOperand());
+  }
+
+  protected String inListOperatorNode(InListOperatorNode node) throws StandardException {
+    return maybeParens(node.getLeftOperand()) +
+      " IN (" + toString(node.getRightOperandList()) + ")";
+  }
+
+  protected String valueNodeList(ValueNodeList node) throws StandardException {
+    return nodeList(node);
+  }
+
+  protected String betweenOperatorNode(BetweenOperatorNode node)
+      throws StandardException {
+    return maybeParens(node.getLeftOperand()) +
+      " BETWEEN " + maybeParens(node.getRightOperandList().get(0)) +
+      " AND " + maybeParens(node.getRightOperandList().get(1));
   }
 
   protected String constantNode(ConstantNode node) throws StandardException {
@@ -270,18 +333,18 @@ public class NodeToString
 
   protected String prefixUnary(UnaryOperatorNode node) throws StandardException {
     return node.getOperator().toUpperCase() + " " +
-      maybeParens(toString(node.getOperand()));
+      maybeParens(node.getOperand());
   }
 
   protected String suffixUnary(UnaryOperatorNode node) throws StandardException {
-    return maybeParens(toString(node.getOperand())) + " " +
+    return maybeParens(node.getOperand()) + " " +
       node.getOperator().toUpperCase();
   }
 
   protected String infixBinary(BinaryOperatorNode node) throws StandardException {
-    return maybeParens(toString(node.getLeftOperand())) +
+    return maybeParens(node.getLeftOperand()) +
       " " + node.getOperator().toUpperCase() + " " +
-      maybeParens(toString(node.getRightOperand()));
+      maybeParens(node.getRightOperand());
   }
   
   protected String nodeList(QueryTreeNodeList<? extends QueryTreeNode> nl)
@@ -293,13 +356,16 @@ public class NodeToString
         first = false;
       else
         str.append(", ");
-      str.append(toString(node));
+      str.append(maybeParens(node));
     }
     return str.toString();
   }
 
-  protected String maybeParens(String str) {
-    if (str.indexOf(' ') < 0)
+  protected String maybeParens(QueryTreeNode node) throws StandardException {
+    String str = toString(node);
+    if (node instanceof ConstantNode)
+      return str;
+    else if (str.indexOf(' ') < 0)
       return str;
     else
       return "(" + str + ")";
@@ -314,6 +380,10 @@ public class NodeToString
     return str.toString();
   }
 
+  protected String parameterNode(ParameterNode node) throws StandardException {
+    return "?";
+  }
+
   // TODO: Temporary low-budget testing.
   public static void main(String[] args) throws Exception {
     SQLParser p = new SQLParser();
@@ -323,8 +393,11 @@ public class NodeToString
       System.out.println(arg);
       try {
         StatementNode stmt = p.parseStatement(arg);
-        System.out.println(ts.toString(stmt));
-        stmt.treePrint();
+        String sql = ts.toString(stmt);
+        System.out.println(sql);
+        if (sql.indexOf("UNKNOWN") > 0) {
+          stmt.treePrint();
+        }
       }
       catch (StandardException ex) {
         ex.printStackTrace();

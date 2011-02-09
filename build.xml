@@ -60,12 +60,11 @@
       <classpath refid="running.class.path"/>
       <arg value="SELECT x,y||y AS yy FROM t WHERE z > 3.14 AND w IS NOT NULL OR y LIKE 'f%'"/>
       <arg value="SELECT DISTINCT MAX(x),y||y AS yy FROM t WHERE z > 3.14 AND w IS NOT NULL OR y LIKE 'f%' GROUP BY yy HAVING yy > 'z' ORDER BY yyo NULLS FIRST"/>
-      <!--
       <arg value="INSERT INTO t1(x,y,z) VALUES(1, X'DEADBEEF', 3 * 10)"/>
       <arg value="INSERT INTO t1 SELECT x,y,z FROM t"/>
       <arg value="DELETE FROM t WHERE x in (1,2,?)"/>
+      <arg value="UPDATE t SET x = null, y = y + 1 WHERE x &lt;= 4"/>
       <arg value="CREATE TABLE t2 AS (SELECT * FROM t1) WITH NO DATA"/>
-      -->
     </java>
   </target> 
 

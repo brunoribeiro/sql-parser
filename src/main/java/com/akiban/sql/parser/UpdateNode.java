@@ -88,11 +88,6 @@ public final class UpdateNode extends DMLModStatementNode
 
   public void printSubNodes(int depth) {
     super.printSubNodes(depth);
-
-    if (targetTableName != null) {
-      printLabel(depth, "targetTableName: ");
-      targetTableName.treePrint(depth + 1);
-    }
   }
 
   /**
