@@ -36,10 +36,14 @@ public class NodeToString
       return updateNode((UpdateNode)node);
     case NodeTypes.DELETE_NODE:
       return deleteNode((DeleteNode)node);
+    case NodeTypes.SUBQUERY_NODE:
+      return subqueryNode((SubqueryNode)node);
     case NodeTypes.RESULT_COLUMN_LIST:
       return resultColumnList((ResultColumnList)node);
     case NodeTypes.RESULT_COLUMN:
       return resultColumn((ResultColumn)node);
+    case NodeTypes.ALL_RESULT_COLUMN:
+      return allResultColumn((AllResultColumn)node);
     case NodeTypes.FROM_LIST:
       return fromList((FromList)node);
     case NodeTypes.GROUP_BY_LIST:
@@ -169,7 +173,7 @@ public class NodeToString
     // Cf. Parser's getUpdateNode().
     SelectNode snode = (SelectNode)unode.getResultSetNode();
     StringBuilder str = new StringBuilder("UPDATE ");
-    str.append(toString(unode.getTargetTableName()));
+    str.append(toString(snode.getFromList().get(0)));
     str.append(" SET ");
     boolean first = true;
     for (ResultColumn col : snode.getResultColumns()) {
@@ -192,12 +196,58 @@ public class NodeToString
     // Cf. Parser's getDeleteNode().
     SelectNode snode = (SelectNode)dnode.getResultSetNode();
     StringBuilder str = new StringBuilder("DELETE FROM ");
-    str.append(toString(dnode.getTargetTableName()));
+    str.append(toString(snode.getFromList().get(0)));
     if (snode.getWhereClause() != null) {
       str.append(" WHERE ");
       str.append(toString(snode.getWhereClause()));
     }
     return str.toString();
+  }
+
+  protected String subqueryNode(SubqueryNode node) throws StandardException {
+    String str = toString(node.getResultSet());
+    if (node.getOrderByList() != null) {
+      str = str + " " + toString(node.getOrderByList());
+    }
+    str = "(" + str + ")";
+    switch (node.getSubqueryType()) {
+    case FROM:
+    case EXPRESSION:
+    default:
+      return str;
+    case EXISTS:
+      return "EXISTS " + str;
+    case NOT_EXISTS:
+      return "NOT EXISTS " + str;
+    case IN:
+      return maybeParens(node.getLeftOperand()) + " IN " + str;
+    case NOT_IN:
+      return maybeParens(node.getLeftOperand()) + " NOT IN " + str;
+    case EQ_ANY:
+      return maybeParens(node.getLeftOperand()) + " = ANY " + str;
+    case EQ_ALL:
+      return maybeParens(node.getLeftOperand()) + " = ALL " + str;
+    case NE_ANY:
+      return maybeParens(node.getLeftOperand()) + " <> ANY " + str;
+    case NE_ALL:
+      return maybeParens(node.getLeftOperand()) + " <> ALL " + str;
+    case GT_ANY:
+      return maybeParens(node.getLeftOperand()) + " > ANY " + str;
+    case GT_ALL:
+      return maybeParens(node.getLeftOperand()) + " > ALL " + str;
+    case GE_ANY:
+      return maybeParens(node.getLeftOperand()) + " >= ANY " + str;
+    case GE_ALL:
+      return maybeParens(node.getLeftOperand()) + " > ANY " + str;
+    case LT_ANY:
+      return maybeParens(node.getLeftOperand()) + " < ANY " + str;
+    case LT_ALL:
+      return maybeParens(node.getLeftOperand()) + " < ALL " + str;
+    case LE_ANY:
+      return maybeParens(node.getLeftOperand()) + " <= ANY " + str;
+    case LE_ALL:
+      return maybeParens(node.getLeftOperand()) + " <= ALL " + str;
+    }
   }
 
   protected String rowResultSetNode(RowResultSetNode node) throws StandardException {
@@ -212,12 +262,16 @@ public class NodeToString
     if (node.getReference() != null)
       return toString(node.getReference());
 
-    String x = toString(node.getExpression());
+    String x = maybeParens(node.getExpression());
     String n = node.getName();
     if ((n == null) || n.equals(x))
       return x;
     else
       return x + " AS " + n;
+  }
+
+  protected String allResultColumn(AllResultColumn node) throws StandardException {
+    return "*";
   }
 
   protected String fromList(FromList node) throws StandardException {
@@ -246,7 +300,7 @@ public class NodeToString
   }
 
   protected String groupByColumn(GroupByColumn node) throws StandardException {
-    return toString(node.getColumnExpression());
+    return maybeParens(node.getColumnExpression());
   }
 
   protected String orderByList(OrderByList node) throws StandardException {
@@ -254,7 +308,7 @@ public class NodeToString
   }
 
   protected String orderByColumn(OrderByColumn node) throws StandardException {
-    String result = toString(node.getExpression());
+    String result = maybeParens(node.getExpression());
     if (!node.isAscending()) {
       result += " DESC";
     }
@@ -309,7 +363,7 @@ public class NodeToString
   }
 
   protected String valueNodeList(ValueNodeList node) throws StandardException {
-    return nodeList(node);
+    return nodeList(node, true);
   }
 
   protected String betweenOperatorNode(BetweenOperatorNode node)
@@ -349,6 +403,11 @@ public class NodeToString
   
   protected String nodeList(QueryTreeNodeList<? extends QueryTreeNode> nl)
       throws StandardException {
+    return nodeList(nl, false);
+  }
+
+  protected String nodeList(QueryTreeNodeList<? extends QueryTreeNode> nl, boolean expr)
+      throws StandardException {
     StringBuilder str = new StringBuilder();
     boolean first = true;
     for (QueryTreeNode node : nl) {
@@ -356,7 +415,7 @@ public class NodeToString
         first = false;
       else
         str.append(", ");
-      str.append(maybeParens(node));
+      str.append(expr ? maybeParens(node) : toString(node));
     }
     return str.toString();
   }

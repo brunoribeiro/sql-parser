@@ -78,10 +78,10 @@ public class SubqueryNode extends ValueNode
   ** for building a derived table.  Derived tables can be multi-column and 
   ** multi-table.
   */
-  ResultSetNode resultSet;
+  private ResultSetNode resultSet;
 
   /* Type of this subquery */
-  SubqueryType subqueryType;
+  private SubqueryType subqueryType;
 
   /* Since we do not have separate subquery operator nodes, the
    * type of the subquery is stored in the subqueryType field.  Most subquery
@@ -90,7 +90,7 @@ public class SubqueryNode extends ValueNode
    * types that take a left operand.  We have decided to add the left operand
    * here for now.
    */
-  ValueNode leftOperand;
+  private ValueNode leftOperand;
 
   private OrderByList orderByList;
   private ValueNode   offset;
@@ -244,6 +244,10 @@ public class SubqueryNode extends ValueNode
    */
   public ValueNode getFetchFirst() {
     return fetchFirst;
+  }
+
+  public ValueNode getLeftOperand() {
+    return leftOperand;
   }
 
 }
