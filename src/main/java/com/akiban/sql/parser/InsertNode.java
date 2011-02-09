@@ -65,8 +65,8 @@ import java.util.Properties;
  */
 public final class InsertNode extends DMLModStatementNode
 {
-  public ResultColumnList targetColumnList;
-  public Properties targetProperties;
+  private ResultColumnList targetColumnList;
+  private Properties targetProperties;
   private OrderByList orderByList;
   private ValueNode offset;
   private ValueNode fetchFirst;
@@ -137,11 +137,6 @@ public final class InsertNode extends DMLModStatementNode
   public void printSubNodes(int depth) {
     super.printSubNodes(depth);
 
-    if (targetTableName != null) {
-      printLabel(depth, "targetTableName: ");
-      targetTableName.treePrint(depth + 1);
-    }
-
     if (targetColumnList != null) {
       printLabel(depth, "targetColumnList: ");
       targetColumnList.treePrint(depth + 1);
@@ -183,6 +178,26 @@ public final class InsertNode extends DMLModStatementNode
       }
     }
     return retval;
+  }
+
+  public ResultColumnList getTargetColumnList() {
+    return targetColumnList;
+  }
+
+  public Properties getTargetProperties() {
+    return targetProperties;
+  }
+
+  public OrderByList getOrderByList() {
+    return orderByList;
+  }
+
+  public ValueNode getOffset() {
+    return offset;
+  }
+
+  public ValueNode getFetchFirst() {
+    return fetchFirst;
   }
 
   /**

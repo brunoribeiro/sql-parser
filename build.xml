@@ -59,11 +59,12 @@
     <java classname="com.akiban.sql.unparser.NodeToString" fork="yes" failonerror="yes">
       <classpath refid="running.class.path"/>
       <arg value="SELECT x,y||y AS yy FROM t WHERE z > 3.14 AND w IS NOT NULL OR y LIKE 'f%'"/>
+      <arg value="SELECT DISTINCT MAX(x),y||y AS yy FROM t WHERE z > 3.14 AND w IS NOT NULL OR y LIKE 'f%' GROUP BY yy HAVING yy > 'z' ORDER BY yyo NULLS FIRST"/>
       <!--
-      <arg value="INSERT INTO t1 VALUES(1, 'foo', 3 * 10)"/>
+      <arg value="INSERT INTO t1(x,y,z) VALUES(1, X'DEADBEEF', 3 * 10)"/>
       <arg value="INSERT INTO t1 SELECT x,y,z FROM t"/>
+      <arg value="DELETE FROM t WHERE x in (1,2,?)"/>
       <arg value="CREATE TABLE t2 AS (SELECT * FROM t1) WITH NO DATA"/>
-      <arg value="DELETE FROM t WHERE x in (1,2,3)"/>
       -->
     </java>
   </target> 

@@ -45,7 +45,7 @@ import com.akiban.sql.StandardException;
  *
  */
 
-abstract class DMLModStatementNode extends DMLStatementNode
+public abstract class DMLModStatementNode extends DMLStatementNode
 {
   protected FromVTI targetVTI;
   protected TableName targetTableName;
@@ -93,6 +93,10 @@ abstract class DMLModStatementNode extends DMLStatementNode
    */
   public boolean isAtomic() {
     return true;
+  }
+
+  public TableName getTargetTableName() {
+    return targetTableName;
   }
 
   /**

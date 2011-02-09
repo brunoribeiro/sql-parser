@@ -94,4 +94,16 @@ public class AggregateNode extends UnaryOperatorNode
     return distinct;
   }
 
+  /**
+   * Convert this object to a String.  See comments in QueryTreeNode.java
+   * for how this should be done for tree printing.
+   *
+   * @return This object as a String
+   */
+
+  public String toString() {
+    return "aggregateName: " + aggregateName + "\n" +
+      super.toString();
+  }
+
 }

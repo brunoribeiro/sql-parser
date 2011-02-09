@@ -30,18 +30,30 @@ public class NodeToString
       return cursorNode((CursorNode)node);
     case NodeTypes.SELECT_NODE:
       return selectNode((SelectNode)node);
+    case NodeTypes.INSERT_NODE:
+      return insertNode((InsertNode)node);
     case NodeTypes.RESULT_COLUMN_LIST:
       return resultColumnList((ResultColumnList)node);
     case NodeTypes.RESULT_COLUMN:
       return resultColumn((ResultColumn)node);
     case NodeTypes.FROM_LIST:
       return fromList((FromList)node);
+    case NodeTypes.GROUP_BY_LIST:
+      return groupByList((GroupByList)node);
+    case NodeTypes.ORDER_BY_LIST:
+      return orderByList((OrderByList)node);
     case NodeTypes.FROM_BASE_TABLE:
       return fromBaseTable((FromBaseTable)node);
     case NodeTypes.TABLE_NAME:
       return tableName((TableName)node);
     case NodeTypes.COLUMN_REFERENCE:
       return columnReference((ColumnReference)node);
+    case NodeTypes.ROW_RESULT_SET_NODE:
+      return rowResultSetNode((RowResultSetNode)node);
+    case NodeTypes.GROUP_BY_COLUMN:
+      return groupByColumn((GroupByColumn)node);
+    case NodeTypes.ORDER_BY_COLUMN:
+      return orderByColumn((OrderByColumn)node);
     case NodeTypes.AND_NODE:
     case NodeTypes.OR_NODE:
       return binaryLogicalOperatorNode((BinaryLogicalOperatorNode)node);
@@ -66,6 +78,8 @@ public class NodeToString
       return isNullnode((IsNullNode)node);
     case NodeTypes.LIKE_OPERATOR_NODE:
       return likeEscapeOperatorNode((LikeEscapeOperatorNode)node);
+    case NodeTypes.AGGREGATE_NODE:
+      return aggregateNode((AggregateNode)node);
     case NodeTypes.UNTYPED_NULL_CONSTANT_NODE:
     case NodeTypes.SQL_BOOLEAN_CONSTANT_NODE:
     case NodeTypes.BOOLEAN_CONSTANT_NODE:
@@ -93,11 +107,17 @@ public class NodeToString
   }
 
   protected String cursorNode(CursorNode node) throws StandardException {
-    return toString(node.getResultSetNode());
+    String result = toString(node.getResultSetNode());
+    if (node.getOrderByList() != null) {
+      result += " " + toString(node.getOrderByList());
+    }
+    return result;
   }
 
   protected String selectNode(SelectNode node) throws StandardException {
     StringBuilder str = new StringBuilder("SELECT ");
+    if (node.isDistinct())
+      str.append("DISTINCT ");
     str.append(toString(node.getResultColumns()));
     str.append(" FROM ");
     str.append(toString(node.getFromList()));
@@ -105,17 +125,49 @@ public class NodeToString
       str.append(" WHERE ");
       str.append(toString(node.getWhereClause()));
     }
+    if (node.getGroupByList() != null) {
+      str.append(" ");
+      str.append(toString(node.getGroupByList()));
+    }
+    if (node.getHavingClause() != null) {
+      str.append(" HAVING ");
+      str.append(toString(node.getHavingClause()));
+    }
     return str.toString();
+  }
+
+  protected String insertNode(InsertNode node) throws StandardException {
+    StringBuilder str = new StringBuilder("INSERT INTO ");
+    str.append(toString(node.getTargetTableName()));
+    if (node.getTargetColumnList() != null) {
+      str.append("(");
+      str.append(toString(node.getTargetColumnList()));
+      str.append(")");
+    }
+    str.append(" ");
+    str.append(toString(node.getResultSetNode()));
+    if (node.getOrderByList() != null) {
+      str.append(" ");
+      str.append(toString(node.getOrderByList()));
+    }
+    return str.toString();
+  }
+
+  protected String rowResultSetNode(RowResultSetNode node) throws StandardException {
+    return "VALUES(" + toString(node.getResultColumns()) + ")";
   }
 
   protected String resultColumnList(ResultColumnList node) throws StandardException {
     return nodeList(node);
   }
-
+  
   protected String resultColumn(ResultColumn node) throws StandardException {
+    if (node.getReference() != null)
+      return toString(node.getReference());
+
     String x = toString(node.getExpression());
     String n = node.getName();
-    if (x.equals(n))
+    if ((n == null) || n.equals(x))
       return x;
     else
       return x + " AS " + n;
@@ -140,6 +192,29 @@ public class NodeToString
 
   protected String columnReference(ColumnReference node) throws StandardException {
     return node.getSQLColumnName();
+  }
+
+  protected String groupByList(GroupByList node) throws StandardException {
+    return "GROUP BY " + nodeList(node);
+  }
+
+  protected String groupByColumn(GroupByColumn node) throws StandardException {
+    return toString(node.getColumnExpression());
+  }
+
+  protected String orderByList(OrderByList node) throws StandardException {
+    return "ORDER BY " + nodeList(node);
+  }
+
+  protected String orderByColumn(OrderByColumn node) throws StandardException {
+    String result = toString(node.getExpression());
+    if (!node.isAscending()) {
+      result += " DESC";
+    }
+    if (node.isNullsOrderedLow()) {
+      result += " NULLS FIRST";
+    }
+    return result;
   }
 
   protected String binaryLogicalOperatorNode(BinaryLogicalOperatorNode node) 
@@ -168,6 +243,10 @@ public class NodeToString
 
   protected String isNullnode(IsNullNode node) throws StandardException {
     return suffixUnary(node);
+  }
+
+  protected String aggregateNode(AggregateNode node) throws StandardException {
+    return node.getAggregateName() + "(" + toString(node.getOperand()) + ")";
   }
 
   protected String likeEscapeOperatorNode(LikeEscapeOperatorNode node) 
@@ -229,7 +308,7 @@ public class NodeToString
   protected String hexConstant(byte[] value) {
     StringBuilder str = new StringBuilder("X'");
     for (byte b : value) {
-      str.append(Integer.toString((int)b & 0xFF, 16));
+      str.append(Integer.toString((int)b & 0xFF, 16).toUpperCase());
     }
     str.append("'");
     return str.toString();

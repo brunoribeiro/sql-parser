@@ -87,6 +87,10 @@ public class OrderByColumn extends OrderedColumn
     }
   }
 
+  public ValueNode getExpression() {
+    return expression;
+  }
+
   /**
    * Mark the column as descending order
    */

@@ -37,8 +37,6 @@
 
 package com.akiban.sql.parser;
 
-import java.util.List;
-
 /**
  * A RowResultSetNode represents the result set for a VALUES clause.
  *
@@ -46,11 +44,6 @@ import java.util.List;
 
 public class RowResultSetNode extends FromTable
 {
-  SubqueryList subquerys;
-  List aggregateList;
-  OrderByList orderByList;
-  ValueNode offset;             // OFFSET n ROWS
-  ValueNode fetchFirst;         // FETCH FIRST n ROWS ONLY
 
   /**
    * Initializer for a RowResultSetNode.
@@ -73,9 +66,7 @@ public class RowResultSetNode extends FromTable
    */
 
   public String toString() {
-    return "orderByList: " + 
-      (orderByList != null ? orderByList.toString() : "null") + "\n" +
-      super.toString();
+    return super.toString();
   }
 
   public String statementToString() {
@@ -91,11 +82,6 @@ public class RowResultSetNode extends FromTable
 
   public void printSubNodes(int depth) {
     super.printSubNodes(depth);
-
-    if (subquerys != null) {
-      printLabel(depth, "subquerys: ");
-      subquerys.treePrint(depth + 1);
-    }
   }
 
 }
