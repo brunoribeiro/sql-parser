@@ -39,9 +39,9 @@ package com.akiban.sql.parser;
 
 import com.akiban.sql.types.ValueClassName;
 
-abstract class BinaryLogicalOperatorNode extends BinaryOperatorNode
+public abstract class BinaryLogicalOperatorNode extends BinaryOperatorNode
 {
-  boolean shortCircuitValue;
+  protected boolean shortCircuitValue;
 
   /**
    * Initializer for a BinaryLogicalOperatorNode

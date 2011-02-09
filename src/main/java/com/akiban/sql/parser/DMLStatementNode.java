@@ -69,7 +69,7 @@ abstract class DMLStatementNode extends StatementNode
    * the binding phase?).
    *
    */
-  ResultSetNode resultSet;
+  private ResultSetNode resultSet;
 
   /**
    * Initializer for a DMLStatementNode
@@ -90,11 +90,10 @@ abstract class DMLStatementNode extends StatementNode
    */
 
   public void printSubNodes(int depth) {
-    if (resultSet != null)
-      {
-        printLabel(depth, "resultSet: ");
-        resultSet.treePrint(depth + 1);
-      }
+    if (resultSet != null) {
+      printLabel(depth, "resultSet: ");
+      resultSet.treePrint(depth + 1);
+    }
   }
 
   /**

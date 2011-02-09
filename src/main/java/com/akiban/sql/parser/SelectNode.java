@@ -59,7 +59,7 @@ public class SelectNode extends ResultSetNode
   /**
    * List of tables in the FROM clause of this SELECT
    */
-  FromList fromList;
+  private FromList fromList;
 
   /**
    * The ValueNode for the WHERE clause must represent a boolean
@@ -67,28 +67,25 @@ public class SelectNode extends ResultSetNode
    * does not have enough information to enforce it in all cases
    * (for example, user methods that return boolean).
    */
-  ValueNode whereClause;
+  private ValueNode whereClause;
 
   /**
    * List of result columns in GROUP BY clause
    */
-  GroupByList groupByList;
+  private GroupByList groupByList;
 
   /**
    * List of windows.
    */
-  WindowList windows;
+  private WindowList windows;
 
-  /* List of columns in ORDER BY list */
-  OrderByList orderByList;
+  /** List of columns in ORDER BY list */
+  private OrderByList orderByList;
 
   private boolean isDistinct;
 
-  private boolean orderByAndDistinctMerged;
+  private ValueNode havingClause;
 
-  ValueNode havingClause;
-
-  private int nestingLevel;
   public void init(Object selectList,
                    Object aggregateList,
                    Object fromList,
@@ -143,7 +140,7 @@ public class SelectNode extends ResultSetNode
     isDistinct = false;
   }
 
-  boolean hasDistinct() {
+  public boolean isDistinct() {
     return isDistinct;
   }
 
@@ -207,6 +204,14 @@ public class SelectNode extends ResultSetNode
     return whereClause;
   }
 
+  public GroupByList getGroupByList() {
+    return groupByList;
+  }
+
+  public ValueNode getHavingClause() {
+    return havingClause;
+  }
+
   /** 
    * Determine whether or not the specified name is an exposed name in
    * the current query block.
@@ -260,6 +265,10 @@ public class SelectNode extends ResultSetNode
    */
   public boolean hasWindows() {
     return windows != null;
+  }
+
+  public WindowList getWindows() {
+    return windows;
   }
 
 }

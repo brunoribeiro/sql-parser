@@ -52,16 +52,16 @@ import java.util.List;
 
 public class CursorNode extends DMLStatementNode
 {
-  public final static int UNSPECIFIED = 0;
-  public final static int READ_ONLY = 1;
-  public final static int UPDATE = 2;
+  public static enum UpdateMode {
+    UNSPECIFIED, READ_ONLY, UPDATE
+  }
 
   private String name;
   private OrderByList orderByList;
   private ValueNode offset;     // <result offset clause> value
   private ValueNode fetchFirst; // <fetch first clause> value
   private String statementType;
-  private int updateMode;
+  private UpdateMode updateMode;
   private IsolationLevel scanIsolationLevel = IsolationLevel.UNSPECIFIED_ISOLATION_LEVEL;
 
   /**
@@ -104,7 +104,7 @@ public class CursorNode extends DMLStatementNode
     this.orderByList = (OrderByList)orderByList;
     this.offset = (ValueNode)offset;
     this.fetchFirst = (ValueNode)fetchFirst;
-    this.updateMode = ((Integer)updateMode).intValue();
+    this.updateMode = (UpdateMode)updateMode;
     this.updatableColumns = (List<String>)updatableColumns;
   }
 
@@ -121,36 +121,12 @@ public class CursorNode extends DMLStatementNode
 
   public String toString() {
     return "name: " + name + "\n" +
-      "updateMode: " + updateModeString(updateMode) + "\n" +
+      "updateMode: " + updateMode + "\n" +
       super.toString();
   }
 
   public String statementToString() {
     return statementType;
-  }
-
-  /**
-   * Support routine for translating an updateMode identifier to a String
-   *
-   * @param updateMode An updateMode identifier
-   *
-   * @return A String representing the update mode.
-   */
-
-  private static String updateModeString(int updateMode) {
-    switch (updateMode) {
-    case UNSPECIFIED:
-      return "UNSPECIFIED (" + UNSPECIFIED + ")";
-
-    case READ_ONLY:
-      return "READ_ONLY (" + READ_ONLY + ")";
-
-    case UPDATE:
-      return "UPDATE (" + UPDATE + ")";
-
-    default:
-      return "UNKNOWN VALUE (" + updateMode + ")";
-    }
   }
 
   /**
@@ -169,40 +145,37 @@ public class CursorNode extends DMLStatementNode
     }
   }
 
-  public int getUpdateMode() {
+  public String getName() {
+    return name;
+  }
+
+  public OrderByList getOrderByList() {
+    return orderByList;
+  }
+
+  public ValueNode getOffsetClause() {
+    return offset;
+  }
+
+  public ValueNode getFetchFirstClause() {
+    return fetchFirst;
+  }
+
+  public UpdateMode getUpdateMode() {
     return updateMode;
   }
 
-  /**
-   * Return String[] of names from the FOR UPDATE OF List
-   *
-   * @return String[] of names from the FOR UPDATE OF list.
-   */
-  private String[] getUpdatableColumns() {
-    return (updatableColumns == null) ?
-      (String[])null :
-      getUpdateColumnNames();
+  public IsolationLevel getScanIsolationLevel() {
+    return scanIsolationLevel;
   }
 
   /**
-   * Get an array of strings for each updatable column
-   * in this list.
+   * Return collection of names from the FOR UPDATE OF List
    *
-   * @return an array of strings
+   * @return List<String> of names from the FOR UPDATE OF list.
    */
-  private String[] getUpdateColumnNames() {
-    int size = updatableColumns.size();
-    if (size == 0) {
-      return (String[])null;
-    }
-
-    String[] names = new String[size];
-    updatableColumns.toArray(names);
-    return names;
-  }
-
-  public String getXML() {
-    return null;
+  public List<String> getUpdatableColumns() {
+    return updatableColumns;
   }
 
 }

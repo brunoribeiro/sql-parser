@@ -57,7 +57,7 @@ import com.akiban.sql.types.TypeId;
  * in the constructor of the generated method.  Ideally
  * we would have just 
  */
-abstract class ConstantNode extends ValueNode
+public abstract class ConstantNode extends ValueNode
 {
   Object value;
 

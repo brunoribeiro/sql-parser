@@ -50,7 +50,7 @@ import java.util.List;
  *
  */
 
-abstract class QueryTreeNodeList<N extends QueryTreeNode> 
+public abstract class QueryTreeNodeList<N extends QueryTreeNode> 
   extends QueryTreeNode implements Iterable<N>
 {
   private List<N> list = new ArrayList<N>();

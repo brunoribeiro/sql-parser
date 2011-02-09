@@ -49,24 +49,14 @@ import com.akiban.sql.StandardException;
 
 public class ColumnReference extends ValueNode
 {
-  String columnName;
+  private String columnName;
 
   /*
   ** This is the user-specified table name.  It will be null if the
   ** user specifies a column without a table name.  Leave it null even
   ** when the column is bound as it is only used in binding.
   */
-  TableName tableName;
-
-  /**
-   * The FromTable this column reference is bound to.
-   */
-  private int tableNumber;
-
-  /**
-   * The column number in the underlying FromTable.
-   */
-  private int columnNumber;
+  private TableName tableName;
 
   /**
    * Initializer.
@@ -89,7 +79,6 @@ public class ColumnReference extends ValueNode
     this.tableName = (TableName)tableName;
     this.setBeginOffset(((Integer)tokBeginOffset).intValue());
     this.setEndOffset(((Integer)tokEndOffset).intValue());
-    tableNumber = -1;
   }
 
   /**
@@ -102,7 +91,6 @@ public class ColumnReference extends ValueNode
   public void init(Object columnName, Object tableName) {
     this.columnName = (String)columnName;
     this.tableName = (TableName)tableName;
-    tableNumber = -1;
   }
 
   /**
@@ -114,8 +102,6 @@ public class ColumnReference extends ValueNode
 
   public String toString() {
     return "columnName: " + columnName + "\n" +
-      "tableNumber: " + tableNumber + "\n" +
-      "columnNumber: " + columnNumber + "\n" +
       "tableName: " + ( ( tableName != null) ?
                         tableName.toString() :
                         "null") + "\n" +
@@ -139,7 +125,7 @@ public class ColumnReference extends ValueNode
    * name as used in the SQL statement. Thus if it was qualified
    * with a table, alias name that will be included.
    *
-   * @return The  column name in the form [[schema.]table.]column
+   * @return The column name in the form [[schema.]table.]column
    */
 
   public String getSQLColumnName() {
@@ -157,28 +143,6 @@ public class ColumnReference extends ValueNode
 
   public String getColumnName() {
     return columnName;
-  }
-
-  /**
-   * Get the table number for this ColumnReference.
-   *
-   * @return int The table number for this ColumnReference
-   */
-
-  public int getTableNumber() {
-    return tableNumber;
-  }
-
-  /**
-   * Set this ColumnReference to refer to the given table number.
-   *
-   * @param tableNumber The table number this ColumnReference will refer to
-   */
-
-  public void setTableNumber(int tableNumber)
-  {
-    assert tableNumber != -1;
-    this.tableNumber = tableNumber;
   }
 
   /**
@@ -208,27 +172,6 @@ public class ColumnReference extends ValueNode
   }
 
   /**
-   * Get the column number for this ColumnReference.
-   *
-   * @return int The column number for this ColumnReference
-   */
-
-  public int getColumnNumber() {
-    return columnNumber;
-  }
-
-  /**
-   * Set the column number for this ColumnReference.  This is
-   * used when scoping predicates for pushdown.
-   *
-   * @param colNum The new column number.
-   */
-
-  public void setColumnNumber(int colNum) {
-    this.columnNumber = colNum;
-  }
-
-  /**
    * Get the user-supplied schema name of this column.  This will be null
    * if the user did not supply a name (for example, select t.a from t).
    * Another example for null return value (for example, select b.a from t as b).
@@ -248,8 +191,13 @@ public class ColumnReference extends ValueNode
       return false;
     }
     ColumnReference other = (ColumnReference)o;
-    return (tableNumber == other.tableNumber 
-            && columnName.equals(other.getColumnName()));
+    if (!columnName.equals(other.getColumnName())) {
+      return false;
+    }
+    if (tableName == null)
+      return other.tableName == null;
+    else
+      return tableName.equals(other.tableName);
   }
 
 }

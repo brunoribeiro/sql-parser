@@ -50,11 +50,11 @@ import com.akiban.sql.types.ValueClassName;
 
 public class UnaryOperatorNode extends ValueNode
 {
-  String operator;
-  String methodName;
+  protected String operator;
+  protected String methodName;
 
-  String resultInterfaceType;
-  String receiverInterfaceType;
+  protected String resultInterfaceType;
+  protected String receiverInterfaceType;
 
   /**
    * WARNING: operand may be NULL for COUNT(*).  
@@ -102,7 +102,7 @@ public class UnaryOperatorNode extends ValueNode
    *
    * @return The operator of this unary operator.
    */
-  String getOperatorString() {
+  public String getOperator() {
     return operator;
   }
 
@@ -113,6 +113,10 @@ public class UnaryOperatorNode extends ValueNode
    */
   void setMethodName(String methodName) {
     this.methodName = methodName;
+  }
+
+  public String getMethodName() {
+    return methodName;
   }
 
   /**

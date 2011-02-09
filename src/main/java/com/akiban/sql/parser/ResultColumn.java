@@ -67,17 +67,17 @@ public class ResultColumn extends ValueNode
    * derived column list, in which case name will point to the underlying name
    * and exposedName will point to the name from the derived column list.
    */
-  String name;
-  String exposedName;
-  String tableName;
-  ValueNode expression;
+  private String name;
+  private String exposedName;
+  private String tableName;
+  private ValueNode expression;
   private boolean defaultColumn;
 
   // tells us if this ResultColumn represents an autoincrement column in a
   // base table.
-  boolean autoincrement;
+  private boolean autoincrement;
 
-  ColumnReference reference; // used to verify quals at bind time, if given.
+  private ColumnReference reference; // used to verify quals at bind time, if given.
 
   /* virtualColumnId is the ResultColumn's position (1-based) within the ResultSet */
   private int virtualColumnId;

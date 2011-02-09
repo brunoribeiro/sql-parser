@@ -50,20 +50,20 @@ import com.akiban.sql.types.ValueClassName;
 
 public class BinaryOperatorNode extends ValueNode
 {
-  String operator;
-  String methodName;
+  protected String operator;
+  protected String methodName;
 
   public static enum OperatorType {
     PLUS, MINUS, TIMES, DIVIDE, CONCATENATE,
     EQ, NE, GT, GE, LT, LE, AND, OR, LIKE
   }
 
-  ValueNode leftOperand;
-  ValueNode rightOperand;
+  protected ValueNode leftOperand;
+  protected ValueNode rightOperand;
 
-  String leftInterfaceType;
-  String rightInterfaceType;
-  String resultInterfaceType;
+  protected String leftInterfaceType;
+  protected String rightInterfaceType;
+  protected String resultInterfaceType;
 
   /**
    * Initializer for a BinaryOperatorNode
@@ -117,6 +117,10 @@ public class BinaryOperatorNode extends ValueNode
     this.operator = operator;
   }
 
+  public String getOperator() {
+    return operator;
+  }
+
   /**
    * Set the methodName.
    *
@@ -124,6 +128,10 @@ public class BinaryOperatorNode extends ValueNode
    */
   void setMethodName(String methodName) {
     this.methodName = methodName;
+  }
+
+  public String getMethodName() {
+    return methodName;
   }
 
   /**

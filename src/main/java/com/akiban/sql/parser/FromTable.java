@@ -50,17 +50,17 @@ import java.util.Properties;
  * @see ProjectRestrictNode
  *
  */
-abstract class FromTable extends ResultSetNode
+public abstract class FromTable extends ResultSetNode
 {
-  Properties tableProperties;
-  String correlationName;
-  TableName corrTableName;
-  int tableNumber;
+  protected Properties tableProperties;
+  protected String correlationName;
+  private TableName corrTableName;
+
   /* (Query block) level is 0-based. */
   /* RESOLVE - View resolution will have to update the level within
    * the view tree.
    */
-  int level;
+  private int level;
 
   /** the original unbound table name */
   protected TableName origTableName;
@@ -94,7 +94,6 @@ abstract class FromTable extends ResultSetNode
     return "correlation Name: " + correlationName + "\n" +
       (corrTableName != null ?
        corrTableName.toString() : "null") + "\n" +
-      "tableNumber " + tableNumber + "\n" +
       "level " + level + "\n" +
       super.toString();
   }
@@ -113,7 +112,6 @@ abstract class FromTable extends ResultSetNode
     if (corrTableName == null) {
       corrTableName = makeTableName(null, correlationName);
     }
-
     return corrTableName;
   }
 

@@ -2766,7 +2766,7 @@ deleteBody() throws StandardException :
       fromTable = (FromTable)nodeFactory.getNode(NodeTypes.FROM_BASE_TABLE,
                                                  tableName,
                                                  correlationName,
-                                                 FromBaseTable.DELETE,
+                                                 FromBaseTable.UpdateOrDelete.DELETE,
                                                  null,
                                                  parserContext);
 
@@ -2808,7 +2808,7 @@ preparableSelectStatement() throws StandardException :
 {
   ResultSetNode queryExpression;
   List<String> updateColumns = new ArrayList<String>();
-  int forUpdateState = CursorNode.UNSPECIFIED;
+  CursorNode.UpdateMode forUpdateState = CursorNode.UpdateMode.UNSPECIFIED;
   IsolationLevel isolationLevel = IsolationLevel.UNSPECIFIED_ISOLATION_LEVEL;
   CursorNode retval;
   OrderByList orderCols = null;
@@ -2834,7 +2834,7 @@ preparableSelectStatement() throws StandardException :
                                              offset,
                                              fetchFirst,
                                              forUpdateState,
-                                             (forUpdateState == CursorNode.READ_ONLY ? null : updateColumns),
+                                             (forUpdateState == CursorNode.UpdateMode.READ_ONLY ? null : updateColumns),
                                              parserContext);
 
     /* Set the isolation levels for the scans if specified */
@@ -2955,7 +2955,7 @@ updateBody() throws StandardException :
       fromTable = (FromTable)nodeFactory.getNode(NodeTypes.FROM_BASE_TABLE,
                                                  tableName,
                                                  correlationName,
-                                                 FromBaseTable.UPDATE,
+                                                 FromBaseTable.UpdateOrDelete.UPDATE,
                                                  null,
                                                  parserContext);
 
@@ -3034,7 +3034,7 @@ bareCallStatement() throws StandardException :
                           null,
                           null,
                           null,
-                          CursorNode.READ_ONLY,
+                          CursorNode.UpdateMode.READ_ONLY,
                           null,
                           parserContext);
 
@@ -4387,7 +4387,7 @@ derivedColumn(ResultColumnList resultColumns) throws StandardException :
      * column, use the name of the column as the result column name.
      */
     if ((columnName == null) && (columnExpression instanceof ColumnReference)) {
-      columnName = ((ColumnReference)columnExpression).columnName;
+      columnName = ((ColumnReference)columnExpression).getColumnName();
     }
     return (ResultColumn)nodeFactory.getNode(NodeTypes.RESULT_COLUMN,
                                              columnName,
@@ -6956,25 +6956,23 @@ fetchFirstClause() throws StandardException :
   }
 }
 
-int
+CursorNode.UpdateMode
 forUpdateClause(List<String> columnList) throws StandardException :
-{
-  int retval;
-}
+{}
 {
   <UPDATE> [ <OF> forUpdateColumnList(columnList) ]
   {
-    return CursorNode.UPDATE;
+    return CursorNode.UpdateMode.UPDATE;
   }
 |
   <READ> <ONLY>
   {
-    return CursorNode.READ_ONLY;
+    return CursorNode.UpdateMode.READ_ONLY;
   }
 |
   <FETCH> <ONLY>
   {
-    return CursorNode.READ_ONLY;
+    return CursorNode.UpdateMode.READ_ONLY;
   }
 }
 

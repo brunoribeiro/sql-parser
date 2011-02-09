@@ -71,12 +71,13 @@ import java.util.Properties;
 
 public class FromBaseTable extends FromTable
 {
-  TableName tableName;
-  int updateOrDelete;
-  private ResultColumnList templateColumns;
+  public static enum UpdateOrDelete {
+    UPDATE, DELETE
+  }
 
-  public static final int UPDATE = 1;
-  public static final int DELETE = 2;
+  private TableName tableName;
+  private UpdateOrDelete updateOrDelete;
+  private ResultColumnList templateColumns;
 
   /**
    * Initializer for a table in a FROM list. Parameters are as follows:
@@ -106,7 +107,7 @@ public class FromBaseTable extends FromTable
     if (arg3 instanceof Integer) {
       init(arg2, null);
       this.tableName = (TableName)arg1;
-      this.updateOrDelete = ((Integer)arg3).intValue();
+      this.updateOrDelete = (UpdateOrDelete)arg3;
       resultColumns = (ResultColumnList)arg4;
     }
     else {
@@ -179,7 +180,7 @@ public class FromBaseTable extends FromTable
    * @return The table name for this table.
    */
 
-  public TableName getTableNameField() {
+  public TableName getTableName() {
     return tableName;
   }
 

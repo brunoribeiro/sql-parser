@@ -361,7 +361,7 @@ public abstract class QueryTreeNode implements Visitable
     this.nodeType = nodeType;
   }
 
-  protected int getNodeType() {
+  public int getNodeType() {
     return nodeType;
   }
 

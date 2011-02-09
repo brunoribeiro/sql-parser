@@ -49,8 +49,8 @@ public class TableName extends QueryTreeNode
   /* Both schemaName and tableName can be null, however, if 
   ** tableName is null then schemaName must also be null.
   */
-  String tableName;
-  String schemaName;
+  private String tableName;
+  private String schemaName;
   private boolean hasSchema;
 
   /**
