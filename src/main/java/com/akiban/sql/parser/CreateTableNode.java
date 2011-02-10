@@ -68,6 +68,7 @@ public class CreateTableNode extends DDLStatementNode
   protected int tableType; //persistent table or global temporary table
   private ResultColumnList resultColumns;
   private ResultSetNode queryExpression;
+  private boolean withData;
 
   /**
    * Initializer for a CreateTableNode for a base table
@@ -181,11 +182,26 @@ public class CreateTableNode extends DDLStatementNode
     } 
     else
       tempString = tempString +
-        (properties != null ?
-         "properties: " + "\n" + properties + "\n" :
-         "") +
+        (properties != null ? "properties: " + "\n" + properties + "\n" : "") +
+        (withData ? "withData: " + withData + "\n" : "") +
         "lockGranularity: " + lockGranularity + "\n";
     return super.toString() +  tempString;
+  }
+
+  public TableElementList getTableElementList() {
+    return tableElementList;
+  }
+
+  public ResultSetNode getQueryExpression() {
+    return queryExpression;
+  }
+
+  public boolean isWithData() {
+    return withData;
+  }
+
+  public void markWithData() {
+    withData = true;
   }
 
   /**
@@ -194,12 +210,14 @@ public class CreateTableNode extends DDLStatementNode
    * @param depth The depth to indent the sub-nodes
    */
   public void printSubNodes(int depth) {
-    printLabel(depth, "tableElementList: ");
     if (tableElementList != null) {
+      printLabel(depth, "tableElementList: ");
       tableElementList.treePrint(depth + 1);
     }
-    if (queryExpression != null)
+    if (queryExpression != null) {
+      printLabel(depth, "queryExpression: ");
       queryExpression.treePrint(depth + 1);
+    }
   }
 
   public String statementToString() {

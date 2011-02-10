@@ -47,14 +47,18 @@ import java.util.Properties;
 
 public class ConstraintDefinitionNode extends TableElementNode
 {
+  public static enum ConstraintType {
+    NOT_NULL, PRIMARY_KEY, UNIQUE, CHECK, DROP, FOREIGN_KEY
+  }
+
   private TableName constraintName;
-  protected int constraintType;
+  protected ConstraintType constraintType;
   protected Properties properties;
-  ResultColumnList columnList;
-  String constraintText;
-  ValueNode checkCondition;
-  private int behavior;
-  private int verifyType = StatementType.DROP_CONSTRAINT; // By default do not check the constraint type
+  private ResultColumnList columnList;
+  private String constraintText;
+  private ValueNode checkCondition;
+  private int behavior;         // A StatementType.DROP_XXX
+  private ConstraintType verifyType = ConstraintType.DROP; // By default do not check the constraint type
 
   public void init(Object constraintName,
                    Object constraintType,
@@ -72,7 +76,7 @@ public class ConstraintDefinitionNode extends TableElementNode
     if (this.constraintName != null) {
       this.name = this.constraintName.getTableName();
     }
-    this.constraintType = ((Integer)constraintType).intValue();
+    this.constraintType = (ConstraintType)constraintType;
     this.properties = (Properties)properties;
     this.columnList = (ResultColumnList)rcl;
     this.checkCondition = (ValueNode)checkCondition;
@@ -105,7 +109,7 @@ public class ConstraintDefinitionNode extends TableElementNode
                    Object verifyType) {
     init(constraintName, constraintType, rcl, properties, checkCondition, 
          constraintText, behavior);
-    this.verifyType = ((Integer)verifyType).intValue();
+    this.verifyType = (ConstraintType)verifyType;
   }
     
   /**
@@ -113,8 +117,12 @@ public class ConstraintDefinitionNode extends TableElementNode
    *
    * @return constraintType The constraint type.
    */
-  int getConstraintType() {
+  public ConstraintType getConstraintType() {
     return constraintType;
+  }
+
+  public ResultColumnList getColumnList() {
+    return columnList;
   }
 
   /**
@@ -153,6 +161,19 @@ public class ConstraintDefinitionNode extends TableElementNode
       "properties: " +
       ((properties != null) ? properties.toString() : "null") + "\n" +
       super.toString();
+  }
+
+  /**
+   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+   * how tree printing is supposed to work.
+   * @param depth The depth to indent the sub-nodes
+   */
+  public void printSubNodes(int depth) {
+    super.printSubNodes(depth);
+    if (columnList != null) {
+      printLabel(depth, "columnList: ");
+      columnList.treePrint(depth + 1);
+    }
   }
 
 }

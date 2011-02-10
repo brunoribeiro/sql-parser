@@ -68,11 +68,4 @@ public interface StatementType
 
   public static final int SET_ROLE_DYNAMIC = 1;
 
-  public static final int NOTNULL_CONSTRAINT = 1;
-  public static final int PRIMARYKEY_CONSTRAINT = 2;
-  public static final int UNIQUE_CONSTRAINT = 3;
-  public static final int CHECK_CONSTRAINT = 4;
-  public static final int DROP_CONSTRAINT = 5;
-  public static final int FOREIGNKEY_CONSTRAINT = 6;
-
 }

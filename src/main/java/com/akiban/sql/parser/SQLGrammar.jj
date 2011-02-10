@@ -8730,12 +8730,6 @@ tableDefinition() throws StandardException :
     <AS> queryExpression = queryExpression(null, NO_SET_OP)
     <WITH> [ <NO> { withData = false; } ] <DATA>
   {
-    // Raise error if WITH DATA is specified
-    // (until it is implemented)
-    if (withData) {
-      throw new StandardException("Not implemented WITH DATA");
-    }
-
     /* Parameters not allowed in create table */
     HasNodeVisitor visitor =
       new HasNodeVisitor(ParameterNode.class);
@@ -8744,11 +8738,15 @@ tableDefinition() throws StandardException :
       throw new StandardException("Parameters not allowed in CREATE TABLE");
     }
 
-    return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_TABLE_NODE,
-                                              tableName,
-                                              resultColumns,
-                                              queryExpression,
-                                              parserContext);
+    StatementNode result = (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_TABLE_NODE,
+                                                              tableName,
+                                                              resultColumns,
+                                                              queryExpression,
+                                                              parserContext);
+    if (withData) {
+      ((CreateTableNode)result).markWithData();
+    }
+    return result;
   }
   )
 }
@@ -10131,7 +10129,7 @@ checkConstraintDefinition(TableName constraintName, String columnName)
     value.setEndOffset(endToken.endOffset);
     return (ConstraintDefinitionNode)nodeFactory.getNode(NodeTypes.CONSTRAINT_DEFINITION_NODE,
                                                          constraintName,
-                                                         StatementType.CHECK_CONSTRAINT,
+                                                         ConstraintDefinitionNode.ConstraintType.CHECK,
                                                          rclList,
                                                          null,
                                                          value,
@@ -10767,7 +10765,7 @@ tableConstraint(TableName constraintName) throws StandardException :
 ConstraintDefinitionNode
 uniqueConstraintDefinition(TableName constraintName) throws StandardException :
 {
-  int constraintType;
+  ConstraintDefinitionNode.ConstraintType constraintType;
   ResultColumnList uniqueColumnList;
 }
 {
@@ -10788,18 +10786,18 @@ uniqueConstraintDefinition(TableName constraintName) throws StandardException :
 
 //the second parameter to the following method will always be null for a table level
 //constraint but not for a column level constraint
-int
+ConstraintDefinitionNode.ConstraintType
 uniqueSpecification(String columnName) throws StandardException :
 {}
 {
   <UNIQUE> 
   {
-    return StatementType.UNIQUE_CONSTRAINT;
+    return ConstraintDefinitionNode.ConstraintType.UNIQUE;
   }
 |
   <PRIMARY> <KEY>
   {
-    return StatementType.PRIMARYKEY_CONSTRAINT;
+    return ConstraintDefinitionNode.ConstraintType.PRIMARY_KEY;
   }
 }
 
@@ -10984,7 +10982,7 @@ columnConstraint(TableName constraintName,
                  DataTypeDescriptor[] dataTypeDescriptor,
                  String columnName) throws StandardException :
 {
-  int constraintType;
+  ConstraintDefinitionNode.ConstraintType constraintType;
   Properties properties = null;
   ConstraintDefinitionNode tcdn;
   ResultColumnList refRcl = (ResultColumnList)nodeFactory.getNode(NodeTypes.RESULT_COLUMN_LIST,
@@ -11468,7 +11466,7 @@ dropTableConstraintDefinition() throws StandardException :
   {
     return (TableElementNode)nodeFactory.getNode(NodeTypes.CONSTRAINT_DEFINITION_NODE,
                                                  constraintName,
-                                                 StatementType.DROP_CONSTRAINT,
+                                                 ConstraintDefinitionNode.ConstraintType.DROP,
                                                  null,
                                                  null,
                                                  null,
@@ -11482,7 +11480,7 @@ dropTableConstraintDefinition() throws StandardException :
   {
     return (TableElementNode)nodeFactory.getNode(NodeTypes.CONSTRAINT_DEFINITION_NODE,
                                                  null,
-                                                 StatementType.DROP_CONSTRAINT,
+                                                 ConstraintDefinitionNode.ConstraintType.DROP,
                                                  null,
                                                  null,
                                                  null,
@@ -11496,13 +11494,13 @@ dropTableConstraintDefinition() throws StandardException :
   {
     return (TableElementNode)nodeFactory.getNode(NodeTypes.CONSTRAINT_DEFINITION_NODE,
                                                  constraintName,
-                                                 StatementType.DROP_CONSTRAINT,
+                                                 ConstraintDefinitionNode.ConstraintType.DROP,
                                                  null,
                                                  null,
                                                  null,
                                                  null,
                                                  StatementType.DROP_DEFAULT,
-                                                 StatementType.FOREIGNKEY_CONSTRAINT,
+                                                 ConstraintDefinitionNode.ConstraintType.FOREIGN_KEY,
                                                  parserContext);
   }
 |
@@ -11511,13 +11509,13 @@ dropTableConstraintDefinition() throws StandardException :
   {
     return (TableElementNode)nodeFactory.getNode(NodeTypes.CONSTRAINT_DEFINITION_NODE,
                                                  constraintName,
-                                                 StatementType.DROP_CONSTRAINT,
+                                                 ConstraintDefinitionNode.ConstraintType.DROP,
                                                  null,
                                                  null,
                                                  null,
                                                  null,
                                                  StatementType.DROP_DEFAULT,
-                                                 StatementType.UNIQUE_CONSTRAINT,
+                                                 ConstraintDefinitionNode.ConstraintType.UNIQUE,
                                                  parserContext);
   }
 |
@@ -11525,13 +11523,13 @@ dropTableConstraintDefinition() throws StandardException :
   {
     return (TableElementNode)nodeFactory.getNode(NodeTypes.CONSTRAINT_DEFINITION_NODE,
                                                  constraintName,
-                                                 StatementType.DROP_CONSTRAINT,
+                                                 ConstraintDefinitionNode.ConstraintType.DROP,
                                                  null,
                                                  null,
                                                  null,
                                                  null,
                                                  StatementType.DROP_DEFAULT,
-                                                 StatementType.CHECK_CONSTRAINT,
+                                                 ConstraintDefinitionNode.ConstraintType.CHECK,
                                                  parserContext);
   }
 }

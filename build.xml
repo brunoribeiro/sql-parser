@@ -64,7 +64,8 @@
       <arg value="INSERT INTO t1 SELECT x,y,z FROM t"/>
       <arg value="DELETE FROM t t1 WHERE x in (1,2,?) AND EXISTS (SELECT * FROM t t2 WHERE t1.id &lt;> t2.id AND t1.name = t2.name)"/>
       <arg value="UPDATE t SET x = null, y = y + 1 WHERE x &lt;= 4"/>
-      <arg value="CREATE TABLE t2 AS (SELECT * FROM t1) WITH NO DATA"/>
+      <arg value="CREATE TABLE t1 (i int PRIMARY KEY, s char(30) NOT NULL, z VARCHAR(128))"/>
+      <arg value="CREATE TABLE t2 AS (SELECT * FROM t1) WITH DATA"/>
       <!--
       -->
     </java>

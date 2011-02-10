@@ -26,6 +26,14 @@ public class NodeToString
 
   public String toString(QueryTreeNode node) throws StandardException {
     switch (node.getNodeType()) {
+    case NodeTypes.CREATE_TABLE_NODE:
+      return createTableNode((CreateTableNode)node);
+    case NodeTypes.TABLE_ELEMENT_LIST:
+      return tableElementList((TableElementList)node);
+    case NodeTypes.COLUMN_DEFINITION_NODE:
+      return columnDefinitionNode((ColumnDefinitionNode)node);
+    case NodeTypes.CONSTRAINT_DEFINITION_NODE:
+      return constraintDefinitionNode((ConstraintDefinitionNode)node);
     case NodeTypes.CURSOR_NODE:
       return cursorNode((CursorNode)node);
     case NodeTypes.SELECT_NODE:
@@ -119,6 +127,45 @@ public class NodeToString
       return parameterNode((ParameterNode)node);
     default:
       return "**UNKNOWN(" + node.getNodeType() +")**";
+    }
+  }
+
+  protected String createTableNode(CreateTableNode node) throws StandardException {
+    StringBuilder str = new StringBuilder("CREATE TABLE ");
+    str.append(toString(node.getObjectName()));
+    if (node.getTableElementList() != null) {
+      str.append("(");
+      str.append(toString(node.getTableElementList()));
+      str.append(")");
+    }
+    if (node.getQueryExpression() != null) {
+      str.append(" AS (");
+      str.append(toString(node.getQueryExpression()));
+      str.append(") WITH ");
+      if (!node.isWithData()) str.append("NO ");
+      str.append("DATA");
+    }
+    return str.toString();
+  }
+
+  protected String tableElementList(TableElementList node) throws StandardException {
+    return nodeList(node);
+  }
+
+  protected String columnDefinitionNode(ColumnDefinitionNode node)
+      throws StandardException {
+    return node.getColumnName() + " " + node.getType();
+  }
+
+  protected String constraintDefinitionNode(ConstraintDefinitionNode node) 
+      throws StandardException {
+    switch (node.getConstraintType()) {
+    case PRIMARY_KEY:
+      return "PRIMARY KEY(" + toString(node.getColumnList()) + ")";
+    case UNIQUE:
+      return "UNIQUE(" + toString(node.getColumnList()) + ")";
+    default:
+      return "**UNKNOWN(" + node.getConstraintType() + ")";
     }
   }
 
@@ -262,8 +309,11 @@ public class NodeToString
     if (node.getReference() != null)
       return toString(node.getReference());
 
-    String x = maybeParens(node.getExpression());
     String n = node.getName();
+    if (node.getExpression() == null)
+      return n;
+
+    String x = maybeParens(node.getExpression());
     if ((n == null) || n.equals(x))
       return x;
     else
