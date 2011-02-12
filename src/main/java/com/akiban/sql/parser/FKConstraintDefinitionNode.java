@@ -55,7 +55,7 @@ public class FKConstraintDefinitionNode extends ConstraintDefinitionNode
                    Object refRcl,
                    Object refActions) {
     super.init(constraintName,
-               StatementType.FOREIGNKEY_CONSTRAINT,
+               ConstraintType.FOREIGN_KEY,
                fkRcl, 
                null,
                null,
