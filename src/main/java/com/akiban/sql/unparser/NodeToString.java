@@ -100,6 +100,8 @@ public class NodeToString
       return inListOperatorNode((InListOperatorNode)node);
     case NodeTypes.BETWEEN_OPERATOR_NODE:
       return betweenOperatorNode((BetweenOperatorNode)node);
+    case NodeTypes.CONDITIONAL_NODE:
+      return conditionalNode((ConditionalNode)node);
     case NodeTypes.AGGREGATE_NODE:
       return aggregateNode((AggregateNode)node);
     case NodeTypes.UNTYPED_NULL_CONSTANT_NODE:
@@ -421,6 +423,26 @@ public class NodeToString
     return maybeParens(node.getLeftOperand()) +
       " BETWEEN " + maybeParens(node.getRightOperandList().get(0)) +
       " AND " + maybeParens(node.getRightOperandList().get(1));
+  }
+
+  protected String conditionalNode(ConditionalNode node) throws StandardException {
+    StringBuilder str = new StringBuilder("CASE");
+    while (true) {
+      str.append(" WHEN ");
+      str.append(maybeParens(node.getTestCondition()));
+      str.append(" THEN ");
+      str.append(maybeParens(node.getThenNode()));
+      ValueNode elseNode = node.getElseNode();
+      if (elseNode instanceof ConditionalNode)
+        node = (ConditionalNode)elseNode;
+      else {
+        str.append(" ELSE ");
+        str.append(maybeParens(elseNode));
+        break;
+      }
+    }
+    str.append(" END");
+    return str.toString();
   }
 
   protected String constantNode(ConstantNode node) throws StandardException {

@@ -48,11 +48,12 @@ import com.akiban.sql.StandardException;
 
 public class ConditionalNode extends ValueNode
 {
-  ValueNode testCondition;
-  ValueNodeList thenElseList;
-  //true means we are here for NULLIF(V1,V2), false means we are here for following
-  //CASE WHEN BooleanExpression THEN thenExpression ELSE elseExpression END
-  boolean thisIsNullIfNode;
+  private ValueNode testCondition;
+  private ValueNodeList thenElseList;
+
+  // True means we are here for NULLIF(V1,V2), false means we are here for following
+  // CASE WHEN BooleanExpression THEN thenExpression ELSE elseExpression END
+  private boolean thisIsNullIfNode;
 
   /**
    * Initializer for a ConditionalNode
@@ -65,6 +66,22 @@ public class ConditionalNode extends ValueNode
     this.testCondition = (ValueNode)testCondition;
     this.thenElseList = (ValueNodeList)thenElseList;
     this.thisIsNullIfNode = ((Boolean)thisIsNullIfNode).booleanValue();
+  }
+
+  public ValueNode getTestCondition() {
+    return testCondition;
+  }
+
+  public ValueNode getThenNode() {
+    return thenElseList.get(0);
+  }
+
+  public ValueNode getElseNode() {
+    return thenElseList.get(1);
+  }
+
+  public boolean isNullIfNode() {
+    return thisIsNullIfNode;
   }
 
   /**

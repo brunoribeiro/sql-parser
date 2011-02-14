@@ -189,4 +189,19 @@ public class SQLParser implements SQLParserContext {
     return printedObjectsMap;
   }
 
+  // TODO: Temporary low-budget testing.
+  public static void main(String[] args) throws Exception {
+    SQLParser p = new SQLParser();
+    for (String arg : args) {
+      System.out.println("=====");
+      System.out.println(arg);
+      try {
+        StatementNode stmt = p.parseStatement(arg);
+        stmt.treePrint();
+      }
+      catch (StandardException ex) {
+        ex.printStackTrace();
+      }
+    }
+  }
 }
