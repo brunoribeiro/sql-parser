@@ -85,6 +85,14 @@ public class BooleanConstantNode extends ConstantNode
     }
   }
 
+  public boolean getBooleanValue() {
+    return booleanValue;
+  }
+
+  public void setBooleanValue(boolean booleanValue) {
+    this.booleanValue = booleanValue;
+  }
+
   /**
    * Return an Object representing the bind time value of this
    * expression tree.  If the expression tree does not evaluate to

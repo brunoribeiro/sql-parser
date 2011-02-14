@@ -84,6 +84,13 @@
     </java>
   </target> 
 
+  <target name="test-normalizer" depends="compile, jvmargs">
+    <java classname="com.akiban.sql.compiler.BooleanNormalizer" fork="yes" failonerror="yes">
+      <classpath refid="running.class.path"/>
+      <arg value="SELECT x,y FROM t WHERE z > 3.14 OR w IS NOT NULL AND y > 10"/>
+    </java>
+  </target> 
+   
   <target name="clean">
     <delete dir="${CLASSES}"/>
     <delete file="${SRC}/com/akiban/sql/parser/SQLGrammar.java"/>

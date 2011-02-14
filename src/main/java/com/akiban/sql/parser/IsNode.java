@@ -59,4 +59,12 @@ public class IsNode extends BinaryLogicalOperatorNode
     this.notMe = ((Boolean)notMe).booleanValue();
   }
 
+  public boolean isNegated() {
+    return notMe;
+  }
+
+  public void toggleNegated() {
+    notMe = !notMe;
+  }
+
 }

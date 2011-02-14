@@ -204,12 +204,20 @@ public class SelectNode extends ResultSetNode
     return whereClause;
   }
 
+  public void setWhereClause(ValueNode whereClause) {
+    this.whereClause = whereClause;
+  }
+
   public GroupByList getGroupByList() {
     return groupByList;
   }
 
   public ValueNode getHavingClause() {
     return havingClause;
+  }
+
+  public void setHavingClause(ValueNode havingClause) {
+    this.havingClause = havingClause;
   }
 
   /** 

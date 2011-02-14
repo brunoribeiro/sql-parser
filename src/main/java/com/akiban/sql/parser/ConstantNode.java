@@ -80,17 +80,17 @@ public abstract class ConstantNode extends ValueNode
   }
 
   /**
-   * Set the value in this ConstantNode.
-   */
-  void setValue(Object value) {
-    this.value = value;
-  }
-
-  /**
    * Get the value in this ConstantNode
    */
   public Object getValue() {
     return value;
+  }
+
+  /**
+   * Set the value in this ConstantNode.
+   */
+  public void setValue(Object value) {
+    this.value = value;
   }
 
   /**

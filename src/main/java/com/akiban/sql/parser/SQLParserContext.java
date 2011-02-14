@@ -18,7 +18,7 @@ import com.akiban.sql.StandardException;
 
 import java.util.Map;
 
-interface SQLParserContext
+public interface SQLParserContext
 {
   /** Check that string literal is not too long. */
   public void checkStringLiteralLengthLimit(String image) throws StandardException;

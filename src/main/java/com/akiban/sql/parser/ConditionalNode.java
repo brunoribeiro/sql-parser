@@ -76,8 +76,16 @@ public class ConditionalNode extends ValueNode
     return thenElseList.get(0);
   }
 
+  public void setThenNode(ValueNode thenNode) {
+    thenElseList.set(0, thenNode);
+  }
+
   public ValueNode getElseNode() {
     return thenElseList.get(1);
+  }
+
+  public void setElseNode(ValueNode elseNode) {
+    thenElseList.set(1, elseNode);
   }
 
   public boolean isNullIfNode() {
