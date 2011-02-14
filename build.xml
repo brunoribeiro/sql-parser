@@ -87,7 +87,8 @@
   <target name="test-normalizer" depends="compile, jvmargs">
     <java classname="com.akiban.sql.compiler.BooleanNormalizer" fork="yes" failonerror="yes">
       <classpath refid="running.class.path"/>
-      <arg value="SELECT x,y FROM t WHERE z > 3.14 AND w IS NOT NULL OR y > 10"/>
+      <arg value="SELECT * FROM t WHERE ((a AND b) AND c) AND NOT d"/>
+      <arg value="SELECT * FROM t WHERE (d OR e) OR ((a AND b) AND c)"/>
     </java>
   </target> 
    

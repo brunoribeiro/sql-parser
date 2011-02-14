@@ -41,6 +41,8 @@ import com.akiban.sql.parser.*;
 import com.akiban.sql.unparser.NodeToString;
 
 import com.akiban.sql.StandardException;
+import com.akiban.sql.types.DataTypeDescriptor;
+import com.akiban.sql.types.TypeId;
 
 /** Perform normalization such as CNF on boolean expressions. */
 public class BooleanNormalizer implements Visitor
@@ -72,7 +74,7 @@ public class BooleanNormalizer implements Visitor
       boolClause = putAndsOnTop(boolClause);
       assert verifyPutAndsOnTop(boolClause);
       boolClause = changeToCNF(boolClause, true);
-      assert (boolClause instanceof AndNode) && verifyChangeToCNF(boolClause);
+      assert verifyChangeToCNF(boolClause, true);
     }
     return boolClause;
   }
@@ -301,6 +303,24 @@ public class BooleanNormalizer implements Visitor
         cnode.setValue(cnode.getValue() == Boolean.TRUE ? Boolean.FALSE : Boolean.TRUE);
       }
       break;
+    default:
+      if (underNotNode) {
+        BooleanConstantNode falseNode = (BooleanConstantNode) 
+          nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
+                              Boolean.FALSE,
+                              parserContext);
+        BinaryRelationalOperatorNode equalsNode = (BinaryRelationalOperatorNode)
+          nodeFactory.getNode(NodeTypes.BINARY_EQUALS_OPERATOR_NODE,
+                              node, falseNode,
+                              parserContext);
+        /* // TODO: Types.
+        boolean nullableResult = node.getTypeServices().isNullable();
+        equalsNode.setType(new DataTypeDescriptor(TypeId.BOOLEAN_ID,
+                                                  nullableResult));
+        */
+        return equalsNode;
+      }
+      break;
     }
     return node;
   }
@@ -349,6 +369,11 @@ public class BooleanNormalizer implements Visitor
     case NodeTypes.COLUMN_REFERENCE:
       {
         /* X -> (X = TRUE) AND TRUE */
+        // TODO: This is suspicious: it only happens on the right-hand AND branch,
+        // and so outputs WHERE f AND ((g = true) AND true).
+        // Perhaps a separate pass that does more (down both sides of
+        // AND and OR), or an earlier conversion that makes sure
+        // things are in some standard boolean form.
         BooleanConstantNode trueNode = (BooleanConstantNode)
           nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
                               Boolean.TRUE,
@@ -394,6 +419,8 @@ public class BooleanNormalizer implements Visitor
    * Verify that putAndsOnTop() did its job correctly.  Verify that the top level 
    * of the expression is a chain of AndNodes terminated by a true BooleanConstantNode.
    *
+   * @param node An expression node.
+   *
    * @return Boolean which reflects validity of the tree.
    */
   protected boolean verifyPutAndsOnTop(ValueNode node) {
@@ -407,12 +434,243 @@ public class BooleanNormalizer implements Visitor
     }
   }
 
-  protected ValueNode changeToCNF(ValueNode node, boolean underTopAndNode) 
+  /**
+   * Finish putting an expression into conjunctive normal
+   * form.  An expression tree in conjunctive normal form meets
+   * the following criteria:
+   *    o  If the expression tree is not null,
+   *       the top level will be a chain of AndNodes terminating
+   *       in a true BooleanConstantNode.
+   *    o  The left child of an AndNode will never be an AndNode.
+   *    o  Any right-linked chain that includes an AndNode will
+   *       be entirely composed of AndNodes terminated by a true BooleanConstantNode.
+   *    o  The left child of an OrNode will never be an OrNode.
+   *    o  Any right-linked chain that includes an OrNode will
+   *       be entirely composed of OrNodes terminated by a false BooleanConstantNode.
+   *    o  ValueNodes other than AndNodes and OrNodes are considered
+   *       leaf nodes for purposes of expression normalization.
+   *       In other words, we won't do any normalization under
+   *       those nodes.
+   *
+   * In addition, we track whether or not we are under a top level AndNode.  
+   * SubqueryNodes need to know this for subquery flattening.
+   *
+   * @param node An expression node.
+   * @param underTopAndNode Whether or not we are under a top level AndNode.
+   *
+   * @return The modified expression
+   *
+   * @exception StandardException Thrown on error
+   */
+  protected ValueNode changeToCNF(ValueNode node, boolean underTopAndNode)
       throws StandardException {
+    switch (node.getNodeType()) {
+    case NodeTypes.AND_NODE:
+      {
+        AndNode andNode = (AndNode)node;
+        ValueNode leftOperand = andNode.getLeftOperand();
+        ValueNode rightOperand = andNode.getRightOperand();
+
+        /* Top chain will be a chain of Ands terminated by a non-AndNode.
+         * (putAndsOnTop() has taken care of this. If the last node in
+         * the chain is not a true BooleanConstantNode then we need to do the
+         * transformation to make it so.
+         */
+
+        /* Add the true BooleanConstantNode if not there yet */
+        if (!(rightOperand instanceof AndNode) &&
+            !(rightOperand.isBooleanTrue())) {
+          BooleanConstantNode trueNode = (BooleanConstantNode) 
+            nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
+                                Boolean.TRUE,
+                                parserContext);
+          rightOperand = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
+                                                      rightOperand, trueNode,
+                                                      parserContext);
+        }
+
+        /* If leftOperand is an AndNode, then we modify the tree from:
+         *
+         *                And1
+         *               /    \
+         *            And2    Nodex
+         *           /    \        ...
+         *        left2    right2
+         *
+         *    to:
+         *
+         *                        And1
+         *                       /    \
+         *     changeToCNF(left2)      And2
+         *                            /    \
+         *         changeToCNF(right2)      changeToCNF(Nodex)
+         *
+         *  NOTE: We could easily switch places between changeToCNF(left2) and 
+         *  changeToCNF(right2).
+         */
+
+        /* Pull up the AndNode chain to our left */
+        while (leftOperand instanceof AndNode) {
+          AndNode oldLeft = (AndNode)leftOperand;
+          ValueNode oldRight = rightOperand;
+          ValueNode newLeft = oldLeft.getLeftOperand();
+          AndNode newRight = oldLeft;
+          
+          /* We then twiddle the tree to match the above diagram */
+          leftOperand = newLeft;
+          rightOperand = newRight;
+          newRight.setLeftOperand(oldLeft.getRightOperand());
+          newRight.setRightOperand(oldRight);
+        }
+        
+        /* We then twiddle the tree to match the above diagram */
+        leftOperand = changeToCNF(leftOperand, underTopAndNode);
+        rightOperand = changeToCNF(rightOperand, underTopAndNode);
+        
+        andNode.setLeftOperand(leftOperand);
+        andNode.setRightOperand(rightOperand);
+      }
+      break;
+    case NodeTypes.OR_NODE:
+      {
+        OrNode orNode = (OrNode)node;
+        ValueNode leftOperand = orNode.getLeftOperand();
+        ValueNode rightOperand = orNode.getRightOperand();
+
+        /* If rightOperand is an AndNode, then we must generate an 
+         * OrNode above it.
+         */
+        if (rightOperand instanceof AndNode) {
+          BooleanConstantNode falseNode = (BooleanConstantNode) 
+            nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
+                                Boolean.FALSE,
+                                parserContext);
+          rightOperand = (ValueNode)nodeFactory.getNode(NodeTypes.OR_NODE,
+                                                        rightOperand, falseNode,
+                                                        parserContext);
+          orNode.setRightOperand(rightOperand);
+        }
+        
+        /* We need to ensure that the right chain is terminated by
+         * a false BooleanConstantNode.
+         */
+        while (rightOperand instanceof OrNode) {
+          orNode = (OrNode)orNode.getRightOperand();
+          rightOperand = orNode.getRightOperand();
+        }
+
+        /* Add the false BooleanConstantNode if not there yet */
+        if (!rightOperand.isBooleanFalse()) {
+          BooleanConstantNode	falseNode = (BooleanConstantNode) 
+            nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
+                                Boolean.FALSE,
+                                parserContext);
+          orNode.setRightOperand((ValueNode)nodeFactory.getNode(NodeTypes.OR_NODE,
+                                                                rightOperand, 
+                                                                falseNode,
+                                                                parserContext));
+        }
+
+        orNode = (OrNode)node;
+        rightOperand = orNode.getRightOperand();
+
+        /* If leftOperand is an OrNode, then we modify the tree from:
+         *
+         *                Or1 
+         *               /    \
+         *            Or2        Nodex
+         *           /    \        ...
+         *        left2    right2
+         *
+         *    to:
+         *
+         *                        Or1 
+         *                       /    \
+         *     changeToCNF(left2)      Or2
+         *                            /    \
+         *         changeToCNF(right2)      changeToCNF(Nodex)
+         *
+         *  NOTE: We could easily switch places between changeToCNF(left2) and 
+         *  changeToCNF(right2).
+         */
+
+        while (leftOperand instanceof OrNode) {
+          OrNode oldLeft = (OrNode)leftOperand;
+          ValueNode oldRight = rightOperand;
+          ValueNode newLeft = oldLeft.getLeftOperand();
+          OrNode newRight = oldLeft;
+
+          /* We then twiddle the tree to match the above diagram */
+          leftOperand = newLeft;
+          rightOperand = newRight;
+          newRight.setLeftOperand(oldLeft.getRightOperand());
+          newRight.setRightOperand(oldRight);
+        }
+
+        /* Finally, we continue to normalize the left and right subtrees. */
+        leftOperand = changeToCNF(leftOperand, false);
+        rightOperand = changeToCNF(rightOperand, false);
+        
+        orNode.setLeftOperand(leftOperand);
+        orNode.setRightOperand(rightOperand);
+      }
+      break;
+
+      // TODO: subquery node to pick up underTopAndNode for flattening.
+      // BinaryComparisonOperatorNode for that case.
+
+    }
     return node;
   }
 
-  protected boolean verifyChangeToCNF(ValueNode node) {
+  /**
+   * Verify that changeToCNF() did its job correctly.  Verify that:
+   *    o  AndNode  - rightOperand is not instanceof OrNode
+   *                  leftOperand is not instanceof AndNode
+   *    o  OrNode    - rightOperand is not instanceof AndNode
+   *                  leftOperand is not instanceof OrNode
+   *
+   * @param node An expression node.
+   *
+   * @return Boolean which reflects validity of the tree.
+   */
+  protected boolean verifyChangeToCNF(ValueNode node, boolean top) {
+    if (node instanceof AndNode) {
+      AndNode andNode = (AndNode)node;
+      ValueNode leftOperand = andNode.getLeftOperand();
+      ValueNode rightOperand = andNode.getRightOperand();
+      boolean isValid = ((rightOperand instanceof AndNode) ||
+                         rightOperand.isBooleanTrue());
+      if (rightOperand instanceof AndNode) {
+        isValid = verifyChangeToCNF(rightOperand, false);
+      }
+      if (leftOperand instanceof AndNode) {
+        isValid = false;
+      }
+      else {
+        isValid = isValid && verifyChangeToCNF(leftOperand, false);
+      }
+      return isValid;
+    }
+    if (top) 
+      return false;
+    if (node instanceof OrNode) {
+      OrNode orNode = (OrNode)node;
+      ValueNode leftOperand = orNode.getLeftOperand();
+      ValueNode rightOperand = orNode.getRightOperand();
+      boolean isValid = ((rightOperand instanceof OrNode) ||
+                         rightOperand.isBooleanFalse());
+      if (rightOperand instanceof OrNode) {
+        isValid = verifyChangeToCNF(rightOperand, false);
+      }
+      if (leftOperand instanceof OrNode) {
+        isValid = false;
+      }
+      else {
+        isValid = verifyChangeToCNF(leftOperand, false);
+      }
+      return isValid;
+    }
     return true;
   }
 
