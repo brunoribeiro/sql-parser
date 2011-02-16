@@ -63,6 +63,7 @@ public abstract class QueryTreeNode implements Visitable
 
   private int nodeType;
   private SQLParserContext pc;
+  private Object userData;
 
   /**
    * Set the parser context for this node.
@@ -80,6 +81,20 @@ public abstract class QueryTreeNode implements Visitable
    */
   public SQLParserContext getParserContext() {
     return pc;
+  }
+
+  /**
+   * Set the user data associated with this node.
+   */
+  public void setUserData(Object userData) {
+    this.userData = userData;
+  }
+
+  /**
+   * Get the user data associated with this node.
+   */
+  public Object getUserData() {
+    return userData;
   }
 
   /**
@@ -298,18 +313,15 @@ public abstract class QueryTreeNode implements Visitable
    * before calling treePrint() on the sub-node, so that the reader of
    * the printed tree can tell what the sub-node is.
    *
-   * This printSubNodes() exists in here merely to act as a backstop.
-   * In other words, the calls to printSubNodes() move up the type
-   * hierarchy, and in this node the calls stop.
-   *
-   * I would have liked to put the call to super.printSubNodes() in
-   * this super-class, but Java resolves "super" statically, so it
-   * wouldn't get to the right super-class.
-   *
    * @param depth The depth to indent the sub-nodes
    */
 
   public void printSubNodes(int depth) {
+    if (userData != null) {
+      printLabel(depth, "userData: ");
+      // TODO: Consiser an interface to allow for special method.
+      debugPrint(userData.toString() + "\n");
+    }
   }
 
   /**

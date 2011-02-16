@@ -93,8 +93,8 @@ public class SubqueryNode extends ValueNode
   private ValueNode leftOperand;
 
   private OrderByList orderByList;
-  private ValueNode   offset;
-  private ValueNode   fetchFirst;
+  private ValueNode offset;
+  private ValueNode fetchFirst;
 
   /* Subquery types.
    * NOTE: FROM only exists for a brief second in the parser.  It

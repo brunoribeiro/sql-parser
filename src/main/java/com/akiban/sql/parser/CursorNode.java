@@ -145,6 +145,21 @@ public class CursorNode extends DMLStatementNode
     }
   }
 
+  /**
+   * Accept the visitor for all visitable children of this node.
+   * 
+   * @param v the visitor
+   *
+   * @exception StandardException on error
+   */
+  void acceptChildren(Visitor v) throws StandardException {
+    super.acceptChildren(v);
+
+    if (orderByList != null) {
+      orderByList = (OrderByList)orderByList.accept(v);
+    }
+  }
+
   public String getName() {
     return name;
   }

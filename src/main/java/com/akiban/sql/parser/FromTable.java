@@ -56,13 +56,8 @@ public abstract class FromTable extends ResultSetNode
   protected String correlationName;
   private TableName corrTableName;
 
-  /* (Query block) level is 0-based. */
-  /* RESOLVE - View resolution will have to update the level within
-   * the view tree.
-   */
-  private int level;
-
   /** the original unbound table name */
+  // TODO: Still need these two separate names?
   protected TableName origTableName;
 
   /**
@@ -94,7 +89,6 @@ public abstract class FromTable extends ResultSetNode
     return "correlation Name: " + correlationName + "\n" +
       (corrTableName != null ?
        corrTableName.toString() : "null") + "\n" +
-      "level " + level + "\n" +
       super.toString();
   }
 
@@ -113,67 +107,6 @@ public abstract class FromTable extends ResultSetNode
       corrTableName = makeTableName(null, correlationName);
     }
     return corrTableName;
-  }
-
-  /**
-   * Set the (query block) level (0-based) for this FromTable.
-   *
-   * @param level The query block level for this FromTable.
-   */
-  public void setLevel(int level) {
-    this.level = level;
-  }
-
-  /**
-   * Get the (query block) level (0-based) for this FromTable.
-   *
-   * @return int The query block level for this FromTable.
-   */
-  public int getLevel() {
-    return level;
-  }
-
-  /**
-   * Decrement (query block) level (0-based) for this FromTable.
-   * This is useful when flattening a subquery.
-   *
-   * @param decrement The amount to decrement by.
-   */
-  void decrementLevel(int decrement) {
-    assert (level < decrement && level != 0);
-    /* NOTE: level doesn't get propagated 
-     * to nodes generated after binding.
-     */
-    if (level > 0) {
-      level -= decrement;
-    }
-  }
-
-  /** 
-   * Determine whether or not the specified name is an exposed name in
-   * the current query block.
-   *
-   * @param name The specified name to search for as an exposed name.
-   * @param schemaName Schema name, if non-null.
-   * @param exactMatch Whether or not we need an exact match on specified schema and table
-   *                   names or match on table id.
-   *
-   * @return The FromTable, if any, with the exposed name.
-   *
-   * @exception StandardException Thrown on error
-   */
-  protected FromTable getFromTableByName(String name, String schemaName, 
-                                         boolean exactMatch)
-      throws StandardException {
-    // Only FromBaseTables have schema names
-    if (schemaName != null) {
-      return null;
-    }
-
-    if (getExposedName().equals(name)) {
-      return this;
-    }
-    return null;
   }
 
   public String getExposedName() throws StandardException {

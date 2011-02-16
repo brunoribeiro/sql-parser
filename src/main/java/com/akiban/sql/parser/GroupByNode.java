@@ -101,7 +101,7 @@ public class GroupByNode extends SingleChildResultSetNode
                    Object nestingLevel)
       throws StandardException {
     super.init(bottomPR, tableProperties);
-    setLevel(((Integer)nestingLevel).intValue());
+    //setLevel(((Integer)nestingLevel).intValue());
     this.havingClause = (ValueNode)havingClause;
     this.havingSubquerys = (SubqueryList)havingSubquerys;
     this.groupingList = (GroupByList)groupingList;

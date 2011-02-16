@@ -144,21 +144,6 @@ abstract class TableOperatorNode extends FromTable
   }
 
   /**
-   * Set the (query block) level (0-based) for this FromTable.
-   *
-   * @param level The query block level for this FromTable.
-   */
-  public void setLevel(int level) {
-    super.setLevel(level);
-    if (leftResultSet instanceof FromTable) {
-      ((FromTable)leftResultSet).setLevel(level);
-    }
-    if (rightResultSet instanceof FromTable) {
-      ((FromTable)rightResultSet).setLevel(level);
-    }
-  }
-
-  /**
    * Return the exposed name for this table, which is the name that
    * can be used to refer to this table in the rest of the query.
    *

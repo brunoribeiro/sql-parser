@@ -10,6 +10,7 @@
   <property name="GRAMMAR" location="${SRC}/com/akiban/sql/parser/SQLGrammar.jj"/>
 
   <path id="compiler.class.path">
+    <pathelement path="${AKIBAN_SERVER_CLASSPATH}"/>
   </path>
 
   <target name="all" depends="init, compile"
@@ -92,6 +93,15 @@
     </java>
   </target> 
    
+  <target name="test-binder" depends="compile, jvmargs">
+    <java classname="com.akiban.sql.compiler.AISBinder" fork="yes" failonerror="yes">
+      <classpath refid="running.class.path"/>
+      <arg value="USE user1; CREATE TABLE t1(x INT, y VARCHAR(7), z DECIMAL); CREATE table t2(w CHAR(1) NOT NULL); USE user2; CREATE TABLE t3(x INT PRIMARY KEY);"/>
+      <arg value="user1"/>
+      <arg value="SELECT x,y FROM t1,t2,user2.t3 WHERE z > w"/>
+    </java>
+  </target> 
+
   <target name="clean">
     <delete dir="${CLASSES}"/>
     <delete file="${SRC}/com/akiban/sql/parser/SQLGrammar.java"/>

@@ -123,25 +123,6 @@ public class FromSubquery extends FromTable
     return subquery;
   }
 
-  /** 
-   * Determine whether or not the specified name is an exposed name in
-   * the current query block.
-   *
-   * @param name The specified name to search for as an exposed name.
-   * @param schemaName Schema name, if non-null.
-   * @param exactMatch Whether or not we need an exact match on specified schema and table
-   *                   names or match on table id.
-   *
-   * @return The FromTable, if any, with the exposed name.
-   *
-   * @exception StandardException Thrown on error
-   */
-  protected FromTable getFromTableByName(String name, String schemaName, 
-                                         boolean exactMatch)
-      throws StandardException {
-    return super.getFromTableByName(name, schemaName, exactMatch);
-  }
-
   /**
    * Get the exposed name for this table, which is the name that can
    * be used to refer to it in the rest of the query.
@@ -151,6 +132,25 @@ public class FromSubquery extends FromTable
 
   public String getExposedName() {
     return correlationName;
+  }
+
+
+  /**
+   * Accept the visitor for all visitable children of this node.
+   * 
+   * @param v the visitor
+   *
+   * @exception StandardException on error
+   */
+  void acceptChildren(Visitor v) throws StandardException {
+    super.acceptChildren(v);
+
+    if (subquery != null) {
+      subquery = (ResultSetNode)subquery.accept(v);
+    }
+    if (orderByList != null) {
+      orderByList = (OrderByList)orderByList.accept(v);
+    }
   }
 
 }

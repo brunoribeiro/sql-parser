@@ -99,37 +99,6 @@ abstract class SingleChildResultSetNode extends FromTable
   }
 
   /**
-   * Set the (query block) level (0-based) for this FromTable.
-   *
-   * @param level The query block level for this FromTable.
-   */
-  public void setLevel(int level) {
-    super.setLevel(level);
-    if (childResult instanceof FromTable) {
-        ((FromTable)childResult).setLevel(level);
-      }
-  }
-
-  /** 
-   * Determine whether or not the specified name is an exposed name in
-   * the current query block.
-   *
-   * @param name The specified name to search for as an exposed name.
-   * @param schemaName Schema name, if non-null.
-   * @param exactMatch Whether or not we need an exact match on specified schema and table
-   *                   names or match on table id.
-   *
-   * @return The FromTable, if any, with the exposed name.
-   *
-   * @exception StandardException Thrown on error
-   */
-  protected FromTable getFromTableByName(String name, String schemaName, 
-                                         boolean exactMatch)
-      throws StandardException {
-    return childResult.getFromTableByName(name, schemaName, exactMatch);
-  }
-
-  /**
    * Accept the visitor for all visitable children of this node.
    * 
    * @param v the visitor

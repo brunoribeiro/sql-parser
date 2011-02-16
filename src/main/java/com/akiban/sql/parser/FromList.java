@@ -122,53 +122,6 @@ public class FromList extends QueryTreeNodeList<FromTable>
     add(fromTable);
   }
 
-  /** 
-   * Determine whether or not the specified name is an exposed name in
-   * the current query block.
-   *
-   * @param name The specified name to search for as an exposed name.
-   * @param schemaName Schema name, if non-null.
-   * @param exactMatch Whether or not we need an exact match on specified schema and table
-   *                   names or match on table id.
-   *
-   * @return The FromTable, if any, with the exposed name.
-   *
-   * @exception StandardException Thrown on error
-   */
-  protected FromTable getFromTableByName(String name, String schemaName, 
-                                         boolean exactMatch)
-      throws StandardException {
-    boolean found = false;
-    FromTable fromTable;
-    FromTable result = null;
-
-    int size = size();
-    for (int index = 0; index < size; index++) {
-      fromTable = get(index);
-
-      result = fromTable.getFromTableByName(name, schemaName, exactMatch);
-
-      if (result != null) {
-        return result;
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Set the (query block) level (0-based) for the FromTables in this
-   * FromList.
-   *
-   * @param level The query block level for this table.
-   */
-  public void setLevel(int level) {
-    int size = size();
-    for (int index = 0; index < size; index++) {
-      FromTable fromTable = get(index);
-      fromTable.setLevel(level);
-    }
-  }
-
   /**
    * Set the Properties list for this FromList.
    *
