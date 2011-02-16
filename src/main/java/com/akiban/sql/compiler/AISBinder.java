@@ -202,38 +202,6 @@ public class AISBinder implements Visitor
     return result;
   }
 
-  // TODO: Move to another file.
-  static class ColumnBinding {
-    private FromTable fromTable;
-    private Column column;
-    private ResultColumn resultColumn;
-    
-    public ColumnBinding(FromTable fromTable, Column column) {
-      this.fromTable = fromTable;
-      this.column = column;
-    }
-    public ColumnBinding(FromTable fromTable, ResultColumn resultColumn) {
-      this.fromTable = fromTable;
-      this.resultColumn = resultColumn;
-    }
-
-    public String toString() {
-      StringBuffer result = new StringBuffer();
-      if (resultColumn != null) {
-        result.append(resultColumn.getClass().getName());
-        result.append('@');
-        result.append(Integer.toHexString(resultColumn.hashCode()));
-      }
-      else
-        result.append(column);
-      result.append(" from ");
-      result.append(fromTable.getClass().getName());
-      result.append('@');
-      result.append(Integer.toHexString(fromTable.hashCode()));
-      return result.toString();
-    }
-  }
-
   protected ColumnBinding getColumnBinding(FromTable fromTable, String columnName)
       throws StandardException {
     if (fromTable instanceof FromBaseTable) {
@@ -305,6 +273,7 @@ public class AISBinder implements Visitor
     AkibanInformationSchema ais = new com.akiban.ais.ddl.DDLSource()
       .buildAISFromString(args[0]);
     AISBinder binder = new AISBinder(ais, args[1]);
+    TypeComputer tc = new TypeComputer();
     SQLParser p = new SQLParser();
     for (int i = 2; i < args.length; i++) {
       String arg = args[i];
@@ -313,6 +282,7 @@ public class AISBinder implements Visitor
       try {
         StatementNode stmt = p.parseStatement(arg);
         binder.bind(stmt);
+        tc.compute(stmt);
         stmt.treePrint();
       }
       catch (StandardException ex) {
