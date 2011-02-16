@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * A SubqueryNode represents a subquery.  Subqueries return values to their
  * outer queries. An quantified subquery is one that appears under a quantified
@@ -179,6 +181,37 @@ public class SubqueryNode extends ValueNode
     if (fetchFirst != null) {
       printLabel(depth, "fetchFirst: ");
       fetchFirst.treePrint(depth + 1);
+    }
+  }
+
+  /**
+   * Accept the visitor for all visitable children of this node.
+   * 
+   * @param v the visitor
+   *
+   * @exception StandardException on error
+   */
+  void acceptChildren(Visitor v) throws StandardException {
+    super.acceptChildren(v);
+
+    if (resultSet != null) {
+      resultSet = (ResultSetNode)resultSet.accept(v);
+    }
+
+    if (leftOperand != null) {
+      leftOperand = (ValueNode)leftOperand.accept(v);
+    }
+
+    if (orderByList != null) {
+      orderByList = (OrderByList)orderByList.accept(v);
+    }
+
+    if (offset != null) {
+      offset = (ValueNode)offset.accept(v);
+    }
+
+    if (fetchFirst != null) {
+      fetchFirst = (ValueNode)fetchFirst.accept(v);
     }
   }
 

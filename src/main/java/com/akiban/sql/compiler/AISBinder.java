@@ -33,6 +33,7 @@ public class AISBinder implements Visitor
   private AkibanInformationSchema ais;
   private String defaultSchemaName;
   private Stack<BindingContext> bindingContexts;
+  private Set<QueryTreeNode> visited;
 
   public AISBinder(AkibanInformationSchema ais, String defaultSchemaName) {
     this.ais = ais;
@@ -41,34 +42,43 @@ public class AISBinder implements Visitor
   }
 
   public void bind(StatementNode stmt) throws StandardException {
+    visited = new HashSet<QueryTreeNode>();
     stmt.accept(this);
+    visited = null;
   }
   
   /* Hierarchical Visitor */
 
   public boolean visitBefore(QueryTreeNode node) throws StandardException {
+    boolean first = visited.add(node);
+
+    if (first) {
+      switch (node.getNodeType()) {
+      case NodeTypes.SUBQUERY_NODE:
+        {
+          SubqueryNode subqueryNode = (SubqueryNode)node;
+          // The LHS of a subquery operator is bound in the outer context.
+          if (subqueryNode.getLeftOperand() != null)
+            subqueryNode.getLeftOperand().accept(this);
+        }
+        break;
+      case NodeTypes.SELECT_NODE:
+        selectNode((SelectNode)node);
+        break;
+      case NodeTypes.COLUMN_REFERENCE:
+        columnReference((ColumnReference)node);
+        break;
+      }
+    }
+
     switch (node.getNodeType()) {
     case NodeTypes.CURSOR_NODE:
     case NodeTypes.FROM_SUBQUERY:
-      pushBindingContext();
-      break;
     case NodeTypes.SUBQUERY_NODE:
-      {
-        SubqueryNode subqueryNode = (SubqueryNode)node;
-        // The LHS of a subquery operator is bound in the outer context.
-        if (subqueryNode.getLeftOperand() != null)
-          subqueryNode.getLeftOperand().accept(this);
-        pushBindingContext();
-      }
-      break;
-    case NodeTypes.SELECT_NODE:
-      selectNode((SelectNode)node);
-      break;
-    case NodeTypes.COLUMN_REFERENCE:
-      columnReference((ColumnReference)node);
-      break;
+      pushBindingContext();
     }
-    return true;
+
+    return first;
   }
 
   public void visitAfter(QueryTreeNode node) throws StandardException {
@@ -84,15 +94,18 @@ public class AISBinder implements Visitor
   /* Specific node types */
 
   protected void selectNode(SelectNode selectNode) throws StandardException {
+    FromList fromList = selectNode.getFromList();
+    // Subqueries in SELECT don't see earlier FROM list tables.
+    fromList.accept(this);
     BindingContext bindingContext = getBindingContext();
-    for (FromTable fromTable : selectNode.getFromList()) {
+    for (FromTable fromTable : fromList) {
       switch (fromTable.getNodeType()) {
       case NodeTypes.FROM_BASE_TABLE:
         fromBaseTable((FromBaseTable)fromTable);
         break;
       }
     }
-    for (FromTable fromTable : selectNode.getFromList()) {
+    for (FromTable fromTable : fromList) {
       bindingContext.tables.add(fromTable);
       if (fromTable.getCorrelationName() != null) {
         if (bindingContext.correlationNames.put(fromTable.getCorrelationName(), 
@@ -174,8 +187,8 @@ public class AISBinder implements Visitor
           FromBaseTable fromBaseTable = (FromBaseTable)fromTable;
           Table table = (Table)fromBaseTable.getTableName().getUserData();
           assert (table != null) : "table not bound yet";
-          if (table.getName().getSchemaName().equals(schemaName) &&
-              table.getName().getTableName().equals(tableName)) {
+          if (table.getName().getSchemaName().equalsIgnoreCase(schemaName) &&
+              table.getName().getTableName().equalsIgnoreCase(tableName)) {
             if (result != null)
               throw new StandardException("Ambiguous table " + tableName);
             else
