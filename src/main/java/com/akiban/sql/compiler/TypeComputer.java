@@ -22,7 +22,12 @@ import com.akiban.sql.types.TypeId;
 
 import java.util.*;
 
-/** Calculate types from schema information. */
+/** Calculate types in statement tree. 
+ * Called after schema binding has introduced column types.
+ *
+ * Most of the work is done by the ValueNodes themselves, since data
+ * type information is intrinsic to the AST.
+ */
 public class TypeComputer implements Visitor
 {
   public TypeComputer() {
@@ -31,34 +36,27 @@ public class TypeComputer implements Visitor
   public void compute(StatementNode stmt) throws StandardException {
     stmt.accept(this);
   }
-  
+
+  protected void selectNode(SelectNode node) throws StandardException {
+    // Children first wasn't enough to ensure that subqueries were done first.
+    node.getResultColumns().accept(this);
+  }
+
   protected DataTypeDescriptor computeType(ValueNode node) throws StandardException {
+    // Only those that depend upon our binding scheme need to be handled by us.
     switch (node.getNodeType()) {
     case NodeTypes.COLUMN_REFERENCE:
       return columnReference((ColumnReference)node);
-    case NodeTypes.RESULT_COLUMN:
-      return resultColumn((ResultColumn)node);
     default:
-      // assert false;
-      return null;
+      return node.computeType();
     }
   }
-
+ 
   protected DataTypeDescriptor columnReference(ColumnReference node) 
       throws StandardException {
     ColumnBinding columnBinding = (ColumnBinding)node.getUserData();
     assert (columnBinding != null) : "column is not bound yet";
     return columnBinding.getType();
-  }
-
-  protected DataTypeDescriptor resultColumn(ResultColumn node)
-      throws StandardException {
-    return node.getExpression().getType();
-  }
-
-  protected void selectNode(SelectNode node) throws StandardException {
-    // Children first wasn't enough to ensure that subqueries were done first.
-    node.getResultColumns().accept(this);
   }
 
   /* Visitor interface. */
