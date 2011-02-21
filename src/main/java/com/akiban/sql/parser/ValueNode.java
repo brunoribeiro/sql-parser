@@ -52,7 +52,7 @@ public abstract class ValueNode extends QueryTreeNode
   /**
    * The data type for this node.
    */
-  private DataTypeDescriptor dataTypeServices;
+  private DataTypeDescriptor type;
 
   /*
   ** Constructor for untyped ValueNodes, for example, untyped NULLs
@@ -122,6 +122,7 @@ public abstract class ValueNode extends QueryTreeNode
    * @exception StandardException
    */
 
+  // TODO: tcf unused; is anyone calling this constructor?
   ValueNode(Object tcf,
             Object typeId,
             Object isNullable,
@@ -140,19 +141,19 @@ public abstract class ValueNode extends QueryTreeNode
    */
 
   public String toString() {
-    return "dataTypeServices: " +
-      ((dataTypeServices != null) ? dataTypeServices.toString() : "null" ) + "\n" +
+    return "type: " +
+      ((type != null) ? type.toString() : "null" ) + "\n" +
       super.toString();
   }
 
   /**
-   * Get the DataTypeServices from this ValueNode.
+   * Get the DataTypeDescriptor from this ValueNode.
    *
-   * @return The DataTypeServices from this ValueNode.  This
+   * @return The DataTypeDescriptor from this ValueNode.  This
    *         may be null if the node isn't bound yet.
    */
-  public DataTypeDescriptor getTypeServices() {
-    return dataTypeServices;
+  public DataTypeDescriptor getType() {
+    return type;
   }
     
   /**
@@ -160,7 +161,7 @@ public abstract class ValueNode extends QueryTreeNode
    * @throws StandardException 
    */
   public void setNullability(boolean nullability) throws StandardException {
-    setType(getTypeServices().getNullabilityType(nullability));
+    setType(getType().getNullabilityType(nullability));
   }
 
   /**
@@ -170,21 +171,21 @@ public abstract class ValueNode extends QueryTreeNode
    *         may be null if the node isn't bound yet.
    */
   public TypeId getTypeId() throws StandardException {
-    DataTypeDescriptor dtd = getTypeServices();
+    DataTypeDescriptor dtd = getType();
     if (dtd != null)
       return dtd.getTypeId();
     return null;
   }
 
   /**
-   * Set the DataTypeServices for this ValueNode.  This method is
+   * Set the DataTypeDescriptor for this ValueNode.  This method is
    * overridden in ParameterNode.
    *
-   * @param dataTypeServices The DataTypeServices to set in this ValueNode
+   * @param type The DataTypeDescriptor to set in this ValueNode
    */
 
-  public void setType(DataTypeDescriptor dataTypeServices) throws StandardException {
-    this.dataTypeServices = dataTypeServices;
+  public void setType(DataTypeDescriptor type) throws StandardException {
+    this.type = type;
   }
 
   /**

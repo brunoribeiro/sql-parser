@@ -60,7 +60,7 @@ abstract class JavaValueNode extends QueryTreeNode
   /**
    * Get the resolved data type of this node. May be overridden by descendants.
    */
-  public DataTypeDescriptor getDataType() throws StandardException {
+  public DataTypeDescriptor getType() throws StandardException {
     return DataTypeDescriptor.getSQLDataTypeDescriptor(getJavaTypeName());
   }
 

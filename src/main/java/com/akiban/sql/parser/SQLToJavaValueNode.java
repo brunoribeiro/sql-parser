@@ -78,8 +78,8 @@ public class SQLToJavaValueNode extends JavaValueNode
   /**
    * Override behavior in superclass.
    */
-  public DataTypeDescriptor getDataType() throws StandardException {
-    return value.getTypeServices();
+  public DataTypeDescriptor getType() throws StandardException {
+    return value.getType();
   }
 
   /**

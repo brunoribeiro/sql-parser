@@ -48,12 +48,12 @@ public class TypeComputer implements Visitor
       throws StandardException {
     ColumnBinding columnBinding = (ColumnBinding)node.getUserData();
     assert (columnBinding != null) : "column is not bound yet";
-    return columnBinding.getTypeServices();
+    return columnBinding.getType();
   }
 
   protected DataTypeDescriptor resultColumn(ResultColumn node)
       throws StandardException {
-    return node.getExpression().getTypeServices();
+    return node.getExpression().getType();
   }
 
   protected void selectNode(SelectNode node) throws StandardException {
@@ -67,7 +67,7 @@ public class TypeComputer implements Visitor
     if (node instanceof ValueNode) {
       // Value nodes compute type if necessary.
       ValueNode valueNode = (ValueNode)node;
-      if (valueNode.getTypeServices() == null) {
+      if (valueNode.getType() == null) {
         valueNode.setType(computeType(valueNode));
       }
     }

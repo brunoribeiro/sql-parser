@@ -211,8 +211,7 @@ class SQLGrammar
   /* Remember the last token we got that was an identifier. */
   private Token lastIdentifierToken, nextToLastIdentifierToken;
 
-  private DataTypeDescriptor getDataTypeServices(int type, int precision, int scale,
-                                                 int length)
+  private DataTypeDescriptor getType(int type, int precision, int scale, int length)
       throws StandardException {
     return new DataTypeDescriptor(TypeId.getBuiltInTypeId(type),
                                   precision,
@@ -3630,7 +3629,7 @@ exactNumericType() throws StandardException :
     ** of 4 (to handle "-0.1").
     */
     maxWidth = DataTypeDescriptor.computeMaxWidth(precision, scale);
-    return getDataTypeServices(type, precision, scale, maxWidth);
+    return getType(type, precision, scale, maxWidth);
   }
 |
   dtd = exactIntegerType()
@@ -3698,7 +3697,7 @@ approximateNumericType() throws StandardException :
       most implementations use synonyms or mappings at some point,
       and this is one of those places, for us.
      */
-    return getDataTypeServices(type, prec, scale, width);
+    return getType(type, prec, scale, width);
   }
 | 
   <REAL>

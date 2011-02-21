@@ -220,10 +220,6 @@ public class ResultColumn extends ValueNode
       return null;
   }
 
-  public DataTypeDescriptor getType() {
-    return getTypeServices();
-  }
-
   public int getColumnPosition() {
     return virtualColumnId;
   }
@@ -259,7 +255,7 @@ public class ResultColumn extends ValueNode
    * @exception StandardException Thrown on error
    */
   void setExpressionToNullNode() throws StandardException {
-    setExpression(getNullNode(getTypeServices()));
+    setExpression(getNullNode(getType()));
   }
 
   /**
@@ -325,7 +321,6 @@ public class ResultColumn extends ValueNode
       "name: " + name + "\n" +
       "tableName: " + tableName + "\n" +
       "isDefaultColumn: " + defaultColumn + "\n" +
-      "type: " + getTypeServices() + "\n" +
       super.toString();
   }
 
@@ -346,17 +341,6 @@ public class ResultColumn extends ValueNode
       printLabel(depth, "reference: ");
       reference.treePrint(depth + 1);
     }
-  }
-    
-  public DataTypeDescriptor getTypeServices() {
-    DataTypeDescriptor type = super.getTypeServices();
-    if (type != null)
-      return type;
-        
-    if (getExpression() != null)
-      return getExpression().getTypeServices();
-        
-    return null;
   }
 
   /**

@@ -45,9 +45,9 @@ public class ColumnBinding
     this.resultColumn = resultColumn;
   }
 
-  public DataTypeDescriptor getTypeServices() throws StandardException {
+  public DataTypeDescriptor getType() throws StandardException {
     if (resultColumn != null) {
-      return resultColumn.getTypeServices();
+      return resultColumn.getType();
     }
     else {
       Type aisType = column.getType();

@@ -80,7 +80,7 @@ public class VirtualColumnNode extends ValueNode
     this.sourceResultSet = (ResultSetNode)sourceResultSet;
     this.sourceColumn = source;
     this.columnId = ((Integer)columnId).intValue();
-    setType(source.getTypeServices());
+    setType(source.getType());
   }
 
   /**
@@ -146,13 +146,13 @@ public class VirtualColumnNode extends ValueNode
   }
 
   /**
-   * Get the DataTypeServices from this Node.
+   * Get the DataTypeDesciptor from this Node.
    *
-   * @return The DataTypeServices from this Node.  This
+   * @return The DataTypeDescriptor from this Node.  This
    *         may be null if the node isn't bound yet.
    */
-  public DataTypeDescriptor getTypeServices() {
-    return sourceColumn.getTypeServices();
+  public DataTypeDescriptor getType() {
+    return sourceColumn.getType();
   }
     
   public void setType(DataTypeDescriptor dtd) throws StandardException {

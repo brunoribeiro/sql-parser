@@ -62,7 +62,7 @@ public class UnaryDateTimestampOperatorNode extends UnaryOperatorNode
 
   public void init(Object operand, Object targetType) throws StandardException {
     setType((DataTypeDescriptor)targetType);
-    switch(getTypeServices().getJDBCTypeId()) {
+    switch(getType().getJDBCTypeId()) {
     case Types.DATE:
       super.init(operand, "date", DATE_METHOD_NAME);
       break;

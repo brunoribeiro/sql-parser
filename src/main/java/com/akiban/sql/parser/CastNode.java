@@ -69,7 +69,7 @@ public class CastNode extends ValueNode
    * Initializer for a CastNode
    *
    * @param castOperand The operand of the node
-   * @param castTarget DataTypeServices (target type of cast)
+   * @param castTarget DataTypeDescriptor (target type of cast)
    *
    * @exception StandardException Thrown on error
    */
@@ -107,7 +107,7 @@ public class CastNode extends ValueNode
    */
 
   public String toString() {
-    return "castTarget: " + getTypeServices() + "\n" +
+    return "castTarget: " + getType() + "\n" +
       super.toString();
   }
 
@@ -180,7 +180,7 @@ public class CastNode extends ValueNode
   protected boolean isEquivalent(ValueNode o) throws StandardException {
     if (isSameNodeType(o)) {
       CastNode other = (CastNode)o;
-      return getTypeServices().equals(other.getTypeServices()) && 
+      return getType().equals(other.getType()) && 
         castOperand.isEquivalent(other.castOperand);
     }
     return false;

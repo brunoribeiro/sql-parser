@@ -87,18 +87,17 @@ public class ColumnDefinitionNode extends TableElementNode
    *
    * @param name The name of the column
    * @param defaultNode The default value of the column
-   * @param dataTypeServices A DataTypeServices telling the type
-   *                         of the column
+   * @param type A DataTypeDescriptor telling the type of the column
    * @param autoIncrementInfo Info for autoincrement columns
    *
    */
 
   public void init(Object name,
                    Object defaultNode,
-                   Object dataTypeServices,
+                   Object type,
                    Object autoIncrementInfo) throws StandardException {
     super.init(name);
-    this.type = (DataTypeDescriptor)dataTypeServices;
+    this.type = (DataTypeDescriptor)type;
     if (defaultNode instanceof UntypedNullConstantNode) {
       // TODO: Can make properly typed null using this.type now.
     }
@@ -130,7 +129,7 @@ public class ColumnDefinitionNode extends TableElementNode
         // you could create a column with ai default, add data, drop 
         // the default, and try to add it back again you'll get an
         // error because the column is marked nullable.
-        if (dataTypeServices != null)
+        if (type != null)
           setNullability(false);
       }
     }

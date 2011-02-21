@@ -189,7 +189,7 @@ public final class DataTypeDescriptor
   }
 
   /**
-   * Get a DataTypeServices that corresponds to a nullable builtin SQL type.
+   * Get a DataTypeDescriptor that corresponds to a nullable builtin SQL type.
    * 
    * Collation type will be UCS_BASIC and derivation IMPLICIT.
    *
@@ -204,7 +204,7 @@ public final class DataTypeDescriptor
   }
 
   /**
-   * Get a DataTypeServices that corresponds to a builtin SQL type
+   * Get a DataTypeDescriptor that corresponds to a builtin SQL type
    * 
    * Collation type will be UCS_BASIC and derivation IMPLICIT.
    *
@@ -220,7 +220,7 @@ public final class DataTypeDescriptor
   }
 
   /**
-   * Get a DataTypeServices that corresponds to a Java type
+   * Get a DataTypeDescriptor that corresponds to a Java type
    *
    * @param javaTypeName The name of the Java type for which to get
    *                     a corresponding SQL DataTypeDescriptor
@@ -234,7 +234,7 @@ public final class DataTypeDescriptor
   }
 
   /**
-   * Get a DataTypeServices that corresponds to a Java type
+   * Get a DataTypeDescriptor that corresponds to a Java type
    *
    * @param javaTypeName The name of the Java type for which to get
    *                     a corresponding SQL DataTypeDescriptor

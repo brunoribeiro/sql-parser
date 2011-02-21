@@ -65,16 +65,16 @@ public class BaseColumnNode extends ValueNode
    *
    * @param columnName The name of the column being referenced
    * @param tableName The qualification for the column
-   * @param dts DataTypeServices for the column
+   * @param type DataTypeDescriptor for the column
    */
 
   public void init(Object columnName,
                    Object tableName,
-                   Object dts) 
+                   Object type) 
       throws StandardException {
     this.columnName = (String)columnName;
     this.tableName = (TableName)tableName;
-    setType((DataTypeDescriptor)dts);
+    setType((DataTypeDescriptor)type);
   }
 
   /**

@@ -76,7 +76,6 @@ public class UserTypeConstantNode extends ConstantNode
    *
    * <ul>
    * <li>arg1 The TypeId for the type of the node</li>
-   * <li>arg2 The factory to get the TypeId and DataTypeServices factories from.</li>
    * </ul>
    *
    * <p>

@@ -85,14 +85,6 @@
     </java>
   </target> 
 
-  <target name="test-normalizer" depends="compile, jvmargs">
-    <java classname="com.akiban.sql.compiler.BooleanNormalizer" fork="yes" failonerror="yes">
-      <classpath refid="running.class.path"/>
-      <arg value="SELECT * FROM t WHERE ((a AND b) AND c) AND NOT d"/>
-      <arg value="SELECT * FROM t WHERE (d OR e) OR ((a AND b) AND c)"/>
-    </java>
-  </target> 
-   
   <target name="test-binder" depends="compile, jvmargs">
     <java classname="com.akiban.sql.compiler.AISBinder" fork="yes" failonerror="yes">
       <classpath refid="running.class.path"/>
@@ -104,6 +96,14 @@
     </java>
   </target> 
 
+  <target name="test-normalizer" depends="compile, jvmargs">
+    <java classname="com.akiban.sql.compiler.BooleanNormalizer" fork="yes" failonerror="yes">
+      <classpath refid="running.class.path"/>
+      <arg value="SELECT * FROM t WHERE ((a AND b) AND c) AND NOT d"/>
+      <arg value="SELECT * FROM t WHERE (d OR e) OR ((a AND b) AND c)"/>
+    </java>
+  </target> 
+   
   <target name="clean">
     <delete dir="${CLASSES}"/>
     <delete file="${SRC}/com/akiban/sql/parser/SQLGrammar.java"/>

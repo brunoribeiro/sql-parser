@@ -117,7 +117,7 @@ public class BooleanNormalizer implements Visitor
             nodeFactory.getNode(NodeTypes.OR_NODE,
                                 leftOperand, rightOperand,
                                 parserContext);
-          cnode.setType(bnode.getTypeServices());
+          cnode.setType(bnode.getType());
           return cnode;
         }
         else {
@@ -178,7 +178,7 @@ public class BooleanNormalizer implements Visitor
         ValueNode newNode = (ValueNode)nodeFactory.getNode(newNodeType,
                                                            operand,
                                                            parserContext);
-        newNode.setType(unode.getTypeServices());
+        newNode.setType(unode.getType());
         return newNode;
       }
       break;
@@ -219,7 +219,7 @@ public class BooleanNormalizer implements Visitor
         ValueNode newNode = (ValueNode)nodeFactory.getNode(newNodeType, 
                                                            leftOperand, rightOperand,
                                                            parserContext);
-        newNode.setType(onode.getTypeServices());
+        newNode.setType(onode.getType());
         return newNode;
       }
       break;
@@ -313,11 +313,11 @@ public class BooleanNormalizer implements Visitor
           nodeFactory.getNode(NodeTypes.BINARY_EQUALS_OPERATOR_NODE,
                               node, falseNode,
                               parserContext);
-        /* // TODO: Types.
-        boolean nullableResult = node.getTypeServices().isNullable();
-        equalsNode.setType(new DataTypeDescriptor(TypeId.BOOLEAN_ID,
-                                                  nullableResult));
-        */
+        if (node.getType() != null) {
+          boolean nullableResult = node.getType().isNullable();
+          equalsNode.setType(new DataTypeDescriptor(TypeId.BOOLEAN_ID,
+                                                    nullableResult));
+        }
         return equalsNode;
       }
       break;
