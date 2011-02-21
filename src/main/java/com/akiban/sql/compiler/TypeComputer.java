@@ -38,6 +38,9 @@ public class TypeComputer implements Visitor
       return columnReference((ColumnReference)node);
     case NodeTypes.RESULT_COLUMN:
       return resultColumn((ResultColumn)node);
+    case NodeTypes.AND_NODE:
+    case NodeTypes.OR_NODE:
+      return binaryLogicalOperatorNode((BinaryLogicalOperatorNode)node);
     case NodeTypes.BINARY_PLUS_OPERATOR_NODE:
     case NodeTypes.BINARY_TIMES_OPERATOR_NODE:
     case NodeTypes.BINARY_DIVIDE_OPERATOR_NODE:
@@ -66,6 +69,21 @@ public class TypeComputer implements Visitor
   protected DataTypeDescriptor resultColumn(ResultColumn node)
       throws StandardException {
     return node.getExpression().getType();
+  }
+
+  protected DataTypeDescriptor binaryLogicalOperatorNode(BinaryLogicalOperatorNode node)
+      throws StandardException {
+    ValueNode leftOperand = node.getLeftOperand();
+    ValueNode rightOperand = node.getRightOperand();
+    DataTypeDescriptor leftType = leftOperand.getType();
+    DataTypeDescriptor rightType = rightOperand.getType();
+    if (!leftType.getTypeId().isBooleanTypeId())
+      throw new StandardException("Boolean operation on non-boolean: " + 
+                                  leftType.getTypeName());
+    if (!rightType.getTypeId().isBooleanTypeId())
+      throw new StandardException("Boolean operation on non-boolean: " + 
+                                  rightType.getTypeName());
+    return leftType.getNullabilityType(leftType.isNullable() || rightType.isNullable());
   }
 
   protected DataTypeDescriptor binaryArithmeticOperatorNode(BinaryArithmeticOperatorNode node)
@@ -214,8 +232,26 @@ public class TypeComputer implements Visitor
   }
 
   protected void selectNode(SelectNode node) throws StandardException {
+    // Probably the only possible case syntactically is a
+    // ColumnReference to a non-boolean column.
+    checkBooleanClause(node.getWhereClause(), "WHERE");
+    checkBooleanClause(node.getHavingClause(), "HAVING");
+
     // Children first wasn't enough to ensure that subqueries were done first.
     node.getResultColumns().accept(this);
+  }
+
+  private void checkBooleanClause(ValueNode clause, String which) 
+      throws StandardException {
+    if (clause != null) {
+      DataTypeDescriptor type = clause.getType();
+      if (type == null) {
+        assert false : "Type not set yet";
+        return;
+      }
+      if (!type.getTypeId().isBooleanTypeId())
+        throw new StandardException("Non-boolean " + which + " clause");
+    }
   }
 
   /* Visitor interface. */
