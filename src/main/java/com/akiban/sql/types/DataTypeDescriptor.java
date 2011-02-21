@@ -452,6 +452,129 @@ public final class DataTypeDescriptor
   }
 
   /**
+   * Compare if two DataTypeDescriptors are exactly the same
+   * @param other the type to compare to.
+  */
+  public boolean equals(Object other) {
+    if (!(other instanceof DataTypeDescriptor))
+      return false;
+        
+    DataTypeDescriptor odtd = (DataTypeDescriptor)other;
+    if (!this.getTypeName().equals(odtd.getTypeName()) ||
+        this.precision != odtd.getPrecision() ||
+        this.scale != odtd.getScale() ||
+        this.isNullable != odtd.isNullable() ||
+        this.maximumWidth != odtd.getMaximumWidth())
+      return false;
+    else
+      return true;              // TODO: Collation info, too, once there.
+  }
+
+  /**
+   * Check if this type is comparable with the passed type.
+   * 
+   * @param compareWithDTD the type of the instance to compare with this type.
+   * @param forEquals True if this is an = or <> comparison, false
+   *                  otherwise.
+   * @return true if compareWithDTD is comparable to this type, else false.
+   */
+  public boolean comparable(DataTypeDescriptor compareWithDTD, boolean forEquals) {
+    TypeId compareWithTypeID = compareWithDTD.getTypeId();
+    int compareWithJDBCTypeId = compareWithTypeID.getJDBCTypeId();
+
+    // Long types cannot be compared. 
+    // XML types also fall in this window
+    // Says SQL/XML[2003] spec:
+    // 4.2.2 XML comparison and assignment
+    // "XML values are not comparable."
+    // An XML value cannot be compared to any type--
+    // not even to other XML values.
+    if (compareWithTypeID.isLongConcatableTypeId() || typeId.isLongConcatableTypeId())
+      return false;
+
+    // Ref types cannot be compared
+    if (typeId.isRefTypeId() || compareWithTypeID.isRefTypeId())
+      return false;
+
+    //If this DTD is not user defined type but the DTD to be compared with 
+    //is user defined type, then let the other DTD decide what should be the
+    //outcome of the comparable method.
+    if (!(typeId.isUserDefinedTypeId()) && 
+        (compareWithTypeID.isUserDefinedTypeId()))
+      return compareWithDTD.comparable(this, forEquals);
+
+    //Numeric types are comparable to numeric types
+    if (typeId.isNumericTypeId())
+      return (compareWithTypeID.isNumericTypeId());
+
+    //CHAR, VARCHAR and LONGVARCHAR are comparable to strings, boolean, 
+    //DATE/TIME/TIMESTAMP and to comparable user types
+    if (typeId.isStringTypeId()) {
+      if((compareWithTypeID.isDateTimeTimeStampTypeID() ||
+          compareWithTypeID.isBooleanTypeId()))
+        return true;
+      //If both the types are string types, then we need to make sure
+      //they have the same collation set on them
+      if (compareWithTypeID.isStringTypeId() && typeId.isStringTypeId()) {
+        return true; // TODO: compareCollationInfo(compareWithDTD);
+      } 
+      else
+        return false;           //can't be compared
+    }
+
+    //Are comparable to other bit types and comparable user types
+    if (typeId.isBitTypeId()) 
+      return (compareWithTypeID.isBitTypeId()); 
+
+    //Booleans are comparable to Boolean, string, and to 
+    //comparable user types. As part of the work on DERYB-887,
+    //I removed the comparability of booleans to numerics; I don't
+    //understand the previous statement about comparable user types.
+    //I suspect that is wrong and should be addressed when we
+    //re-enable UDTs (see DERBY-651).
+    if (typeId.isBooleanTypeId())
+      return (compareWithTypeID.getSQLTypeName().equals(typeId.getSQLTypeName()) ||
+              compareWithTypeID.isStringTypeId()); 
+
+    //Dates are comparable to dates, strings and to comparable
+    //user types.
+    if (typeId.getJDBCTypeId() == Types.DATE)
+      if (compareWithJDBCTypeId == Types.DATE || 
+          compareWithTypeID.isStringTypeId())
+        return true;
+      else
+        return false;
+
+    //Times are comparable to times, strings and to comparable
+    //user types.
+    if (typeId.getJDBCTypeId() == Types.TIME)
+      if (compareWithJDBCTypeId == Types.TIME || 
+          compareWithTypeID.isStringTypeId())
+        return true;
+      else
+        return false;
+
+    //Timestamps are comparable to timestamps, strings and to
+    //comparable user types.
+    if (typeId.getJDBCTypeId() == Types.TIMESTAMP)
+      if (compareWithJDBCTypeId == Types.TIMESTAMP || 
+          compareWithTypeID.isStringTypeId())
+        return true;
+      else
+        return false;
+
+    // Right now, user defined types are not comparable.
+    // This removes old logic which we might want
+    // to revive when we support comparable UDTs. See
+    // DERBY-4470.
+    if (typeId.isUserDefinedTypeId() || typeId.getJDBCTypeId() == Types.OTHER) { 
+      return false; 
+    }
+
+    return false;
+  }
+
+  /**
    * Converts this data type descriptor (including length/precision)
    * to a string. E.g.
    *

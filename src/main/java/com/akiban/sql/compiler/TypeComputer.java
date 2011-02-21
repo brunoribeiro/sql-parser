@@ -38,6 +38,18 @@ public class TypeComputer implements Visitor
       return columnReference((ColumnReference)node);
     case NodeTypes.RESULT_COLUMN:
       return resultColumn((ResultColumn)node);
+    case NodeTypes.BINARY_PLUS_OPERATOR_NODE:
+    case NodeTypes.BINARY_TIMES_OPERATOR_NODE:
+    case NodeTypes.BINARY_DIVIDE_OPERATOR_NODE:
+    case NodeTypes.BINARY_MINUS_OPERATOR_NODE:
+      return binaryArithmeticOperatorNode((BinaryArithmeticOperatorNode)node);
+    case NodeTypes.BINARY_EQUALS_OPERATOR_NODE:
+    case NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE:
+    case NodeTypes.BINARY_GREATER_THAN_OPERATOR_NODE:
+    case NodeTypes.BINARY_GREATER_EQUALS_OPERATOR_NODE:
+    case NodeTypes.BINARY_LESS_THAN_OPERATOR_NODE:
+    case NodeTypes.BINARY_LESS_EQUALS_OPERATOR_NODE:
+      return binaryComparisonOperatorNode((BinaryComparisonOperatorNode)node);
     default:
       // assert false;
       return null;
@@ -54,6 +66,151 @@ public class TypeComputer implements Visitor
   protected DataTypeDescriptor resultColumn(ResultColumn node)
       throws StandardException {
     return node.getExpression().getType();
+  }
+
+  protected DataTypeDescriptor binaryArithmeticOperatorNode(BinaryArithmeticOperatorNode node)
+      throws StandardException {
+    ValueNode leftOperand = node.getLeftOperand();
+    ValueNode rightOperand = node.getRightOperand();
+    DataTypeDescriptor leftType = leftOperand.getType();
+    DataTypeDescriptor rightType = rightOperand.getType();
+    TypeId leftTypeId = leftType.getTypeId();
+    TypeId rightTypeId = rightType.getTypeId();
+
+    /* Do any implicit conversions from (long) (var)char. */
+    if (leftTypeId.isStringTypeId() && rightTypeId.isNumericTypeId()) {
+      boolean nullableResult;
+      nullableResult = leftType.isNullable() || rightType.isNullable();
+
+      /* If other side is decimal/numeric, then we need to diddle
+       * with the precision, scale and max width in order to handle
+       * computations like:  1.1 + '0.111'
+       */
+      int precision = rightType.getPrecision();
+      int scale = rightType.getScale();
+      int maxWidth = rightType.getMaximumWidth();
+
+      if (rightTypeId.isDecimalTypeId()) {
+        int charMaxWidth = leftType.getMaximumWidth();
+        precision += (2 * charMaxWidth);
+        scale += charMaxWidth;								
+        maxWidth = precision + 3;
+      }
+
+      leftOperand = (ValueNode)node.getNodeFactory()
+        .getNode(NodeTypes.CAST_NODE,
+                 leftOperand, 
+                 new DataTypeDescriptor(rightTypeId, precision,
+                                        scale, nullableResult, 
+                                        maxWidth),
+                 node.getParserContext());
+      node.setLeftOperand(leftOperand);
+    }
+    else if (rightTypeId.isStringTypeId() && leftTypeId.isNumericTypeId()) {
+      boolean nullableResult;
+      nullableResult = leftType.isNullable() || rightType.isNullable();
+
+      /* If other side is decimal/numeric, then we need to diddle
+       * with the precision, scale and max width in order to handle
+       * computations like:  1.1 + '0.111'
+       */
+      int precision = leftType.getPrecision();
+      int scale = leftType.getScale();
+      int maxWidth = leftType.getMaximumWidth();
+
+      if (leftTypeId.isDecimalTypeId()) {
+        int charMaxWidth = rightType.getMaximumWidth();
+        precision += (2 * charMaxWidth);
+        scale += charMaxWidth;								
+        maxWidth = precision + 3;
+      }
+      
+      rightOperand = (ValueNode)node.getNodeFactory()
+        .getNode(NodeTypes.CAST_NODE,
+                 rightOperand, 
+                 new DataTypeDescriptor(leftTypeId, precision,
+                                        scale, nullableResult, 
+                                        maxWidth),
+                 node.getParserContext());
+      node.setRightOperand(rightOperand);
+    }
+
+    /*
+    ** Set the result type of this operator based on the operands.
+    ** By convention, the left operand gets to decide the result type
+    ** of a binary operator.
+    */
+    return getTypeCompiler(leftOperand).
+      resolveArithmeticOperation(leftOperand.getType(),
+                                 rightOperand.getType(),
+                                 node.getOperator());
+  }
+
+  protected DataTypeDescriptor binaryComparisonOperatorNode(BinaryComparisonOperatorNode node) 
+      throws StandardException {
+    ValueNode leftOperand = node.getLeftOperand();
+    ValueNode rightOperand = node.getRightOperand();
+    TypeId leftTypeId = leftOperand.getTypeId();
+    TypeId rightTypeId = rightOperand.getTypeId();
+
+    // TODO: See whether this ends up being needed this way.
+
+    /*
+     * If we are comparing a non-string with a string type, then we
+     * must prevent the non-string value from being used to probe into
+     * an index on a string column. This is because the string types
+     * are all of low precedence, so the comparison rules of the non-string
+     * value are used, so it may not find values in a string index because
+     * it will be in the wrong order. So, cast the string value to its
+     * own type. This is easier than casting it to the non-string type,
+     * because we would have to figure out the right length to cast it to.
+     */
+    if (!leftTypeId.isStringTypeId() && rightTypeId.isStringTypeId()) {
+      DataTypeDescriptor rightType = rightOperand.getType();
+
+      rightOperand = (ValueNode)node.getNodeFactory()
+        .getNode(NodeTypes.CAST_NODE,
+                 rightOperand, 
+                 new DataTypeDescriptor(rightTypeId, true, 
+                                        rightType.getMaximumWidth()),
+                 node.getParserContext());
+      node.setRightOperand(rightOperand);
+    }
+    else if (!rightTypeId.isStringTypeId() && leftTypeId.isStringTypeId()) {
+      DataTypeDescriptor leftType = leftOperand.getType();
+
+      leftOperand = (ValueNode)node.getNodeFactory()
+        .getNode(NodeTypes.CAST_NODE,
+                 leftOperand,
+                 new DataTypeDescriptor(leftTypeId, true, 
+                                        leftType.getMaximumWidth()),
+                 node.getParserContext());
+      node.setLeftOperand(leftOperand);
+    }
+    
+    // Bypass the comparable check if this is a rewrite from the 
+    // optimizer.  We will assume Mr. Optimizer knows what he is doing.
+    if (!node.isForQueryRewrite()) {
+      String operator = node.getOperator();
+      boolean forEquals = operator.equals("=") || operator.equals("<>");
+      boolean cmp = leftOperand.getType().comparable(rightOperand.getType(),
+                                                     forEquals);
+      if (!cmp) {
+        throw new StandardException("Types not comparable: " + leftOperand.getType().getTypeName() +
+                                    " and " + rightOperand.getType().getTypeName());
+      }
+    }
+    
+    /*
+    ** Set the result type of this comparison operator based on the
+    ** operands.  The result type is always Boolean - the only question
+    ** is whether it is nullable or not.  If either of the operands is
+    ** nullable, the result of the comparison must be nullable, too, so
+    ** we can represent the unknown truth value.
+    */
+    boolean nullableResult = leftOperand.getType().isNullable() ||
+                             rightOperand.getType().isNullable();
+    return new DataTypeDescriptor(TypeId.BOOLEAN_ID, nullableResult);
   }
 
   protected void selectNode(SelectNode node) throws StandardException {
@@ -89,6 +246,29 @@ public class TypeComputer implements Visitor
   }
   public boolean stopTraversal() {
     return false;
+  }
+
+  /**
+   * Get the TypeCompiler associated with the given TypeId
+   *
+   * @param typeId The TypeId to get a TypeCompiler for
+   *
+   * @return The corresponding TypeCompiler
+   *
+   */
+  protected TypeCompiler getTypeCompiler(TypeId typeId) {
+    return TypeCompiler.getTypeCompiler(typeId);
+  }
+
+  /**
+   * Get the TypeCompiler from this ValueNode, based on its TypeId
+   * using getTypeId().
+   *
+   * @return This ValueNode's TypeCompiler
+   *
+   */
+  protected TypeCompiler getTypeCompiler(ValueNode valueNode) throws StandardException {
+    return getTypeCompiler(valueNode.getTypeId());
   }
 
 }

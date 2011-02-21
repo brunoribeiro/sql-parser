@@ -35,6 +35,8 @@
 
  */
 
+package com.akiban.sql.compiler;
+
 import com.akiban.sql.parser.*;
 
 import com.akiban.sql.StandardException;

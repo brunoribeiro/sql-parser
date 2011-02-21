@@ -89,11 +89,14 @@
   <target name="test-binder" depends="compile, jvmargs">
     <java classname="com.akiban.sql.compiler.AISBinder" fork="yes" failonerror="yes">
       <classpath refid="running.class.path"/>
-      <arg value="USE user1; CREATE TABLE t1(x INT, y VARCHAR(7), z DECIMAL); CREATE table t2(w CHAR(1) NOT NULL); USE user2; CREATE TABLE t3(x INT PRIMARY KEY);"/>
+      <arg value="USE user1; CREATE TABLE t1(x INT NOT NULL, y VARCHAR(7), z DECIMAL); CREATE table t2(w CHAR(1) NOT NULL); USE user2; CREATE TABLE t3(x INT PRIMARY KEY);"/>
       <arg value="user1"/>
+      <arg value="SELECT x + y + z FROM t1 WHERE x > 0"/>
+      <!--
       <arg value="SELECT x,y FROM t1,t2 AS tt WHERE t1.z > tt.w"/>
       <arg value="SELECT x, x2 FROM t1, (SELECT x AS not_x, y AS x2 FROM t1) AS t2"/>
       <arg value="SELECT * FROM t1 WHERE x in (SELECT w FROM t2 WHERE w &lt;> y)"/>
+      -->
     </java>
   </target> 
 

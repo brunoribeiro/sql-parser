@@ -256,7 +256,27 @@ public class BooleanNormalizer implements Visitor
                                                    leftBCO,
                                                    rightBCO,
                                                    parserContext);
-        // TODO: Maybe something about types.
+        /* Work out types (only nullability). */
+        DataTypeDescriptor leftType = leftOperand.getType();
+        DataTypeDescriptor right0Type = rightOperandList.get(0).getType();
+        DataTypeDescriptor right1Type = rightOperandList.get(1).getType();
+        boolean orNullable = false;
+        if ((leftType != null) && (right0Type != null)) {
+          boolean nullable = leftType.isNullable() || right0Type.isNullable();
+          DataTypeDescriptor leftBCType = new DataTypeDescriptor(TypeId.BOOLEAN_ID, 
+                                                                 nullable);
+          leftBCO.setType(leftBCType);
+          orNullable = nullable;
+        }
+        if ((leftType != null) && (right1Type != null)) {
+          boolean nullable = leftType.isNullable() || right1Type.isNullable();
+          DataTypeDescriptor rightBCType = new DataTypeDescriptor(TypeId.BOOLEAN_ID, 
+                                                                  nullable);
+          rightBCO.setType(rightBCType);
+          orNullable |= nullable;
+        }
+        if ((leftType != null) && (right0Type != null) && (right1Type != null))
+          newOr.setType(new DataTypeDescriptor(TypeId.BOOLEAN_ID, orNullable));
         return newOr;
       }
     case NodeTypes.IN_LIST_OPERATOR_NODE:
@@ -288,6 +308,7 @@ public class BooleanNormalizer implements Visitor
             result = andNode;
           }
         }
+        // TODO: Work out types.
         return result;
       }
       break;
@@ -303,6 +324,28 @@ public class BooleanNormalizer implements Visitor
         cnode.setValue(cnode.getValue() == Boolean.TRUE ? Boolean.FALSE : Boolean.TRUE);
       }
       break;
+    case NodeTypes.COLUMN_REFERENCE:
+      if (!underNotNode) {
+        /* X -> (X = TRUE) */
+        // NOTE: This happened in a different place in the original
+        // Derby, but that ended up only doing those along the
+        // right-hand branch, which does not seem consistent.
+        BooleanConstantNode trueNode = (BooleanConstantNode)
+          nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
+                              Boolean.TRUE,
+                              parserContext);
+        BinaryComparisonOperatorNode equalsNode = (BinaryComparisonOperatorNode)
+          nodeFactory.getNode(NodeTypes.BINARY_EQUALS_OPERATOR_NODE,
+                              node, trueNode,
+                              parserContext);
+        if (node.getType() != null) {
+          boolean nullableResult = node.getType().isNullable();
+          equalsNode.setType(new DataTypeDescriptor(TypeId.BOOLEAN_ID,
+                                                    nullableResult));
+        }
+        return equalsNode;
+      }
+      /* else falls through */
     default:
       if (underNotNode) {
         BooleanConstantNode falseNode = (BooleanConstantNode) 
@@ -366,30 +409,9 @@ public class BooleanNormalizer implements Visitor
         andNode.setRightOperand(putAndsOnTop(andNode.getRightOperand()));
         return andNode;
       }
-    case NodeTypes.COLUMN_REFERENCE:
-      {
-        /* X -> (X = TRUE) AND TRUE */
-        // TODO: This is suspicious: it only happens on the right-hand AND branch,
-        // and so outputs WHERE f AND ((g = true) AND true).
-        // Perhaps a separate pass that does more (down both sides of
-        // AND and OR), or an earlier conversion that makes sure
-        // things are in some standard boolean form.
-        BooleanConstantNode trueNode = (BooleanConstantNode)
-          nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
-                              Boolean.TRUE,
-                              parserContext);
-        BinaryComparisonOperatorNode equalsNode = (BinaryComparisonOperatorNode)
-          nodeFactory.getNode(NodeTypes.BINARY_EQUALS_OPERATOR_NODE,
-                              node, trueNode,
-                              parserContext);
-        AndNode andNode = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
-                                                       equalsNode, trueNode, 
-                                                       parserContext);
-        return andNode;
-      }
-      /* // Not sure at all about this
-         case NodeTypes.IS_NODE:
-         {
+    /* // Not sure at all about this
+    case NodeTypes.IS_NODE:
+       {
          IsNode isNode = (IsNode)node;
          ValueNode leftOperand = isNode.getLeftOperand();
          ValueNode rightOperand = isNode.getRightOperand();
@@ -397,9 +419,9 @@ public class BooleanNormalizer implements Visitor
          rightOperand = putAndsOnTop(rightOperand);
          isNode.setLeftOperand(leftOperand);
          isNode.setRightOperand(rightOperand);
-         }
-         break;
-      */
+       }
+       break;
+    */
     default:
       {
         /* expr -> expr AND TRUE */
@@ -410,6 +432,11 @@ public class BooleanNormalizer implements Visitor
         AndNode andNode = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
                                                        node, trueNode,
                                                        parserContext);
+        if (node.getType() != null) {
+          boolean nullableResult = node.getType().isNullable();
+          andNode.setType(new DataTypeDescriptor(TypeId.BOOLEAN_ID,
+                                                 nullableResult));
+        }
         return andNode;
       }
     }
@@ -484,9 +511,11 @@ public class BooleanNormalizer implements Visitor
             nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
                                 Boolean.TRUE,
                                 parserContext);
-          rightOperand = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
-                                                      rightOperand, trueNode,
-                                                      parserContext);
+          AndNode newRight = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
+                                                          rightOperand, trueNode,
+                                                          parserContext);
+          newRight.setType(rightOperand.getType());
+          rightOperand = newRight;
         }
 
         /* If leftOperand is an AndNode, then we modify the tree from:
@@ -545,9 +574,11 @@ public class BooleanNormalizer implements Visitor
             nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
                                 Boolean.FALSE,
                                 parserContext);
-          rightOperand = (ValueNode)nodeFactory.getNode(NodeTypes.OR_NODE,
+          OrNode newRight = (OrNode)nodeFactory.getNode(NodeTypes.OR_NODE,
                                                         rightOperand, falseNode,
                                                         parserContext);
+          newRight.setType(rightOperand.getType());
+          rightOperand = newRight;
           orNode.setRightOperand(rightOperand);
         }
         
@@ -565,10 +596,12 @@ public class BooleanNormalizer implements Visitor
             nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
                                 Boolean.FALSE,
                                 parserContext);
-          orNode.setRightOperand((ValueNode)nodeFactory.getNode(NodeTypes.OR_NODE,
-                                                                rightOperand, 
-                                                                falseNode,
-                                                                parserContext));
+          OrNode newRight = (OrNode)nodeFactory.getNode(NodeTypes.OR_NODE,
+                                                        rightOperand, 
+                                                        falseNode,
+                                                        parserContext);
+          newRight.setType(rightOperand.getType());
+          orNode.setRightOperand(newRight);
         }
 
         orNode = (OrNode)node;

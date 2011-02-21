@@ -47,6 +47,8 @@ import com.akiban.sql.types.ValueClassName;
 
 public abstract class BinaryComparisonOperatorNode extends BinaryOperatorNode
 {
+  private boolean forQueryRewrite;
+
   /**
    * Initializer for a BinaryComparisonOperatorNode
    *
@@ -62,6 +64,24 @@ public abstract class BinaryComparisonOperatorNode extends BinaryOperatorNode
                    Object methodName) {
     super.init(leftOperand, rightOperand, operator, methodName,
                ValueClassName.DataValueDescriptor, ValueClassName.DataValueDescriptor);
+  }
+
+  /**
+   * This node was generated as part of a query rewrite. Bypass the
+   * normal comparability checks.
+   * @param val  true if this was for a query rewrite
+   */
+  public void setForQueryRewrite(boolean val) {
+    forQueryRewrite=val;
+  }
+
+  /**
+   * Was this node generated in a query rewrite?
+   *
+   * @return true if it was generated in a query rewrite.
+   */
+  public boolean isForQueryRewrite() {
+    return forQueryRewrite;
   }
 
 }
