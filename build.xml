@@ -74,6 +74,7 @@
       <arg value="SELECT DISTINCT MAX(x),y||y AS yy FROM t WHERE z > 3.14 AND w IS NOT NULL OR y LIKE 'f%' GROUP BY yy HAVING yy > 'z' ORDER BY yyo NULLS FIRST"/>
       <arg value="SELECT x,y FROM t WHERE z BETWEEN 1 AND 10"/>
       <arg value="SELECT CASE WHEN x = y OR x = z THEN x WHEN y = z THEN y ELSE w END FROM t"/>
+      <arg value="SELECT CAST(x AS DECIMAL(4,2)) FROM t"/>
       <!--
       <arg value="INSERT INTO t1(x,y,z) VALUES(1, X'DEADBEEF', 3 * 10)"/>
       <arg value="INSERT INTO t1 SELECT x,y,z FROM t"/>

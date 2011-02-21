@@ -127,6 +127,8 @@ public class NodeToString
       return constantNode((ConstantNode)node);
     case NodeTypes.PARAMETER_NODE:
       return parameterNode((ParameterNode)node);
+    case NodeTypes.CAST_NODE:
+      return castNode((CastNode)node);
     default:
       return "**UNKNOWN(" + node.getNodeType() +")**";
     }
@@ -513,6 +515,11 @@ public class NodeToString
 
   protected String parameterNode(ParameterNode node) throws StandardException {
     return "?";
+  }
+
+  protected String castNode(CastNode node) throws StandardException {
+    return "CAST(" + toString(node.getCastOperand()) + 
+      " AS " + node.getType().toString() + ")";
   }
 
   // TODO: Temporary low-budget testing.

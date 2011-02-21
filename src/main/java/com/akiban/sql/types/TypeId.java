@@ -222,31 +222,31 @@ public class TypeId
 
   // This makes it easier to keep the modularity somewhat similar but
   // without all the extra instances.
-  private static class FormatIds {
-    static final int BIT_TYPE_ID = 0;
-    static final int BOOLEAN_TYPE_ID = 1;
-    static final int CHAR_TYPE_ID = 2;
-    static final int DATE_TYPE_ID = 3;
-    static final int DECIMAL_TYPE_ID = 4;
-    static final int NUMERIC_TYPE_ID = 5;
-    static final int DOUBLE_TYPE_ID = 6;
-    static final int INT_TYPE_ID = 7;
-    static final int LONGINT_TYPE_ID = 8;
-    static final int LONGVARBIT_TYPE_ID = 9;
-    static final int LONGVARCHAR_TYPE_ID = 10;
-    static final int REAL_TYPE_ID = 11;
-    static final int REF_TYPE_ID = 12;
-    static final int SMALLINT_TYPE_ID = 13;
-    static final int TIME_TYPE_ID = 14;
-    static final int TIMESTAMP_TYPE_ID = 15;
-    static final int TINYINT_TYPE_ID = 16;
-    static final int USERDEFINED_TYPE_ID = 17;
-    static final int VARBIT_TYPE_ID = 18;
-    static final int BLOB_TYPE_ID = 19;
-    static final int VARCHAR_TYPE_ID = 20;
-    static final int CLOB_TYPE_ID = 21;
-    static final int XML_TYPE_ID = 22;
-    static final int ROW_MULTISET_TYPE_ID_IMPL = 23;
+  public static class FormatIds {
+    public static final int BIT_TYPE_ID = 0;
+    public static final int BOOLEAN_TYPE_ID = 1;
+    public static final int CHAR_TYPE_ID = 2;
+    public static final int DATE_TYPE_ID = 3;
+    public static final int DECIMAL_TYPE_ID = 4;
+    public static final int NUMERIC_TYPE_ID = 5;
+    public static final int DOUBLE_TYPE_ID = 6;
+    public static final int INT_TYPE_ID = 7;
+    public static final int LONGINT_TYPE_ID = 8;
+    public static final int LONGVARBIT_TYPE_ID = 9;
+    public static final int LONGVARCHAR_TYPE_ID = 10;
+    public static final int REAL_TYPE_ID = 11;
+    public static final int REF_TYPE_ID = 12;
+    public static final int SMALLINT_TYPE_ID = 13;
+    public static final int TIME_TYPE_ID = 14;
+    public static final int TIMESTAMP_TYPE_ID = 15;
+    public static final int TINYINT_TYPE_ID = 16;
+    public static final int USERDEFINED_TYPE_ID = 17;
+    public static final int VARBIT_TYPE_ID = 18;
+    public static final int BLOB_TYPE_ID = 19;
+    public static final int VARCHAR_TYPE_ID = 20;
+    public static final int CLOB_TYPE_ID = 21;
+    public static final int XML_TYPE_ID = 22;
+    public static final int ROW_MULTISET_TYPE_ID_IMPL = 23;
   }
 
   public static final TypeId BOOLEAN_ID = new TypeId(FormatIds.BOOLEAN_TYPE_ID);
@@ -421,6 +421,11 @@ public class TypeId
                                             String className)
       throws StandardException {
     return new TypeId(schemaName, unqualifiedName, className);
+  }
+
+  /** Return true if this is this type id describes an ANSI UDT */
+  public boolean isAnsiUDT() { 
+    return (schemaName != null); 
   }
 
   /**
@@ -909,6 +914,10 @@ public class TypeId
       assert false;
       break;
     }
+  }
+
+  public int getTypeFormatId() {
+    return formatId;
   }
 
   /**
