@@ -189,17 +189,6 @@ public abstract class ValueNode extends QueryTreeNode
   }
 
   /**
-   * Compute the data type from subnodes. This method is normally
-   * overridden, unless the type is only set from the outside somehow,
-   * such as ColumnReference, which depends on the binding
-   * implementation.
-   */
-  public DataTypeDescriptor computeType() throws StandardException {
-    assert (type != null) : "data type has not been set yet";
-    return type;
-  }
-
-  /**
    * Get the source for this ValueNode.
    *
    * @return The source of this ValueNode, null if this node

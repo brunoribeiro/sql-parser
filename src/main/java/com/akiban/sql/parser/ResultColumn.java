@@ -310,19 +310,6 @@ public class ResultColumn extends ValueNode
   }
 
   /**
-   * Compute the data type from subnodes. This method is normally
-   * overridden, unless the type is only set from the outside somehow,
-   * such as ColumnReference, which depends on the binding
-   * implementation.
-   */
-  public DataTypeDescriptor computeType() throws StandardException {
-    if (expression != null)
-      return expression.getType();
-    else
-      return super.computeType();
-  }
-
-  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *
