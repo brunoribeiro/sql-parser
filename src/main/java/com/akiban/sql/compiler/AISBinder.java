@@ -268,26 +268,4 @@ public class AISBinder implements Visitor
     return false;
   }
 
-  // TODO: Temporary low-budget testing.
-  public static void main(String[] args) throws Exception {
-    AkibanInformationSchema ais = new com.akiban.ais.ddl.DDLSource()
-      .buildAISFromString(args[0]);
-    AISBinder binder = new AISBinder(ais, args[1]);
-    TypeComputer tc = new TypeComputer();
-    SQLParser p = new SQLParser();
-    for (int i = 2; i < args.length; i++) {
-      String arg = args[i];
-      System.out.println("=====");
-      System.out.println(arg);
-      try {
-        StatementNode stmt = p.parseStatement(arg);
-        binder.bind(stmt);
-        tc.compute(stmt);
-        stmt.treePrint();
-      }
-      catch (StandardException ex) {
-        ex.printStackTrace();
-      }
-    }
-  }
 }

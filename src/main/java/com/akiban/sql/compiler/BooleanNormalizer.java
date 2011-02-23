@@ -727,25 +727,4 @@ public class BooleanNormalizer implements Visitor
     return false;
   }
 
-  // TODO: Temporary low-budget testing.
-  public static void main(String[] args) throws Exception {
-    SQLParser p = new SQLParser();
-    BooleanNormalizer bn = new BooleanNormalizer(p);
-    NodeToString ts = new NodeToString();
-    for (String arg : args) {
-      System.out.println("=====");
-      System.out.println(arg);
-      try {
-        StatementNode stmt = p.parseStatement(arg);
-        String sql = ts.toString(stmt);
-        System.out.println(sql);
-        stmt = (StatementNode)stmt.accept(bn);
-        sql = ts.toString(stmt);
-        System.out.println(sql);
-      }
-      catch (StandardException ex) {
-        ex.printStackTrace();
-      }
-    }
-  }
 }

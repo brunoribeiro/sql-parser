@@ -57,8 +57,9 @@
   </target>
 
   <target name="test-parser" depends="compile, jvmargs">
-    <java classname="com.akiban.sql.parser.SQLParser" fork="yes" failonerror="yes">
+    <java classname="com.akiban.sql.test.Tester" fork="yes" failonerror="yes">
       <classpath refid="running.class.path"/>
+      <arg line="-tree"/>
       <arg value="SELECT x,y FROM t WHERE z > 3.14 AND w IS NOT NULL"/>
       <arg value="INSERT INTO t1 VALUES(1, 'foo', 3 * 10)"/>
       <arg value="INSERT INTO t1 SELECT x,y,z FROM t"/>
@@ -68,8 +69,9 @@
   </target> 
 
   <target name="test-unparser" depends="compile, jvmargs">
-    <java classname="com.akiban.sql.unparser.NodeToString" fork="yes" failonerror="yes">
+    <java classname="com.akiban.sql.test.Tester" fork="yes" failonerror="yes">
       <classpath refid="running.class.path"/>
+      <arg line="-print"/>
       <arg value="SELECT x,y||y AS yy FROM t WHERE z > 3.14 AND w IS NOT NULL OR y LIKE 'f%'"/>
       <arg value="SELECT DISTINCT MAX(x),y||y AS yy FROM t WHERE z > 3.14 AND w IS NOT NULL OR y LIKE 'f%' GROUP BY yy HAVING yy > 'z' ORDER BY yyo NULLS FIRST"/>
       <arg value="SELECT x,y FROM t WHERE z BETWEEN 1 AND 10"/>
@@ -87,10 +89,11 @@
   </target> 
 
   <target name="test-binder" depends="compile, jvmargs">
-    <java classname="com.akiban.sql.compiler.AISBinder" fork="yes" failonerror="yes">
+    <java classname="com.akiban.sql.test.Tester" fork="yes" failonerror="yes">
       <classpath refid="running.class.path"/>
-      <arg value="USE user1; CREATE TABLE t1(x INT NOT NULL, y VARCHAR(7), z DECIMAL); CREATE table t2(w CHAR(1) NOT NULL); USE user2; CREATE TABLE t3(x INT PRIMARY KEY);"/>
-      <arg value="user1"/>
+      <arg value="-bind"/>
+      <arg value="CREATE TABLE t1(x INT NOT NULL, y VARCHAR(7), z DECIMAL); CREATE table t2(w CHAR(1) NOT NULL);"/>
+      <arg line="-types -tree"/>
       <arg value="SELECT x + y + z FROM t1 WHERE x > 0 AND y > 'foo'"/>
       <!--
       <arg value="SELECT x,y FROM t1,t2 AS tt WHERE t1.z > tt.w"/>
@@ -101,8 +104,9 @@
   </target> 
 
   <target name="test-normalizer" depends="compile, jvmargs">
-    <java classname="com.akiban.sql.compiler.BooleanNormalizer" fork="yes" failonerror="yes">
+    <java classname="com.akiban.sql.test.Tester" fork="yes" failonerror="yes">
       <classpath refid="running.class.path"/>
+      <arg line="-boolean -print"/>
       <arg value="SELECT * FROM t WHERE ((a AND b) AND c) AND NOT d"/>
       <arg value="SELECT * FROM t WHERE (d OR e) OR ((a AND b) AND c)"/>
     </java>

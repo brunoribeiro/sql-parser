@@ -522,24 +522,4 @@ public class NodeToString
       " AS " + node.getType().toString() + ")";
   }
 
-  // TODO: Temporary low-budget testing.
-  public static void main(String[] args) throws Exception {
-    SQLParser p = new SQLParser();
-    NodeToString ts = new NodeToString();
-    for (String arg : args) {
-      System.out.println("=====");
-      System.out.println(arg);
-      try {
-        StatementNode stmt = p.parseStatement(arg);
-        String sql = ts.toString(stmt);
-        System.out.println(sql);
-        if (sql.indexOf("UNKNOWN") > 0) {
-          stmt.treePrint();
-        }
-      }
-      catch (StandardException ex) {
-        ex.printStackTrace();
-      }
-    }
-  }
 }
