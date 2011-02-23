@@ -55,6 +55,8 @@ public class TypeComputer implements Visitor
       return binaryComparisonOperatorNode((BinaryComparisonOperatorNode)node);
     case NodeTypes.CONDITIONAL_NODE:
       return conditionalNode((ConditionalNode)node);
+    case NodeTypes.COALESCE_FUNCTION_NODE:
+      return coalesceFunctionNode((CoalesceFunctionNode)node);
     default:
       // assert false;
       return null;
@@ -237,6 +239,11 @@ public class TypeComputer implements Visitor
       throws StandardException {
     checkBooleanClause(node.getTestCondition(), "WHEN");
     return dominantType(node.getThenElseList());
+  }
+
+  protected DataTypeDescriptor coalesceFunctionNode(CoalesceFunctionNode node)
+      throws StandardException {
+    return dominantType(node.getArgumentsList());
   }
 
   protected DataTypeDescriptor dominantType(ValueNodeList nodeList) 

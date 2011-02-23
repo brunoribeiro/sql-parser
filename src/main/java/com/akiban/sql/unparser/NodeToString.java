@@ -102,6 +102,8 @@ public class NodeToString
       return betweenOperatorNode((BetweenOperatorNode)node);
     case NodeTypes.CONDITIONAL_NODE:
       return conditionalNode((ConditionalNode)node);
+    case NodeTypes.COALESCE_FUNCTION_NODE:
+      return coalesceFunctionNode((CoalesceFunctionNode)node);
     case NodeTypes.AGGREGATE_NODE:
       return aggregateNode((AggregateNode)node);
     case NodeTypes.UNTYPED_NULL_CONSTANT_NODE:
@@ -447,6 +449,12 @@ public class NodeToString
     return str.toString();
   }
 
+  protected String coalesceFunctionNode(CoalesceFunctionNode node) 
+      throws StandardException {
+    return functionCall(node.getFunctionName(),
+                        node.getArgumentsList());
+  }
+  
   protected String constantNode(ConstantNode node) throws StandardException {
     Object value = node.getValue();
     if (value == null)
@@ -475,6 +483,11 @@ public class NodeToString
       maybeParens(node.getRightOperand());
   }
   
+  protected String functionCall(String functionName, ValueNodeList args)
+      throws StandardException {
+    return functionName + "(" + nodeList(args, true) + ")";
+  }
+
   protected String nodeList(QueryTreeNodeList<? extends QueryTreeNode> nl)
       throws StandardException {
     return nodeList(nl, false);
