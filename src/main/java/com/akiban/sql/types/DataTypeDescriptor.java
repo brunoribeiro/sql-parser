@@ -361,6 +361,206 @@ public final class DataTypeDescriptor
     this.maximumWidth = source.maximumWidth;
   }
 
+  private DataTypeDescriptor(DataTypeDescriptor source, 
+                             int precision, int scale,
+                             boolean isNullable, int maximumWidth) {
+    this.typeId = source.typeId;
+    this.precision = precision;
+    this.scale = scale;
+    this.isNullable = isNullable;
+    this.maximumWidth = maximumWidth;
+  }
+
+  /**
+   * Get the dominant type (DataTypeDescriptor) of the 2.
+   * For variable length types, the resulting type will have the
+   * biggest max length of the 2.
+   * If either side is nullable, then the result will also be nullable.
+   * 
+   * @param otherDTS DataTypeDescriptor to compare with.
+   *
+   * @return DataTypeDescriptor DTS for dominant type
+   *
+   * @exception StandardException Thrown on error
+   */
+  public DataTypeDescriptor getDominantType(DataTypeDescriptor otherDTS)
+      throws StandardException {
+    boolean nullable;
+    TypeId thisType;
+    TypeId otherType;
+    DataTypeDescriptor higherType;
+    DataTypeDescriptor lowerType = null;
+    int maximumWidth;
+    int precision = getPrecision();
+    int scale = getScale();
+
+    thisType = getTypeId();
+    otherType = otherDTS.getTypeId();
+
+    /* The result is nullable if either side is nullable */
+    nullable = isNullable() || otherDTS.isNullable();
+
+    /*
+    ** The result will have the maximum width of both sides
+    */
+    maximumWidth = (getMaximumWidth() > otherDTS.getMaximumWidth())
+                  ? getMaximumWidth() : otherDTS.getMaximumWidth();
+
+    /* We need 2 separate methods of determining type dominance - 1 if both
+     * types are system built-in types and the other if at least 1 is
+     * a user type. (typePrecedence is meaningless for user types.)
+     */
+    if (!thisType.userType() && !otherType.userType()) {
+        TypeId higherTypeId;
+        TypeId lowerTypeId;
+        if (thisType.typePrecedence() > otherType.typePrecedence()) {
+          higherType = this;
+          lowerType = otherDTS;
+          higherTypeId = thisType;
+          lowerTypeId = otherType;
+        }
+        else {
+          higherType = otherDTS;
+          lowerType = this;
+          higherTypeId = otherType;
+          lowerTypeId = thisType;
+        }
+
+        //Following is checking if higher type argument is real and other argument is decimal/bigint/integer/smallint,
+        //then result type should be double
+        if (higherTypeId.isRealTypeId() && 
+            !lowerTypeId.isRealTypeId() && 
+            lowerTypeId.isNumericTypeId()) {
+          higherType = DataTypeDescriptor.getBuiltInDataTypeDescriptor(Types.DOUBLE);
+          higherTypeId = TypeId.getBuiltInTypeId(Types.DOUBLE);
+        }
+        /*
+        ** If we have a DECIMAL/NUMERIC we have to do some
+        ** extra work to make sure the resultant type can
+        ** handle the maximum values for the two input
+        ** types.  We cannot just take the maximum for
+        ** precision.  E.g. we want something like:
+        **
+        **      DEC(10,10) and DEC(3,0) => DEC(13,10)
+        **
+        ** (var)char type needs some conversion handled later.
+        */
+        if (higherTypeId.isDecimalTypeId() && 
+            !lowerTypeId.isStringTypeId()) {
+          precision = higherTypeId.getPrecision(this, otherDTS);
+          if (precision > 31) precision = 31; //db2 silently does this and so do we
+          scale = higherTypeId.getScale(this, otherDTS);
+
+          /* maximumWidth needs to count possible leading '-' and
+           * decimal point and leading '0' if scale > 0.  See also
+           * sqlgrammar.jj(exactNumericType).  Beetle 3875
+           */
+          maximumWidth = (scale > 0) ? precision + 3 : precision + 1;
+        }
+        else if (thisType.typePrecedence() != otherType.typePrecedence()) {
+          precision = higherType.getPrecision();
+          scale = higherType.getScale();
+
+          /* GROSS HACKS:
+           * If we are doing an implicit (var)char->(var)bit conversion
+           * then the maximum width for the (var)char as a (var)bit
+           * is really 16 * its width as a (var)char.  Adjust
+           * maximumWidth accordingly.
+           * If we are doing an implicit (var)char->decimal conversion
+           * then we need to increment the decimal's precision by
+           * 2 * the maximum width for the (var)char and the scale
+           * by the maximum width for the (var)char. The maximumWidth
+           * becomes the new precision + 3.  This is because
+           * the (var)char could contain any decimal value from XXXXXX
+           * to 0.XXXXX.  (In other words, we don't know which side of the
+           * decimal point the characters will be on.)
+           */
+          if (lowerTypeId.isStringTypeId()) {
+            if (higherTypeId.isBitTypeId() &&
+                !higherTypeId.isLongConcatableTypeId()) {
+              if (lowerTypeId.isLongConcatableTypeId()) {
+                if (maximumWidth > (Integer.MAX_VALUE / 16))
+                  maximumWidth = Integer.MAX_VALUE;
+                else
+                  maximumWidth *= 16;
+              }
+              else {
+                int charMaxWidth;
+
+                int fromWidth = lowerType.getMaximumWidth();
+                if (fromWidth > (Integer.MAX_VALUE / 16))
+                  charMaxWidth = Integer.MAX_VALUE;
+                else
+                  charMaxWidth = 16 * fromWidth;
+
+                maximumWidth = (maximumWidth >= charMaxWidth) ?
+                  maximumWidth : charMaxWidth;
+              }
+            }
+          }
+
+          /*
+           * If we are doing an implicit (var)char->decimal conversion
+           * then the resulting decimal's precision could be as high as 
+           * 2 * the maximum width (precisely 2mw-1) for the (var)char
+           * and the scale could be as high as the maximum width
+           * (precisely mw-1) for the (var)char.
+           * The maximumWidth becomes the new precision + 3.  This is
+           * because the (var)char could contain any decimal value from
+           * XXXXXX to 0.XXXXX.  (In other words, we don't know which
+           * side of the decimal point the characters will be on.)
+           *
+           * We don't follow this algorithm for long varchar because the
+           * maximum length of a long varchar is maxint, and we don't
+           * want to allocate a huge decimal value.  So in this case,
+           * the precision, scale, and maximum width all come from
+           * the decimal type.
+           */
+          if (lowerTypeId.isStringTypeId() &&
+              !lowerTypeId.isLongConcatableTypeId() &&
+              higherTypeId.isDecimalTypeId()) {
+            int charMaxWidth = lowerType.getMaximumWidth();
+            int charPrecision;
+
+            /*
+            ** Be careful not to overflow when calculating the
+            ** precision.  Remember that we will be adding
+            ** three to the precision to get the maximum width.
+            */
+            if (charMaxWidth > (Integer.MAX_VALUE - 3) / 2)
+              charPrecision = Integer.MAX_VALUE - 3;
+            else
+              charPrecision = charMaxWidth * 2;
+
+            if (precision < charPrecision)
+              precision = charPrecision;
+
+            if (scale < charMaxWidth)
+              scale = charMaxWidth;
+
+            maximumWidth = precision + 3;
+          }
+        }
+      }
+    else {
+      /* At least 1 type is not a system built-in type */
+      if (!thisType.equals(otherType)) {
+        throw new StandardException("Two different user-defined types");
+      }
+      higherType = this;
+      precision = higherType.getPrecision();
+      scale = higherType.getScale();
+    }
+
+
+    higherType = new DataTypeDescriptor(higherType, 
+                                        precision, scale, nullable, maximumWidth);
+
+    // TODO: Collation merge was here (with long comment at function head).
+
+    return higherType;
+  }
+
   /**
    * Get maximum width.
    */

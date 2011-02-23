@@ -119,6 +119,7 @@ public class Tester
           tester.process(arg);
         }
         catch (StandardException ex) {
+          System.out.flush();
           ex.printStackTrace();
         }
       }

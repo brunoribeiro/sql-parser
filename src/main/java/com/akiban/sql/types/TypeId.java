@@ -1342,6 +1342,53 @@ public class TypeId
   }
 
   /**
+   * Get the precision of the merge of two Decimals
+   *
+   * @param leftType the left type
+   * @param rightType the left type
+   *
+   * @return the resultant precision
+   */
+  public int getPrecision(DataTypeDescriptor leftType,
+                          DataTypeDescriptor rightType) {
+    long lscale = (long)leftType.getScale();
+    long rscale = (long)rightType.getScale();
+    long lprec = (long)leftType.getPrecision();
+    long rprec = (long)rightType.getPrecision();
+    long val;
+
+    assert (formatId != FormatIds.DECIMAL_TYPE_ID);
+
+    /*
+    ** Take the maximum left of decimal digits plus the scale.
+    */
+    val = this.getScale(leftType, rightType) + Math.max(lprec - lscale, rprec - rscale);
+
+    if (val > Integer.MAX_VALUE) {
+      val = Integer.MAX_VALUE;
+    }
+    return (int)val;
+  }
+
+  /**
+   * Get the scale of the merge of two decimals
+   *
+   * @param leftType the left type
+   * @param rightType the left type
+   *
+   * @return the resultant precision
+   */
+  public int getScale(DataTypeDescriptor leftType,
+                      DataTypeDescriptor rightType) {
+    assert (formatId != FormatIds.DECIMAL_TYPE_ID);
+
+    /*
+    ** Retain greatest scale
+    */
+    return Math.max(leftType.getScale(), rightType.getScale());
+  }
+
+  /**
    * Does type hava a declared variable length (defined by the application).
    * Examples are CHAR(10), CLOB(1M).
    * Unbounded long types, like LONG VARCHAR return false here.

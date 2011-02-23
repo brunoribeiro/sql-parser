@@ -49,8 +49,8 @@ import com.akiban.sql.StandardException;
 
 public class CoalesceFunctionNode extends ValueNode
 {
-  String functionName; //Are we here because of COALESCE function or VALUE function
-  ValueNodeList argumentsList; //this is the list of arguments to the function. We are interested in the first not-null argument
+  private String functionName; //Are we here because of COALESCE function or VALUE function
+  private ValueNodeList argumentsList; //this is the list of arguments to the function. We are interested in the first not-null argument
 
   /**
    * Initializer for a CalesceFunctionNode
@@ -61,6 +61,14 @@ public class CoalesceFunctionNode extends ValueNode
   public void init(Object functionName, Object argumentsList) {
     this.functionName = (String)functionName;
     this.argumentsList = (ValueNodeList)argumentsList;
+  }
+
+  public String getFunctionName() {
+    return functionName;
+  }
+
+  public ValueNodeList getArgumentsList() {
+    return argumentsList;
   }
 
   /*

@@ -53,6 +53,8 @@ public class TypeComputer implements Visitor
     case NodeTypes.BINARY_LESS_THAN_OPERATOR_NODE:
     case NodeTypes.BINARY_LESS_EQUALS_OPERATOR_NODE:
       return binaryComparisonOperatorNode((BinaryComparisonOperatorNode)node);
+    case NodeTypes.CONDITIONAL_NODE:
+      return conditionalNode((ConditionalNode)node);
     default:
       // assert false;
       return null;
@@ -229,6 +231,25 @@ public class TypeComputer implements Visitor
     boolean nullableResult = leftOperand.getType().isNullable() ||
                              rightOperand.getType().isNullable();
     return new DataTypeDescriptor(TypeId.BOOLEAN_ID, nullableResult);
+  }
+
+  protected DataTypeDescriptor conditionalNode(ConditionalNode node) 
+      throws StandardException {
+    checkBooleanClause(node.getTestCondition(), "WHEN");
+    return dominantType(node.getThenElseList());
+  }
+
+  protected DataTypeDescriptor dominantType(ValueNodeList nodeList) 
+      throws StandardException {
+    DataTypeDescriptor result = null;
+    for (ValueNode node : nodeList) {
+      if (node.getType() == null) continue;
+      if (result == null)
+        result = node.getType();
+      else
+        result = result.getDominantType(node.getType());
+    }
+    return result;
   }
 
   protected void selectNode(SelectNode node) throws StandardException {
