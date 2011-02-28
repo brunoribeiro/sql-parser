@@ -288,8 +288,7 @@ public class AISBinder implements Visitor
   protected void fromBaseTable(FromBaseTable fromBaseTable) throws StandardException {
     TableName tableName = fromBaseTable.getTableName();
     Table table = lookupTableName(tableName);
-    tableName.setUserData(table);
-    // TODO: Some higher level object on the fromBaseTable.
+    fromBaseTable.setUserData(new TableBinding(table));
   }
   
   protected void columnReference(ColumnReference columnReference) 
@@ -355,8 +354,9 @@ public class AISBinder implements Visitor
             // Not allowed to reference correlated by underlying name.
             (fromTable.getCorrelationName() == null)) {
           FromBaseTable fromBaseTable = (FromBaseTable)fromTable;
-          Table table = (Table)fromBaseTable.getTableName().getUserData();
-          assert (table != null) : "table not bound yet";
+          TableBinding tableBinding = (TableBinding)fromBaseTable.getUserData();
+          assert (tableBinding != null) : "table not bound yet";
+          Table table = tableBinding.getTable();
           if (table.getName().getSchemaName().equalsIgnoreCase(schemaName) &&
               table.getName().getTableName().equalsIgnoreCase(tableName)) {
             if (result != null)
@@ -376,8 +376,9 @@ public class AISBinder implements Visitor
       throws StandardException {
     if (fromTable instanceof FromBaseTable) {
       FromBaseTable fromBaseTable = (FromBaseTable)fromTable;
-      Table table = (Table)fromBaseTable.getTableName().getUserData();
-      assert (table != null) : "table not bound yet";
+      TableBinding tableBinding = (TableBinding)fromBaseTable.getUserData();
+      assert (tableBinding != null) : "table not bound yet";
+      Table table = tableBinding.getTable();
       Column column = table.getColumn(columnName);
       if (column == null)
         return null;
@@ -523,7 +524,8 @@ public class AISBinder implements Visitor
     ResultColumnList rcList = (ResultColumnList)
       nodeFactory.getNode(NodeTypes.RESULT_COLUMN_LIST,
                           parserContext);
-    Table table = (Table)fromTable.getTableName().getUserData();
+    TableBinding tableBinding = (TableBinding)fromTable.getUserData();
+    Table table = tableBinding.getTable();
     for (Column column : table.getColumns()) {
       String columnName = column.getName().toUpperCase();
       ValueNode valueNode = (ValueNode)

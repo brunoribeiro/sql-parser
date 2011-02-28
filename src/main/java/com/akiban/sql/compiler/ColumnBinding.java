@@ -45,6 +45,10 @@ public class ColumnBinding
     this.resultColumn = resultColumn;
   }
 
+  public Column getColumn() {
+    return column;
+  }
+
   public DataTypeDescriptor getType() throws StandardException {
     if (resultColumn != null) {
       return resultColumn.getType();
