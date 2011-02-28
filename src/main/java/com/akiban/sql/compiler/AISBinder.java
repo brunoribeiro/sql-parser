@@ -55,12 +55,7 @@ public class AISBinder implements Visitor
     if (first) {
       switch (node.getNodeType()) {
       case NodeTypes.SUBQUERY_NODE:
-        {
-          SubqueryNode subqueryNode = (SubqueryNode)node;
-          // The LHS of a subquery operator is bound in the outer context.
-          if (subqueryNode.getLeftOperand() != null)
-            subqueryNode.getLeftOperand().accept(this);
-        }
+        subqueryNode((SubqueryNode)node);
         break;
       case NodeTypes.SELECT_NODE:
         selectNode((SelectNode)node);
@@ -92,6 +87,177 @@ public class AISBinder implements Visitor
   }
 
   /* Specific node types */
+
+  protected void subqueryNode(SubqueryNode subqueryNode) throws StandardException {
+    // The LHS of a subquery operator is bound in the outer context.
+    if (subqueryNode.getLeftOperand() != null)
+      subqueryNode.getLeftOperand().accept(this);
+
+    ResultSetNode resultSet = subqueryNode.getResultSet();
+    ResultColumnList resultColumns = resultSet.getResultColumns();
+    // The parser does not enforce the fact that a subquery can only
+    // return a single column, so we must check here.
+    if (resultColumns.size() != 1) {
+      throw new StandardException("Subquery must return single column");
+    }
+
+    SubqueryNode.SubqueryType subqueryType = subqueryNode.getSubqueryType();
+    /* Verify the usage of "*" in the select list:
+     *  o  Only valid in EXISTS subqueries
+     *  o  If the AllResultColumn is qualified, then we have to verify
+     *     that the qualification is a valid exposed name.
+     *     NOTE: The exposed name can come from an outer query block.
+     */
+    verifySelectStarSubquery(resultSet, subqueryType);
+
+    /* For an EXISTS subquery:
+     *  o  If the SELECT list is a "*", then we convert it to a true.
+     *     (We need to do the conversion since we don't want the "*" to
+     *     get expanded.)
+     */
+    if (subqueryType == SubqueryNode.SubqueryType.EXISTS) {
+      resultSet = setResultToBooleanTrueNode(resultSet);
+      subqueryNode.setResultSet(resultSet);
+    }
+  }
+
+  protected void verifySelectStarSubquery(ResultSetNode resultSet, 
+                                          SubqueryNode.SubqueryType subqueryType)
+      throws StandardException {
+    if (resultSet instanceof SetOperatorNode) {
+      SetOperatorNode setOperatorNode = (SetOperatorNode)resultSet;
+      verifySelectStarSubquery(setOperatorNode.getLeftResultSet(), subqueryType);
+      verifySelectStarSubquery(setOperatorNode.getRightResultSet(), subqueryType);
+      return;
+    }
+    if (!(resultSet.getResultColumns().get(0) instanceof AllResultColumn)) {
+      return;
+    }
+    // Select * currently only valid for EXISTS/NOT EXISTS.
+    if (subqueryType != SubqueryNode.SubqueryType.EXISTS) {
+      throw new StandardException("Cannot SELECT * in non-EXISTS subquery");
+    }
+  }
+
+  /**
+   * Set the result column for the subquery to a boolean true,
+   * Useful for transformations such as
+   * changing:
+   *    where exists (select ... from ...) 
+   * to:
+   *    where (select true from ...)
+   *
+   * NOTE: No transformation is performed if the ResultColumn.expression is
+   * already the correct boolean constant.
+   * 
+   * This method is used during binding of EXISTS predicates to map
+   * a subquery's result column list into a single TRUE node.  For
+   * SELECT and VALUES subqueries this transformation is pretty
+   * straightforward.  But for set operators (ex. INTERSECT) we have
+   * to do some extra work.  To see why, assume we have the following
+   * query:
+   *
+   *  select * from ( values 'BAD' ) as T
+   *    where exists ((values 1) intersect (values 2))
+   *
+   * If we treated the INTERSECT in this query the same way that we
+   * treat SELECT/VALUES subqueries then the above query would get
+   * transformed into:
+   *
+   *  select * from ( values 'BAD' ) as T
+   *    where exists ((values TRUE) intersect (values TRUE))
+   *
+   * Since both children of the INTERSECT would then have the same value,
+   * the result of set operation would be a single value (TRUE), which
+   * means the WHERE clause would evaluate to TRUE and thus the query
+   * would return one row with value 'BAD'.  That would be wrong.
+   *
+   * To avoid this problem, we internally wrap this SetOperatorNode
+   * inside a "SELECT *" subquery and then we change the new SelectNode's
+   * result column list (as opposed to *this* nodes' result column list)
+   * to a singe boolean true node:
+   *
+   *  select * from ( values 'BAD' ) as T where exists
+   *      SELECT TRUE FROM ((values 1) intersect (values 2))
+   *
+   * In this case the left and right children of the INTERSECT retain
+   * their values, which ensures that the result of the intersect
+   * operation will be correct.  Since (1 intersect 2) is an empty
+   * result set, the internally generated SELECT node will return
+   * zero rows, which in turn means the WHERE predicate will return
+   * NULL (an empty result set from a SubqueryNode is treated as NULL
+   * at execution time; see impl/sql/execute/AnyResultSet). Since
+   * NULL is not the same as TRUE the query will correctly return
+   * zero rows.  DERBY-2370.
+   *
+   * @exception StandardException Thrown on error
+   */
+  public ResultSetNode setResultToBooleanTrueNode(ResultSetNode resultSet)
+      throws StandardException {
+    NodeFactory nodeFactory = resultSet.getNodeFactory();
+    SQLParserContext parserContext = resultSet.getParserContext();
+    if (resultSet instanceof SetOperatorNode) {
+      // First create a FromList to hold this node (and only this node).
+      FromList fromList = (FromList)nodeFactory.getNode(NodeTypes.FROM_LIST,
+                                                        parserContext);
+      fromList.addFromTable((SetOperatorNode)resultSet);
+
+      // Now create a ResultColumnList that simply holds the "*".
+      ResultColumnList rcl = (ResultColumnList)
+        nodeFactory.getNode(NodeTypes.RESULT_COLUMN_LIST,
+                            parserContext);
+      ResultColumn allResultColumn = (ResultColumn) 
+        nodeFactory.getNode(NodeTypes.ALL_RESULT_COLUMN,
+                            null,
+                            parserContext);
+      rcl.addResultColumn(allResultColumn);
+
+      /* Create a new SELECT node of the form:
+       *  SELECT * FROM <thisSetOperatorNode>
+       */
+      resultSet = (ResultSetNode) 
+        nodeFactory.getNode(NodeTypes.SELECT_NODE,
+                            rcl,      // ResultColumns
+                            null,     // AGGREGATE list
+                            fromList, // FROM list
+                            null,     // WHERE clause
+                            null,     // GROUP BY list
+                            null,     // having clause
+                            null, /* window list */
+                            parserContext);
+
+      /* And finally, transform the "*" in the new SELECT node
+       * into a TRUE constant node.  This ultimately gives us:
+       *
+       *  SELECT TRUE FROM <thisSetOperatorNode>
+       *
+       * which has a single result column that is a boolean TRUE
+       * constant.  So we're done.
+       */
+    }
+
+    ResultColumnList resultColumns = resultSet.getResultColumns();
+    ResultColumn resultColumn = resultColumns.get(0);
+    if (resultColumns.get(0) instanceof AllResultColumn) {
+      resultColumn = (ResultColumn)nodeFactory.getNode(NodeTypes.RESULT_COLUMN,
+                                                       "",
+                                                       null,
+                                                       parserContext);
+    }
+    else if (resultColumn.getExpression().isBooleanTrue()) {
+      // Nothing to do if query is already select TRUE ...
+      return resultSet;
+    }
+
+    BooleanConstantNode booleanNode = (BooleanConstantNode)
+      nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
+                          Boolean.TRUE,
+                          parserContext);
+    resultColumn.setExpression(booleanNode);
+    resultColumn.setType(booleanNode.getType());
+    resultColumns.set(0, resultColumn);
+    return resultSet;
+  }
 
   protected void selectNode(SelectNode selectNode) throws StandardException {
     FromList fromList = selectNode.getFromList();
@@ -278,7 +444,7 @@ public class AISBinder implements Visitor
    * Generate a unique (across the entire statement) column name for unnamed
    * ResultColumns
    *
-   * @exception StandardException		Thrown on error
+   * @exception StandardException Thrown on error
    */
   protected void guaranteeColumnName(ResultColumn rc) throws StandardException {
     if (rc.getName() == null) {

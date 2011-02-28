@@ -60,11 +60,15 @@
     <java classname="com.akiban.sql.test.Tester" fork="yes" failonerror="yes">
       <classpath refid="running.class.path"/>
       <arg line="-tree"/>
+      <!--
       <arg value="SELECT x,y FROM t WHERE z > 3.14 AND w IS NOT NULL"/>
       <arg value="INSERT INTO t1 VALUES(1, 'foo', 3 * 10)"/>
       <arg value="INSERT INTO t1 SELECT x,y,z FROM t"/>
       <arg value="CREATE TABLE t2 AS (SELECT * FROM t1) WITH NO DATA"/>
       <arg value="DELETE FROM t WHERE x in (1,2,3)"/>
+      <arg value="SELECT x,y FROM t WHERE z IN (SELECT z FROM w WHERE q > 10)"/>
+      -->
+      <arg value="SELECT * FROM t1 WHERE EXISTS ((VALUES 1) INTERSECT (VALUES 2))"/>
     </java>
   </target> 
 
@@ -101,7 +105,7 @@
       <arg value="SELECT x,y FROM t1,t2 AS tt WHERE t1.z > tt.w"/>
       <arg value="SELECT x, x2 FROM t1, (SELECT x AS not_x, y AS x2 FROM t1) AS t2"/>
       -->
-      <arg value="SELECT * FROM t1 WHERE x in (SELECT w FROM t2 WHERE w &lt;> y)"/>
+      <arg value="SELECT * FROM t1 WHERE EXISTS (SELECT * FROM t2)"/>
     </java>
   </target> 
 

@@ -48,7 +48,7 @@ import com.akiban.sql.StandardException;
  *
  */
 
-abstract class SetOperatorNode extends TableOperatorNode
+public abstract class SetOperatorNode extends TableOperatorNode
 {
   /**
    ** Tells whether to eliminate duplicate rows.  all == TRUE means do
@@ -78,6 +78,14 @@ abstract class SetOperatorNode extends TableOperatorNode
       throws StandardException {
     super.init(leftResult, rightResult, tableProperties);
     this.all = ((Boolean)all).booleanValue();
+
+    /* resultColumns cannot be null, so we make a copy of the left RCL
+     * for now.  At bind() time, we need to recopy the list because there
+     * may have been a "*" in the list.  (We will set the names and
+     * column types at that time, as expected.)
+     */
+    // TODO: Do we need the full cloning mechanism for this?
+    //resultColumns = leftResultSet.getResultColumns().copyListAndObjects();
   }
 
   /**

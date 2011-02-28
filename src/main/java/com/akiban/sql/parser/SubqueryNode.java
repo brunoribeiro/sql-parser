@@ -224,6 +224,10 @@ public class SubqueryNode extends ValueNode
     return resultSet;
   }
 
+  public void setResultSet(ResultSetNode resultSet) {
+    this.resultSet = resultSet;
+  }
+
   /**
    * Return the type of this subquery.
    *
