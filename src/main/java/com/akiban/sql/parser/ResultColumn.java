@@ -82,6 +82,8 @@ public class ResultColumn extends ValueNode
   /* virtualColumnId is the ResultColumn's position (1-based) within the ResultSet */
   private int virtualColumnId;
 
+  private boolean isNameGenerated;
+
   /**
    * Different types of initializer parameters indicate different
    * types of initialization. Parameters may be:
@@ -278,6 +280,20 @@ public class ResultColumn extends ValueNode
     }
 
     this.exposedName = name;
+  }
+
+  /**
+   * Is the name for this ResultColumn generated?
+   */
+  public boolean isNameGenerated() {
+    return isNameGenerated;
+  }
+
+  /**
+   * Set that this result column name is generated.
+   */
+  public void setNameGenerated(boolean value) {
+    isNameGenerated = value;
   }
 
   /** 

@@ -167,7 +167,7 @@ public class FromBaseTable extends FromTable
    *
    * @exception StandardException  Thrown on error
    */
-  private TableName getExposedTableName() throws StandardException {
+  public TableName getExposedTableName() throws StandardException {
     if (correlationName != null)
       return makeTableName(null, correlationName);
     else

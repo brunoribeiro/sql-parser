@@ -74,4 +74,16 @@ public class AllResultColumn extends ResultColumn
   public TableName getTableNameObject() {
     return tableName;
   }
+
+  /**
+   * Convert this object to a String.  See comments in QueryTreeNode.java
+   * for how this should be done for tree printing.
+   *
+   * @return This object as a String
+   */
+  // TODO: Somewhat of a mess: the superclass has a tableName field of a different type.
+  public String toString() {
+    return "tableName: " + tableName + "\n" +
+      super.toString();
+  }
 }

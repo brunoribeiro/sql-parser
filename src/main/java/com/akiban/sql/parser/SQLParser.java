@@ -35,8 +35,9 @@ import java.util.Map;
 public class SQLParser implements SQLParserContext {
   private String sqlText;
   private List<ValueNode> parameterList;
-  private boolean returnParameterFlag;;
+  private boolean returnParameterFlag;
   private Map printedObjectsMap;
+  private int generatedColumnNameIndex;
   
   static final int LARGE_TOKEN_SIZE = 128;
 
@@ -114,6 +115,7 @@ public class SQLParser implements SQLParserContext {
     parameterList = new ArrayList<ValueNode>();
     returnParameterFlag = false;
     printedObjectsMap = null;
+    generatedColumnNameIndex = 1;
     try {
       return parser.parseStatement(sqlText, parameterList);
     }
@@ -187,6 +189,10 @@ public class SQLParser implements SQLParserContext {
     if (printedObjectsMap == null)
       printedObjectsMap = new HashMap();
     return printedObjectsMap;
+  }
+
+  public String generateColumnName() {
+    return "_SQL_COL_" + generatedColumnNameIndex++;
   }
 
 }

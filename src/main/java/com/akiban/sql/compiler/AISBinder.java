@@ -115,19 +115,23 @@ public class AISBinder implements Visitor
                                       " as correlation name");
         }
       }
-    }    
+    }
+    expandAllsAndNameColumns(selectNode.getResultColumns(), fromList);
   }
 
   protected void fromBaseTable(FromBaseTable fromBaseTable) throws StandardException {
     TableName tableName = fromBaseTable.getTableName();
     Table table = lookupTableName(tableName);
     tableName.setUserData(table);
-    // TODO: Something higher level on the fromBaseTable.
+    // TODO: Some higher level object on the fromBaseTable.
   }
   
   protected void columnReference(ColumnReference columnReference) 
       throws StandardException {
-    ColumnBinding columnBinding = null;
+    ColumnBinding columnBinding = (ColumnBinding)columnReference.getUserData();
+    if (columnBinding != null)
+      return;
+
     String columnName = columnReference.getColumnName();
     if (columnReference.getTableNameNode() != null) {
       FromTable fromTable = findFromTable(columnReference.getTableNameNode());
@@ -225,6 +229,152 @@ public class AISBinder implements Visitor
       assert false;
       return null;
     }
+  }
+
+  /**
+   * Expand any *'s in the ResultColumnList.  In addition, we will guarantee that
+   * each ResultColumn has a name.  (All generated names will be unique across the
+   * entire statement.)
+   *
+   * @exception StandardException               Thrown on error
+   */
+  public void expandAllsAndNameColumns(ResultColumnList rcl, FromList fromList) 
+      throws StandardException {
+    boolean expanded = false;
+    ResultColumnList allExpansion;
+    TableName fullTableName;
+
+    for (int index = 0; index < rcl.size(); index++) {
+      ResultColumn rc = rcl.get(index);
+      if (rc instanceof AllResultColumn) {
+        expanded = true;
+
+        fullTableName = rc.getTableNameObject();
+        allExpansion = expandAll(fullTableName, fromList);
+
+        // Make sure that every column has a name.
+        for (ResultColumn nrc : allExpansion) {
+          guaranteeColumnName(nrc);
+        }
+
+        // Replace the AllResultColumn with the expanded list.
+        rcl.remove(index);
+        for (int inner = 0; inner < allExpansion.size(); inner++) {
+          rcl.add(index + inner, allExpansion.get(inner));
+        }
+        index += allExpansion.size() - 1;
+
+        // TODO: This is where Derby remembered the original size in
+        // case other things get added to the RCL.
+      }
+      else {
+        // Make sure that every column has a name.
+        guaranteeColumnName(rc);
+      }
+    }
+  }
+
+  /**
+   * Generate a unique (across the entire statement) column name for unnamed
+   * ResultColumns
+   *
+   * @exception StandardException		Thrown on error
+   */
+  protected void guaranteeColumnName(ResultColumn rc) throws StandardException {
+    if (rc.getName() == null) {
+      rc.setName(((SQLParser)rc.getParserContext()).generateColumnName());
+      rc.setNameGenerated(true);
+    }
+  }
+
+  /**
+   * Expand a "*" into the appropriate ResultColumnList. If the "*"
+   * is unqualified it will expand into a list of all columns in all
+   * of the base tables in the from list at the current nesting level;
+   * otherwise it will expand into a list of all of the columns in the
+   * base table that matches the qualification.
+   * 
+   * @param allTableName The qualification on the "*" as a String
+   * @param fromList The select list
+   *
+   * @return ResultColumnList representing expansion
+   *
+   * @exception StandardException Thrown on error
+   */
+  protected ResultColumnList expandAll(TableName allTableName, FromList fromList)
+      throws StandardException {
+    ResultColumnList resultColumnList = null;
+    ResultColumnList tempRCList = null;
+
+    for (FromTable fromTable : fromList) {
+      tempRCList = getAllResultColumns(allTableName, fromTable);
+
+      if (tempRCList == null)
+        continue;
+
+      /* Expand the column list and append to the list that
+       * we will return.
+       */
+      if (resultColumnList == null)
+        resultColumnList = tempRCList;
+      else
+        resultColumnList.addAll(tempRCList);
+
+      // If the "*" is qualified, then we can stop the expansion as
+      // soon as we find the matching table.
+      if (allTableName != null)
+        break;
+    }
+
+    // Give an error if the qualification name did not match an exposed name.
+    if (resultColumnList == null) {
+      throw new StandardException("Table not found: " + allTableName);
+    }
+
+    return resultColumnList;
+  }
+
+  protected ResultColumnList getAllResultColumns(TableName allTableName, 
+                                                 FromTable fromTable)
+      throws StandardException {
+    switch (fromTable.getNodeType()) {
+    case NodeTypes.FROM_BASE_TABLE:
+      return getAllResultColumns(allTableName, (FromBaseTable)fromTable);
+    default:
+      return null;
+    }
+  }
+
+  protected ResultColumnList getAllResultColumns(TableName allTableName, 
+                                                 FromBaseTable fromTable)
+      throws StandardException {
+    TableName exposedName = fromTable.getExposedTableName();
+    if ((allTableName != null) && !allTableName.equals(exposedName))
+      return null;
+
+    NodeFactory nodeFactory = fromTable.getNodeFactory();
+    SQLParserContext parserContext = fromTable.getParserContext();
+    ResultColumnList rcList = (ResultColumnList)
+      nodeFactory.getNode(NodeTypes.RESULT_COLUMN_LIST,
+                          parserContext);
+    Table table = (Table)fromTable.getTableName().getUserData();
+    for (Column column : table.getColumns()) {
+      String columnName = column.getName().toUpperCase();
+      ValueNode valueNode = (ValueNode)
+        nodeFactory.getNode(NodeTypes.COLUMN_REFERENCE,
+                            columnName,
+                            exposedName,
+                            parserContext);
+      ResultColumn resultColumn = (ResultColumn)
+        nodeFactory.getNode(NodeTypes.RESULT_COLUMN,
+                            columnName,
+                            valueNode,
+                            parserContext);
+      rcList.addResultColumn(resultColumn);
+      // Easy to do binding right here.
+      valueNode.setUserData(new ColumnBinding(fromTable, column));
+    }
+    return rcList;
   }
 
   protected static class BindingContext {

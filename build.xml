@@ -94,14 +94,14 @@
       <arg value="-bind"/>
       <arg value="CREATE TABLE t1(x INT NOT NULL, y VARCHAR(7), z DECIMAL); CREATE table t2(w CHAR(1) NOT NULL);"/>
       <arg line="-types -tree"/>
+      <!--
       <arg value="SELECT x + y + z FROM t1 WHERE x > 0 AND y > 'foo'"/>
       <arg value="SELECT CASE WHEN x = 10 THEN y WHEN x = 20 THEN 3 ELSE z END FROM t1"/>
       <arg value="SELECT COALESCE(x,y,z) FROM t1"/>
-      <!--
       <arg value="SELECT x,y FROM t1,t2 AS tt WHERE t1.z > tt.w"/>
       <arg value="SELECT x, x2 FROM t1, (SELECT x AS not_x, y AS x2 FROM t1) AS t2"/>
-      <arg value="SELECT * FROM t1 WHERE x in (SELECT w FROM t2 WHERE w &lt;> y)"/>
       -->
+      <arg value="SELECT * FROM t1 WHERE x in (SELECT w FROM t2 WHERE w &lt;> y)"/>
     </java>
   </target> 
 
