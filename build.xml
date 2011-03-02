@@ -119,11 +119,12 @@
     <java classname="com.akiban.sql.test.Tester" fork="yes" failonerror="yes">
       <classpath refid="running.class.path"/>
       <arg value="-bind"/>
-      <arg value="CREATE TABLE parent(id INT, PRIMARY KEY(id), name VARCHAR(256) NOT NULL, key(name)); CREATE TABLE child(id INT, PRIMARY KEY(id), pid INT, CONSTRAINT `__akiban_fk0` FOREIGN KEY akibanfk(pid) REFERENCES parent(id), name VARCHAR(256) NOT NULL);"/>
-      <arg line="-boolean -types -flatten -print -tree"/>
+      <arg value="CREATE TABLE parent(id INT, PRIMARY KEY(id), name VARCHAR(256) NOT NULL, UNIQUE(name)); CREATE TABLE child(id INT, PRIMARY KEY(id), pid INT, CONSTRAINT `__akiban_fk0` FOREIGN KEY akibanfk(pid) REFERENCES parent(id), name VARCHAR(256) NOT NULL);"/>
+      <arg line="-boolean -types -flatten -print"/>
       <arg value="SELECT name FROM child WHERE pid IN (SELECT parent.id FROM parent WHERE parent.name = 'foo')"/>
       <arg value="SELECT name FROM child WHERE pid = ANY (SELECT parent.id FROM parent WHERE parent.name = 'foo')"/>
       <arg value="SELECT name FROM child WHERE pid > ANY (SELECT parent.id FROM parent WHERE parent.name = 'foo')"/>
+      <arg value="SELECT name FROM child WHERE pid > ANY (SELECT parent.id FROM parent WHERE parent.name > 'foo')"/>
     </java>
   </target> 
 

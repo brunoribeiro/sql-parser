@@ -43,6 +43,11 @@ import com.akiban.sql.StandardException;
 import com.akiban.sql.types.DataTypeDescriptor;
 import com.akiban.sql.types.TypeId;
 
+import com.akiban.ais.model.Column;
+import com.akiban.ais.model.Index;
+import com.akiban.ais.model.IndexColumn;
+import com.akiban.ais.model.Table;
+
 import java.util.Stack;
 
 /** Flatten subqueries.
@@ -155,10 +160,13 @@ public class SubqueryFlattener
     if (visitor.hasNode())
       return result;
     
-    // Get left operand, if any (if from comparison, subquery is the right).
+    // Get left operand, if any (if from comparison, subquery is the current right).
     ValueNode leftOperand = subqueryNode.getLeftOperand();
     if (parentComparisonOperator != null)
       leftOperand = parentComparisonOperator.getLeftOperand();
+    // Right operand is whatever subquery selects.
+    ValueNode rightOperand = 
+      selectNode.getResultColumns().get(0).getExpression();
     
     boolean additionalEQ = false;
     switch (subqueryNode.getSubqueryType()) {
@@ -171,7 +179,7 @@ public class SubqueryFlattener
                                     (leftOperand instanceof ColumnReference) ||
                                     (leftOperand instanceof ParameterNode));
     
-    if (!isUniqueSubquery(selectNode, additionalEQ))
+    if (!isUniqueSubquery(selectNode, additionalEQ ? rightOperand : null))
       return result;
 
     // Yes, we can flatten it.
@@ -183,9 +191,6 @@ public class SubqueryFlattener
                                             Boolean.TRUE,
                                             parserContext);
 
-    // Right operand is whatever subquery select's.
-    ValueNode rightOperand = 
-      selectNode.getResultColumns().get(0).getExpression();
     int nodeType = 0;
     switch (subqueryNode.getSubqueryType()) {
       // TODO: The ALL and NOT_IN cases aren't actually supported here yet.
@@ -229,11 +234,6 @@ public class SubqueryFlattener
                                           parserContext);
   }
 
-  protected boolean isUniqueSubquery(SelectNode selectNode, boolean additionalEQ)
-      throws StandardException {
-    return true;
-  }
-
   protected ValueNode mergeWhereClause(ValueNode whereClause, ValueNode intoWhereClause)
       throws StandardException {
     if (intoWhereClause == null)
@@ -250,5 +250,162 @@ public class SubqueryFlattener
     }
     parentNode.setRightOperand(whereClause);
     return intoWhereClause;
+  }
+
+  // To be flattened into normal inner join, results must be unique.
+  
+  // All of the tables in the FROM list must have a unique index all
+  // of whose columns appear in top-level equality conditions with
+  // something not from that table and at least one of them the
+  // stronger condition of something not in the subquery.
+  protected boolean isUniqueSubquery(SelectNode selectNode, ValueNode parentOperand)
+      throws StandardException {
+    FromList fromList = selectNode.getFromList();
+    AndNode whereConditions = (AndNode)selectNode.getWhereClause();
+    boolean anyStronger = false;
+    boolean[] results = new boolean[2];
+    for (FromTable fromTable : fromList) {
+      TableBinding binding = (TableBinding)fromTable.getUserData();
+      if (binding == null) continue;
+      Table table = binding.getTable();
+      boolean anyIndex = false;
+      for (Index index : table.getIndexes()) {
+        if (!index.isUnique()) continue;
+        boolean allColumns = true, allStronger = true;
+        for (IndexColumn indexColumn : index.getColumns()) {
+          Column column = indexColumn.getColumn();
+          results[0] = results[1] = false;
+          findColumnCondition(fromList, fromTable, column, 
+                              whereConditions, parentOperand,
+                              results);
+          if (!results[0]) {
+            // Failed weaker condition (some column condition free of same table),
+            // index is no good.
+            allColumns = false;
+            break;
+          }
+          if (!results[1]) {
+            // Only failed stronger condition (some column condition free of all tables),
+            // remember but finish index.
+            allStronger = false;
+          }
+        }
+        if (allColumns) {
+          anyIndex = true;
+          if (allStronger) {
+            anyStronger = true;
+            break;
+          }
+        }
+      }
+      if (!anyIndex)
+        return false;
+    }
+    return anyStronger;
+  }
+
+  // Does this column appear in an equality condition, either in the
+  // where clause or because of the parent RHS, that is free of the given tables.
+  // results[0] is true if free of the specific table.
+  // results[1] is true if free of all the tables.
+  protected void findColumnCondition(FromList fromList, FromTable fromTable, 
+                                     Column column, 
+                                     AndNode whereConditions, ValueNode parentOperand,
+                                     boolean[] results)
+      throws StandardException {
+    if (isColumnReference(fromTable, column, parentOperand)) {
+      results[0] = results[1] = true; // Totally outside this query.
+      return;
+    }
+    if (whereConditions != null) {
+      FromTableBindingVisitor visitor = new FromTableBindingVisitor(fromList, fromTable);
+      while (true) {
+        ValueNode leftOperand = whereConditions.getLeftOperand();
+        ValueNode rightOperand = whereConditions.getRightOperand();
+        if (leftOperand.getNodeType() == NodeTypes.BINARY_EQUALS_OPERATOR_NODE) {
+          BinaryComparisonOperatorNode binop = (BinaryComparisonOperatorNode)leftOperand;
+          ValueNode checkOperand = null;
+          // If both left and right are column references, it's a
+          // failure caught by visiting the right.
+          if (isColumnReference(fromTable, column, binop.getLeftOperand()))
+            checkOperand = binop.getRightOperand();
+          else if (isColumnReference(fromTable, column, binop.getRightOperand()))
+            checkOperand = binop.getLeftOperand();
+          if (checkOperand != null) {
+            visitor.reset();
+            checkOperand.accept(visitor);
+            switch (visitor.getFound()) {
+            case NOT_FOUND:
+              results[0] = results[1] = true;
+              return;
+            case FOUND_FROM_LIST:
+              results[0] = true;  // Failed the stronger, but passed the weaker test.
+              break;
+            }
+          }
+        }
+        if (rightOperand instanceof AndNode)
+          whereConditions = (AndNode)rightOperand;
+        else
+          break;
+      }
+    }
+  }
+
+  protected boolean isColumnReference(FromTable fromTable, Column column, ValueNode expr)
+      throws StandardException {
+    if (!(expr instanceof ColumnReference)) return false;
+    ColumnBinding binding = (ColumnBinding)((ColumnReference)expr).getUserData();
+    return ((binding != null) && 
+            (binding.getFromTable() == fromTable) &&
+            (binding.getColumn() == column));
+  }
+
+  static public class FromTableBindingVisitor implements Visitor {
+    enum Found { NOT_FOUND, FOUND_FROM_LIST, FOUND_TABLE };
+
+    protected Found found;
+    private FromList fromList;
+    private FromTable fromTable;
+
+    public FromTableBindingVisitor(FromList fromList, FromTable fromTable) {
+      this.found = Found.NOT_FOUND;
+      this.fromList = fromList;
+      this.fromTable = fromTable;
+    }
+
+    public Visitable visit(Visitable node) {
+      if (node instanceof ColumnReference) {
+        ColumnBinding binding = (ColumnBinding)((ColumnReference)node).getUserData();
+        if (binding != null) {
+          FromTable bft = binding.getFromTable();
+          if (bft == fromTable) {
+            found = Found.FOUND_TABLE;
+          }
+          else if (fromList.indexOf(bft) >= 0) {
+            found = Found.FOUND_FROM_LIST;
+          }
+        }
+      }
+      return node;
+    }
+
+    public boolean stopTraversal() {
+      return (found == Found.FOUND_TABLE);
+    }
+
+    public boolean skipChildren(Visitable node) {
+      return false;
+    }
+    public boolean visitChildrenFirst(Visitable node) {
+      return false;
+    }
+
+    public Found getFound() {
+      return found;
+    }
+    public void reset() {
+      found = Found.NOT_FOUND;
+    }
   }
 }

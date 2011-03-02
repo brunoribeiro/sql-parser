@@ -45,6 +45,10 @@ public class ColumnBinding
     this.resultColumn = resultColumn;
   }
 
+  public FromTable getFromTable() {
+    return fromTable;
+  }
+
   public Column getColumn() {
     return column;
   }
