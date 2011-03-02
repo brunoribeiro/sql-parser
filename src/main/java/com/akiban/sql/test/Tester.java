@@ -17,9 +17,9 @@ package com.akiban.sql.test;
 import com.akiban.sql.StandardException;
 import com.akiban.sql.parser.StatementNode;
 import com.akiban.sql.parser.SQLParser;
-import com.akiban.sql.unparser.NodeToString;
 import com.akiban.sql.compiler.AISBinder;
 import com.akiban.sql.compiler.BooleanNormalizer;
+import com.akiban.sql.compiler.BoundNodeToString;
 import com.akiban.sql.compiler.SubqueryFlattener;
 import com.akiban.sql.compiler.TypeComputer;
 
@@ -32,14 +32,14 @@ public class Tester
 {
   enum Action { 
     ECHO, PARSE, 
-    PRINT_SQL, PRINT_TREE,
+    PRINT_TREE, PRINT_SQL, PRINT_BOUND_SQL,
     BIND, COMPUTE_TYPES,
     BOOLEAN_NORMALIZE, FLATTEN_SUBQUERIES
   }
 
   List<Action> actions;
   SQLParser parser;
-  NodeToString unparser;
+  BoundNodeToString unparser;
   AISBinder binder;
   TypeComputer typeComputer;
   BooleanNormalizer booleanNormalizer;
@@ -48,7 +48,7 @@ public class Tester
   public Tester() {
     actions = new ArrayList<Action>();
     parser = new SQLParser();
-    unparser = new NodeToString();
+    unparser = new BoundNodeToString();
     typeComputer = new TypeComputer();
     booleanNormalizer = new BooleanNormalizer(parser);
     subqueryFlattener = new SubqueryFlattener(parser);
@@ -69,11 +69,16 @@ public class Tester
       case PARSE:
         stmt = parser.parseStatement(sql);
         break;
-      case PRINT_SQL:
-        System.out.println(unparser.toString(stmt));
-        break;
       case PRINT_TREE:
         stmt.treePrint();
+        break;
+      case PRINT_SQL:
+        unparser.setUseBindings(false);
+        System.out.println(unparser.toString(stmt));
+        break;
+      case PRINT_BOUND_SQL:
+        unparser.setUseBindings(true);
+        System.out.println(unparser.toString(stmt));
         break;
       case BIND:
         binder.bind(stmt);
@@ -105,10 +110,12 @@ public class Tester
     while (i < args.length) {
       String arg = args[i++];
       if (arg.startsWith("-")) {
-        if ("-print".equals(arg))
-          tester.addAction(Action.PRINT_SQL);
-        else if ("-tree".equals(arg))
+        if ("-tree".equals(arg))
           tester.addAction(Action.PRINT_TREE);
+        else if ("-print".equals(arg))
+          tester.addAction(Action.PRINT_SQL);
+        else if ("-print-bound".equals(arg))
+          tester.addAction(Action.PRINT_BOUND_SQL);
         else if ("-bind".equals(arg)) {
           tester.setSchema(args[i++]);
           tester.addAction(Action.BIND);

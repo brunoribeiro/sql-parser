@@ -120,11 +120,13 @@
       <classpath refid="running.class.path"/>
       <arg value="-bind"/>
       <arg value="CREATE TABLE parent(id INT, PRIMARY KEY(id), name VARCHAR(256) NOT NULL, UNIQUE(name)); CREATE TABLE child(id INT, PRIMARY KEY(id), pid INT, CONSTRAINT `__akiban_fk0` FOREIGN KEY akibanfk(pid) REFERENCES parent(id), name VARCHAR(256) NOT NULL);"/>
-      <arg line="-boolean -types -flatten -print"/>
+      <arg line="-boolean -types -flatten -print-bound"/>
       <arg value="SELECT name FROM child WHERE pid IN (SELECT parent.id FROM parent WHERE parent.name = 'foo')"/>
       <arg value="SELECT name FROM child WHERE pid = ANY (SELECT parent.id FROM parent WHERE parent.name = 'foo')"/>
       <arg value="SELECT name FROM child WHERE pid > ANY (SELECT parent.id FROM parent WHERE parent.name = 'foo')"/>
       <arg value="SELECT name FROM child WHERE pid > ANY (SELECT parent.id FROM parent WHERE parent.name > 'foo')"/>
+      <arg value="SELECT name FROM child WHERE pid IN (SELECT parent.id FROM parent,child WHERE parent.name = 'foo')"/>
+      <arg value="SELECT name FROM child WHERE pid IN (SELECT parent.id FROM parent,child c2 WHERE parent.name = 'foo' AND parent.id = c2.pid AND c2.id = 1)"/>
     </java>
   </target> 
 
