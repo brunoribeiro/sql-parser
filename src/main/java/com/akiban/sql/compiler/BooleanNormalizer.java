@@ -38,7 +38,6 @@
 package com.akiban.sql.compiler;
 
 import com.akiban.sql.parser.*;
-import com.akiban.sql.unparser.NodeToString;
 
 import com.akiban.sql.StandardException;
 import com.akiban.sql.types.DataTypeDescriptor;
@@ -52,6 +51,10 @@ public class BooleanNormalizer implements Visitor
   public BooleanNormalizer(SQLParserContext parserContext) {
     this.parserContext = parserContext;
     this.nodeFactory = parserContext.getNodeFactory();
+  }
+
+  public StatementNode normalize(StatementNode stmt) throws StandardException {
+    return (StatementNode)stmt.accept(this);
   }
 
   /* Normalize clauses in this SELECT node. */

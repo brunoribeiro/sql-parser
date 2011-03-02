@@ -20,6 +20,7 @@ import com.akiban.sql.parser.SQLParser;
 import com.akiban.sql.unparser.NodeToString;
 import com.akiban.sql.compiler.AISBinder;
 import com.akiban.sql.compiler.BooleanNormalizer;
+import com.akiban.sql.compiler.SubqueryFlattener;
 import com.akiban.sql.compiler.TypeComputer;
 
 import com.akiban.ais.model.AkibanInformationSchema;
@@ -33,7 +34,7 @@ public class Tester
     ECHO, PARSE, 
     PRINT_SQL, PRINT_TREE,
     BIND, COMPUTE_TYPES,
-    BOOLEAN_NORMALIZE
+    BOOLEAN_NORMALIZE, FLATTEN_SUBQUERIES
   }
 
   List<Action> actions;
@@ -42,6 +43,7 @@ public class Tester
   AISBinder binder;
   TypeComputer typeComputer;
   BooleanNormalizer booleanNormalizer;
+  SubqueryFlattener subqueryFlattener;
 
   public Tester() {
     actions = new ArrayList<Action>();
@@ -49,6 +51,7 @@ public class Tester
     unparser = new NodeToString();
     typeComputer = new TypeComputer();
     booleanNormalizer = new BooleanNormalizer(parser);
+    subqueryFlattener = new SubqueryFlattener(parser);
   }
 
   public void addAction(Action action) {
@@ -79,7 +82,10 @@ public class Tester
         typeComputer.compute(stmt);
         break;
       case BOOLEAN_NORMALIZE:
-        stmt = (StatementNode)stmt.accept(booleanNormalizer);
+        stmt = booleanNormalizer.normalize(stmt);
+        break;
+      case FLATTEN_SUBQUERIES:
+        stmt = subqueryFlattener.flatten(stmt);
         break;
       }
     }
@@ -111,6 +117,8 @@ public class Tester
           tester.addAction(Action.COMPUTE_TYPES);
         else if ("-boolean".equals(arg))
           tester.addAction(Action.BOOLEAN_NORMALIZE);
+        else if ("-flatten".equals(arg))
+          tester.addAction(Action.FLATTEN_SUBQUERIES);
         else
           throw new Exception("Unknown switch: " + arg);
       }

@@ -53,6 +53,8 @@ public class TypeComputer implements Visitor
     case NodeTypes.BINARY_LESS_THAN_OPERATOR_NODE:
     case NodeTypes.BINARY_LESS_EQUALS_OPERATOR_NODE:
       return binaryComparisonOperatorNode((BinaryComparisonOperatorNode)node);
+    case NodeTypes.SUBQUERY_NODE:
+      return subqueryNode((SubqueryNode)node);
     case NodeTypes.CONDITIONAL_NODE:
       return conditionalNode((ConditionalNode)node);
     case NodeTypes.COALESCE_FUNCTION_NODE:
@@ -233,6 +235,14 @@ public class TypeComputer implements Visitor
     boolean nullableResult = leftOperand.getType().isNullable() ||
                              rightOperand.getType().isNullable();
     return new DataTypeDescriptor(TypeId.BOOLEAN_ID, nullableResult);
+  }
+
+  protected DataTypeDescriptor subqueryNode(SubqueryNode node) throws StandardException {
+    if (node.getSubqueryType() == SubqueryNode.SubqueryType.EXPRESSION)
+      return node.getResultSet().getResultColumns().get(0)
+        .getType().getNullabilityType(true);
+    else
+      return new DataTypeDescriptor(TypeId.BOOLEAN_ID, true);
   }
 
   protected DataTypeDescriptor conditionalNode(ConditionalNode node) 
