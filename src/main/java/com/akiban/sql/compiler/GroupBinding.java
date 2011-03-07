@@ -14,36 +14,26 @@
 
 package com.akiban.sql.compiler;
 
-import com.akiban.ais.model.Table;
+import com.akiban.ais.model.Group;
 
 /**
- * A table binding: stored in the UserData of a FromTable and
- * referring to a Table in the AIS.
+ * A group binding: joins several TableBindings together.
  */
-public class TableBinding 
+public class GroupBinding 
 {
-  private Table table;
-  private GroupBinding groupBinding;
+  private Group group;
+  private String correlationName;
     
-  public TableBinding(Table table) {
-    this.table = table;
+  public GroupBinding(Group group, String correlationName) {
+    this.group = group;
+    this.correlationName = correlationName;
   }
 
-  public Table getTable() {
-    return table;
+  public Group getGroup() {
+    return group;
   }
 
   public String toString() {
-    if (groupBinding == null)
-      return table.toString();
-    else
-      return table.toString() + " in " + groupBinding.toString();
-  }
-
-  public GroupBinding getGroupBinding() {
-    return groupBinding;
-  }
-  public void setGroupBinding(GroupBinding groupBinding) {
-    groupBinding = this.groupBinding;
+    return group.toString() + " AS " + correlationName;
   }
 }

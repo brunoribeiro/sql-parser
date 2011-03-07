@@ -63,6 +63,11 @@ public class BooleanNormalizer implements Visitor
     node.setHavingClause(normalizeExpression(node.getHavingClause()));
   }
 
+  /* Normalize clauses in this JOIN node. */
+  public void joinNode(JoinNode node) throws StandardException {
+    node.setJoinClause(normalizeExpression(node.getJoinClause()));
+  }
+
   /* Normalize a top-level boolean expression. */
   public ValueNode normalizeExpression(ValueNode boolClause) throws StandardException {
     /* For each expression tree:
@@ -716,6 +721,11 @@ public class BooleanNormalizer implements Visitor
     switch (((QueryTreeNode)node).getNodeType()) {
     case NodeTypes.SELECT_NODE:
       selectNode((SelectNode)node);
+      break;
+    case NodeTypes.JOIN_NODE:
+    case NodeTypes.HALF_OUTER_JOIN_NODE:
+      joinNode((JoinNode)node);
+      break;
     }
     return node;
   }

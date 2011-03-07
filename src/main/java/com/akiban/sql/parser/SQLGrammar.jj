@@ -1379,10 +1379,10 @@ class SQLGrammar
    */
   private JoinNode newJoinNode(ResultSetNode leftRSN, ResultSetNode rightRSN,
                                ValueNode onClause, ResultColumnList usingClause,
-                               int joinType)
+                               JoinNode.JoinType joinType)
       throws StandardException {
     switch(joinType) {
-    case JoinNode.INNERJOIN:
+    case INNER:
       return (JoinNode)nodeFactory.getNode(NodeTypes.JOIN_NODE,
                                            leftRSN,
                                            rightRSN,
@@ -1393,7 +1393,7 @@ class SQLGrammar
                                            null,
                                            parserContext);
 
-    case JoinNode.LEFTOUTERJOIN:
+    case LEFT_OUTER:
       return (JoinNode)nodeFactory.getNode(NodeTypes.HALF_OUTER_JOIN_NODE,
                                            leftRSN,
                                            rightRSN,
@@ -1403,7 +1403,7 @@ class SQLGrammar
                                            null,
                                            parserContext);
 
-    case JoinNode.RIGHTOUTERJOIN:
+    case RIGHT_OUTER:
       return (JoinNode)nodeFactory.getNode(NodeTypes.HALF_OUTER_JOIN_NODE,
                                            leftRSN,
                                            rightRSN,
@@ -7879,7 +7879,7 @@ crossJoin(ResultSetNode leftRSN, boolean nestedInParens)
                 rightRSN,
                 null, // no ON clause in CROSS JOIN
                 null, // no USING clause in CROSS JOIN
-                JoinNode.INNERJOIN);
+                JoinNode.JoinType.INNER);
         ton.setNestedInParens(nestedInParens);
         return ton;
   }
@@ -7888,7 +7888,7 @@ crossJoin(ResultSetNode leftRSN, boolean nestedInParens)
 TableOperatorNode
 qualifiedJoin(ResultSetNode leftRSN, boolean nestedInParens) throws StandardException :
 {
-  int joinType = JoinNode.INNERJOIN;
+  JoinNode.JoinType joinType = JoinNode.JoinType.INNER;
   ResultSetNode rightRSN;
   TableOperatorNode ton = null;
   Object[] onOrUsingClause = null;
@@ -7925,7 +7925,7 @@ qualifiedJoin(ResultSetNode leftRSN, boolean nestedInParens) throws StandardExce
 TableOperatorNode naturalJoin(ResultSetNode leftRSN, boolean nestedInParens)
     throws StandardException :
 {
-  int joinType = JoinNode.INNERJOIN;
+  JoinNode.JoinType joinType = JoinNode.JoinType.INNER;
   ResultSetNode rightRSN;
 }
 {
@@ -7938,15 +7938,15 @@ TableOperatorNode naturalJoin(ResultSetNode leftRSN, boolean nestedInParens)
   }
 }
 
-int
+JoinNode.JoinType
 joinType() throws StandardException :
 {
-  int joinType;
+  JoinNode.JoinType joinType;
 }
 {
   <INNER> 
   {
-    return JoinNode.INNERJOIN;
+    return JoinNode.JoinType.INNER;
   }
 |
   joinType = outerJoinType() [ <OUTER> ]
@@ -7955,18 +7955,18 @@ joinType() throws StandardException :
   }
 }
 
-int
+JoinNode.JoinType
 outerJoinType() throws StandardException :
 {}
 {
   <LEFT> 
   {
-    return JoinNode.LEFTOUTERJOIN;
+    return JoinNode.JoinType.LEFT_OUTER;
   }
 |
   <RIGHT> 
   {
-    return JoinNode.RIGHTOUTERJOIN;
+    return JoinNode.JoinType.RIGHT_OUTER;
   }
 }
 

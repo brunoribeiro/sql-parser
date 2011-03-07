@@ -87,6 +87,7 @@
       <arg value="CREATE TABLE t1 (i int PRIMARY KEY, s char(30) NOT NULL, z VARCHAR(128))"/>
       <arg value="CREATE TABLE t2 AS (SELECT * FROM t1) WITH DATA"/>
       -->
+      <arg value="SELECT * FROM t1 LEFT OUTER JOIN t2 on t1.id = t2.xid RIGHT OUTER JOIN t3 on t1.id = t3.yid INNER JOIN t4 USING (a,b,c)"/>
     </java>
   </target> 
 
@@ -112,6 +113,7 @@
       <arg value="SELECT * FROM t WHERE a = 1"/>
       <arg value="SELECT * FROM t WHERE ((a AND b) AND c) AND NOT d"/>
       <arg value="SELECT * FROM t WHERE (d OR e) OR ((a AND b) AND c)"/>
+      <arg value="SELECT * FROM t1 LEFT OUTER JOIN t2 ON t1.id = t2.pid"/>
     </java>
   </target> 
    

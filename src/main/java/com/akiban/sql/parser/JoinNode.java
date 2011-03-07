@@ -54,21 +54,17 @@ import java.util.Properties;
 public class JoinNode extends TableOperatorNode
 {
   /* Join semantics */
-  public static final int INNERJOIN = 1;
-  public static final int CROSSJOIN = 2;
-  public static final int LEFTOUTERJOIN = 3;
-  public static final int RIGHTOUTERJOIN = 4;
-  public static final int FULLOUTERJOIN = 5;
-  public static final int UNIONJOIN = 6;
+  public static enum JoinType {
+    INNER, CROSS, LEFT_OUTER, RIGHT_OUTER, FULL_OUTER, UNION
+  }
   
   /** If this flag is true, this node represents a natural join. */
   private boolean naturalJoin;
 
-  ValueNode joinClause;
-  boolean joinClauseNormalized;
-  ResultColumnList usingClause;
+  private ValueNode joinClause;
+  private ResultColumnList usingClause;
   //User provided optimizer overrides
-  Properties joinOrderStrategyProperties;
+  private Properties joinOrderStrategyProperties;
 
   /**
    * Initializer for a JoinNode.
@@ -94,7 +90,6 @@ public class JoinNode extends TableOperatorNode
     super.init(leftResult, rightResult, tableProperties);
     resultColumns = (ResultColumnList)selectList;
     joinClause = (ValueNode)onClause;
-    joinClauseNormalized = false;
     this.usingClause = (ResultColumnList)usingClause;
     this.joinOrderStrategyProperties = (Properties)joinOrderStrategyProperties;
   }
@@ -102,34 +97,45 @@ public class JoinNode extends TableOperatorNode
   /** 
    * Convert the joinType to a string.
    *
-   * @param joinType The joinType as an int.
+   * @param joinType The joinType as an enum.
    *
    * @return String The joinType as a String.
    */
-  public static String joinTypeToString(int joinType) {
+  public static String joinTypeToString(JoinType joinType) {
     switch(joinType) {
-    case INNERJOIN:
+    case INNER:
       return "INNER JOIN";
 
-    case CROSSJOIN:
+    case CROSS:
       return "CROSS JOIN";
 
-    case LEFTOUTERJOIN:
+    case LEFT_OUTER:
       return "LEFT OUTER JOIN";
 
-    case RIGHTOUTERJOIN:
+    case RIGHT_OUTER:
       return "RIGHT OUTER JOIN";
 
-    case FULLOUTERJOIN:
+    case FULL_OUTER:
       return "FULL OUTER JOIN";
 
-    case UNIONJOIN:
+    case UNION:
       return "UNION JOIN";
 
     default:
       assert false : "Unexpected joinType";
       return null;
     }
+  }
+
+  public ValueNode getJoinClause() {
+    return joinClause;
+  }
+  public void setJoinClause(ValueNode joinClause) {
+    this.joinClause = joinClause;
+  }
+
+  public ResultColumnList getUsingClause() {
+    return usingClause;
   }
 
   /**

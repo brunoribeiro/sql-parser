@@ -81,6 +81,10 @@ public class HalfOuterJoinNode extends JoinNode
     this.rightOuterJoin = ((Boolean)rightOuterJoin).booleanValue();
   }
 
+  public boolean isRightOuterJoin() {
+    return rightOuterJoin;
+  }
+
   /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.

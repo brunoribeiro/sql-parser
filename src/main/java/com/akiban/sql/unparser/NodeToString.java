@@ -54,6 +54,9 @@ public class NodeToString
       return allResultColumn((AllResultColumn)node);
     case NodeTypes.FROM_LIST:
       return fromList((FromList)node);
+    case NodeTypes.JOIN_NODE:
+    case NodeTypes.HALF_OUTER_JOIN_NODE:
+      return joinNode((JoinNode)node);
     case NodeTypes.GROUP_BY_LIST:
       return groupByList((GroupByList)node);
     case NodeTypes.ORDER_BY_LIST:
@@ -341,6 +344,28 @@ public class NodeToString
       return tn;
     else
       return tn + " AS " + n;
+  }
+
+  protected String joinNode(JoinNode node) throws StandardException {
+    StringBuilder str = new StringBuilder(toString(node.getLeftResultSet()));
+    JoinNode.JoinType joinType = JoinNode.JoinType.INNER;
+    if (node instanceof HalfOuterJoinNode)
+      joinType = ((HalfOuterJoinNode)node).isRightOuterJoin() ? 
+        JoinNode.JoinType.RIGHT_OUTER : JoinNode.JoinType.LEFT_OUTER;
+    str.append(' ');
+    str.append(JoinNode.joinTypeToString(joinType));
+    str.append(' ');
+    str.append(toString(node.getRightResultSet()));
+    if (node.getJoinClause() != null) {
+      str.append(" ON ");
+      str.append(maybeParens(node.getJoinClause()));
+    }
+    if (node.getUsingClause() != null) {
+      str.append(" USING (");
+      str.append(toString(node.getUsingClause()));
+      str.append(')');
+    }
+    return str.toString();
   }
 
   protected String tableName(TableName node) throws StandardException {
