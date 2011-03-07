@@ -17,7 +17,7 @@ package com.akiban.sql.compiler;
 import com.akiban.ais.model.Table;
 
 /**
- * A table binding: stored in the UserData of a FromTable and
+ * A table binding: stored in the UserData of a FromBaseTable and
  * referring to a Table in the AIS.
  */
 public class TableBinding 

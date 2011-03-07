@@ -137,6 +137,9 @@ public class JoinNode extends TableOperatorNode
   public ResultColumnList getUsingClause() {
     return usingClause;
   }
+  public void setUsingClause(ResultColumnList usingClause) {
+    this.usingClause = usingClause;
+  }
 
   /**
    * Prints the sub-nodes of this object.  See QueryTreeNode.java for

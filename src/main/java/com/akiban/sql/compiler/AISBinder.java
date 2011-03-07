@@ -261,28 +261,30 @@ public class AISBinder implements Visitor
 
   protected void selectNode(SelectNode selectNode) throws StandardException {
     FromList fromList = selectNode.getFromList();
-    // Subqueries in SELECT don't see earlier FROM list tables.
-    fromList.accept(this);
-    BindingContext bindingContext = getBindingContext();
     for (FromTable fromTable : fromList) {
-      switch (fromTable.getNodeType()) {
-      case NodeTypes.FROM_BASE_TABLE:
-        fromBaseTable((FromBaseTable)fromTable);
-        break;
-      }
+      fromTable(fromTable);
     }
     for (FromTable fromTable : fromList) {
-      bindingContext.tables.add(fromTable);
-      if (fromTable.getCorrelationName() != null) {
-        if (bindingContext.correlationNames.put(fromTable.getCorrelationName(), 
-                                                fromTable) != null) {
-          throw new StandardException("More than one use of " + 
-                                      fromTable.getCorrelationName() +
-                                      " as correlation name");
-        }
-      }
+      addFromTable(fromTable);
     }
     expandAllsAndNameColumns(selectNode.getResultColumns(), fromList);
+  }
+
+  // Process a FROM list table, finding the table binding.
+  protected void fromTable(FromTable fromTable) throws StandardException {
+    switch (fromTable.getNodeType()) {
+    case NodeTypes.FROM_BASE_TABLE:
+      fromBaseTable((FromBaseTable)fromTable);
+      break;
+    case NodeTypes.JOIN_NODE:
+    case NodeTypes.HALF_OUTER_JOIN_NODE:
+      joinNode((JoinNode)fromTable);
+      break;
+    default:
+      // Subqueries in SELECT don't see earlier FROM list tables.
+      fromTable.accept(this);
+      break;
+    }
   }
 
   protected void fromBaseTable(FromBaseTable fromBaseTable) throws StandardException {
@@ -292,6 +294,85 @@ public class AISBinder implements Visitor
     fromBaseTable.setUserData(new TableBinding(table));
   }
   
+  protected void joinNode(JoinNode joinNode) throws StandardException {
+    fromTable((FromTable)joinNode.getLeftResultSet());
+    fromTable((FromTable)joinNode.getRightResultSet());
+  }
+
+  protected void addFromTable(FromTable fromTable) throws StandardException {
+    if (fromTable instanceof JoinNode) {
+      addJoinNode((JoinNode)fromTable);
+      return;
+    }
+    BindingContext bindingContext = getBindingContext();
+    bindingContext.tables.add(fromTable);
+    if (fromTable.getCorrelationName() != null) {
+      if (bindingContext.correlationNames.put(fromTable.getCorrelationName(), 
+                                              fromTable) != null) {
+        throw new StandardException("More than one use of " + 
+                                    fromTable.getCorrelationName() +
+                                    " as correlation name");
+      }
+    }
+  }
+
+  protected void addJoinNode(JoinNode joinNode) throws StandardException {
+    FromTable fromLeft = (FromTable)joinNode.getLeftResultSet();
+    FromTable fromRight = (FromTable)joinNode.getRightResultSet();
+    addFromTable(fromLeft);
+    addFromTable(fromRight);
+    if (joinNode.getUsingClause() != null) {
+      // Replace USING clause with equivalent equality predicates, all bound up.
+      NodeFactory nodeFactory = joinNode.getNodeFactory();
+      SQLParserContext parserContext = joinNode.getParserContext();
+      ValueNode conditions = null;
+      for (ResultColumn rc : joinNode.getUsingClause()) {
+        String columnName = rc.getName();
+        ColumnBinding leftBinding = getColumnBinding(fromLeft, columnName);
+        if (leftBinding == null)
+          throw new StandardException("Column " + columnName +
+                                      " not found in " + fromLeft.getExposedName());
+        ColumnBinding rightBinding = getColumnBinding(fromRight, columnName);
+        if (rightBinding == null)
+          throw new StandardException("Column " + columnName +
+                                      " not found in " + fromRight.getExposedName());
+        ColumnReference leftCR = (ColumnReference)
+          nodeFactory.getNode(NodeTypes.COLUMN_REFERENCE,
+                              columnName, leftBinding.getFromTable().getTableName(),
+                              parserContext);
+        ColumnReference rightCR = (ColumnReference)
+          nodeFactory.getNode(NodeTypes.COLUMN_REFERENCE,
+                              columnName, rightBinding.getFromTable().getTableName(),
+                              parserContext);
+        ValueNode condition = (ValueNode)
+          nodeFactory.getNode(NodeTypes.BINARY_EQUALS_OPERATOR_NODE,
+                              leftCR, rightCR,
+                              parserContext);
+        if (conditions == null) {
+          conditions = condition;
+        }
+        else {
+          conditions = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
+                                                    conditions, condition,
+                                                    parserContext);
+        }
+      }
+      if (joinNode.getJoinClause() == null) {
+        joinNode.setJoinClause(conditions);
+      }
+      else {
+        joinNode.setJoinClause((AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
+                                                            joinNode.getJoinClause(),
+                                                            conditions,
+                                                            parserContext));
+      }
+      joinNode.setUsingClause(null);
+    }
+    // Take care of any remaining column bindings in the ON clause.
+    if (joinNode.getJoinClause() != null)
+      joinNode.getJoinClause().accept(this);
+  }
+
   protected void columnReference(ColumnReference columnReference) 
       throws StandardException {
     ColumnBinding columnBinding = (ColumnBinding)columnReference.getUserData();
@@ -392,6 +473,14 @@ public class AISBinder implements Visitor
       if (resultColumn == null)
         return null;
       return new ColumnBinding(fromTable, resultColumn);
+    }
+    else if (fromTable instanceof JoinNode) {
+      JoinNode joinNode = (JoinNode)fromTable;
+      ColumnBinding leftBinding = getColumnBinding((FromTable)joinNode.getLeftResultSet(),
+                                                   columnName);
+      if (leftBinding != null)
+        return leftBinding;
+      return getColumnBinding((FromTable)joinNode.getRightResultSet(), columnName);
     }
     else {
       assert false;
