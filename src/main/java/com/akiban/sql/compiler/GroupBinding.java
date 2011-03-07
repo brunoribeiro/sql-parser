@@ -33,6 +33,10 @@ public class GroupBinding
     return group;
   }
 
+  public String getCorrelationName() {
+    return correlationName;
+  }
+
   public String toString() {
     return group.toString() + " AS " + correlationName;
   }

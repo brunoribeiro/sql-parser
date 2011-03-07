@@ -338,7 +338,7 @@ public class NodeToString
   }
 
   protected String fromBaseTable(FromBaseTable node) throws StandardException {
-    String tn = toString(node.getTableName());
+    String tn = toString(node.getOrigTableName());
     String n = node.getCorrelationName();
     if (n == null)
       return tn;

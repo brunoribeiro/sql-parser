@@ -223,10 +223,93 @@ public class Grouper implements Visitor
 
   protected QueryTreeNode rewriteNode(QueryTreeNode node) throws StandardException {
     switch (node.getNodeType()) {
+    case NodeTypes.FROM_LIST:
+      return rewriteFromList((FromList)node);
+    case NodeTypes.AND_NODE:
+      return rewriteAndNode((AndNode)node);
+    case NodeTypes.COLUMN_REFERENCE:
+      return rewriteColumnReference((ColumnReference)node);
     default:
       break;
     }
     return node;
+  }
+
+  protected FromList rewriteFromList(FromList fromList) throws StandardException {
+    FromList toAdd = null;
+    Map<GroupBinding,FromBaseTable> groupTables = 
+      new HashMap<GroupBinding,FromBaseTable>();
+    Iterator<FromTable> iter = fromList.iterator();
+    while (iter.hasNext()) {
+      FromTable fromTable = iter.next();
+      BoundTable boundTable = allBoundTables.get(fromTable);
+      GroupBinding groupBinding = boundTable.groupBinding;
+      if (groupBinding != null) { // Negative case is those without a group.
+        iter.remove();
+        if (groupTables.containsKey(groupBinding)) 
+          continue;
+        if (toAdd == null)
+          toAdd = (FromList)nodeFactory.getNode(NodeTypes.FROM_LIST, 
+                                                parserContext);
+        GroupTable aisGroupTable = groupBinding.getGroup().getGroupTable();
+        com.akiban.ais.model.TableName aisTableName = aisGroupTable.getName();
+        TableName groupTableName = (TableName)
+          nodeFactory.getNode(NodeTypes.TABLE_NAME,
+                              aisTableName.getSchemaName(),
+                              aisTableName.getTableName(),
+                              parserContext);
+        FromBaseTable groupTable = (FromBaseTable)
+          nodeFactory.getNode(NodeTypes.FROM_BASE_TABLE,
+                              groupTableName,
+                              groupBinding.getCorrelationName(),
+                              null, null,
+                              parserContext);
+        TableBinding groupTableBinding = new TableBinding(aisGroupTable);
+        groupTableBinding.setGroupBinding(groupBinding);
+        groupTable.setUserData(groupTableBinding);
+        toAdd.addFromTable(groupTable);
+        groupTables.put(groupBinding, groupTable);
+      }
+    }
+    if (toAdd != null)
+      fromList.addAll(toAdd);
+    return fromList;
+  }
+
+  protected AndNode rewriteAndNode(AndNode andNode) throws StandardException {
+    if (allJoinConditions.contains(andNode.getLeftOperand())) {
+      andNode.setLeftOperand((BooleanConstantNode)
+                             nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
+                                                 Boolean.TRUE,
+                                                 parserContext));
+    }
+    return andNode;
+  }
+
+  protected ColumnReference rewriteColumnReference(ColumnReference columnReference) 
+      throws StandardException {
+    ColumnBinding columnBinding = (ColumnBinding)columnReference.getUserData();
+    if (columnBinding != null) {
+      BoundTable boundTable = allBoundTables.get(columnBinding.getFromTable());
+      if (boundTable != null) {
+        GroupBinding groupBinding = boundTable.groupBinding;
+        if (groupBinding != null) {
+          TableName groupTableName = (TableName)
+            nodeFactory.getNode(NodeTypes.TABLE_NAME,
+                                null,
+                                groupBinding.getCorrelationName(),
+                                parserContext);
+          ColumnReference groupColumnReference = (ColumnReference)
+            nodeFactory.getNode(NodeTypes.COLUMN_REFERENCE,
+                                columnBinding.getColumn().getGroupColumn().getName().toUpperCase(),
+                                groupTableName,
+                                parserContext);
+          groupColumnReference.setType(columnReference.getType());
+          return groupColumnReference;
+        }
+      }
+    }
+    return columnReference;
   }
 
   /* Visitor interface */
