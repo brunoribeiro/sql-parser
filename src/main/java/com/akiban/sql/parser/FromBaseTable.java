@@ -180,8 +180,12 @@ public class FromBaseTable extends FromTable
    * @return The table name for this table.
    */
 
-  public TableName getTableName() {
-    return tableName;
+  public TableName getTableName() throws StandardException {
+    TableName tn = super.getTableName();
+    if (tn != null)
+      return tn;
+    else
+      return tableName;
   }
 
   /**

@@ -44,6 +44,6 @@ public class TableBinding
     return groupBinding;
   }
   public void setGroupBinding(GroupBinding groupBinding) {
-    groupBinding = this.groupBinding;
+    this.groupBinding = groupBinding;
   }
 }

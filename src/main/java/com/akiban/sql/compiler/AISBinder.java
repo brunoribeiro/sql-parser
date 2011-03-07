@@ -288,7 +288,7 @@ public class AISBinder implements Visitor
   }
 
   protected void fromBaseTable(FromBaseTable fromBaseTable) throws StandardException {
-    TableName tableName = fromBaseTable.getTableName();
+    TableName tableName = fromBaseTable.getOrigTableName();
     Table table = lookupTableName(tableName);
     tableName.setUserData(table);
     fromBaseTable.setUserData(new TableBinding(table));

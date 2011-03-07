@@ -20,6 +20,7 @@ import com.akiban.sql.parser.SQLParser;
 import com.akiban.sql.compiler.AISBinder;
 import com.akiban.sql.compiler.BooleanNormalizer;
 import com.akiban.sql.compiler.BoundNodeToString;
+import com.akiban.sql.compiler.Grouper;
 import com.akiban.sql.compiler.SubqueryFlattener;
 import com.akiban.sql.compiler.TypeComputer;
 
@@ -34,7 +35,8 @@ public class Tester
     ECHO, PARSE, 
     PRINT_TREE, PRINT_SQL, PRINT_BOUND_SQL,
     BIND, COMPUTE_TYPES,
-    BOOLEAN_NORMALIZE, FLATTEN_SUBQUERIES
+    BOOLEAN_NORMALIZE, FLATTEN_SUBQUERIES,
+    GROUP, GROUP_REWRITE  
   }
 
   List<Action> actions;
@@ -44,6 +46,7 @@ public class Tester
   TypeComputer typeComputer;
   BooleanNormalizer booleanNormalizer;
   SubqueryFlattener subqueryFlattener;
+  Grouper grouper;
 
   public Tester() {
     actions = new ArrayList<Action>();
@@ -52,6 +55,7 @@ public class Tester
     typeComputer = new TypeComputer();
     booleanNormalizer = new BooleanNormalizer(parser);
     subqueryFlattener = new SubqueryFlattener(parser);
+    grouper = new Grouper(parser);
   }
 
   public void addAction(Action action) {
@@ -92,6 +96,13 @@ public class Tester
       case FLATTEN_SUBQUERIES:
         stmt = subqueryFlattener.flatten(stmt);
         break;
+      case GROUP:
+        grouper.group(stmt);
+        break;
+      case GROUP_REWRITE:
+        grouper.group(stmt);
+        grouper.rewrite(stmt);
+        break;
       }
     }
   }
@@ -126,6 +137,10 @@ public class Tester
           tester.addAction(Action.BOOLEAN_NORMALIZE);
         else if ("-flatten".equals(arg))
           tester.addAction(Action.FLATTEN_SUBQUERIES);
+        else if ("-group".equals(arg))
+          tester.addAction(Action.GROUP);
+        else if ("-group-rewrite".equals(arg))
+          tester.addAction(Action.GROUP_REWRITE);
         else
           throw new Exception("Unknown switch: " + arg);
       }

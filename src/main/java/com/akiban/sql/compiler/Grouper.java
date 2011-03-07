@@ -24,6 +24,7 @@ import com.akiban.ais.model.GroupTable;
 import com.akiban.ais.model.Join;
 import com.akiban.ais.model.JoinColumn;
 import com.akiban.ais.model.Table;
+import com.akiban.ais.model.UserTable;
 
 import java.util.*;
 
@@ -40,8 +41,37 @@ public class Grouper implements Visitor
     this.nodeFactory = parserContext.getNodeFactory();
   }
 
+  // Internal state for bound table while finding joins.
+  static class BoundTable {
+    FromBaseTable baseTable;
+    TableBinding tableBinding;
+    Map<Column,List<ColumnBinding> > boundColumns;
+    Map<ColumnBinding,ValueNode> joinedColumns;
+    GroupBinding groupBinding;
+    BoundTable(FromBaseTable baseTable, TableBinding tableBinding) {
+      this.baseTable = baseTable;
+      this.tableBinding = tableBinding;
+      boundColumns = new HashMap<Column,List<ColumnBinding> >();
+      joinedColumns = new HashMap<ColumnBinding,ValueNode>();
+    }
+    UserTable getUserTable() {
+      return (UserTable)tableBinding.getTable();
+    }
+    void setGroupBinding(GroupBinding groupBinding) {
+      this.groupBinding = groupBinding;
+      tableBinding.setGroupBinding(groupBinding);
+    }
+  }
+
+  private Map<FromTable,BoundTable> allBoundTables;
+  private Set<ValueNode> allJoinConditions;
+  private int groupNumber;
+
   public void group(StatementNode stmt) throws StandardException {
     visitMode = VisitMode.GROUP;
+    allBoundTables = new HashMap<FromTable,BoundTable>();
+    allJoinConditions = new HashSet<ValueNode>();
+    groupNumber = 0;
     stmt.accept(this);
     visitMode = null;
   }
@@ -55,7 +85,138 @@ public class Grouper implements Visitor
   /* Group finding */
 
   protected void groupSelectNode(SelectNode selectNode) throws StandardException {
-    
+    Map<FromTable,BoundTable> boundTables = new HashMap<FromTable,BoundTable>();
+    for (FromTable fromTable : selectNode.getFromList())
+      addFromTable(fromTable, boundTables);
+    findJoinedColumns(selectNode.getWhereClause(), boundTables);
+    allBoundTables.putAll(boundTables);
+
+    List<BoundTable> ordered = new ArrayList<BoundTable>(boundTables.values());
+    Collections.sort(ordered, new Comparator<BoundTable>() {
+                       public int compare(BoundTable bt1, BoundTable bt2) {
+                         return bt1.getUserTable().getDepth()
+                           .compareTo(bt2.getUserTable().getDepth());
+                       }
+                     });
+    for (int i = 0; i < ordered.size(); i++) {
+      BoundTable boundTable = ordered.get(i);
+      UserTable userTable = boundTable.getUserTable();
+      Join join = userTable.getParentJoin();
+      if (join != null) {
+        UserTable parentTable = join.getParent();
+        for (int j = 0; j < i; j++) {
+          BoundTable otherBoundTable = ordered.get(j);
+          if (parentTable.equals(otherBoundTable.getUserTable())) {
+            Set<ValueNode> joinConditions = matchJoin(join, boundTable, otherBoundTable);
+            if (joinConditions != null) {
+              boundTable.setGroupBinding(otherBoundTable.groupBinding);
+              allJoinConditions.addAll(joinConditions);
+              break;
+            }
+          }
+        }
+      }
+      if (boundTable.groupBinding == null) {
+        boundTable.setGroupBinding(new GroupBinding(userTable.getGroup(),
+                                                    "_G_" + (++groupNumber)));
+      }
+    }
+  }
+
+  protected void addFromTable(FromTable fromTable,
+                              Map<FromTable,BoundTable> boundTables) {
+    if (fromTable instanceof FromBaseTable) {
+      FromBaseTable fromBaseTable = (FromBaseTable)fromTable;
+      TableBinding tableBinding = (TableBinding)fromBaseTable.getUserData();
+      if ((tableBinding != null) &&
+          (tableBinding.getTable().getGroup() != null)) {
+        BoundTable boundTable = new BoundTable(fromBaseTable, tableBinding);
+        boundTables.put(fromBaseTable, boundTable);
+      }
+    }
+    else if (fromTable instanceof JoinNode) {
+      JoinNode joinNode = (JoinNode)fromTable;
+      addFromTable((FromTable)joinNode.getLeftResultSet(), boundTables);
+      addFromTable((FromTable)joinNode.getRightResultSet(), boundTables);
+      findJoinedColumns(joinNode.getJoinClause(), boundTables);
+    }
+  }
+
+  protected void findJoinedColumns(ValueNode condition, 
+                                   Map<FromTable,BoundTable> boundTables) {
+    while (condition instanceof AndNode) {
+      AndNode andNode = (AndNode)condition;
+      ValueNode leftOperand = andNode.getLeftOperand();
+      do_binop:
+      if (leftOperand.getNodeType() == NodeTypes.BINARY_EQUALS_OPERATOR_NODE) {
+        BinaryRelationalOperatorNode binop = (BinaryRelationalOperatorNode)leftOperand;
+        ValueNode leftEquals = binop.getLeftOperand();
+        ValueNode rightEquals = binop.getRightOperand();
+        if (!(leftEquals instanceof ColumnReference) ||
+            !(rightEquals instanceof ColumnReference))
+          break do_binop;
+        ColumnReference leftCR = (ColumnReference)leftEquals;
+        ColumnReference rightCR = (ColumnReference)rightEquals;
+        ColumnBinding leftCB = (ColumnBinding)leftCR.getUserData();
+        ColumnBinding rightCB = (ColumnBinding)rightCR.getUserData();
+        if ((leftCB == null) || (rightCB == null))
+          break do_binop;
+        BoundTable leftBT = boundTables.get(leftCB.getFromTable());
+        BoundTable rightBT = boundTables.get(rightCB.getFromTable());
+        if ((leftBT == null) || (rightBT == null))
+          break do_binop;
+        addJoinedColumn(leftCB, leftBT, binop);
+        addJoinedColumn(rightCB, rightBT, binop);
+      }
+      ValueNode rightOperand = andNode.getRightOperand();
+      if (rightOperand.isBooleanTrue()) break;
+      condition = rightOperand;
+    }
+  }
+
+  protected void addJoinedColumn(ColumnBinding columnBinding,
+                                 BoundTable boundTable,
+                                 ValueNode equals) {
+    Column column = columnBinding.getColumn();
+    List<ColumnBinding> list = boundTable.boundColumns.get(column);
+    if (list == null) {
+      list = new ArrayList<ColumnBinding>(1);
+      boundTable.boundColumns.put(column, list);
+    }
+    list.add(columnBinding);
+    boundTable.joinedColumns.put(columnBinding, equals);
+  }
+
+  // Match given join to equality conditions.
+  protected Set<ValueNode> matchJoin(Join join, 
+                                     BoundTable childBoundTable, 
+                                     BoundTable parentBoundTable) {
+    Set<ValueNode> result = null;
+    for (JoinColumn joinColumn : join.getJoinColumns()) {
+      List<ColumnBinding> childBindings =
+        childBoundTable.boundColumns.get(joinColumn.getChild());
+      List<ColumnBinding> parentBindings =
+        parentBoundTable.boundColumns.get(joinColumn.getParent());
+      if ((childBindings == null) || (parentBindings == null))
+        return null;
+      ValueNode matchingEquals = null;
+      found:
+      for (ColumnBinding childBinding : childBindings) {
+        ValueNode equals = childBoundTable.joinedColumns.get(childBinding);
+        for (ColumnBinding parentBinding : parentBindings) {
+          if (equals == parentBoundTable.joinedColumns.get(parentBinding)) {
+            matchingEquals = equals;
+            break found;
+          }
+        }
+      }
+      if (matchingEquals == null)
+        return null;
+      if (result == null)
+        result = new HashSet<ValueNode>(1);
+      result.add(matchingEquals);
+    }
+    return result;
   }
 
   /* Group rewriting */
