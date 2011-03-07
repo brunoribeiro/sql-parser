@@ -142,6 +142,7 @@
       <arg value="SELECT parent.name,child.name FROM parent,child WHERE child.pid = parent.id AND parent.state = 'MA'"/>
       <arg value="SELECT p1.name,child.name FROM parent AS p1,parent AS p2,child WHERE child.pid = p1.id AND p2.state = 'MA' AND p1.id &lt;> p2.id"/>
       <arg value="SELECT child.name FROM child WHERE pid IN (SELECT parent.id FROM parent WHERE state = 'MA')"/>
+      <arg value="SELECT parent.name,child.name FROM parent INNER JOIN child ON child.pid = parent.id WHERE parent.state = 'MA'"/>
     </java>
   </target> 
 
