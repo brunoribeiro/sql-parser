@@ -236,44 +236,118 @@ public class Grouper implements Visitor
   }
 
   protected FromList rewriteFromList(FromList fromList) throws StandardException {
-    FromList toAdd = null;
     Map<GroupBinding,FromBaseTable> groupTables = 
       new HashMap<GroupBinding,FromBaseTable>();
-    Iterator<FromTable> iter = fromList.iterator();
-    while (iter.hasNext()) {
-      FromTable fromTable = iter.next();
-      BoundTable boundTable = allBoundTables.get(fromTable);
-      GroupBinding groupBinding = boundTable.groupBinding;
-      if (groupBinding != null) { // Negative case is those without a group.
-        iter.remove();
-        if (groupTables.containsKey(groupBinding)) 
-          continue;
-        if (toAdd == null)
-          toAdd = (FromList)nodeFactory.getNode(NodeTypes.FROM_LIST, 
-                                                parserContext);
-        GroupTable aisGroupTable = groupBinding.getGroup().getGroupTable();
-        com.akiban.ais.model.TableName aisTableName = aisGroupTable.getName();
-        TableName groupTableName = (TableName)
-          nodeFactory.getNode(NodeTypes.TABLE_NAME,
-                              aisTableName.getSchemaName(),
-                              aisTableName.getTableName(),
-                              parserContext);
-        FromBaseTable groupTable = (FromBaseTable)
-          nodeFactory.getNode(NodeTypes.FROM_BASE_TABLE,
-                              groupTableName,
-                              groupBinding.getCorrelationName(),
-                              null, null,
-                              parserContext);
-        TableBinding groupTableBinding = new TableBinding(aisGroupTable);
-        groupTableBinding.setGroupBinding(groupBinding);
-        groupTable.setUserData(groupTableBinding);
-        toAdd.addFromTable(groupTable);
-        groupTables.put(groupBinding, groupTable);
+    boolean[] bholder = new boolean[1];
+    for (int i = 0; i < fromList.size(); i++) {
+      FromTable fromTable = fromList.get(i);
+      FromTable groupTable = null;
+      boolean newGroup = false;
+      if (fromTable instanceof JoinNode) {
+        // TODO: Is there a way to make the two cases more parallel?
+        groupTable = joinGroupTable((JoinNode)fromTable, groupTables);
+        if (groupTable == fromTable)
+          groupTable = null;
+        else {
+          newGroup = true;
+          for (int j = 0; j < i; j++) {
+            if (fromList.get(j) == groupTable) {
+              newGroup = false;
+              break;
+            }
+          }
+        }
+      }
+      else {
+        bholder[0] = false;
+        groupTable = getGroupTable(fromTable, groupTables, bholder);
+        newGroup = bholder[0];
+      }
+      if (groupTable == null) {
+        // Leave original node there.
+      }
+      else if (newGroup) {
+        // First time this group used.
+        fromList.set(i, groupTable);
+      }
+      else {
+        // Duplicate group binding.
+        fromList.remove(i);
+        i--;
       }
     }
-    if (toAdd != null)
-      fromList.addAll(toAdd);
     return fromList;
+  }
+
+  protected FromBaseTable getGroupTable(FromTable fromTable, 
+                                        Map<GroupBinding,FromBaseTable> groupTables,
+                                        boolean[] return_newGroup) 
+      throws StandardException {
+    BoundTable boundTable = allBoundTables.get(fromTable);
+    if (boundTable == null)
+      return null;
+
+    GroupBinding groupBinding = boundTable.groupBinding;
+    if (groupBinding == null)
+      return null;              // Negative case is those without a group.
+
+    FromBaseTable groupTable = groupTables.get(groupBinding);
+    if (groupTable != null)
+      return groupTable;
+
+    GroupTable aisGroupTable = groupBinding.getGroup().getGroupTable();
+    com.akiban.ais.model.TableName aisTableName = aisGroupTable.getName();
+    TableName groupTableName = (TableName)
+      nodeFactory.getNode(NodeTypes.TABLE_NAME,
+                          aisTableName.getSchemaName(),
+                          aisTableName.getTableName(),
+                          parserContext);
+    groupTable = (FromBaseTable)
+      nodeFactory.getNode(NodeTypes.FROM_BASE_TABLE,
+                          groupTableName,
+                          groupBinding.getCorrelationName(),
+                          null, null,
+                          parserContext);
+    TableBinding groupTableBinding = new TableBinding(aisGroupTable);
+    groupTableBinding.setGroupBinding(groupBinding);
+    groupTable.setUserData(groupTableBinding);
+    groupTables.put(groupBinding, groupTable);
+    if (return_newGroup != null)
+      return_newGroup[0] = true;
+    return groupTable;
+  }
+
+  protected FromTable joinGroupTable(JoinNode joinNode, 
+                                     Map<GroupBinding,FromBaseTable> groupTables)
+      throws StandardException {
+    FromTable leftJoin = (FromTable)joinNode.getLeftResultSet();
+    FromTable rightJoin = (FromTable)joinNode.getRightResultSet();
+    if (leftJoin instanceof JoinNode)
+      leftJoin = joinGroupTable((JoinNode)leftJoin, groupTables);
+    else {
+      FromTable groupTable = getGroupTable(leftJoin, groupTables, null);
+      if (groupTable != null) {
+        leftJoin = groupTable;
+        joinNode.setLeftResultSet(leftJoin);
+      }
+    }
+    if (rightJoin instanceof JoinNode)
+      rightJoin = joinGroupTable((JoinNode)rightJoin, groupTables);
+    else {
+      FromTable groupTable = getGroupTable(rightJoin, groupTables, null);
+      if (groupTable != null) {
+        rightJoin = groupTable;
+        joinNode.setRightResultSet(rightJoin);
+      }
+    }
+    if (leftJoin == rightJoin)
+      // This is the normal group case: both sides use the same group table.  
+      // TODO: We lose the INNER / OUTER distinction here;
+      // need to annotate group binding.
+      return leftJoin;
+    else
+      // Did not coalesce top. (May have brought in groups below, though).
+      return joinNode;
   }
 
   protected AndNode rewriteAndNode(AndNode andNode) throws StandardException {

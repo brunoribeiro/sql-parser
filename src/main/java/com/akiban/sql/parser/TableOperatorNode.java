@@ -125,6 +125,14 @@ abstract class TableOperatorNode extends FromTable
     return rightResultSet;
   }
 
+  public void setLeftResultSet(ResultSetNode leftResultSet) {
+    this.leftResultSet =  leftResultSet;
+  }
+
+  public void setRightResultSet(ResultSetNode rightResultSet) {
+    this.rightResultSet =  rightResultSet;
+  }
+
   public ResultSetNode getLeftmostResultSet() {
     if (leftResultSet instanceof TableOperatorNode) {
       return ((TableOperatorNode)leftResultSet).getLeftmostResultSet();
