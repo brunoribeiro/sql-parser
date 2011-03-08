@@ -135,6 +135,10 @@ public class Grouper implements Visitor
       }
     }
     else if (fromTable instanceof JoinNode) {
+      // TODO: It may not work to just flatten our accumulation of
+      // these, since a different group table in the middle must
+      // segregate left and right, unless the join order can be
+      // flipped to keep them together.
       JoinNode joinNode = (JoinNode)fromTable;
       addFromTable((FromTable)joinNode.getLeftResultSet(), boundTables);
       addFromTable((FromTable)joinNode.getRightResultSet(), boundTables);
