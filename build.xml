@@ -66,7 +66,9 @@
       <arg value="CREATE TABLE t2 AS (SELECT * FROM t1) WITH NO DATA"/>
       <arg value="DELETE FROM t WHERE x in (1,2,3)"/>
       <arg value="SELECT x,y FROM t WHERE z IN (SELECT z FROM w WHERE q > 10)"/>
+      <arg value="SELECT * FROM (SELECT z,y FROM t1) AS s"/>
       <arg value="SELECT * FROM t1 WHERE EXISTS ((VALUES 1) INTERSECT (VALUES 2))"/>
+      <arg value="CREATE VIEW v1(x,y) AS (SELECT y,z FROM t1 WHERE y IS NOT NULL)"/>
     </java>
   </target> 
 
@@ -88,6 +90,8 @@
       <arg value="CREATE TABLE t2 AS (SELECT * FROM t1) WITH DATA"/>
       -->
       <arg value="SELECT * FROM t1 LEFT OUTER JOIN t2 on t1.id = t2.xid RIGHT OUTER JOIN t3 on t1.id = t3.yid INNER JOIN t4 USING (a,b,c)"/>
+      <arg value="SELECT * FROM (SELECT z,y FROM t1) AS s"/>
+      <arg value="CREATE VIEW v1(x,y) AS (SELECT y,z FROM t1 WHERE y IS NOT NULL)"/>
     </java>
   </target> 
 
@@ -125,6 +129,18 @@
     </java>
   </target> 
    
+  <target name="test-views" depends="compile, jvmargs">
+    <java classname="com.akiban.sql.test.Tester" fork="yes" failonerror="yes">
+      <classpath refid="running.class.path"/>
+      <arg value="-bind"/>
+      <arg value="CREATE TABLE t1(x INT NOT NULL, y VARCHAR(7), z DECIMAL); CREATE table t2(w CHAR(1) NOT NULL);"/>
+      <arg value="-view"/>
+      <arg value="CREATE VIEW v1(x,y) AS SELECT y,z FROM t1 WHERE y IS NOT NULL"/>
+      <arg line="-print -tree"/>
+      <arg value="SELECT x FROM v1 WHERE y > 'foo'"/>
+    </java>
+  </target> 
+
   <target name="test-flattener" depends="compile, jvmargs">
     <java classname="com.akiban.sql.test.Tester" fork="yes" failonerror="yes">
       <classpath refid="running.class.path"/>

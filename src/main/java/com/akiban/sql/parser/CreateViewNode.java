@@ -50,10 +50,10 @@ public class CreateViewNode extends DDLStatementNode
   // TODO: Need the rest.
   public static final int NO_CHECK_OPTION = 0;
 
-  ResultColumnList resultColumns;
-  ResultSetNode queryExpression;
-  String qeText;
-  int checkOption;
+  private ResultColumnList resultColumns;
+  private ResultSetNode queryExpression;
+  private String qeText;
+  private int checkOption;
   private OrderByList orderByList;
   private ValueNode offset;
   private ValueNode fetchFirst;
@@ -172,7 +172,11 @@ public class CreateViewNode extends DDLStatementNode
     return checkOption; 
   }
 
-  ResultSetNode getParsedQueryExpression() { 
+  public ResultColumnList getResultColumns() {
+    return resultColumns;
+  }
+
+  public ResultSetNode getParsedQueryExpression() { 
     return queryExpression; 
   }
 

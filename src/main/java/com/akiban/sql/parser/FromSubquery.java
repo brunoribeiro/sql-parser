@@ -152,6 +152,10 @@ public class FromSubquery extends FromTable
   }
 
 
+  public OrderByList getOrderByList() {
+    return orderByList;
+  }
+
   /**
    * Accept the visitor for all visitable children of this node.
    * 

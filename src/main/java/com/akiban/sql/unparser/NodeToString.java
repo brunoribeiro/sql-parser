@@ -28,6 +28,8 @@ public class NodeToString
     switch (node.getNodeType()) {
     case NodeTypes.CREATE_TABLE_NODE:
       return createTableNode((CreateTableNode)node);
+    case NodeTypes.CREATE_VIEW_NODE:
+      return createViewNode((CreateViewNode)node);
     case NodeTypes.TABLE_ELEMENT_LIST:
       return tableElementList((TableElementList)node);
     case NodeTypes.COLUMN_DEFINITION_NODE:
@@ -65,6 +67,8 @@ public class NodeToString
       return valueNodeList((ValueNodeList)node);
     case NodeTypes.FROM_BASE_TABLE:
       return fromBaseTable((FromBaseTable)node);
+    case NodeTypes.FROM_SUBQUERY:
+      return fromSubquery((FromSubquery)node);
     case NodeTypes.TABLE_NAME:
       return tableName((TableName)node);
     case NodeTypes.COLUMN_REFERENCE:
@@ -154,6 +158,20 @@ public class NodeToString
       if (!node.isWithData()) str.append("NO ");
       str.append("DATA");
     }
+    return str.toString();
+  }
+
+  protected String createViewNode(CreateViewNode node) throws StandardException {
+    StringBuilder str = new StringBuilder("CREATE VIEW ");
+    str.append(toString(node.getObjectName()));
+    if (node.getResultColumns() != null) {
+      str.append("(");
+      str.append(toString(node.getResultColumns()));
+      str.append(")");
+    }
+    str.append(" AS (");
+    str.append(toString(node.getParsedQueryExpression()));
+    str.append(")");
     return str.toString();
   }
 
@@ -344,6 +362,24 @@ public class NodeToString
       return tn;
     else
       return tn + " AS " + n;
+  }
+
+  protected String fromSubquery(FromSubquery node) throws StandardException {
+    StringBuilder str = new StringBuilder(toString(node.getSubquery()));
+    if (node.getOrderByList() != null) {
+      str.append(' ');
+      str.append(toString(node.getOrderByList()));
+    }
+    str.insert(0, '(');
+    str.append(')');
+    str.append(" AS ");
+    str.append(node.getCorrelationName());
+    if (node.getResultColumns() != null) {
+      str.append('(');
+      str.append(toString(node.getResultColumns()));
+      str.append(')');
+    }
+    return str.toString();
   }
 
   protected String joinNode(JoinNode node) throws StandardException {

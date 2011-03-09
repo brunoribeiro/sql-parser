@@ -20,6 +20,8 @@ import com.akiban.sql.StandardException;
 import com.akiban.sql.types.DataTypeDescriptor;
 import com.akiban.sql.types.TypeId;
 
+import com.akiban.sql.views.ViewDefinition;
+
 import com.akiban.ais.model.AkibanInformationSchema;
 import com.akiban.ais.model.Column;
 import com.akiban.ais.model.Table;
@@ -32,13 +34,24 @@ public class AISBinder implements Visitor
 {
   private AkibanInformationSchema ais;
   private String defaultSchemaName;
+  private Map<TableName,ViewDefinition> views;
   private Stack<BindingContext> bindingContexts;
   private Set<QueryTreeNode> visited;
 
   public AISBinder(AkibanInformationSchema ais, String defaultSchemaName) {
     this.ais = ais;
     this.defaultSchemaName = defaultSchemaName;
+    this.views = new HashMap<TableName,ViewDefinition>();
     this.bindingContexts = new Stack<BindingContext>();
+  }
+
+  public void addView(ViewDefinition view) throws StandardException {
+    TableName name = view.getName();
+    /**
+    if (name.getSchemaName() == null)
+      name.setSchemaName(defaultSchemaName);
+    **/
+    views.put(name, view);
   }
 
   public void bind(StatementNode stmt) throws StandardException {
@@ -261,42 +274,50 @@ public class AISBinder implements Visitor
 
   protected void selectNode(SelectNode selectNode) throws StandardException {
     FromList fromList = selectNode.getFromList();
-    for (FromTable fromTable : fromList) {
-      fromTable(fromTable);
+    int size = fromList.size();
+    for (int i = 0; i < size; i++) {
+      FromTable fromTable = fromList.get(i);
+      FromTable newFromTable = fromTable(fromTable);
+      if (newFromTable != fromTable)
+        fromList.set(i, newFromTable);
     }
-    for (FromTable fromTable : fromList) {
-      addFromTable(fromTable);
+    for (int i = 0; i < size; i++) {
+      addFromTable(fromList.get(i));
     }
     expandAllsAndNameColumns(selectNode.getResultColumns(), fromList);
   }
 
   // Process a FROM list table, finding the table binding.
-  protected void fromTable(FromTable fromTable) throws StandardException {
+  protected FromTable fromTable(FromTable fromTable) throws StandardException {
     switch (fromTable.getNodeType()) {
     case NodeTypes.FROM_BASE_TABLE:
-      fromBaseTable((FromBaseTable)fromTable);
-      break;
+      return fromBaseTable((FromBaseTable)fromTable);
     case NodeTypes.JOIN_NODE:
     case NodeTypes.HALF_OUTER_JOIN_NODE:
-      joinNode((JoinNode)fromTable);
-      break;
+      return joinNode((JoinNode)fromTable);
     default:
       // Subqueries in SELECT don't see earlier FROM list tables.
-      fromTable.accept(this);
-      break;
+      return (FromTable)fromTable.accept(this);
     }
   }
 
-  protected void fromBaseTable(FromBaseTable fromBaseTable) throws StandardException {
+  protected FromTable fromBaseTable(FromBaseTable fromBaseTable) 
+      throws StandardException {
     TableName tableName = fromBaseTable.getOrigTableName();
+    ViewDefinition view = views.get(tableName);
+    if (view != null)
+      return fromTable(view.getSubquery()); // Splice in definition and bind it.
+
     Table table = lookupTableName(tableName);
     tableName.setUserData(table);
     fromBaseTable.setUserData(new TableBinding(table));
+    return fromBaseTable;
   }
   
-  protected void joinNode(JoinNode joinNode) throws StandardException {
-    fromTable((FromTable)joinNode.getLeftResultSet());
-    fromTable((FromTable)joinNode.getRightResultSet());
+  protected FromTable joinNode(JoinNode joinNode) throws StandardException {
+    joinNode.setLeftResultSet(fromTable((FromTable)joinNode.getLeftResultSet()));
+    joinNode.setRightResultSet(fromTable((FromTable)joinNode.getRightResultSet()));
+    return joinNode;
   }
 
   protected void addFromTable(FromTable fromTable) throws StandardException {
@@ -468,8 +489,10 @@ public class AISBinder implements Visitor
     }
     else if (fromTable instanceof FromSubquery) {
       FromSubquery fromSubquery = (FromSubquery)fromTable;
-      ResultColumn resultColumn = fromSubquery.getSubquery().getResultColumns()
-        .getResultColumn(columnName);
+      ResultColumnList columns = fromSubquery.getResultColumns();
+      if (columns == null)
+        columns = fromSubquery.getSubquery().getResultColumns();
+      ResultColumn resultColumn = columns.getResultColumn(columnName);
       if (resultColumn == null)
         return null;
       return new ColumnBinding(fromTable, resultColumn);

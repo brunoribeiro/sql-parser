@@ -137,6 +137,7 @@ public class TableName extends QueryTreeNode
 
   public void setSchemaName(String schemaName) {
     this.schemaName = schemaName;
+    this.hasSchema = schemaName != null;
   }
 
   /**

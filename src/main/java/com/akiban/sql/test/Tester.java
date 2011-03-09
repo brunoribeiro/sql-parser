@@ -23,6 +23,7 @@ import com.akiban.sql.compiler.BoundNodeToString;
 import com.akiban.sql.compiler.Grouper;
 import com.akiban.sql.compiler.SubqueryFlattener;
 import com.akiban.sql.compiler.TypeComputer;
+import com.akiban.sql.views.ViewDefinition;
 
 import com.akiban.ais.model.AkibanInformationSchema;
 
@@ -116,6 +117,10 @@ public class Tester
     binder = new AISBinder(ais, "user");
   }
 
+  public void addView(String sql) throws Exception {
+    binder.addView(new ViewDefinition(sql, parser));
+  }
+
   public static void main(String[] args) throws Exception {
     Tester tester = new Tester();
     tester.addAction(Action.ECHO);
@@ -136,6 +141,8 @@ public class Tester
           tester.setSchema(args[i++]);
           tester.addAction(Action.BIND);
         }
+        else if ("-view".equals(arg))
+          tester.addView(args[i++]);
         else if ("-types".equals(arg))
           tester.addAction(Action.COMPUTE_TYPES);
         else if ("-boolean".equals(arg))
