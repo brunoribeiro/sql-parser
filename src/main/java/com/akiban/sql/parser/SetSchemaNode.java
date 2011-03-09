@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * A SetSchemaNode is the root of a QueryTree that 
  * represents a SET SCHEMA statement.  It isn't
@@ -62,6 +64,17 @@ public class SetSchemaNode extends MiscellaneousStatementNode
     this.name = (String)schemaName;
     if (type != null)
       this.type = ((Integer)type).intValue();
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    SetSchemaNode other = (SetSchemaNode)node;
+    this.name = other.name;
+    this.type = other.type;
   }
 
   /**

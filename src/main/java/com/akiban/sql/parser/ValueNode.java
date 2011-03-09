@@ -111,26 +111,13 @@ public abstract class ValueNode extends QueryTreeNode
   }
 
   /**
-   * Initializer for non-numeric types.
-   * 
-   *
-   * @param tcf The factory to get the DataTypeServicesFactory from
-   * @param typeId The TypeID of this new node
-   * @param isNullable The nullability of this new node
-   * @param maximumWidth The maximum width of this new node
-   *
-   * @exception StandardException
+   * Fill this node with a deep copy of the given node.
    */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
 
-  // TODO: tcf unused; is anyone calling this constructor?
-  ValueNode(Object tcf,
-            Object typeId,
-            Object isNullable,
-            Object maximumWidth)
-      throws StandardException {
-    setType(new DataTypeDescriptor((TypeId)typeId,
-                                   ((Boolean)isNullable).booleanValue(),
-                                   ((Integer)maximumWidth).intValue()));
+    ValueNode other = (ValueNode)node;
+    this.type = other.type;
   }
 
   /**

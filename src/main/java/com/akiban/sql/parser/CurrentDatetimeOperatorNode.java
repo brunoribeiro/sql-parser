@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 import java.sql.Types;
 
 /**
@@ -66,6 +68,16 @@ public class CurrentDatetimeOperatorNode extends ValueNode
   public void init(Object whichType) {
     this.whichType = ((Integer)whichType).intValue();
     assert (this.whichType >= 0 && this.whichType <= 2);
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    CurrentDatetimeOperatorNode other = (CurrentDatetimeOperatorNode)node;
+    this.whichType = other.whichType;
   }
 
   public String toString() {

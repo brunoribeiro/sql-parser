@@ -86,4 +86,14 @@ public class UnaryArithmeticOperatorNode extends UnaryOperatorNode
     init(operand, operatorType.operator, operatorType.methodName);
   }
     
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    UnaryArithmeticOperatorNode other = (UnaryArithmeticOperatorNode)node;
+    this.operatorType = other.operatorType;
+  }
+
 }

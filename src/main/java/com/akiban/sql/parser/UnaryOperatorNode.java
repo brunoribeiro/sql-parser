@@ -89,6 +89,21 @@ public class UnaryOperatorNode extends ValueNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    UnaryOperatorNode other = (UnaryOperatorNode)node;
+    this.operator = other.operator;
+    this.methodName = other.methodName;
+    this.resultInterfaceType = other.resultInterfaceType;
+    this.receiverInterfaceType = other.receiverInterfaceType;
+    this.operand = (ValueNode)getNodeFactory().copyNode(other.operand,
+                                                        getParserContext());
+  }
+
+  /**
    * Set the operator.
    *
    * @param operator The operator.

@@ -65,6 +65,17 @@ abstract class SingleChildResultSetNode extends FromTable
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    SingleChildResultSetNode other = (SingleChildResultSetNode)node;
+    this.childResult = (ResultSetNode)getNodeFactory().copyNode(other.childResult,
+                                                                getParserContext());
+  }
+
+  /**
    * Return the childResult from this node.
    *
    * @return ResultSetNode The childResult from this node.

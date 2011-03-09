@@ -108,6 +108,14 @@ public abstract class QueryTreeNode implements Visitable
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode other) throws StandardException {
+    // TODO: Should we attempt to deal with cloning the user data?
+    // Maybe need an interface for it.
+  }
+
+  /**
    * Gets the beginning offset of the SQL substring which this
    * query node represents.
    *

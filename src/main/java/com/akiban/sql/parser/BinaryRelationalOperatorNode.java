@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * This class represents the 6 binary operators: LessThan, LessThanEquals,
  * Equals, NotEquals, GreaterThan and GreaterThanEquals.
@@ -103,6 +105,16 @@ public class BinaryRelationalOperatorNode extends BinaryComparisonOperatorNode
       break;
     }
     super.init(leftOperand, rightOperand, operatorName, methodName);
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    BinaryRelationalOperatorNode other = (BinaryRelationalOperatorNode)node;
+    this.operatorType = other.operatorType;
   }
 
   public int getOperatorType() {

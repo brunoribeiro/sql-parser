@@ -57,6 +57,17 @@ public class JavaToSQLValueNode extends ValueNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    JavaToSQLValueNode other = (JavaToSQLValueNode)node;
+    this.javaNode = (JavaValueNode)getNodeFactory().copyNode(other.javaNode,
+                                                             getParserContext());
+  }
+
+  /**
    * Prints the sub-nodes of this object.  See QueryTreeNode for
    * how tree printing is supposed to work.
    *

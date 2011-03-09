@@ -108,6 +108,26 @@ public class CursorNode extends DMLStatementNode
     this.updatableColumns = (List<String>)updatableColumns;
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    CursorNode other = (CursorNode)node;
+    this.name = other.name;
+    this.orderByList = (OrderByList)getNodeFactory().copyNode(other.orderByList,
+                                                              getParserContext());
+    this.offset = (ValueNode)getNodeFactory().copyNode(other.offset,
+                                                       getParserContext());
+    this.fetchFirst = (ValueNode)getNodeFactory().copyNode(other.fetchFirst,
+                                                           getParserContext());
+    this.statementType = other.statementType;
+    this.updateMode = other.updateMode;
+    this.scanIsolationLevel = other.scanIsolationLevel;
+    this.updatableColumns = other.updatableColumns;
+  }
+
   public void setScanIsolationLevel(IsolationLevel isolationLevel) {
     this.scanIsolationLevel = isolationLevel;
   }

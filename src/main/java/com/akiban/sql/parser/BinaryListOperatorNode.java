@@ -48,12 +48,12 @@ import com.akiban.sql.StandardException;
 
 public abstract class BinaryListOperatorNode extends ValueNode
 {
-  String methodName;
+  protected String methodName;
   /* operator used for error messages */
-  String operator;
+  protected String operator;
 
-  ValueNode leftOperand;
-  ValueNodeList rightOperandList;
+  protected ValueNode leftOperand;
+  protected ValueNodeList rightOperandList;
 
   /**
    * Initializer for a BinaryListOperatorNode
@@ -69,6 +69,21 @@ public abstract class BinaryListOperatorNode extends ValueNode
     this.rightOperandList = (ValueNodeList)rightOperandList;
     this.operator = (String)operator;
     this.methodName = (String)methodName;
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    BinaryListOperatorNode other = (BinaryListOperatorNode)node;
+    this.methodName = other.methodName;
+    this.operator = other.operator;
+    this.leftOperand = (ValueNode)
+      getNodeFactory().copyNode(other.leftOperand, getParserContext());
+    this.rightOperandList = (ValueNodeList)
+      getNodeFactory().copyNode(other.rightOperandList, getParserContext());
   }
 
   /**

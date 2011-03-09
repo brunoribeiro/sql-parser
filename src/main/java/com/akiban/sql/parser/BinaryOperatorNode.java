@@ -96,6 +96,24 @@ public class BinaryOperatorNode extends ValueNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    BinaryOperatorNode other = (BinaryOperatorNode)node;
+    this.operator = other.operator;
+    this.methodName = other.methodName;
+    this.leftOperand = (ValueNode)
+      getNodeFactory().copyNode(other.leftOperand, getParserContext());
+    this.rightOperand = (ValueNode)
+      getNodeFactory().copyNode(other.rightOperand, getParserContext());
+    this.leftInterfaceType = other.leftInterfaceType;
+    this.rightInterfaceType = other.rightInterfaceType;
+    this.resultInterfaceType = other.resultInterfaceType;
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *

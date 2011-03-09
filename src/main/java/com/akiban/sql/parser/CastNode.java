@@ -99,6 +99,20 @@ public class CastNode extends ValueNode
     setType(DataTypeDescriptor.getBuiltInDataTypeDescriptor(targetCharType, charLen));
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    CastNode other = (CastNode)node;
+    this.castOperand = (ValueNode)
+      getNodeFactory().copyNode(other.castOperand, getParserContext());
+    this.targetCharType = other.targetCharType;
+    this.forDataTypeFunction = other.forDataTypeFunction;
+    this.externallyGeneratedCastNode = other.externallyGeneratedCastNode;
+  }
+
   public ValueNode getCastOperand() {
     return castOperand;
   }

@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * This node type represents a ? parameter.
  *
@@ -67,6 +69,18 @@ public class ParameterNode extends ValueNode
 
   public void init(Object parameterNumber, Object defaultValue) {
     this.parameterNumber = ((Integer)parameterNumber).intValue();
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    ParameterNode other = (ParameterNode)node;
+    this.parameterNumber = other.parameterNumber;
+    this.returnOutputParameter = (ValueNode)
+      getNodeFactory().copyNode(other.returnOutputParameter, getParserContext());
   }
 
   /**

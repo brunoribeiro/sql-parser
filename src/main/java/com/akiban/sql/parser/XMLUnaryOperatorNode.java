@@ -99,4 +99,15 @@ public class XMLUnaryOperatorNode extends UnaryOperatorNode
     this.additionalArgs = (Object[])addedArgs;
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    XMLUnaryOperatorNode other = (XMLUnaryOperatorNode)node;
+    this.operatorType = other.operatorType;
+    this.additionalArgs = other.additionalArgs; // TODO: Clone?
+  }
+
 }

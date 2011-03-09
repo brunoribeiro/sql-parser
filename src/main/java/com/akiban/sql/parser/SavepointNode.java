@@ -70,6 +70,17 @@ public class SavepointNode extends DDLStatementNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    SavepointNode other = (SavepointNode)node;
+    this.statementType = other.statementType;
+    this.savepointName = other.savepointName;
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *

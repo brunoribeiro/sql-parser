@@ -79,6 +79,17 @@ public class NonStaticMethodCallNode extends MethodCallNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    NonStaticMethodCallNode other = (NonStaticMethodCallNode)node;
+    this.receiver = (JavaValueNode)getNodeFactory().copyNode(other.receiver,
+                                                             getParserContext());
+  }
+
+  /**
    * Prints the sub-nodes of this object.  See QueryTreeNode.java for
    * how tree printing is supposed to work.
    *

@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * A StaticClassFieldReferenceNode represents a Java static field reference from 
  * a Class (as opposed to an Object).  Field references can be 
@@ -67,6 +69,18 @@ public final class StaticClassFieldReferenceNode extends JavaValueNode
     this.fieldName = (String)fieldName;
     this.javaClassName = (String)javaClassName;
     this.classNameDelimitedIdentifier = ((Boolean)classNameDelimitedIdentifier).booleanValue();
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    StaticClassFieldReferenceNode other = (StaticClassFieldReferenceNode)node;
+    this.fieldName = other.fieldName;
+    this.javaClassName = other.javaClassName;
+    this.classNameDelimitedIdentifier = other.classNameDelimitedIdentifier;
   }
 
 }

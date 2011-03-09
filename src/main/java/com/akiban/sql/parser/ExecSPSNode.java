@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * A ExecSPSNode is the root of a QueryTree 
  * that represents an EXECUTE STATEMENT
@@ -63,6 +65,17 @@ public class ExecSPSNode extends StatementNode
 
   public void init(Object newObjectName) {
     this.name = (TableName)newObjectName;
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    ExecSPSNode other = (ExecSPSNode)node;
+    this.name = (TableName)getNodeFactory().copyNode(other.name,
+                                                     getParserContext());
   }
 
   /** @see StatementNode#executeStatementName */

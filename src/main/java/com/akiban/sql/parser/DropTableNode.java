@@ -64,6 +64,16 @@ public class DropTableNode extends DDLStatementNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    DropTableNode other = (DropTableNode)node;
+    this.dropBehavior = other.dropBehavior;
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *

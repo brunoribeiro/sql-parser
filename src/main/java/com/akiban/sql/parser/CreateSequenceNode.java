@@ -119,6 +119,23 @@ public class CreateSequenceNode extends DDLStatementNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    CreateSequenceNode other = (CreateSequenceNode)node;
+    this.sequenceName = (TableName)getNodeFactory().copyNode(other.sequenceName,
+                                                             getParserContext());
+    this.dataType = other.dataType;
+    this.initialValue = other.initialValue;
+    this.stepValue = other.stepValue;
+    this.maxValue = other.maxValue;
+    this.minValue = other.minValue;
+    this.cycle = other.cycle;
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *

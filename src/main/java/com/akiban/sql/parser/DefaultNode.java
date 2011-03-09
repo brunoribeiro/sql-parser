@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * DefaultNode represents a column/parameter default.
  */
@@ -64,6 +66,19 @@ public  class DefaultNode extends ValueNode
    */
   public void init(Object columnName) {
     this.columnName = (String)columnName;
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    DefaultNode other = (DefaultNode)node;
+    this.columnName = other.columnName;
+    this.defaultText = other.defaultText;
+    this.defaultTree = (ValueNode)getNodeFactory().copyNode(other.defaultTree,
+                                                            getParserContext());
   }
 
   /**

@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * A FKConstraintDefintionNode represents table constraint definitions.
  *
@@ -65,6 +67,21 @@ public class FKConstraintDefinitionNode extends ConstraintDefinitionNode
 
     this.refActionDeleteRule = ((int[])refActions)[0];
     this.refActionUpdateRule = ((int[])refActions)[1];
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    FKConstraintDefinitionNode other = (FKConstraintDefinitionNode)node;
+    this.refTableName = (TableName)getNodeFactory().copyNode(other.refTableName,
+                                                             getParserContext());
+    this.refRcl = (ResultColumnList)getNodeFactory().copyNode(other.refRcl,
+                                                              getParserContext());
+    this.refActionDeleteRule = other.refActionDeleteRule;
+    this.refActionUpdateRule = other.refActionUpdateRule;
   }
 
   public TableName getRefTableName() { 

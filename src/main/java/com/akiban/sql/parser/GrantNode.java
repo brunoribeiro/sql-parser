@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 import java.util.List;
 import java.util.Iterator;
 
@@ -57,6 +59,18 @@ public class GrantNode extends DDLStatementNode
   public void init(Object privileges, Object grantees) {
     this.privileges = (PrivilegeNode)privileges;
     this.grantees = (List<String>)grantees;
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    GrantNode other = (GrantNode)node;
+    this.privileges = (PrivilegeNode)getNodeFactory().copyNode(other.privileges,
+                                                               getParserContext());
+    this.grantees = other.grantees; // TODO: Clone?
   }
 
   /**

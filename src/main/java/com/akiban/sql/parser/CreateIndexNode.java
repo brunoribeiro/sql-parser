@@ -87,6 +87,23 @@ public class CreateIndexNode extends DDLStatementNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    CreateIndexNode other = (CreateIndexNode)node;
+    this.unique = other.unique;
+    this.indexType = other.indexType;
+    this.indexName = (TableName)
+      getNodeFactory().copyNode(other.indexName, getParserContext());
+    this.tableName = (TableName)
+      getNodeFactory().copyNode(other.tableName, getParserContext());
+    this.columnNameList = other.columnNameList; // TODO: Clone?
+    this.properties = other.properties; // TODO: Clone?
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *

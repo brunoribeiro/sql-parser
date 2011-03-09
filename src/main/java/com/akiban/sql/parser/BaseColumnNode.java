@@ -78,6 +78,18 @@ public class BaseColumnNode extends ValueNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    BaseColumnNode other = (BaseColumnNode)node;
+    this.columnName = other.columnName;
+    this.tableName = (TableName)getNodeFactory().copyNode(other.tableName, 
+                                                          getParserContext());
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *

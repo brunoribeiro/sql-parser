@@ -82,6 +82,18 @@ public final class WindowDefinitionNode extends WindowNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    WindowDefinitionNode other = (WindowDefinitionNode)node;
+    this.inlined = other.inlined;
+    this.orderByList = (OrderByList)getNodeFactory().copyNode(other.orderByList,
+                                                              getParserContext());
+  }
+
+  /**
    * java.lang.Object override.
    * @see QueryTreeNode#toString
    */

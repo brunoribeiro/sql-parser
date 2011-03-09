@@ -74,6 +74,24 @@ abstract class MethodCallNode extends JavaValueNode
     this.methodName = (String)methodName;
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    MethodCallNode other = (MethodCallNode)node;
+    this.methodName = other.methodName;
+    this.javaClassName = other.javaClassName;
+    if (other.methodParms != null) {
+      this.methodParms = new JavaValueNode[other.methodParms.length];
+      for (int i = 0; i < this.methodParms.length; i++) {
+        this.methodParms[i] = (JavaValueNode)
+          getNodeFactory().copyNode(other.methodParms[i], getParserContext());
+      }
+    }
+  }
+
   public String getMethodName() {
     return methodName;
   }

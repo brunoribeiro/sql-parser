@@ -63,6 +63,18 @@ public class CoalesceFunctionNode extends ValueNode
     this.argumentsList = (ValueNodeList)argumentsList;
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    CoalesceFunctionNode other = (CoalesceFunctionNode)node;
+    this.functionName = other.functionName;
+    this.argumentsList = (ValueNodeList)
+      getNodeFactory().copyNode(other.argumentsList, getParserContext());
+  }
+
   public String getFunctionName() {
     return functionName;
   }

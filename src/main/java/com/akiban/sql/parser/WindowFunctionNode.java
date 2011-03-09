@@ -43,7 +43,6 @@ import com.akiban.sql.StandardException;
  */
 public abstract class WindowFunctionNode extends UnaryOperatorNode
 {
-
   private WindowNode window;    // definition or reference
 
   /**
@@ -56,6 +55,17 @@ public abstract class WindowFunctionNode extends UnaryOperatorNode
   public void init(Object arg1, Object arg2, Object arg3) throws StandardException {
     super.init(arg1, arg2, null);
     this.window = (WindowNode)arg3;
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    WindowFunctionNode other = (WindowFunctionNode)node;
+    this.window = (WindowNode)getNodeFactory().copyNode(other.window,
+                                                        getParserContext());
   }
 
   /**

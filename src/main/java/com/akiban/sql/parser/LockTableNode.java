@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * A LockTableNode is the root of a QueryTree that represents a LOCK TABLE command:
  *	LOCK TABLE <TableName> IN SHARE/EXCLUSIVE MODE
@@ -57,6 +59,18 @@ public class LockTableNode extends MiscellaneousStatementNode
   public void init(Object tableName, Object exclusiveMode) {
     this.tableName = (TableName)tableName;
     this.exclusiveMode = ((Boolean)exclusiveMode).booleanValue();
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    LockTableNode other = (LockTableNode)node;
+    this.tableName = (TableName)getNodeFactory().copyNode(other.tableName,
+                                                          getParserContext());
+    this.exclusiveMode = other.exclusiveMode;
   }
 
   /**

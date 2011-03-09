@@ -126,7 +126,7 @@ public class NodeFactory
 
     retval.init(arg1);
 
-    return  retval;
+    return retval;
   }
 
   /**
@@ -150,7 +150,7 @@ public class NodeFactory
 
     retval.init(arg1, arg2);
 
-    return  retval;
+    return retval;
   }
 
   /**
@@ -176,7 +176,7 @@ public class NodeFactory
 
     retval.init(arg1, arg2, arg3);
 
-    return  retval;
+    return retval;
   }
 
   /**
@@ -204,7 +204,7 @@ public class NodeFactory
 
     retval.init(arg1, arg2, arg3, arg4);
 
-    return  retval;
+    return retval;
   }
 
 
@@ -235,7 +235,7 @@ public class NodeFactory
 
     retval.init(arg1, arg2, arg3, arg4, arg5);
 
-    return  retval;
+    return retval;
   }
 
   /**
@@ -267,7 +267,7 @@ public class NodeFactory
 
     retval.init(arg1, arg2, arg3, arg4, arg5, arg6);
 
-    return  retval;
+    return retval;
   }
 
   /**
@@ -301,7 +301,7 @@ public class NodeFactory
 
     retval.init(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 
-    return  retval;
+    return retval;
   }
 
   /**
@@ -337,7 +337,7 @@ public class NodeFactory
 
     retval.init(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 
-    return  retval;
+    return retval;
   }
 
   /**
@@ -375,7 +375,7 @@ public class NodeFactory
 
     retval.init(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
 
-    return  retval;
+    return retval;
   }
 
   /**
@@ -416,7 +416,7 @@ public class NodeFactory
     retval.init(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
                 arg10);
 
-    return  retval;
+    return retval;
   }
 
   /**
@@ -459,7 +459,7 @@ public class NodeFactory
     retval.init(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
                 arg10, arg11);
 
-    return  retval;
+    return retval;
   }
 
   /**
@@ -504,7 +504,7 @@ public class NodeFactory
     retval.init(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
                 arg10, arg11, arg12);
 
-    return  retval;
+    return retval;
   }
 
   /**
@@ -551,7 +551,7 @@ public class NodeFactory
     retval.init(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
                 arg10, arg11, arg12, arg13);
 
-    return  retval;
+    return retval;
   }
 
   /**
@@ -600,7 +600,23 @@ public class NodeFactory
     retval.init(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
                 arg10, arg11, arg12, arg13, arg14);
 
-    return  retval;
+    return retval;
+  }
+
+  /** 
+   * Make a deep copy of the given node for the given context, which
+   * may not be the same as the node's context.
+   */
+  public final QueryTreeNode copyNode(QueryTreeNode node,
+                                      SQLParserContext pc)
+      throws StandardException {
+    if (node == null) return null; // TODO: Convenience or bug-hider?
+
+    QueryTreeNode retval =  getNode(node.getNodeType(), pc);
+
+    retval.copyFrom(node);
+
+    return retval;
   }
 
   /**

@@ -68,6 +68,20 @@ public class ConditionalNode extends ValueNode
     this.thisIsNullIfNode = ((Boolean)thisIsNullIfNode).booleanValue();
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    ConditionalNode other = (ConditionalNode)node;
+    this.testCondition = (ValueNode)
+      getNodeFactory().copyNode(other.testCondition, getParserContext());
+    this.thenElseList = (ValueNodeList)
+      getNodeFactory().copyNode(other.thenElseList, getParserContext());
+    this.thisIsNullIfNode = other.thisIsNullIfNode;
+  }
+
   public ValueNode getTestCondition() {
     return testCondition;
   }

@@ -223,6 +223,20 @@ public class CreateAliasNode extends DDLStatementNode
     }
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    CreateAliasNode other = (CreateAliasNode)node;
+    this.javaClassName = other.javaClassName;
+    this.methodName = other.methodName;
+    this.aliasType = other.aliasType; 
+    this.delimitedIdentifier = other.delimitedIdentifier;
+    this.aliasInfo = other.aliasInfo; // TODO: Clone?
+  }
+
   public String statementToString() {
     switch (this.aliasType) {
     case AliasInfo.ALIAS_TYPE_UDT_AS_CHAR:

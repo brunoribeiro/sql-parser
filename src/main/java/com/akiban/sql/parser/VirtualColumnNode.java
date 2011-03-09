@@ -84,6 +84,20 @@ public class VirtualColumnNode extends ValueNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    VirtualColumnNode other = (VirtualColumnNode)node;
+    this.sourceResultSet = (ResultSetNode)
+      getNodeFactory().copyNode(other.sourceResultSet, getParserContext());
+    this.sourceColumn = (ResultColumn)
+      getNodeFactory().copyNode(other.sourceColumn, getParserContext());
+    this.columnId = other.columnId;
+  }
+
+  /**
    * Prints the sub-nodes of this object.  See QueryTreeNode.java for
    * how tree printing is supposed to work.
    *

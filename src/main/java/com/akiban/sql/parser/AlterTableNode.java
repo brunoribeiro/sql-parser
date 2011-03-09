@@ -194,6 +194,29 @@ public class AlterTableNode extends DDLStatementNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    AlterTableNode other = (AlterTableNode)node;
+    this.tableElementList = (TableElementList)
+      getNodeFactory().copyNode(other.tableElementList, getParserContext());
+    this.lockGranularity = other.lockGranularity;
+    this.updateStatistics = other.updateStatistics;
+    this.updateStatisticsAll = other.updateStatisticsAll;
+    this.indexNameForUpdateStatistics = other.indexNameForUpdateStatistics;
+    this.compressTable = other.compressTable;
+    this.sequential = other.sequential;
+    this.purge = other.purge;
+    this.defragment = other.defragment;
+    this.truncateEndOfTable = other.truncateEndOfTable;
+    this.behavior = other.behavior;
+    this.changeType = other.changeType;
+    this.truncateTable = other.truncateTable;
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *

@@ -84,8 +84,25 @@ public abstract class SetOperatorNode extends TableOperatorNode
      * may have been a "*" in the list.  (We will set the names and
      * column types at that time, as expected.)
      */
-    // TODO: Do we need the full cloning mechanism for this?
-    //resultColumns = leftResultSet.getResultColumns().copyListAndObjects();
+    resultColumns = (ResultColumnList)
+      getNodeFactory().copyNode(leftResultSet.getResultColumns(),
+                                getParserContext());
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    SetOperatorNode other = (SetOperatorNode)node;
+    this.all = other.all;
+    this.orderByList = (OrderByList)getNodeFactory().copyNode(other.orderByList,
+                                                              getParserContext());
+    this.offset = (ValueNode)getNodeFactory().copyNode(other.offset,
+                                                       getParserContext());
+    this.fetchFirst = (ValueNode)getNodeFactory().copyNode(other.fetchFirst,
+                                                           getParserContext());
   }
 
   /**

@@ -83,6 +83,17 @@ abstract class DMLStatementNode extends StatementNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    DMLStatementNode other = (DMLStatementNode)node;
+    this.resultSet = (ResultSetNode)getNodeFactory().copyNode(other.resultSet,
+                                                              getParserContext());
+  }
+
+  /**
    * Prints the sub-nodes of this object.  See QueryTreeNode.java for
    * how tree printing is supposed to work.
    *

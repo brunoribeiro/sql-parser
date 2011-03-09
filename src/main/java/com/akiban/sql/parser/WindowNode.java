@@ -64,6 +64,16 @@ public abstract class WindowNode extends QueryTreeNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    WindowNode other = (WindowNode)node;
+    this.windowName = other.windowName;
+  }
+
+  /**
    * @return the name of this window
    */
   public String getName() {

@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 // TODO: I do not know when this is ever instantiated, even in the original Derby.
 
 public class IsNode extends BinaryLogicalOperatorNode
@@ -57,6 +59,16 @@ public class IsNode extends BinaryLogicalOperatorNode
     // the false for shortCir
     super.init(leftOperand, rightOperand, "is");
     this.notMe = ((Boolean)notMe).booleanValue();
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    IsNode other = (IsNode)node;
+    this.notMe = other.notMe;
   }
 
   public boolean isNegated() {

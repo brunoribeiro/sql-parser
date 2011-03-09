@@ -125,6 +125,16 @@ public class UserTypeConstantNode extends ConstantNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    UserTypeConstantNode other = (UserTypeConstantNode)node;
+    this.value = other.value;
+  }
+
+  /**
    * Return the object value of this user defined type.
    *
    * @return the value of this constant. can't use getValue() for this.

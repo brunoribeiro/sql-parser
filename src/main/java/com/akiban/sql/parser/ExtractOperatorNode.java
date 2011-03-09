@@ -77,6 +77,16 @@ public class ExtractOperatorNode extends UnaryOperatorNode
                extractField.fieldMethod);
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    ExtractOperatorNode other = (ExtractOperatorNode)node;
+    this.extractField = other.extractField;
+  }
+
   public String toString() {
     return "fieldName: " + extractField.fieldName + "\n" +
       super.toString();

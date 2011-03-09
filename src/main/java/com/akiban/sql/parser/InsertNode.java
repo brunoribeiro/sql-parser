@@ -112,6 +112,24 @@ public final class InsertNode extends DMLModStatementNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    InsertNode other = (InsertNode)node;
+    this.targetColumnList = (ResultColumnList)
+      getNodeFactory().copyNode(other.targetColumnList, getParserContext());
+    this.targetProperties = other.targetProperties; // TODO: Clone?
+    this.orderByList = (OrderByList)
+      getNodeFactory().copyNode(other.orderByList, getParserContext());
+    this.offset = (ValueNode)
+      getNodeFactory().copyNode(other.offset, getParserContext());
+    this.fetchFirst = (ValueNode)
+      getNodeFactory().copyNode(other.fetchFirst, getParserContext());
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *

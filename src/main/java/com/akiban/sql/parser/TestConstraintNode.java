@@ -72,4 +72,16 @@ public class TestConstraintNode extends UnaryLogicalOperatorNode
     this.constraintName = (String)constraintName;
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    TestConstraintNode other = (TestConstraintNode)node;
+    this.sqlState = other.sqlState;
+    this.tableName = other.tableName;
+    this.constraintName = other.constraintName;
+  }
+
 }

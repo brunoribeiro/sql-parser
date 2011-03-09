@@ -63,6 +63,16 @@ public class DropAliasNode extends DDLStatementNode
     this.aliasType = ((Character)aliasType).charValue();
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    DropAliasNode other = (DropAliasNode)node;
+    this.aliasType = other.aliasType;
+  }
+
   public char getAliasType() { 
     return aliasType; 
   }

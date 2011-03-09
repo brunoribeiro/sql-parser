@@ -94,6 +94,21 @@ public class JoinNode extends TableOperatorNode
     this.joinOrderStrategyProperties = (Properties)joinOrderStrategyProperties;
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    JoinNode other = (JoinNode)node;
+    this.naturalJoin = other.naturalJoin;
+    this.joinClause = (ValueNode)getNodeFactory().copyNode(other.joinClause,
+                                                           getParserContext());
+    this.usingClause = (ResultColumnList)getNodeFactory().copyNode(other.usingClause,
+                                                                   getParserContext());
+    this.joinOrderStrategyProperties = other.joinOrderStrategyProperties; // TODO: Clone?
+  }
+
   /** 
    * Convert the joinType to a string.
    *

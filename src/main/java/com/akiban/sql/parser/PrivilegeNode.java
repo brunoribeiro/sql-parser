@@ -103,5 +103,28 @@ public class PrivilegeNode extends QueryTreeNode
     this.privilege = (String)privilege;
     this.restrict = ((Boolean)restrict).booleanValue();
   }
-    
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    PrivilegeNode other = (PrivilegeNode)node;
+    this.objectType = other.objectType;
+    this.objectName = (TableName)getNodeFactory().copyNode(other.objectName,
+                                                           getParserContext());
+    this.specificPrivileges = (TablePrivilegesNode)getNodeFactory().copyNode(other.specificPrivileges,
+                                                                             getParserContext());
+    if (other.routineDesignator != null)
+      this.routineDesignator = 
+        new RoutineDesignator(other.routineDesignator.isSpecific,
+                              (TableName)getNodeFactory().copyNode(other.routineDesignator.name,
+                                                                   getParserContext()),
+                              other.routineDesignator.isFunction,
+                              other.routineDesignator.paramTypeList);
+    this.privilege = other.privilege;
+    this.restrict = other.restrict;
+  }
+
 }

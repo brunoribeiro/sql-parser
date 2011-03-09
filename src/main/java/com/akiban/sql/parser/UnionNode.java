@@ -77,6 +77,17 @@ public class UnionNode extends SetOperatorNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    UnionNode other = (UnionNode)node;
+    this.tableConstructor = other.tableConstructor;
+    this.topTableConstructor = other.topTableConstructor;
+  }
+
+  /**
    * Mark this as the top node of a table constructor.
    */
   public void markTopTableConstructor() {

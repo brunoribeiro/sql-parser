@@ -74,6 +74,17 @@ public class CallStatementNode extends DMLStatementNode
     this.methodCall.getJavaValueNode().markForCallStatement();
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    CallStatementNode other = (CallStatementNode)node;
+    this.methodCall = (JavaToSQLValueNode)
+      getNodeFactory().copyNode(other.methodCall, getParserContext());
+  }
+
   public String statementToString() {
     return "CALL";
   }

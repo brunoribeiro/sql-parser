@@ -59,6 +59,17 @@ public final class AggregateWindowFunctionNode extends WindowFunctionNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+    
+    AggregateWindowFunctionNode other = (AggregateWindowFunctionNode)node;
+    aggregateFunction = (AggregateNode)getNodeFactory().copyNode(other.aggregateFunction,
+                                                                 getParserContext());
+  }
+
+  /**
    * QueryTreeNode override. Prints the sub-nodes of this object.
    * @see QueryTreeNode#printSubNodes
    *

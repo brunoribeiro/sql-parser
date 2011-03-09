@@ -80,6 +80,16 @@ public abstract class ConstantNode extends ValueNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    ConstantNode other = (ConstantNode)node;
+    this.value = other.value;   // Assumed to be immutable.
+  }
+
+  /**
    * Get the value in this ConstantNode
    */
   public Object getValue() {

@@ -84,6 +84,23 @@ public class FromSubquery extends FromTable
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    FromSubquery other = (FromSubquery)node;
+    this.subquery = (ResultSetNode)getNodeFactory().copyNode(other.subquery,
+                                                             getParserContext());
+    this.orderByList = (OrderByList)getNodeFactory().copyNode(other.orderByList,
+                                                              getParserContext());
+    this.offset = (ValueNode)getNodeFactory().copyNode(other.offset,
+                                                       getParserContext());
+    this.fetchFirst = (ValueNode)getNodeFactory().copyNode(other.fetchFirst,
+                                                           getParserContext());
+  }
+
+  /**
    * Prints the sub-nodes of this object.  See QueryTreeNode.java for
    * how tree printing is supposed to work.
    *

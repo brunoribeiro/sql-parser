@@ -82,6 +82,18 @@ public class FromList extends QueryTreeNodeList<FromTable>
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    FromList other = (FromList)node;
+    this.properties = other.properties; // TODO: Clone?
+    this.fixedJoinOrder = other.fixedJoinOrder;
+    this.isTransparent = other.isTransparent;
+  }
+
+  /**
    * Add a table to the FROM list.
    *
    * @param fromTable A FromTable to add to the list

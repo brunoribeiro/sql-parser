@@ -44,8 +44,8 @@ import java.sql.Types;
 
 public class BooleanConstantNode extends ConstantNode
 {
-  boolean booleanValue;
-  boolean unknownValue;
+  private boolean booleanValue;
+  private boolean unknownValue;
 
   /**
    * Initializer for a BooleanConstantNode.
@@ -83,6 +83,17 @@ public class BooleanConstantNode extends ConstantNode
                  0);
       unknownValue = true;
     }
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    BooleanConstantNode other = (BooleanConstantNode)node;
+    this.booleanValue = other.booleanValue;
+    this.unknownValue = other.unknownValue;
   }
 
   public boolean getBooleanValue() {

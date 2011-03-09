@@ -75,6 +75,20 @@ public abstract class DMLModStatementNode extends DMLStatementNode
     this.statementType = ((Integer)statementType).intValue();
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    DMLModStatementNode other = (DMLModStatementNode)node;
+    this.targetVTI = (FromVTI)getNodeFactory().copyNode(other.targetVTI,
+                                                        getParserContext());
+    this.targetTableName = (TableName)getNodeFactory().copyNode(other.targetTableName,
+                                                                getParserContext());
+    this.statementType = other.statementType;
+  }
+
   void setTarget(QueryTreeNode targetName) {
     if (targetName instanceof TableName) {
       this.targetTableName = (TableName)targetName;

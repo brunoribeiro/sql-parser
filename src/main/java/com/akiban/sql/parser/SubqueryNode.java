@@ -137,6 +137,26 @@ public class SubqueryNode extends ValueNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    SubqueryNode other = (SubqueryNode)node;
+    this.resultSet = (ResultSetNode)getNodeFactory().copyNode(other.resultSet,
+                                                              getParserContext());
+    this.subqueryType = other.subqueryType;
+    this.leftOperand = (ValueNode)getNodeFactory().copyNode(other.leftOperand,
+                                                            getParserContext());
+    this.orderByList = (OrderByList)getNodeFactory().copyNode(other.orderByList,
+                                                              getParserContext());
+    this.offset = (ValueNode)getNodeFactory().copyNode(other.offset,
+                                                       getParserContext());
+    this.fetchFirst = (ValueNode)getNodeFactory().copyNode(other.fetchFirst,
+                                                           getParserContext());
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *

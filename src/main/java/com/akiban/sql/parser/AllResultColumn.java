@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * An AllResultColumn represents a "*" result column in a SELECT
  * statement.  It gets replaced with the appropriate set of columns
@@ -55,6 +57,17 @@ public class AllResultColumn extends ResultColumn
    */
   public void init(Object tableName) {
     this.tableName = (TableName)tableName;
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    AllResultColumn other = (AllResultColumn)node;
+    this.tableName = (TableName)getNodeFactory().copyNode(other.tableName,
+                                                          getParserContext());
   }
 
   /** 

@@ -57,6 +57,17 @@ public class GroupByColumn extends OrderedColumn
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    GroupByColumn other = (GroupByColumn)node;
+    this.columnExpression = (ValueNode)getNodeFactory().copyNode(other.columnExpression,
+                                                                 getParserContext());
+  }
+
+  /**
    * Prints the sub-nodes of this object.  See QueryTreeNode.java for
    * how tree printing is supposed to work.
    *

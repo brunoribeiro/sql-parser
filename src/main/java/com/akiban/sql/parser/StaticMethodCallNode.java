@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * A StaticMethodCallNode represents a static method call from a Class
  * (as opposed to from an Object).
@@ -105,6 +107,17 @@ public class StaticMethodCallNode extends MethodCallNode
     }
 
     this.javaClassName = (String)javaClassName;
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    StaticMethodCallNode other = (StaticMethodCallNode)node;
+    this.procedureName = (TableName)getNodeFactory().copyNode(other.procedureName,
+                                                              getParserContext());
   }
 
   /**

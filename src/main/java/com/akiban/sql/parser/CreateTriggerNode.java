@@ -124,6 +124,35 @@ public class CreateTriggerNode extends DDLStatementNode
     implicitCreateSchema = true;
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    CreateTriggerNode other = (CreateTriggerNode)node;
+    this.triggerName = (TableName)getNodeFactory().copyNode(other.triggerName,
+                                                            getParserContext());
+    this.tableName = (TableName)getNodeFactory().copyNode(other.tableName,
+                                                          getParserContext());
+    this.triggerEventMask = other.triggerEventMask;
+    this.triggerCols = (ResultColumnList)getNodeFactory().copyNode(other.triggerCols,
+                                                                   getParserContext());
+    this.isBefore = other.isBefore;
+    this.isRow = other.isRow;
+    this.isEnabled = other.isEnabled;
+    this.refClause = other.refClause;
+    this.whenClause = (ValueNode)getNodeFactory().copyNode(other.whenClause,
+                                                           getParserContext());
+    this.whenText = other.whenText;
+    this.whenOffset = other.whenOffset;
+    this.actionNode = (StatementNode)getNodeFactory().copyNode(other.actionNode,
+                                                               getParserContext());
+    this.actionText = other.actionText;
+    this.originalActionText = other.originalActionText;
+    this.actionOffset = other.actionOffset;
+  }
+
   public String statementToString() {
     return "CREATE TRIGGER";
   }

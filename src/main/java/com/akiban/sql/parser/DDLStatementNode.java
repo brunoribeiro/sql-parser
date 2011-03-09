@@ -47,23 +47,11 @@ import com.akiban.sql.StandardException;
 
 abstract class DDLStatementNode extends StatementNode
 {
-  /////////////////////////////////////////////////////////////////////////
-  //
-  // CONSTANTS
-  //
-  /////////////////////////////////////////////////////////////////////////
-
   public static final int UNKNOWN_TYPE = 0;
   public static final int ADD_TYPE = 1;
   public static final int DROP_TYPE = 2;
   public static final int MODIFY_TYPE = 3;
   public static final int LOCKING_TYPE = 4;
-
-  /////////////////////////////////////////////////////////////////////////
-  //
-  // STATE
-  //
-  /////////////////////////////////////////////////////////////////////////
 
   private TableName objectName;
   private boolean initOk;
@@ -74,15 +62,9 @@ abstract class DDLStatementNode extends StatementNode
   */
   boolean implicitCreateSchema;
 
-  /////////////////////////////////////////////////////////////////////////
-  //
-  // BEHAVIOR
-  //
-  /////////////////////////////////////////////////////////////////////////
-
-    public void init(Object objectName) throws StandardException {
-      initAndCheck(objectName);
-    }
+  public void init(Object objectName) throws StandardException {
+    initAndCheck(objectName);
+  }
 
   /**
      Initialize the object name we will be performing the DDL
@@ -92,6 +74,19 @@ abstract class DDLStatementNode extends StatementNode
   protected void initAndCheck(Object objectName) throws StandardException {
     this.objectName = (TableName)objectName;
     initOk = true;
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    DDLStatementNode other = (DDLStatementNode)node;
+    this.objectName = (TableName)getNodeFactory().copyNode(other.objectName,
+                                                           getParserContext());
+    this.initOk = other.initOk;
+    this.implicitCreateSchema = other.implicitCreateSchema;
   }
 
   /**

@@ -77,6 +77,18 @@ public class AggregateNode extends UnaryOperatorNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    AggregateNode other = (AggregateNode)node;
+    this.aggregateDefinitionClassName = other.aggregateDefinitionClassName;
+    this.aggregateName = other.aggregateName;
+    this.distinct = other.distinct;
+  }
+
+  /**
    * Get the name of the aggregate.
    *
    * @return the aggregate name

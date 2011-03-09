@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 import java.util.Properties;
 
 /**
@@ -63,6 +65,16 @@ public class CurrentOfNode extends FromTable
   public void init(Object correlationName, Object cursor, Object tableProperties) {
     super.init(correlationName, tableProperties);
     cursorName = (String)cursor;
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    CurrentOfNode other = (CurrentOfNode)node;
+    this.cursorName = other.cursorName;
   }
 
   /**

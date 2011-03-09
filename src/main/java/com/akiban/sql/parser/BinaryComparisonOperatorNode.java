@@ -37,6 +37,7 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
 import com.akiban.sql.types.ValueClassName;
 
 /**
@@ -64,6 +65,16 @@ public abstract class BinaryComparisonOperatorNode extends BinaryOperatorNode
                    Object methodName) {
     super.init(leftOperand, rightOperand, operator, methodName,
                ValueClassName.DataValueDescriptor, ValueClassName.DataValueDescriptor);
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    BinaryComparisonOperatorNode other = (BinaryComparisonOperatorNode)node;
+    this.forQueryRewrite = other.forQueryRewrite;
   }
 
   /**

@@ -37,6 +37,7 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
 import com.akiban.sql.types.ValueClassName;
 
 public abstract class BinaryLogicalOperatorNode extends BinaryOperatorNode
@@ -58,6 +59,16 @@ public abstract class BinaryLogicalOperatorNode extends BinaryOperatorNode
     /* For logical operators, the operator and method names are the same */
     super.init(leftOperand, rightOperand, methodName, methodName,
                ValueClassName.BooleanDataValue, ValueClassName.BooleanDataValue);
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    BinaryLogicalOperatorNode other = (BinaryLogicalOperatorNode)node;
+    this.shortCircuitValue = other.shortCircuitValue;
   }
 
 }

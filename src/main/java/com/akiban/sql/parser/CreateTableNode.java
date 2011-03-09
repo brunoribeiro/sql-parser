@@ -152,6 +152,27 @@ public class CreateTableNode extends DDLStatementNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    CreateTableNode other = (CreateTableNode)node;
+    this.lockGranularity = other.lockGranularity;
+    this.onCommitDeleteRows = other.onCommitDeleteRows;
+    this.onRollbackDeleteRows = other.onRollbackDeleteRows;
+    this.properties = other.properties; // TODO: Clone?
+    this.tableElementList = (TableElementList)
+      getNodeFactory().copyNode(other.tableElementList, getParserContext());
+    this.tableType = other.tableType;
+    this.resultColumns = (ResultColumnList)
+      getNodeFactory().copyNode(other.resultColumns, getParserContext());
+    this.queryExpression = (ResultSetNode)
+      getNodeFactory().copyNode(other.queryExpression, getParserContext());
+    this.withData = other.withData;
+  }
+
+  /**
    * If no schema name specified for global temporary table, SESSION is the implicit schema.
    * Otherwise, make sure the specified schema name for global temporary table is SESSION.
    * @param objectName The name of the new object being declared (ie temporary table)

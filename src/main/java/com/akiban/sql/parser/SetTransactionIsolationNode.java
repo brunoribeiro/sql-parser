@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * A SetTransactionIsolationNode is the root of a QueryTree that represents a SET
  * TRANSACTION ISOLATION command
@@ -54,6 +56,16 @@ public class SetTransactionIsolationNode extends TransactionStatementNode
    */
   public void init(Object isolationLevel) {
     this.isolationLevel = (IsolationLevel)isolationLevel;
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    SetTransactionIsolationNode other = (SetTransactionIsolationNode)node;
+    this.isolationLevel = other.isolationLevel;
   }
 
   /**

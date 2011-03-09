@@ -78,6 +78,16 @@ public class IntersectOrExceptNode extends SetOperatorNode
     this.opType = (OpType)opType;
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    IntersectOrExceptNode other = (IntersectOrExceptNode)node;
+    this.opType = other.opType;
+  }
+
   public OpType getOpType() {
     return opType;
   }

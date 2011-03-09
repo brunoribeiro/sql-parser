@@ -52,8 +52,8 @@ import com.akiban.sql.StandardException;
 
 abstract class TableOperatorNode extends FromTable
 {
-  ResultSetNode leftResultSet;
-  ResultSetNode rightResultSet;
+  protected ResultSetNode leftResultSet;
+  protected ResultSetNode rightResultSet;
 
   /**
    * Initializer for a TableOperatorNode.
@@ -72,6 +72,19 @@ abstract class TableOperatorNode extends FromTable
     init(null, tableProperties);
     this.leftResultSet = (ResultSetNode)leftResultSet;
     this.rightResultSet = (ResultSetNode)rightResultSet;
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    TableOperatorNode other = (TableOperatorNode)node;
+    this.leftResultSet = (ResultSetNode)getNodeFactory().copyNode(other.leftResultSet,
+                                                                  getParserContext());
+    this.rightResultSet = (ResultSetNode)getNodeFactory().copyNode(other.rightResultSet,
+                                                                   getParserContext());
   }
 
   /**

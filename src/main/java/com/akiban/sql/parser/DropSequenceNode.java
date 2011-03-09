@@ -58,6 +58,17 @@ public class DropSequenceNode extends DDLStatementNode
     initAndCheck(dropItem);
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    DropSequenceNode other = (DropSequenceNode)node;
+    this.dropItem = (TableName)getNodeFactory().copyNode(other.dropItem,
+                                                         getParserContext());
+  }
+
   public String statementToString() {
     return "DROP ".concat(dropItem.getTableName());
   }

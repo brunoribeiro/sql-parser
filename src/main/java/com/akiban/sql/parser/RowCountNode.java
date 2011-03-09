@@ -77,6 +77,19 @@ public final class RowCountNode extends SingleChildResultSetNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    RowCountNode other = (RowCountNode)node;
+    this.offset = (ValueNode)getNodeFactory().copyNode(other.offset,
+                                                       getParserContext());
+    this.fetchFirst = (ValueNode)getNodeFactory().copyNode(other.fetchFirst,
+                                                           getParserContext());
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *

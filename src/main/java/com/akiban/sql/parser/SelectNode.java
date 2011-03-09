@@ -117,6 +117,28 @@ public class SelectNode extends ResultSetNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    SelectNode other = (SelectNode)node;
+    this.fromList = (FromList)getNodeFactory().copyNode(other.fromList,
+                                                        getParserContext());
+    this.whereClause = (ValueNode)getNodeFactory().copyNode(other.whereClause,
+                                                            getParserContext());
+    this.groupByList = (GroupByList)getNodeFactory().copyNode(other.groupByList,
+                                                              getParserContext());
+    this.windows = (WindowList)getNodeFactory().copyNode(other.windows,
+                                                         getParserContext());
+    this.orderByList = (OrderByList)getNodeFactory().copyNode(other.orderByList,
+                                                              getParserContext());
+    this.isDistinct = other.isDistinct;
+    this.havingClause = (ValueNode)getNodeFactory().copyNode(other.havingClause,
+                                                             getParserContext());
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *

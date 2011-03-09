@@ -81,6 +81,16 @@ public class HalfOuterJoinNode extends JoinNode
     this.rightOuterJoin = ((Boolean)rightOuterJoin).booleanValue();
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    HalfOuterJoinNode other = (HalfOuterJoinNode)node;
+    this.rightOuterJoin = other.rightOuterJoin;
+  }
+
   public boolean isRightOuterJoin() {
     return rightOuterJoin;
   }

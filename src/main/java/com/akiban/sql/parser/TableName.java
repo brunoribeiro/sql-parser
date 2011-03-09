@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * A TableName represents a qualified name, externally represented as a schema name
  * and an object name separated by a dot. This class is mis-named: it is used to
@@ -83,6 +85,18 @@ public class TableName extends QueryTreeNode
     init(schemaName, tableName);
     this.setBeginOffset(((Integer)tokBeginOffset).intValue());
     this.setEndOffset(((Integer)tokEndOffset).intValue());
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    TableName other = (TableName)node;
+    this.tableName = other.tableName;
+    this.schemaName = other.schemaName;
+    this.hasSchema = other.hasSchema;
   }
 
   /**

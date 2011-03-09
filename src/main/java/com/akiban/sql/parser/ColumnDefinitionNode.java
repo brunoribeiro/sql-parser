@@ -147,6 +147,26 @@ public class ColumnDefinitionNode extends TableElementNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    ColumnDefinitionNode other = (ColumnDefinitionNode)node;
+    this.isAutoincrement = other.isAutoincrement;
+    this.type = other.type;
+    this.defaultNode = (DefaultNode)
+      getNodeFactory().copyNode(other.defaultNode, getParserContext());
+    this.keepCurrentDefault = other.keepCurrentDefault;
+    this.generationClauseNode = (GenerationClauseNode)
+      getNodeFactory().copyNode(other.generationClauseNode, getParserContext());
+    this.autoincrementIncrement = other.autoincrementIncrement;
+    this.autoincrementStart = other.autoincrementStart;
+    this.autoinc_create_or_modify_Start_Increment = other.autoinc_create_or_modify_Start_Increment;
+    this.autoincrementVerify = other.autoincrementVerify;
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *

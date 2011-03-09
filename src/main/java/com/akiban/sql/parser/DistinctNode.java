@@ -72,4 +72,14 @@ public class DistinctNode extends SingleChildResultSetNode
     this.inSortedOrder = ((Boolean)inSortedOrder).booleanValue();
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    DistinctNode other = (DistinctNode)node;
+    this.inSortedOrder = other.inSortedOrder;
+  }
+
 }

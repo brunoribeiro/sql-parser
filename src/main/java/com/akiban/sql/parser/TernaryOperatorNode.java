@@ -153,6 +153,29 @@ public class TernaryOperatorNode extends ValueNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    TernaryOperatorNode other = (TernaryOperatorNode)node;
+    this.operator = other.operator;
+    this.methodName = other.methodName;
+    this.operatorType = other.operatorType;
+    this.receiver = (ValueNode)getNodeFactory().copyNode(other.receiver,
+                                                         getParserContext());
+    this.leftOperand = (ValueNode)getNodeFactory().copyNode(other.leftOperand,
+                                                            getParserContext());
+    this.rightOperand = (ValueNode)getNodeFactory().copyNode(other.rightOperand,
+                                                             getParserContext());
+    this.resultInterfaceType = other.resultInterfaceType;
+    this.receiverInterfaceType = other.receiverInterfaceType;
+    this.leftInterfaceType = other.leftInterfaceType;
+    this.rightInterfaceType = other.rightInterfaceType;
+    this.trimType = other.trimType;
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *

@@ -72,6 +72,21 @@ public abstract class FromTable extends ResultSetNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    FromTable other = (FromTable)node;
+    this.tableProperties = other.tableProperties; // TODO: Clone?
+    this.correlationName = other.correlationName;
+    this.corrTableName = (TableName)getNodeFactory().copyNode(other.corrTableName,
+                                                              getParserContext());
+    this.origTableName = (TableName)getNodeFactory().copyNode(other.origTableName,
+                                                              getParserContext());
+  }
+
+  /**
    * Get this table's correlation name, if any.
    */
   public String getCorrelationName() { 

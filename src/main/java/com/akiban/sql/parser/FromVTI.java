@@ -101,6 +101,22 @@ public class FromVTI extends FromTable
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    FromVTI other = (FromVTI)node;
+    this.methodCall = (MethodCallNode)getNodeFactory().copyNode(other.methodCall,
+                                                                getParserContext());
+    this.exposedName = (TableName)getNodeFactory().copyNode(other.exposedName,
+                                                            getParserContext());
+    this.subqueryList = (SubqueryList)getNodeFactory().copyNode(other.subqueryList,
+                                                                getParserContext());
+    this.isTarget = other.isTarget;
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *

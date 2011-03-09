@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 import java.util.Properties;
 
 /**
@@ -112,6 +114,26 @@ public class ConstraintDefinitionNode extends TableElementNode
     this.verifyType = (ConstraintType)verifyType;
   }
     
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    ConstraintDefinitionNode other = (ConstraintDefinitionNode)node;
+    this.constraintName = (TableName)
+      getNodeFactory().copyNode(other.constraintName, getParserContext());
+    this.constraintType = other.constraintType;
+    this.properties = other.properties; // TODO: Clone?
+    this.columnList = (ResultColumnList)
+      getNodeFactory().copyNode(other.columnList, getParserContext());
+    this.constraintText = other.constraintText;
+    this.checkCondition = (ValueNode)
+      getNodeFactory().copyNode(other.checkCondition, getParserContext());
+    this.behavior = other.behavior;
+    this.verifyType = other.verifyType;
+  }
+
   /**
    * Get the constraint type
    *

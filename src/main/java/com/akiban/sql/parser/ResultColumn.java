@@ -158,6 +158,26 @@ public class ResultColumn extends ValueNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    ResultColumn other = (ResultColumn)node;
+    this.name = other.name;
+    this.exposedName = other.exposedName;
+    this.tableName = other.tableName;
+    this.expression = (ValueNode)getNodeFactory().copyNode(other.expression,
+                                                           getParserContext());
+    this.defaultColumn = other.defaultColumn;
+    this.autoincrement = other.autoincrement;
+    this.reference = (ColumnReference)getNodeFactory().copyNode(other.reference,
+                                                                getParserContext());
+    this.virtualColumnId = other.virtualColumnId;
+    this.isNameGenerated = other.isNameGenerated;
+  }
+
+  /**
    * Returns TRUE if the ResultColumn is standing in for a DEFAULT keyword in
    * an insert/update statement.
    */

@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * A TableElementNode is an item in a TableElementList, and represents
  * a single table element such as a column or constraint in a CREATE TABLE
@@ -67,9 +69,9 @@ public class TableElementNode extends QueryTreeNode
    * @param name The name of the table element, if any
    */
 
-    public void init(Object name) {
-      this.name = (String)name;
-    }
+  public void init(Object name) {
+    this.name = (String)name;
+  }
 
   /**
    * Initializer for a TableElementNode
@@ -80,6 +82,17 @@ public class TableElementNode extends QueryTreeNode
   public void init(Object name, Object elementType) {
     this.name = (String)name;
     this.elementType = (ElementType)elementType;
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    TableElementNode other = (TableElementNode)node;
+    this.name = other.name;
+    this.elementType = other.elementType;
   }
 
   /**

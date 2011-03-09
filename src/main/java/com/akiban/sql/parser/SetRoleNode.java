@@ -37,6 +37,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * A SetRoleNode is the root of a QueryTree that represents a SET ROLE
  * statement.
@@ -59,6 +61,17 @@ public class SetRoleNode extends MiscellaneousStatementNode
     if (type != null) {
       this.type = ((Integer)type).intValue();
     }
+  }
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    SetRoleNode other = (SetRoleNode)node;
+    this.name = other.name;
+    this.type = other.type;
   }
 
   /**

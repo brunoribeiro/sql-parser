@@ -117,6 +117,17 @@ public class NewInvocationNode extends MethodCallNode
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    NewInvocationNode other = (NewInvocationNode)node;
+    this.delimitedIdentifier = other.delimitedIdentifier;
+    this.isBuiltinVTI = other.isBuiltinVTI;
+  }
+
+  /**
    * Report whether this node represents a builtin VTI.
    */
   public boolean isBuiltinVTI() {

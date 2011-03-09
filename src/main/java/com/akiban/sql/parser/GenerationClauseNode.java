@@ -53,6 +53,18 @@ public class GenerationClauseNode extends ValueNode
     this.expressionText = (String)expressionText;
   }
 
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    GenerationClauseNode other = (GenerationClauseNode)node;
+    this.generationExpression = (ValueNode)
+      getNodeFactory().copyNode(other.generationExpression, getParserContext());
+    this.expressionText = other.expressionText;
+  }
+
   /** Get the defining text of this generation clause */
   public String getExpressionText() { 
     return expressionText; 
