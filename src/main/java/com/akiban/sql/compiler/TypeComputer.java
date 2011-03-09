@@ -74,6 +74,8 @@ public class TypeComputer implements Visitor
 
   protected DataTypeDescriptor resultColumn(ResultColumn node)
       throws StandardException {
+    if (node.getExpression() == null)
+      return null;
     return node.getExpression().getType();
   }
 
@@ -292,6 +294,17 @@ public class TypeComputer implements Visitor
     }
   }
 
+  private void fromSubquery(FromSubquery node) throws StandardException {
+    if (node.getResultColumns() != null) {
+      ResultColumnList rcl1 = node.getResultColumns(); 
+      ResultColumnList rcl2 = node.getSubquery().getResultColumns();
+      int size = rcl1.size();
+      for (int i = 0; i < size; i++) {
+        rcl1.get(i).setType(rcl2.get(i).getType());
+      }
+    }
+  }
+
   /* Visitor interface. */
 
   public Visitable visit(Visitable node) throws StandardException {
@@ -307,6 +320,10 @@ public class TypeComputer implements Visitor
       switch (((QueryTreeNode)node).getNodeType()) {
       case NodeTypes.SELECT_NODE:
         selectNode((SelectNode)node);
+        break;
+      case NodeTypes.FROM_SUBQUERY:
+        fromSubquery((FromSubquery)node);
+        break;
       }
     }
     return node;

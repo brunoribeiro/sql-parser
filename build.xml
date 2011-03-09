@@ -146,6 +146,8 @@
       <classpath refid="running.class.path"/>
       <arg value="-bind"/>
       <arg value="CREATE TABLE parent(id INT, PRIMARY KEY(id), name VARCHAR(256) NOT NULL, UNIQUE(name)); CREATE TABLE child(id INT, PRIMARY KEY(id), pid INT, CONSTRAINT `__akiban_fk0` FOREIGN KEY akibanfk(pid) REFERENCES parent(id), name VARCHAR(256) NOT NULL);"/>
+      <arg value="-view"/>
+      <arg value="CREATE VIEW names(pname,cname) AS SELECT parent.name,child.name FROM parent,child WHERE parent.id = child.pid"/>
       <arg line="-boolean -types -flatten -print-bound"/>
       <arg value="SELECT name FROM child WHERE pid IN (SELECT parent.id FROM parent WHERE parent.name = 'foo')"/>
       <arg value="SELECT name FROM child WHERE pid = ANY (SELECT parent.id FROM parent WHERE parent.name = 'foo')"/>
@@ -153,6 +155,7 @@
       <arg value="SELECT name FROM child WHERE pid > ANY (SELECT parent.id FROM parent WHERE parent.name > 'foo')"/>
       <arg value="SELECT name FROM child WHERE pid IN (SELECT parent.id FROM parent,child WHERE parent.name = 'foo')"/>
       <arg value="SELECT name FROM child WHERE pid IN (SELECT parent.id FROM parent,child c2 WHERE parent.name = 'foo' AND parent.id = c2.pid AND c2.id = 1)"/>
+      <arg value="SELECT pname,cname FROM names WHERE pname = 'foo'"/>
     </java>
   </target> 
 
@@ -161,12 +164,15 @@
       <classpath refid="running.class.path"/>
       <arg value="-bind"/>
       <arg value="CREATE TABLE parent(id INT, PRIMARY KEY(id), name VARCHAR(256) NOT NULL, UNIQUE(name), state CHAR(2)); CREATE TABLE child(id INT, PRIMARY KEY(id), pid INT, CONSTRAINT `__akiban_fk0` FOREIGN KEY akibanfk(pid) REFERENCES parent(id), name VARCHAR(256) NOT NULL);"/>
+      <arg value="-view"/>
+      <arg value="CREATE VIEW names(pname,cname) AS SELECT parent.name,child.name FROM parent,child WHERE parent.id = child.pid"/>
       <arg line="-boolean -types -flatten -group-rewrite -print"/>
       <arg value="SELECT parent.name,child.name FROM parent,child WHERE parent.state = 'MA'"/>
       <arg value="SELECT parent.name,child.name FROM parent,child WHERE child.pid = parent.id AND parent.state = 'MA'"/>
       <arg value="SELECT p1.name,child.name FROM parent AS p1,parent AS p2,child WHERE child.pid = p1.id AND p2.state = 'MA' AND p1.id &lt;> p2.id"/>
       <arg value="SELECT child.name FROM child WHERE pid IN (SELECT parent.id FROM parent WHERE state = 'MA')"/>
       <arg value="SELECT parent.name,child.name FROM parent INNER JOIN child ON child.pid = parent.id WHERE parent.state = 'MA'"/>
+      <arg value="SELECT pname,cname FROM names WHERE pname = 'foo'"/>
     </java>
   </target> 
 

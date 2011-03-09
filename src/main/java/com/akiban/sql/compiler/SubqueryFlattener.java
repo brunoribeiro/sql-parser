@@ -48,7 +48,7 @@ import com.akiban.ais.model.Index;
 import com.akiban.ais.model.IndexColumn;
 import com.akiban.ais.model.Table;
 
-import java.util.Stack;
+import java.util.*;
 
 /** Flatten subqueries.
  *
@@ -90,6 +90,34 @@ public class SubqueryFlattener
   protected void selectNode(SelectNode selectNode) throws StandardException {
     selectStack.push(currentSelectNode);
     currentSelectNode = selectNode;
+
+    // Flatten subqueries in the FROM list.
+    Iterator<FromTable> iter = selectNode.getFromList().iterator();
+    Collection<FromSubquery> flattenSubqueries = new HashSet<FromSubquery>();
+    while (iter.hasNext()) {
+      FromTable fromTable = iter.next();
+      if ((fromTable instanceof FromSubquery) &&
+          flattenableFromSubquery((FromSubquery)fromTable)) {
+        flattenSubqueries.add((FromSubquery)fromTable);
+        iter.remove();          // Can be flattened out.
+      }
+    }
+    if (!flattenSubqueries.isEmpty()) {
+      for (FromSubquery fromSubquery : flattenSubqueries) {
+        ResultSetNode subquery = fromSubquery.getSubquery();
+        if (subquery instanceof SelectNode) {
+          SelectNode subselect = (SelectNode)subquery;
+          selectNode.getFromList().addAll(subselect.getFromList());
+          selectNode.setWhereClause(mergeWhereClause(subselect.getWhereClause(),
+                                                     selectNode.getWhereClause()));
+        }
+      }
+      // Update column bindings.
+      FromSubqueryBindingVisitor visitor =
+        new FromSubqueryBindingVisitor(flattenSubqueries);
+      selectNode.accept(visitor);
+    }
+
     // After CFN, only possibilities are AND and nothing.
     if (selectNode.getWhereClause() != null) {
       AndNode andNode = (AndNode)selectNode.getWhereClause();
@@ -97,7 +125,7 @@ public class SubqueryFlattener
     }
     currentSelectNode = selectStack.pop();
   }
-  
+
   // Top-level (within some WHERE clause) AND expression.
   protected void andNode(AndNode andNode) throws StandardException {
     // Left operand might be IN (SELECT ...) or = ANY (SELECT ...)
@@ -234,6 +262,12 @@ public class SubqueryFlattener
                                           parserContext);
   }
 
+  protected boolean flattenableFromSubquery(FromSubquery fromSubquery)
+      throws StandardException {
+    // TODO: need to filter out sub-subqueries, aggregates, GROUP BY, etc.
+    return true;
+  }
+
   protected ValueNode mergeWhereClause(ValueNode whereClause, ValueNode intoWhereClause)
       throws StandardException {
     if (intoWhereClause == null)
@@ -361,7 +395,7 @@ public class SubqueryFlattener
             (binding.getColumn() == column));
   }
 
-  static public class FromTableBindingVisitor implements Visitor {
+  static class FromTableBindingVisitor implements Visitor {
     enum Found { NOT_FOUND, FOUND_FROM_LIST, FOUND_TABLE };
 
     protected Found found;
@@ -406,6 +440,46 @@ public class SubqueryFlattener
     }
     public void reset() {
       found = Found.NOT_FOUND;
+    }
+  }
+
+  class FromSubqueryBindingVisitor implements Visitor {
+    Collection<FromSubquery> subqueries;
+    
+    public FromSubqueryBindingVisitor(Collection<FromSubquery> subqueries) {
+      this.subqueries = subqueries;
+    }
+
+    public Visitable visit(Visitable node) throws StandardException {
+      if (node instanceof ColumnReference) {
+        ColumnBinding binding = (ColumnBinding)((ColumnReference)node).getUserData();
+        if (binding != null) {
+          FromTable bft = binding.getFromTable();
+          if (subqueries.contains(bft)) {
+            FromSubquery fromSubquery = (FromSubquery)bft;
+            ResultColumn rc = binding.getResultColumn();
+            if (fromSubquery.getResultColumns() != null) {
+              // Bound to derived column: switch to definition column.
+              ResultColumnList rcl1 = fromSubquery.getResultColumns();
+              ResultColumnList rcl2 = fromSubquery.getSubquery().getResultColumns();
+              rc = rcl2.get(rcl1.indexOf(rc));
+            }
+            // Return (copy of) subquery's SELECT expression (or VALUES element).
+            return nodeFactory.copyNode(rc.getExpression(), parserContext);
+          }
+        }
+      }
+      return node;
+    }
+
+    public boolean stopTraversal() {
+      return false;
+    }
+    public boolean skipChildren(Visitable node) {
+      return false;
+    }
+    public boolean visitChildrenFirst(Visitable node) {
+      return false;
     }
   }
 }
