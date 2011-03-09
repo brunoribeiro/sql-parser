@@ -21,6 +21,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * An ordered column has position.   It is an
  * abstract class for group by and order by
@@ -31,6 +33,16 @@ public abstract class OrderedColumn extends QueryTreeNode
 {
   protected static final int UNMATCHEDPOSITION = -1;
   protected int columnPosition = UNMATCHEDPOSITION;
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    OrderedColumn other = (OrderedColumn)node;
+    this.columnPosition = other.columnPosition;
+  }
 
   /**
    * Indicate whether this column is ascending or not.

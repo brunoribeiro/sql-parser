@@ -91,6 +91,14 @@
     </java>
   </target> 
 
+  <target name="test-clone" depends="compile, jvmargs">
+    <java classname="com.akiban.sql.test.Tester" fork="yes" failonerror="yes">
+      <classpath refid="running.class.path"/>
+      <arg line="-print -clone -print"/>
+      <arg value="SELECT x + y + z FROM t1 WHERE x > 0 AND y > 'foo'"/>
+    </java>
+  </target> 
+
   <target name="test-binder" depends="compile, jvmargs">
     <java classname="com.akiban.sql.test.Tester" fork="yes" failonerror="yes">
       <classpath refid="running.class.path"/>

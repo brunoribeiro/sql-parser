@@ -48,7 +48,7 @@ import com.akiban.sql.types.TypeId;
 
 // TODO: I think this is too much (or too little).
 
-abstract class JavaValueNode extends QueryTreeNode
+public abstract class JavaValueNode extends QueryTreeNode
 {
   private boolean mustCastToPrimitive;
 
@@ -56,6 +56,20 @@ abstract class JavaValueNode extends QueryTreeNode
   private boolean valueReturnedToSQLDomain;
   private boolean returnValueDiscarded;
   protected JSQLType jsqlType;
+
+  /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    JavaValueNode other = (JavaValueNode)node;
+    this.mustCastToPrimitive = other.mustCastToPrimitive;
+    this.forCallStatement = other.forCallStatement;
+    this.valueReturnedToSQLDomain = other.valueReturnedToSQLDomain;
+    this.returnValueDiscarded = other.returnValueDiscarded;
+    this.jsqlType = other.jsqlType;
+  }
 
   /**
    * Get the resolved data type of this node. May be overridden by descendants.

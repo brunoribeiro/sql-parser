@@ -44,6 +44,6 @@ package com.akiban.sql.parser;
  *
  */
 
-abstract class MiscellaneousStatementNode extends StatementNode
+public abstract class MiscellaneousStatementNode extends StatementNode
 {
 }

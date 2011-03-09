@@ -32,7 +32,7 @@ import java.util.*;
 public class Tester
 {
   enum Action { 
-    ECHO, PARSE, 
+    ECHO, PARSE, CLONE,
     PRINT_TREE, PRINT_SQL, PRINT_BOUND_SQL,
     BIND, COMPUTE_TYPES,
     BOOLEAN_NORMALIZE, FLATTEN_SUBQUERIES,
@@ -72,6 +72,9 @@ public class Tester
         break;
       case PARSE:
         stmt = parser.parseStatement(sql);
+        break;
+      case CLONE:
+        stmt = (StatementNode)parser.getNodeFactory().copyNode(stmt, parser);
         break;
       case PRINT_TREE:
         stmt.treePrint();
@@ -127,6 +130,8 @@ public class Tester
           tester.addAction(Action.PRINT_SQL);
         else if ("-print-bound".equals(arg))
           tester.addAction(Action.PRINT_BOUND_SQL);
+        else if ("-clone".equals(arg))
+          tester.addAction(Action.CLONE);
         else if ("-bind".equals(arg)) {
           tester.setSchema(args[i++]);
           tester.addAction(Action.BIND);

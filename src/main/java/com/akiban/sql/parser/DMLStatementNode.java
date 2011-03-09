@@ -51,9 +51,8 @@ import com.akiban.sql.StandardException;
  *
  */
 
-abstract class DMLStatementNode extends StatementNode
+public abstract class DMLStatementNode extends StatementNode
 {
-
   /**
    * The result set is the rows that result from running the
    * statement.  What this means for SELECT statements is fairly obvious.

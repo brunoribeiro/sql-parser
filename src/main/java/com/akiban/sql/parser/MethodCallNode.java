@@ -47,18 +47,18 @@ import java.util.List;
  *
  */
 
-abstract class MethodCallNode extends JavaValueNode
+public abstract class MethodCallNode extends JavaValueNode
 {
   /*
   ** Name of the method.
   */
-  String methodName;
+  protected String methodName;
 
   /** The name of the class containing the method. May not be known until bindExpression() has been called.
    * @see #bindExpression
    * @see #getJavaClassName()
    */
-  String javaClassName;
+  protected String javaClassName;
 
   /*
   ** Parameters to the method, if any.  No elements if no parameters.

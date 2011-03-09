@@ -105,6 +105,17 @@ public abstract class QueryTreeNodeList<N extends QueryTreeNode>
   }
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    QueryTreeNodeList<N> other = (QueryTreeNodeList<N>)node;
+    for (N n : other.list)
+      list.add((N)getNodeFactory().copyNode(n, getParserContext()));
+  }
+
+  /**
    * Prints the sub-nodes of this object.  See QueryTreeNode.java for
    * how tree printing is supposed to work.
    * @param depth		The depth to indent the sub-nodes

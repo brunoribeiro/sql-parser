@@ -53,6 +53,18 @@ public abstract class ResultSetNode extends QueryTreeNode
   boolean insertSource;
 
   /**
+   * Fill this node with a deep copy of the given node.
+   */
+  public void copyFrom(QueryTreeNode node) throws StandardException {
+    super.copyFrom(node);
+
+    ResultSetNode other = (ResultSetNode)node;
+    this.resultColumns = (ResultColumnList)getNodeFactory().copyNode(other.resultColumns,
+                                                                     getParserContext());
+    this.insertSource = other.insertSource;
+  }
+
+  /**
    * Convert this object to a String.  See comments in QueryTreeNode.java
    * for how this should be done for tree printing.
    *
