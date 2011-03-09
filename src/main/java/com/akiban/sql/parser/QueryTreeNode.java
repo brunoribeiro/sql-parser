@@ -113,6 +113,7 @@ public abstract class QueryTreeNode implements Visitable
   public void copyFrom(QueryTreeNode other) throws StandardException {
     // TODO: Should we attempt to deal with cloning the user data?
     // Maybe need an interface for it.
+    this.userData = other.userData;
   }
 
   /**

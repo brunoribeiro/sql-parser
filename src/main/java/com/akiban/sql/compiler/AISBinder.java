@@ -46,6 +46,10 @@ public class AISBinder implements Visitor
   }
 
   public void addView(ViewDefinition view) throws StandardException {
+    // TODO: We could type bind here, for efficiency, if we could
+    // manage to clone the Table/ColumnBindings properly by
+    // rendezvousing with the corresponding clones.
+
     TableName name = view.getName();
     /**
     if (name.getSchemaName() == null)

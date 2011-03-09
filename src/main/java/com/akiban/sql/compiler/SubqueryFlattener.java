@@ -465,6 +465,8 @@ public class SubqueryFlattener
               rc = rcl2.get(rcl1.indexOf(rc));
             }
             // Return (copy of) subquery's SELECT expression (or VALUES element).
+            // TODO: We depend on the shallow-copied binding user-data being valid
+            // here. Cf. AISBinder's addView() and when it does binding.
             return nodeFactory.copyNode(rc.getExpression(), parserContext);
           }
         }

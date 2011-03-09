@@ -47,6 +47,10 @@ public class ViewDefinition
     return definition.getObjectName();
   }
 
+  public ResultSetNode getQueryExpression() throws StandardException {
+    return definition.getParsedQueryExpression();
+  }
+
   private FromSubquery subquery = null;
 
   /**
