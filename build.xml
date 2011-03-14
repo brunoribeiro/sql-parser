@@ -155,6 +155,8 @@
       <arg value="SELECT name FROM child WHERE pid > ANY (SELECT parent.id FROM parent WHERE parent.name > 'foo')"/>
       <arg value="SELECT name FROM child WHERE pid IN (SELECT parent.id FROM parent,child WHERE parent.name = 'foo')"/>
       <arg value="SELECT name FROM child WHERE pid IN (SELECT parent.id FROM parent,child c2 WHERE parent.name = 'foo' AND parent.id = c2.pid AND c2.id = 1)"/>
+      <!-- child condition can be much more interesting with EXISTS JOIN -->
+      <arg value="SELECT name FROM parent p WHERE EXISTS (SELECT * from child c WHERE c.pid = p.id AND c.id = 3)"/>
       <arg value="SELECT pname,cname FROM names WHERE pname = 'foo'"/>
     </java>
   </target> 
