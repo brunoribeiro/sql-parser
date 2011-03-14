@@ -46,10 +46,6 @@ public class AISBinder implements Visitor
   }
 
   public void addView(ViewDefinition view) throws StandardException {
-    // TODO: We could type bind here, for efficiency, if we could
-    // manage to clone the Table/ColumnBindings properly by
-    // rendezvousing with the corresponding clones.
-
     TableName name = view.getName();
     /**
     if (name.getSchemaName() == null)
@@ -310,7 +306,10 @@ public class AISBinder implements Visitor
     TableName tableName = fromBaseTable.getOrigTableName();
     ViewDefinition view = views.get(tableName);
     if (view != null)
-      return fromTable(view.getSubquery()); // Splice in definition and bind it.
+      // Splice in definition and bind it.
+      // For efficiency, bindings are computed on the definition and
+      // then remapped in the deep copy if gives out.
+      return fromTable(view.getSubquery(this));
 
     Table table = lookupTableName(tableName);
     tableName.setUserData(table);

@@ -47,16 +47,12 @@ public class ViewDefinition
     return definition.getObjectName();
   }
 
-  public ResultSetNode getQueryExpression() throws StandardException {
-    return definition.getParsedQueryExpression();
-  }
-
   private FromSubquery subquery = null;
 
   /**
    * Get the view as an equivalent subquery.
    */
-  public FromSubquery getSubquery() throws StandardException {
+  public FromSubquery getSubquery(Visitor binder) throws StandardException {
     if (subquery == null) {
       subquery = (FromSubquery)
         nodeFactory.getNode(NodeTypes.FROM_SUBQUERY,
@@ -66,6 +62,7 @@ public class ViewDefinition
                             definition.getResultColumns(),
                             null,
                             parserContext);
+      subquery = (FromSubquery)subquery.accept(binder);
     }
     // Return a clone so caller can mess with it and not affect us.
     return (FromSubquery)nodeFactory.copyNode(subquery, parserContext);
