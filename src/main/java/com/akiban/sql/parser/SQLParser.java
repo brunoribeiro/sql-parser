@@ -61,7 +61,7 @@ public class SQLParser implements SQLParserContext {
    * Parser can be reused.
    */
   public SQLParser() {
-    nodeFactory = new NodeFactory();
+    nodeFactory = new NodeFactoryImpl();
   }
 
   /** Return the SQL string this parser just parsed. */
@@ -177,6 +177,11 @@ public class SQLParser implements SQLParserContext {
   /** Get a node factory. */
   public NodeFactory getNodeFactory() {
     return nodeFactory;
+  }
+
+  /** Set the node factory. */
+  public void setNodeFactory(NodeFactory nodeFactory) {
+    this.nodeFactory = nodeFactory;
   }
 
   /**

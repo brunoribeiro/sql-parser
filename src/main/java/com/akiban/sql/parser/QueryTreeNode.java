@@ -109,11 +109,10 @@ public abstract class QueryTreeNode implements Visitable
 
   /**
    * Fill this node with a deep copy of the given node.
+   * Specific node classes must override to deep copy their data.
    */
   public void copyFrom(QueryTreeNode other) throws StandardException {
-    // TODO: Should we attempt to deal with cloning the user data?
-    // Maybe need an interface for it.
-    this.userData = other.userData;
+    this.userData = getNodeFactory().copyUserData(this, other.userData);
   }
 
   /**
