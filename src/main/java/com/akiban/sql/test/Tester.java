@@ -18,6 +18,7 @@ import com.akiban.sql.StandardException;
 import com.akiban.sql.parser.StatementNode;
 import com.akiban.sql.parser.SQLParser;
 import com.akiban.sql.compiler.AISBinder;
+import com.akiban.sql.compiler.BindingNodeFactory;
 import com.akiban.sql.compiler.BooleanNormalizer;
 import com.akiban.sql.compiler.BoundNodeToString;
 import com.akiban.sql.compiler.Grouper;
@@ -52,6 +53,7 @@ public class Tester
   public Tester() {
     actions = new ArrayList<Action>();
     parser = new SQLParser();
+    parser.setNodeFactory(new BindingNodeFactory(parser.getNodeFactory()));
     unparser = new BoundNodeToString();
     typeComputer = new TypeComputer();
     booleanNormalizer = new BooleanNormalizer(parser);

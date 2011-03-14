@@ -29,6 +29,11 @@ public class TableBinding
     this.table = table;
   }
 
+  public TableBinding(TableBinding other) {
+    this.table = other.table;
+    this.groupBinding = other.groupBinding; // TODO: Or null?
+  }
+
   public Table getTable() {
     return table;
   }

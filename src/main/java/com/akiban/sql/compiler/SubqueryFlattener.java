@@ -264,7 +264,12 @@ public class SubqueryFlattener
 
   protected boolean flattenableFromSubquery(FromSubquery fromSubquery)
       throws StandardException {
-    // TODO: need to filter out sub-subqueries, aggregates, GROUP BY, etc.
+    if (fromSubquery.getSubquery() instanceof SelectNode) {
+      SelectNode selectNode = (SelectNode)fromSubquery.getSubquery();
+      if (selectNode.getGroupByList() != null)
+        return false;
+    }
+    // TODO: Need more filtering.
     return true;
   }
 
