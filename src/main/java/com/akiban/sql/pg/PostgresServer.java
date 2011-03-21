@@ -380,11 +380,13 @@ public class PostgresServer implements Runnable, DataInput, DataOutput
     }
     beginMessage(ROW_DESCRIPTION_TYPE);
     int nfields = 2;
+    String[] names = new String[] { "foo", "bar" };
     writeShort(nfields);
     boolean binary = false;
     for (int i = 0; i < nfields; i++) {
       if ((resultsBinary != null) && (i < resultsBinary.length))
         binary = resultsBinary[i];
+      writeString(names[i]);
       writeInt(0);              // OID of table.
       writeShort(0);            // colno in table.
       writeInt(VARCHAR_TYPE_OID); // data type
@@ -392,6 +394,7 @@ public class PostgresServer implements Runnable, DataInput, DataOutput
       writeInt(0);              // atttypmod
       writeShort(binary ? 0 : 1);
     }
+    sendMessage();
   }
 
   protected void processExecute() throws Exception {
@@ -414,7 +417,7 @@ public class PostgresServer implements Runnable, DataInput, DataOutput
         for (int i = 0; i < ncols; i++) {
           if (i < binding.m_resultsBinary.length)
             binary = binding.m_resultsBinary[i];
-          String value = (i < 1) ? Integer.toString(i) : null;
+          String value = (i < 1) ? Integer.toString(j) : null;
           int len = (value == null) ? -1 : value.length();
           byte[] bv = null;
           if ((len > 0) && !binary)
