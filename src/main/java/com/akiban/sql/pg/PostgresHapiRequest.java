@@ -14,6 +14,7 @@
 
 package com.akiban.sql.pg;
 
+import com.akiban.ais.model.Column;
 import com.akiban.ais.model.TableName;
 import com.akiban.server.api.HapiGetRequest;
 import com.akiban.server.api.HapiPredicate;
@@ -25,13 +26,18 @@ public class PostgresHapiRequest implements HapiGetRequest
   private String m_schema, m_rootTable;
   private TableName m_queryTable;
   private List<HapiPredicate> m_predicates;
+  private List<Column> m_columns;
 
   public PostgresHapiRequest(String schema, String rootTable, TableName queryTable,
-                             List<HapiPredicate> predicates) {
+                             List<HapiPredicate> predicates, List<Column> columns) {
     m_schema = schema;
     m_rootTable = rootTable;
     m_queryTable = queryTable;
     m_predicates = predicates;
+  }
+
+  public List<Column> getColumns() {
+    return m_columns;
   }
 
   /*** HapiGetRequest ***/

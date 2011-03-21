@@ -123,6 +123,10 @@ public class PostgresServer implements Runnable, DataInput, DataOutput
     m_secret = secret;
   }
 
+  public String getEncoding() {
+    return m_encoding;
+  }
+
   public void run() {
     try {
       m_inputStream = m_socket.getInputStream();
