@@ -25,8 +25,6 @@ import java.util.*;
  */
 public class PostgresServer implements Runnable, DataInput, DataOutput
 {
-  public static final int DEFAULT_PORT = 15432; // Real one is 5432
-
   /*** Message Formats ***/
   public static final int AUTHENTICATION_TYPE = 'R'; // (B)
   public static final int BACKEND_KEY_DATA_TYPE = 'K'; // (B)
@@ -79,44 +77,6 @@ public class PostgresServer implements Runnable, DataInput, DataOutput
 
   public static final int VARCHAR_TYPE_OID = 1043;
 
-  public static void main(String[] args) throws Exception {
-    int port = DEFAULT_PORT;
-    int i = 0;
-    while (i < args.length) {
-      String arg = args[i++];
-      if ("-port".equals(arg)) {
-        port = Integer.parseInt(args[i++]);
-      }
-      else {
-        throw new Exception("Unknown argument: " + arg);
-      }
-    }
-    serverTopLevel(port);
-  }
-  
-  protected static Map<Integer,PostgresServer> g_servers = 
-    new HashMap<Integer,PostgresServer>();
-
-  protected static void serverTopLevel(int port) throws Exception {
-    ServerSocket server = new ServerSocket(port);
-    try {
-      System.out.println("Listening on port " + port);
-      int pid = 0;
-      Random rand = new Random();
-      while (true) {
-        Socket socket = server.accept();
-        pid++;
-        int secret = rand.nextInt();
-        PostgresServer pg = new PostgresServer(socket, pid, secret);
-        g_servers.put(pid, pg);
-        new Thread(pg).start();
-      }
-    }
-    finally {
-      server.close();
-    }
-  }
-
   static class DummyPreparedStatement {
     String m_sql;
     int[] m_paramTypes;
@@ -137,6 +97,7 @@ public class PostgresServer implements Runnable, DataInput, DataOutput
     }
   }
 
+  private PostgresServerManager m_manager;
   private Socket m_socket;
   private InputStream m_inputStream;
   private OutputStream m_outputStream;
@@ -154,7 +115,9 @@ public class PostgresServer implements Runnable, DataInput, DataOutput
   private Map<String,DummyStatementBinding> m_boundPortals =
     new HashMap<String,DummyStatementBinding>();
 
-  public PostgresServer(Socket socket, int pid, int secret) {
+  public PostgresServer(PostgresServerManager manager, Socket socket, 
+                        int pid, int secret) {
+    m_manager = manager;
     m_socket = socket;
     m_pid = pid;
     m_secret = secret;
@@ -193,6 +156,10 @@ public class PostgresServer implements Runnable, DataInput, DataOutput
    }
   }
 
+  public void stop() {
+    m_running = false;
+  }
+
   protected void topLevel() throws Exception {
     System.out.println("Connect from " + m_socket.getRemoteSocketAddress());
     m_running = true;
@@ -202,7 +169,7 @@ public class PostgresServer implements Runnable, DataInput, DataOutput
       int type = readMessage();
       switch (type) {
       case -1:                  // EOF
-        m_running = false;
+        stop();
         break;
       case PASSWORD_MESSAGE_TYPE:
         processPasswordMessage();
@@ -229,6 +196,7 @@ public class PostgresServer implements Runnable, DataInput, DataOutput
         throw new Exception("Unknown message type: " + (char)type);
       }
     }
+    m_manager.removeServer(m_pid);
   }
 
   protected void processStartupMessage() throws Exception {
@@ -269,11 +237,11 @@ public class PostgresServer implements Runnable, DataInput, DataOutput
   protected void processCancelMessage() throws Exception {
     int pid = readInt();
     int secret = readInt();
-    PostgresServer pg = g_servers.get(pid);
+    PostgresServer pg = m_manager.getServer(pid);
     if ((pg != null) && (secret == pg.m_secret))
       // No easy way to signal in another thread.
       pg.m_cancel = true;
-    m_running = false;
+    stop();
   }
 
   protected void processSSLMessage() throws Exception {
@@ -323,6 +291,7 @@ public class PostgresServer implements Runnable, DataInput, DataOutput
     for (int i = 0; i < nparams; i++)
       paramTypes[i] = readInt();
     m_preparedStatements.put(stmtName, new DummyPreparedStatement(query, paramTypes));
+    System.out.println(query);
     beginMessage(PARSE_COMPLETE_TYPE);
     sendMessage();
   }
@@ -441,7 +410,7 @@ public class PostgresServer implements Runnable, DataInput, DataOutput
   }
 
   protected void processTerminate() throws Exception {
-    m_running = false;
+    stop();
   }
 
   protected int readMessage() throws IOException {

@@ -178,6 +178,12 @@
     </java>
   </target> 
 
+  <target name="test-postgres-server" depends="compile, jvmargs">
+    <java classname="com.akiban.sql.pg.PostgresServerManager" fork="yes" failonerror="yes">
+      <classpath refid="running.class.path"/>
+    </java>
+  </target>
+
   <path id="sql.class.path">
     <path refid="compiler.class.path"/>
     <pathelement path="${CLASSES}"/>
