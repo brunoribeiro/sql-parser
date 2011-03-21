@@ -26,7 +26,7 @@ public class PostgresHapiOutputter implements HapiOutputter {
   public void output(HapiProcessedGetRequest request, Iterable<RowData> rows, 
               OutputStream outputStream) throws IOException {
     for (RowData rowData : rows) {
-      // NiceRow niceRow = new LegacyRowWrapper(rowData).niceRow();
+      NiceRow niceRow = new LegacyRowWrapper(rowData).niceRow();
     }
   }
 }
