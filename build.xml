@@ -178,6 +178,23 @@
     </java>
   </target> 
 
+  <path id="sql.class.path">
+    <path refid="compiler.class.path"/>
+    <pathelement path="${CLASSES}"/>
+    <pathelement path="/usr/share/java/postgresql-jdbc3-8.4.jar"/>
+  </path>
+
+  <target name="test-sql-1" depends="compile, jvmargs">
+    <java classname="com.akiban.sql.test.SQLClient" fork="yes" failonerror="yes">
+      <classpath refid="sql.class.path"/>
+      <arg value="org.postgresql.Driver"/>
+      <arg value="jdbc:postgresql://daffy:5432/mmcm"/>
+      <arg value="mmcm"/>
+      <arg value="foo"/>
+      <arg value="SELECT * FROM foo"/>
+    </java>
+  </target> 
+
   <target name="clean">
     <delete dir="${CLASSES}"/>
     <delete file="${SRC}/com/akiban/sql/parser/SQLGrammar.java"/>
