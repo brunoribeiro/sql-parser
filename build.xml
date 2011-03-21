@@ -8,12 +8,13 @@
   <property name="SRC" location="src/main/java"/>
   <property name="CLASSES" value="classes"/>
   <property name="GRAMMAR" location="${SRC}/com/akiban/sql/parser/SQLGrammar.jj"/>
+  <property name="JAR" value="parser-combined.jar"/>
 
   <path id="compiler.class.path">
     <pathelement path="${AKIBAN_SERVER_CLASSPATH}"/>
   </path>
 
-  <target name="all" depends="init, compile"
+  <target name="all" depends="init, compile, jar"
           description="Compile everything."/>
 
   <target name="init">
@@ -36,14 +37,20 @@
     </javac>
   </target> 
 
+  <target name="jar" depends="compile">
+    <copy file="${AKIBAN_SERVER_CLASSPATH}" tofile="${JAR}"/>
+    <jar destfile="${JAR}" update="true">
+      <fileset dir="${CLASSES}"/>
+    </jar>
+  </target> 
+
   <target name="dtd" depends="init"
           description="Create DTD file.">
     <antstructure output="build.dtd"/>
   </target>
 
   <path id="running.class.path">
-    <path refid="compiler.class.path"/>
-    <pathelement path="${CLASSES}"/>
+    <pathelement path="${JAR}"/>
   </path>
 
   <target name="enableJavaDebugger" if="JDWP_PORT">

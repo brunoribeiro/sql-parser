@@ -22,6 +22,8 @@ import java.util.*;
 
 /** The PostgreSQL server service.
  * @see PostgresServer
+ * 
+ * <code>JVM_OPTS="-Dakserver.services.customload=com.akiban.sql.pg.PostgresServerManager" $AKIBAN_SERVER_HOME/bin/akserver -f -j /opt/akiban/source/parser-latest/parser-combined.jar</code>
 */
 public class PostgresServerManager implements PostgresService, Service<PostgresService> {
   public static final int DEFAULT_PORT = 15432; // Real one is 5432
@@ -116,13 +118,4 @@ public class PostgresServerManager implements PostgresService, Service<PostgresS
     }
   }
 
-  /*** Standalone testing ***/
-
-  public static void main(String[] args) throws Exception {
-    PostgresServerManager server = new PostgresServerManager();
-    server.start();
-    System.out.println("Enter to stop server");
-    System.in.read();
-    server.stop();
-  }
 }
