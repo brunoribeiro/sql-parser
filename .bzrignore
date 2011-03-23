@@ -1,4 +1,5 @@
 ./classes
+parser-combined.jar
 SQLGrammar.java
 SQLGrammarConstants.java
 SQLGrammarTokenManager.java

@@ -26,57 +26,9 @@ import java.util.*;
  * <code>JVM_OPTS="-Dakserver.services.customload=com.akiban.sql.pg.PostgresServerManager" $AKIBAN_SERVER_HOME/bin/akserver -f -j /opt/akiban/source/parser-latest/parser-combined.jar</code>
 */
 public class PostgresServerManager implements PostgresService, Service<PostgresService> {
-  public static final int DEFAULT_PORT = 15432; // Real one is 5432
-  
-  private int m_port = DEFAULT_PORT;
-  private ServerSocket m_socket = null;
-  private boolean m_running = false;
-  private Map<Integer,PostgresServer> m_servers =
-      new HashMap<Integer,PostgresServer>();
+  private PostgresServer m_server = null;
 
   public PostgresServerManager() {
-  }
-
-  protected void topLevel() {
-    System.out.println("Listening on port " + m_port);
-    int pid = 0;
-    Random rand = new Random();
-    try {
-      synchronized(this) {
-        if (!m_running) return;
-        m_socket = new ServerSocket(m_port);
-      }
-      while (m_running) {
-        Socket socket = m_socket.accept();
-        pid++;
-        int secret = rand.nextInt();
-        PostgresServer pg = new PostgresServer(this, socket, pid, secret);
-        m_servers.put(pid, pg);
-        new Thread(pg).start();
-      }
-    }
-    catch (Exception ex) {
-      if (m_running)
-        ex.printStackTrace(System.err);
-    }
-    finally {
-      if (m_socket != null) {
-        try {
-          m_socket.close();
-        }
-        catch (IOException ex) {
-        }
-      }
-      m_running = false;
-    }
-  }
-
-  public PostgresServer getServer(int pid) {
-    return m_servers.get(pid);
-  }
-
-  public void removeServer(int pid) {
-    m_servers.remove(pid);
   }
 
   /*** Service<PostgresService> ***/
@@ -90,31 +42,14 @@ public class PostgresServerManager implements PostgresService, Service<PostgresS
   }
 
   public void start() throws Exception {
-    m_running = true;
-    new Thread() {
-      public void run() {
-        topLevel();
-      }
-    }.start();
+    m_server = new PostgresServer(PostgresServer.DEFAULT_PORT);
+    m_server.start();
   }
 
   public void stop() throws Exception {
-    // Can only wake up by closing socket inside whose accept() we are blocked.
-    ServerSocket socket;
-    synchronized(this) {
-      m_running = false;
-      socket = m_socket;
-    }
-    if (socket != null) {
-      try {
-        m_socket.close();
-      }
-      catch (IOException ex) {
-      }
-    }
-
-    for (PostgresServer server : m_servers.values()) {
-      server.stop();
+    if (m_server != null) {
+      m_server.stop();
+      m_server = null;
     }
   }
 
