@@ -56,10 +56,10 @@ public class PostgresHapiCompiler
   private Grouper m_grouper;
 
   public PostgresHapiCompiler(SQLParser parser, 
-                              AkibanInformationSchema ais, String user) {
+                              AkibanInformationSchema ais, String schema) {
     m_parserContext = parser;
     m_nodeFactory = m_parserContext.getNodeFactory();
-    m_binder = new AISBinder(ais, user);
+    m_binder = new AISBinder(ais, schema);
     parser.setNodeFactory(new BindingNodeFactory(m_nodeFactory));
     m_typeComputer = new TypeComputer();
     m_booleanNormalizer = new BooleanNormalizer(parser);
@@ -191,6 +191,11 @@ public class PostgresHapiCompiler
       column = ((ColumnBinding)leftOperand.getUserData()).getColumn();
       if (column == null)
         throw new StandardException("Unsupported WHERE predicate on non-column");
+      UserTable predTable = column.getUserTable();
+      if (queryTable == null)
+        queryTable = predTable;
+      else if (queryTable != predTable)
+        throw new StandardException("Unsupported WHERE predicate on multiple tables");
       if (rightOperand instanceof ConstantNode)
         predicates.add(new PostgresHapiPredicate(column, op,
                                                  ((ConstantNode)
@@ -201,6 +206,9 @@ public class PostgresHapiCompiler
                                                   rightOperand).getParameterNumber()));
       whereClause = andNode.getRightOperand();
     }
+
+    if (queryTable == null)
+      queryTable = deepestTable;
 
     return new PostgresHapiRequest(shallowestTable, queryTable, deepestTable,
                                    predicates, columns);

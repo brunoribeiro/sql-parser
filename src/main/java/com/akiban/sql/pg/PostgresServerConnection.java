@@ -44,7 +44,7 @@ public class PostgresServerConnection implements Runnable
   private static final Logger g_logger = LoggerFactory.getLogger(PostgresServerConnection.class);
 
   private PostgresServer m_server;
-  private boolean m_running = false;
+  private boolean m_running = false, m_ignoreUntilSync = false;
   private Socket m_socket;
   private PostgresMessenger m_messenger;
   private int m_pid, m_secret;
@@ -88,12 +88,6 @@ public class PostgresServerConnection implements Runnable
     try {
       m_messenger = new PostgresMessenger(m_socket.getInputStream(),
                                           m_socket.getOutputStream());
-
-      m_session = new SessionImpl();
-      m_ais = DDLFunctionsImpl.instance().getAIS(m_session);
-      m_parser = new SQLParser();
-      m_outputter = new PostgresHapiOutputter(m_messenger, m_session);
-
       topLevel();
     }
     catch (Exception ex) {
@@ -114,6 +108,11 @@ public class PostgresServerConnection implements Runnable
     processStartupMessage();
     while (m_running) {
       int type = m_messenger.readMessage();
+      if (m_ignoreUntilSync) {
+        if ((type != -1) && (type != PostgresMessenger.SYNC_TYPE))
+          continue;
+        m_ignoreUntilSync = false;
+      }
       switch (type) {
       case -1:                  // EOF
         stop();
@@ -174,6 +173,14 @@ public class PostgresServerConnection implements Runnable
       else
         m_messenger.setEncoding(enc);
     }
+    
+    String schema = m_properties.getProperty("database");
+    m_session = new SessionImpl();
+    m_ais = DDLFunctionsImpl.instance().getAIS(m_session);
+    m_parser = new SQLParser();
+    m_compiler = new PostgresHapiCompiler(m_parser, m_ais, schema);
+    m_outputter = new PostgresHapiOutputter(m_messenger, m_session);
+
     {
       m_messenger.beginMessage(PostgresMessenger.AUTHENTICATION_TYPE);
       m_messenger.writeInt(PostgresMessenger.AUTHENTICATION_CLEAR_TEXT);
@@ -239,13 +246,28 @@ public class PostgresServerConnection implements Runnable
       paramTypes[i] = m_messenger.readInt();
     g_logger.warn("Parse: {}", sql);
 
-    StatementNode stmt = m_parser.parseStatement(sql);
-    if (stmt instanceof CursorNode) {
-      PostgresHapiRequest req = m_compiler.compile((CursorNode)stmt, paramTypes);
-      m_preparedStatements.put(stmtName, req);
+    try {
+      StatementNode stmt = m_parser.parseStatement(sql);
+      if (stmt instanceof CursorNode) {
+        PostgresHapiRequest req = m_compiler.compile((CursorNode)stmt, paramTypes);
+        m_preparedStatements.put(stmtName, req);
+      }
+      else
+        throw new StandardException("Not a SELECT");
     }
-    else
-      throw new Exception("Not a SELECT");
+    catch (StandardException ex) {
+      g_logger.warn("Error in query", ex);
+      m_messenger.beginMessage(PostgresMessenger.ERROR_RESPONSE_TYPE);
+      m_messenger.write('S');
+      m_messenger.writeString("ERROR");
+      // TODO: Could dummy up an SQLSTATE, etc.
+      m_messenger.write('M');
+      m_messenger.writeString(ex.getMessage());
+      m_messenger.write(0);
+      m_messenger.sendMessage(true);
+      m_ignoreUntilSync = true;
+      return;
+    }
 
     m_messenger.beginMessage(PostgresMessenger.PARSE_COMPLETE_TYPE);
     m_messenger.sendMessage();

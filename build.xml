@@ -203,8 +203,18 @@
       <arg value="org.postgresql.Driver"/>
       <arg value="jdbc:postgresql://daffy:15432/mmcm"/>
       <arg value="mmcm"/>
-      <arg value="foo"/>
-      <arg value="SELECT * FROM foo"/>
+      <arg value="mmcm"/>
+      <arg value="SELECT * FROM t1"/>
+    </java>
+  </target> 
+  <target name="test-sql-2" depends="compile, jvmargs">
+    <java classname="com.akiban.sql.test.SQLClient" fork="yes" failonerror="yes">
+      <classpath refid="sql.class.path"/>
+      <arg value="org.postgresql.Driver"/>
+      <arg value="jdbc:postgresql://daffy:15432/mmcm"/>
+      <arg value="mmcm"/>
+      <arg value="mmcm"/>
+      <arg value="SELECT * FROM t1 WHERE name &lt;> 'bar'"/>
     </java>
   </target> 
 
