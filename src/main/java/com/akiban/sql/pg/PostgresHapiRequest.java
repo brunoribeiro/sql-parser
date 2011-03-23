@@ -31,20 +31,15 @@ public class PostgresHapiRequest implements HapiGetRequest
   private UserTable m_shallowestTable, m_queryTable, m_deepestTable;
   private List<HapiPredicate> m_predicates; // All on m_queryTable.
   private List<Column> m_columns; // Any from m_shallowestTable through m_deepestTable.
-  private boolean[] m_columnBinary; // Is this column binary format?
-  private boolean m_defaultColumnBinary;
 
   public PostgresHapiRequest(UserTable shallowestTable, UserTable queryTable, 
                              UserTable deepestTable,
-                             List<HapiPredicate> predicates, List<Column> columns,
-                             boolean[] columnBinary, boolean defaultColumnBinary) {
+                             List<HapiPredicate> predicates, List<Column> columns) {
     m_shallowestTable = shallowestTable;
     m_queryTable = queryTable;
     m_deepestTable = deepestTable;
     m_predicates = predicates;
     m_columns = columns;
-    m_columnBinary = columnBinary;
-    m_defaultColumnBinary = defaultColumnBinary;
   }
 
   public UserTable getShallowestTable() {
@@ -62,10 +57,7 @@ public class PostgresHapiRequest implements HapiGetRequest
   }
 
   public boolean isColumnBinary(int i) {
-    if ((m_columnBinary != null) && (i < m_columnBinary.length))
-      return m_columnBinary[i];
-    else
-      return m_defaultColumnBinary;
+    return false;
   }
 
   /*** HapiGetRequest ***/

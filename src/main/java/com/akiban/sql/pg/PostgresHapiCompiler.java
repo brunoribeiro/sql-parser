@@ -30,7 +30,6 @@ import com.akiban.ais.model.AkibanInformationSchema;
 
 import java.util.*;
 
-
 /**
  * Compile SQL SELECT statements into Hapi requests if possible.
  * Restrictions are:
@@ -74,7 +73,8 @@ public class PostgresHapiCompiler
     m_binder.addView(view);
   }
 
-  public PostgresHapiRequest compile(CursorNode stmt) throws StandardException {
+  public PostgresHapiRequest compile(CursorNode stmt, int[] paramTypes)
+      throws StandardException {
     // Get into bound & grouped form.
     m_binder.bind(stmt);
     stmt = (CursorNode)m_booleanNormalizer.normalize(stmt);

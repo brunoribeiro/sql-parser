@@ -29,7 +29,6 @@ import java.util.*;
  * Also keeps global state for shutdown and inter-connection communication like cancel.
 */
 public class PostgresServer implements Runnable {
-  private static final Logger LOG = LoggerFactory.getLogger(PostgresServer.class);
   public static final int DEFAULT_PORT = 15432; // Real one is 5432
   
   private int m_port = DEFAULT_PORT;
@@ -37,6 +36,8 @@ public class PostgresServer implements Runnable {
   private boolean m_running = false;
   private Map<Integer,PostgresServerConnection> m_connections =
       new HashMap<Integer,PostgresServerConnection>();
+
+  private static final Logger g_logger = LoggerFactory.getLogger(PostgresServer.class);
 
   public PostgresServer(int port) {
     m_port = port;
@@ -72,7 +73,7 @@ public class PostgresServer implements Runnable {
   }
 
   public void run() {
-    LOG.warn("Postgres server listening on port {}", m_port);
+    g_logger.warn("Postgres server listening on port {}", m_port);
     int pid = 0;
     Random rand = new Random();
     try {
@@ -92,7 +93,7 @@ public class PostgresServer implements Runnable {
     }
     catch (Exception ex) {
       if (m_running)
-        LOG.warn("Error in server", ex);
+        g_logger.warn("Error in server", ex);
     }
     finally {
       if (m_socket != null) {

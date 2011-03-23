@@ -25,25 +25,30 @@ import com.akiban.server.api.dml.scan.LegacyRowWrapper;
 import com.akiban.server.api.dml.scan.NewRow;
 import com.akiban.server.service.memcache.hprocessor.Scanrows;
 import com.akiban.server.service.session.Session;
-import com.akiban.server.service.session.SessionImpl;
 
 import java.io.*;
 import java.util.*;
 
 public class PostgresHapiOutputter implements HapiOutputter {
   private PostgresMessenger m_messenger;
-  private PostgresHapiRequest m_request;
   private Session m_session;
+  private PostgresHapiRequest m_request;
+  private int m_nrows, m_maxrows;
 
-  public PostgresHapiOutputter(PostgresMessenger messenger) {
+  public PostgresHapiOutputter(PostgresMessenger messenger, Session session) {
     m_messenger = messenger;
-    m_session = new SessionImpl();
+    m_session = session;
   }
 
-  public void run(PostgresHapiRequest request) throws HapiRequestException {
+  /** Run this outputter for the given Hapi request and return the
+   * number of (flattened) rows that were output. */
+  public int run(PostgresHapiRequest request, int maxrows) throws HapiRequestException {
+    // No way to get from HapiProcessedGetRequest to original HapiGetRequest.
     m_request = request;
-    // null for OutputStream, since we use the higher level messenger.
+    m_nrows = 0;
+    // null as OutputStream, since we use the higher level messenger.
     Scanrows.instance().processRequest(m_session, request, this, null);
+    return m_nrows;
   }
 
   public void output(HapiProcessedGetRequest request, Iterable<RowData> rows, 
@@ -60,8 +65,9 @@ public class PostgresHapiOutputter implements HapiOutputter {
     boolean[] processedTableIds = new boolean[ntables];
     int outputTableId = -1;
     for (RowData rowData : rows) {
-      if (m_messenger.isCancel()) 
-        return;
+      if (m_messenger.isCancel()) {
+        m_nrows = -1;
+      }
       NewRow row = new LegacyRowWrapper(rowData).niceRow();
       int tableId = row.getTableId();
       if (!processedTableIds[tableId]) {
@@ -93,8 +99,12 @@ public class PostgresHapiOutputter implements HapiOutputter {
           outputData[i] = bv;
         }
       }
-      if (tableId == outputTableId)
+      if (tableId == outputTableId) {
         sendDataRow(outputData);
+        m_nrows++;
+        if ((m_maxrows > 0) && (m_nrows >= m_maxrows))
+          return;
+      }
     }
   }
 

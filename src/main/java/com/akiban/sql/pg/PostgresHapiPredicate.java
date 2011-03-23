@@ -23,6 +23,7 @@ public class PostgresHapiPredicate implements HapiPredicate
   private String m_columnName;
   private Operator m_op;
   private String m_value;
+  private int m_parameterIndex;
 
   public PostgresHapiPredicate(TableName tableName, String columnName,
                                Operator op, String value) {
@@ -32,6 +33,21 @@ public class PostgresHapiPredicate implements HapiPredicate
     m_value = value;
   }
 
+  public PostgresHapiPredicate(TableName tableName, String columnName,
+                               Operator op, int parameterIndex) {
+    m_tableName = tableName;
+    m_columnName = columnName;
+    m_op = op;
+    m_parameterIndex = parameterIndex;
+  }
+
+  public PostgresHapiPredicate(PostgresHapiPredicate other, String value) {
+    m_tableName = other.m_tableName;
+    m_columnName = other.m_columnName;
+    m_op = other.m_op;
+    m_value = value;
+  }
+                               
   public TableName getTableName() {
     return m_tableName;
   }
@@ -46,5 +62,9 @@ public class PostgresHapiPredicate implements HapiPredicate
 
   public String getValue() {
     return m_value;
+  }
+
+  public int getParameterIndex() {
+    return m_parameterIndex;
   }
 }

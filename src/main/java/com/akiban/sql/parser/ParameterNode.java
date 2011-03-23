@@ -89,7 +89,7 @@ public class ParameterNode extends ValueNode
    * @return The parameter number
    */
 
-  int getParameterNumber() {
+  public int getParameterNumber() {
     return parameterNumber;
   }
 
