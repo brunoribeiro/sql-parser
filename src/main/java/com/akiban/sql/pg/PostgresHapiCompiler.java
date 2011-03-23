@@ -15,18 +15,16 @@
 package com.akiban.sql.pg;
 
 import com.akiban.sql.parser.*;
+import com.akiban.sql.compiler.*;
 
 import com.akiban.sql.StandardException;
-import com.akiban.sql.compiler.AISBinder;
-import com.akiban.sql.compiler.BindingNodeFactory;
-import com.akiban.sql.compiler.BooleanNormalizer;
-import com.akiban.sql.compiler.BoundNodeToString;
-import com.akiban.sql.compiler.Grouper;
-import com.akiban.sql.compiler.SubqueryFlattener;
-import com.akiban.sql.compiler.TypeComputer;
 import com.akiban.sql.views.ViewDefinition;
 
 import com.akiban.ais.model.AkibanInformationSchema;
+import com.akiban.ais.model.Column;
+import com.akiban.ais.model.Join;
+import com.akiban.ais.model.UserTable;
+import com.akiban.server.api.HapiPredicate;
 
 import java.util.*;
 
@@ -73,14 +71,153 @@ public class PostgresHapiCompiler
     m_binder.addView(view);
   }
 
-  public PostgresHapiRequest compile(CursorNode stmt, int[] paramTypes)
+  public PostgresHapiRequest compile(CursorNode cursor, int[] paramTypes)
       throws StandardException {
     // Get into bound & grouped form.
-    m_binder.bind(stmt);
-    stmt = (CursorNode)m_booleanNormalizer.normalize(stmt);
-    m_typeComputer.compute(stmt);
-    stmt = (CursorNode)m_subqueryFlattener.flatten(stmt);
-    m_grouper.group(stmt);
-    return null;
+    m_binder.bind(cursor);
+    cursor = (CursorNode)m_booleanNormalizer.normalize(cursor);
+    m_typeComputer.compute(cursor);
+    cursor = (CursorNode)m_subqueryFlattener.flatten(cursor);
+    m_grouper.group(cursor);
+
+    if (cursor.getOrderByList() != null)
+      throw new StandardException("Unsupported ORDER BY");
+    if (cursor.getOffsetClause() != null)
+      throw new StandardException("Unsupported OFFSET");
+    if (cursor.getFetchFirstClause() != null)
+      throw new StandardException("Unsupported FETCH");
+    if (cursor.getUpdateMode() == CursorNode.UpdateMode.UPDATE)
+      throw new StandardException("Unsupported FOR UPDATE");
+
+    SelectNode select = (SelectNode)cursor.getResultSetNode();
+    if (select.getGroupByList() != null)
+      throw new StandardException("Unsupported GROUP BY");
+    if (select.isDistinct())
+      throw new StandardException("Unsupported DISTINCT");
+    if (select.hasWindows())
+      throw new StandardException("Unsupported WINDOW");
+
+    UserTable shallowestTable = null, queryTable = null, deepestTable = null;
+    List<HapiPredicate> predicates = new ArrayList<HapiPredicate>();
+    List<Column> columns = new ArrayList<Column>();
+
+    GroupBinding group = null;
+    for (FromTable fromTable : select.getFromList()) {
+      if (!(fromTable instanceof FromBaseTable))
+        throw new StandardException("Unsupported FROM non-table: " + fromTable);
+      TableBinding tb = (TableBinding)fromTable.getUserData();
+      if (tb == null) 
+        throw new StandardException("Unsupported FROM table: " + fromTable);
+      GroupBinding gb = tb.getGroupBinding();
+      if (gb == null)
+        throw new StandardException("Unsupported FROM non-group: " + fromTable);
+      if (group == null)
+        group = gb;
+      else if (group != gb)
+        throw new StandardException("Unsupported multiple groups");
+      UserTable table = (UserTable)tb.getTable();
+      checkDepth:
+      if (shallowestTable == null)
+        shallowestTable = deepestTable = table;
+      else {
+        if (table != shallowestTable) {
+          if (isAncestorTable(table, shallowestTable))
+            shallowestTable = table; // Going shallower
+          else if (isAncestorTable(shallowestTable, table)) {
+            if (shallowestTable == deepestTable) {
+              deepestTable = table; // Going deeper
+              break checkDepth;
+            }
+          }
+          else
+            throw new StandardException("Unsupported branching group");
+        }
+        if (table != deepestTable) {
+          if (isAncestorTable(deepestTable, table))
+            deepestTable = table; // Going deeper
+          else if (!isAncestorTable(table, deepestTable))
+            throw new StandardException("Unsupported branching group");
+        }
+      }
+    }
+
+    for (ResultColumn result : select.getResultColumns()) {
+      if (!(result.getExpression() instanceof ColumnReference))
+        throw new StandardException("Unsupported result column: " + result);
+      ColumnReference cref = (ColumnReference)result.getExpression();
+      ColumnBinding cb = (ColumnBinding)cref.getUserData();
+      if (cb == null)
+        throw new StandardException("Unsupported result column: " + result);
+      Column column = cb.getColumn();
+      if (column == null)
+        throw new StandardException("Unsupported result column: " + result);
+      columns.add(column);
+    }
+
+    ValueNode whereClause = select.getWhereClause();
+    while (whereClause != null) {
+      if (whereClause.isBooleanTrue()) break;
+      if (!(whereClause instanceof AndNode))
+        throw new StandardException("Unsupported complex WHERE");
+      AndNode andNode = (AndNode)whereClause;
+      ValueNode condition = andNode.getLeftOperand();
+      HapiPredicate.Operator op;
+      switch (condition.getNodeType()) {
+      case NodeTypes.BINARY_EQUALS_OPERATOR_NODE:
+        op = HapiPredicate.Operator.EQ;
+        break;
+      case NodeTypes.BINARY_GREATER_THAN_OPERATOR_NODE:
+        op = HapiPredicate.Operator.GT;
+        break;
+      case NodeTypes.BINARY_GREATER_EQUALS_OPERATOR_NODE:
+        op = HapiPredicate.Operator.GTE;
+        break;
+      case NodeTypes.BINARY_LESS_THAN_OPERATOR_NODE:
+        op = HapiPredicate.Operator.LT;
+        break;
+      case NodeTypes.BINARY_LESS_EQUALS_OPERATOR_NODE:
+        op = HapiPredicate.Operator.LTE;
+        break;
+      default:
+        throw new StandardException("Unsupported WHERE predicate");
+      }
+      BinaryOperatorNode binop = (BinaryOperatorNode)condition;
+      ValueNode leftOperand = binop.getLeftOperand();
+      ValueNode rightOperand = binop.getRightOperand();
+      Column column;
+      if (!(leftOperand instanceof ColumnReference) ||
+          (leftOperand.getUserData() == null))
+        throw new StandardException("Unsupported WHERE predicate on non-column");
+      column = ((ColumnBinding)leftOperand.getUserData()).getColumn();
+      if (column == null)
+        throw new StandardException("Unsupported WHERE predicate on non-column");
+      if (rightOperand instanceof ConstantNode)
+        predicates.add(new PostgresHapiPredicate(column, op,
+                                                 ((ConstantNode)
+                                                  rightOperand).getValue().toString()));
+      else if (rightOperand instanceof ParameterNode)
+        predicates.add(new PostgresHapiPredicate(column, op,
+                                                 ((ParameterNode)
+                                                  rightOperand).getParameterNumber()));
+      whereClause = andNode.getRightOperand();
+    }
+
+    return new PostgresHapiRequest(shallowestTable, queryTable, deepestTable,
+                                   predicates, columns);
+  }
+
+  /** Is t1 an ancestor of t2? */
+  static boolean isAncestorTable(UserTable t1, UserTable t2) {
+    while (true) {
+      Join j = t2.getParentJoin();
+      if (j == null)
+        return false;
+      UserTable parent = j.getParent();
+      if (parent == null)
+        return false;
+      if (parent == t1)
+        return true;
+      t2 = parent;
+    }
   }
 }

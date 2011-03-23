@@ -14,46 +14,42 @@
 
 package com.akiban.sql.pg;
 
+import com.akiban.ais.model.Column;
 import com.akiban.ais.model.TableName;
 import com.akiban.server.api.HapiPredicate;
 
 public class PostgresHapiPredicate implements HapiPredicate
 {
-  private TableName m_tableName;
-  private String m_columnName;
+  private Column m_column;
   private Operator m_op;
   private String m_value;
   private int m_parameterIndex;
 
-  public PostgresHapiPredicate(TableName tableName, String columnName,
-                               Operator op, String value) {
-    m_tableName = tableName;
-    m_columnName = columnName;
+  public PostgresHapiPredicate(Column column, Operator op, String value) {
+    m_column = column;
     m_op = op;
     m_value = value;
   }
 
-  public PostgresHapiPredicate(TableName tableName, String columnName,
+  public PostgresHapiPredicate(Column column,
                                Operator op, int parameterIndex) {
-    m_tableName = tableName;
-    m_columnName = columnName;
+    m_column = column;
     m_op = op;
     m_parameterIndex = parameterIndex;
   }
 
   public PostgresHapiPredicate(PostgresHapiPredicate other, String value) {
-    m_tableName = other.m_tableName;
-    m_columnName = other.m_columnName;
+    m_column = other.m_column;
     m_op = other.m_op;
     m_value = value;
   }
                                
   public TableName getTableName() {
-    return m_tableName;
+    return m_column.getUserTable().getName();
   }
 
   public String getColumnName() {
-    return m_columnName;
+    return m_column.getName();
   }
 
   public Operator getOp() {
