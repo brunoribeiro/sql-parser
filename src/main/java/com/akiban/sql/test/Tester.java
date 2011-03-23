@@ -26,6 +26,8 @@ import com.akiban.sql.compiler.SubqueryFlattener;
 import com.akiban.sql.compiler.TypeComputer;
 import com.akiban.sql.views.ViewDefinition;
 
+import com.akiban.ais.ddl.SchemaDef;
+import com.akiban.ais.ddl.SchemaDefToAis;
 import com.akiban.ais.model.AkibanInformationSchema;
 
 import java.util.*;
@@ -114,8 +116,9 @@ public class Tester
   }
 
   public void setSchema(String sql) throws Exception {
-    AkibanInformationSchema ais = new com.akiban.ais.ddl.DDLSource()
-      .buildAISFromString("use user; " + sql);
+    SchemaDef schemaDef = SchemaDef.parseSchema("use user; " + sql);
+    SchemaDefToAis toAis = new SchemaDefToAis(schemaDef, false);
+    AkibanInformationSchema ais = toAis.getAis();
     binder = new AISBinder(ais, "user");
   }
 
