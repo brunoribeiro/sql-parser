@@ -16,6 +16,9 @@ package com.akiban.sql.pg;
 
 import com.akiban.server.service.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.*;
 import java.io.*;
 import java.util.*;
@@ -26,6 +29,7 @@ import java.util.*;
  * Also keeps global state for shutdown and inter-connection communication like cancel.
 */
 public class PostgresServer implements Runnable {
+  private static final Logger LOG = LoggerFactory.getLogger(PostgresServer.class);
   public static final int DEFAULT_PORT = 15432; // Real one is 5432
   
   private int m_port = DEFAULT_PORT;
@@ -68,7 +72,7 @@ public class PostgresServer implements Runnable {
   }
 
   public void run() {
-    System.out.println("Listening on port " + m_port);
+    LOG.warn("Postgres server listening on port {}", m_port);
     int pid = 0;
     Random rand = new Random();
     try {
@@ -88,7 +92,7 @@ public class PostgresServer implements Runnable {
     }
     catch (Exception ex) {
       if (m_running)
-        ex.printStackTrace(System.err);
+        LOG.warn("Error in server", ex);
     }
     finally {
       if (m_socket != null) {

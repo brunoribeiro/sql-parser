@@ -14,6 +14,9 @@
 
 package com.akiban.sql.pg;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.*;
 import java.io.*;
 import java.util.*;
@@ -25,6 +28,8 @@ import java.util.*;
  */
 public class PostgresServerConnection implements Runnable
 {
+  private static final Logger LOG = LoggerFactory.getLogger(PostgresServerConnection.class);
+
   static class DummyPreparedStatement {
     String m_sql;
     int[] m_paramTypes;
@@ -87,7 +92,7 @@ public class PostgresServerConnection implements Runnable
       topLevel();
     }
     catch (Exception ex) {
-      ex.printStackTrace(System.err);
+      LOG.warn("Error in server", ex);
     }
     finally {
       try {
@@ -99,7 +104,7 @@ public class PostgresServerConnection implements Runnable
   }
 
   protected void topLevel() throws Exception {
-    System.out.println("Connect from " + m_socket.getRemoteSocketAddress());
+    LOG.warn("Connect from {}" + m_socket.getRemoteSocketAddress());
     m_messenger.readMessage(false);
     processStartupMessage();
     while (m_running) {
@@ -147,7 +152,7 @@ public class PostgresServerConnection implements Runnable
       return;
     default:
       m_version = version;
-      System.out.println("Version " + (version >> 16) + "." + (version & 0xFFFF));
+      LOG.warn("Version {}.{}", (version >> 16), (version & 0xFFFF));
     }
     m_properties = new Properties();
     while (true) {
@@ -156,7 +161,7 @@ public class PostgresServerConnection implements Runnable
       String value = m_messenger.readString();
       m_properties.put(param, value);
     }
-    System.out.println(m_properties);
+    LOG.warn("Properties: {}", m_properties);
     String enc = m_properties.getProperty("client_encoding");
     if (enc != null) {
       if ("UNICODE".equals(enc))
@@ -188,7 +193,7 @@ public class PostgresServerConnection implements Runnable
   protected void processPasswordMessage() throws Exception {
     String user = m_properties.getProperty("user");
     String pass = m_messenger.readString();
-    System.out.println(user + "/" + pass);
+    LOG.warn("Login {}/{}", user, pass);
     Properties status = new Properties();
     // This is enough to make the JDBC driver happy.
     status.put("client_encoding", m_properties.getProperty("client_encoding"));
@@ -228,7 +233,7 @@ public class PostgresServerConnection implements Runnable
     for (int i = 0; i < nparams; i++)
       paramTypes[i] = m_messenger.readInt();
     m_preparedStatements.put(stmtName, new DummyPreparedStatement(query, paramTypes));
-    System.out.println(query);
+    LOG.warn("Query: {}", query);
     m_messenger.beginMessage(PostgresMessenger.PARSE_COMPLETE_TYPE);
     m_messenger.sendMessage();
   }
