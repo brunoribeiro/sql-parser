@@ -24,6 +24,7 @@ import com.akiban.ais.model.Column;
 import com.akiban.ais.model.UserTable;
 import com.akiban.server.api.DDLFunctionsImpl;
 import com.akiban.server.api.HapiPredicate;
+import com.akiban.server.api.HapiRequestException;
 import com.akiban.server.service.session.Session;
 import com.akiban.server.service.session.SessionImpl;
 
@@ -102,7 +103,7 @@ public class PostgresServerConnection implements Runnable
     }
   }
 
-  protected void topLevel() throws Exception {
+  protected void topLevel() throws IOException {
     g_logger.warn("Connect from {}" + m_socket.getRemoteSocketAddress());
     m_messenger.readMessage(false);
     processStartupMessage();
@@ -113,39 +114,53 @@ public class PostgresServerConnection implements Runnable
           continue;
         m_ignoreUntilSync = false;
       }
-      switch (type) {
-      case -1:                  // EOF
-        stop();
-        break;
-      case PostgresMessenger.PASSWORD_MESSAGE_TYPE:
-        processPasswordMessage();
-        break;
-      case PostgresMessenger.PARSE_TYPE:
-        processParse();
-        break;
-      case PostgresMessenger.BIND_TYPE:
-        processBind();
-        break;
-      case PostgresMessenger.DESCRIBE_TYPE:
-        processDescribe();
-        break;
-      case PostgresMessenger.EXECUTE_TYPE:
-        processExecute();
-        break;
-      case PostgresMessenger.SYNC_TYPE:
-        processSync();
-        break;
-      case PostgresMessenger.TERMINATE_TYPE:
-        processTerminate();
-        break;
-      default:
-        throw new Exception("Unknown message type: " + (char)type);
+      try {
+        switch (type) {
+        case -1:                  // EOF
+          stop();
+          break;
+        case PostgresMessenger.PASSWORD_MESSAGE_TYPE:
+          processPasswordMessage();
+          break;
+        case PostgresMessenger.PARSE_TYPE:
+          processParse();
+          break;
+        case PostgresMessenger.BIND_TYPE:
+          processBind();
+          break;
+        case PostgresMessenger.DESCRIBE_TYPE:
+          processDescribe();
+          break;
+        case PostgresMessenger.EXECUTE_TYPE:
+          processExecute();
+          break;
+        case PostgresMessenger.SYNC_TYPE:
+          processSync();
+          break;
+        case PostgresMessenger.TERMINATE_TYPE:
+          processTerminate();
+          break;
+        default:
+          throw new IOException("Unknown message type: " + (char)type);
+        }
+      }
+      catch (StandardException ex) {
+        g_logger.warn("Error in query", ex);
+        m_messenger.beginMessage(PostgresMessenger.ERROR_RESPONSE_TYPE);
+        m_messenger.write('S');
+        m_messenger.writeString("ERROR");
+        // TODO: Could dummy up an SQLSTATE, etc.
+        m_messenger.write('M');
+        m_messenger.writeString(ex.getMessage());
+        m_messenger.write(0);
+        m_messenger.sendMessage(true);
+        m_ignoreUntilSync = true;
       }
     }
     m_server.removeConnection(m_pid);
   }
 
-  protected void processStartupMessage() throws Exception {
+  protected void processStartupMessage() throws IOException {
     int version = m_messenger.readInt();
     switch (version) {
     case PostgresMessenger.VERSION_CANCEL:
@@ -188,7 +203,7 @@ public class PostgresServerConnection implements Runnable
     }
   }
 
-  protected void processCancelRequest() throws Exception {
+  protected void processCancelRequest() throws IOException {
     int pid = m_messenger.readInt();
     int secret = m_messenger.readInt();
     PostgresServerConnection connection = m_server.getConnection(pid);
@@ -198,11 +213,11 @@ public class PostgresServerConnection implements Runnable
     stop();                     // That's all for this connection.
   }
 
-  protected void processSSLMessage() throws Exception {
-    throw new Exception("NIY");
+  protected void processSSLMessage() throws IOException {
+    throw new IOException("NIY");
   }
 
-  protected void processPasswordMessage() throws Exception {
+  protected void processPasswordMessage() throws IOException {
     String user = m_properties.getProperty("user");
     String pass = m_messenger.readString();
     g_logger.warn("Login {}/{}", user, pass);
@@ -237,7 +252,7 @@ public class PostgresServerConnection implements Runnable
     }
   }
 
-  protected void processParse() throws Exception {
+  protected void processParse() throws IOException, StandardException {
     String stmtName = m_messenger.readString();
     String sql = m_messenger.readString();
     short nparams = m_messenger.readShort();
@@ -246,34 +261,19 @@ public class PostgresServerConnection implements Runnable
       paramTypes[i] = m_messenger.readInt();
     g_logger.warn("Parse: {}", sql);
 
-    try {
-      StatementNode stmt = m_parser.parseStatement(sql);
-      if (stmt instanceof CursorNode) {
-        PostgresHapiRequest req = m_compiler.compile((CursorNode)stmt, paramTypes);
-        m_preparedStatements.put(stmtName, req);
-      }
-      else
-        throw new StandardException("Not a SELECT");
+    StatementNode stmt = m_parser.parseStatement(sql);
+    if (stmt instanceof CursorNode) {
+      PostgresHapiRequest req = m_compiler.compile((CursorNode)stmt, paramTypes);
+      m_preparedStatements.put(stmtName, req);
     }
-    catch (StandardException ex) {
-      g_logger.warn("Error in query", ex);
-      m_messenger.beginMessage(PostgresMessenger.ERROR_RESPONSE_TYPE);
-      m_messenger.write('S');
-      m_messenger.writeString("ERROR");
-      // TODO: Could dummy up an SQLSTATE, etc.
-      m_messenger.write('M');
-      m_messenger.writeString(ex.getMessage());
-      m_messenger.write(0);
-      m_messenger.sendMessage(true);
-      m_ignoreUntilSync = true;
-      return;
-    }
+    else
+      throw new StandardException("Not a SELECT");
 
     m_messenger.beginMessage(PostgresMessenger.PARSE_COMPLETE_TYPE);
     m_messenger.sendMessage();
   }
 
-  protected void processBind() throws Exception {
+  protected void processBind() throws IOException {
     String portalName = m_messenger.readString();
     String stmtName = m_messenger.readString();
     String[] params = null;
@@ -322,7 +322,7 @@ public class PostgresServerConnection implements Runnable
     m_messenger.sendMessage();
   }
 
-  protected void processDescribe() throws Exception {
+  protected void processDescribe() throws IOException {
     byte source = m_messenger.readByte();
     String name = m_messenger.readString();
     PostgresHapiRequest req;    
@@ -334,7 +334,7 @@ public class PostgresServerConnection implements Runnable
       req = m_boundPortals.get(name);
       break;
     default:
-      throw new Exception("Unknown describe source: " + (char)source);
+      throw new IOException("Unknown describe source: " + (char)source);
     }
     m_messenger.beginMessage(PostgresMessenger.ROW_DESCRIPTION_TYPE);
     List<Column> columns = req.getColumns();
@@ -354,11 +354,17 @@ public class PostgresServerConnection implements Runnable
     m_messenger.sendMessage();
   }
 
-  protected void processExecute() throws Exception {
+  protected void processExecute() throws IOException, StandardException {
     String portalName = m_messenger.readString();
     int maxrows = m_messenger.readInt();
     PostgresHapiRequest req = m_boundPortals.get(portalName);
-    int nrows = m_outputter.run(req, maxrows);
+    int nrows;
+    try {
+      nrows = m_outputter.run(req, maxrows);
+    }
+    catch (HapiRequestException ex) {
+      throw new StandardException(ex);
+    }
     if (nrows == 0) {
       m_messenger.beginMessage(PostgresMessenger.NO_DATA_TYPE);
       m_messenger.sendMessage();
@@ -368,13 +374,13 @@ public class PostgresServerConnection implements Runnable
     m_messenger.sendMessage();
   }
 
-  protected void processSync() throws Exception {
+  protected void processSync() throws IOException {
     m_messenger.beginMessage(PostgresMessenger.READY_FOR_QUERY_TYPE);
     m_messenger.writeByte('I'); // Idle ('T' -> xact open; 'E' -> xact abort)
     m_messenger.sendMessage(true);
   }
 
-  protected void processTerminate() throws Exception {
+  protected void processTerminate() throws IOException {
     stop();
   }
 
