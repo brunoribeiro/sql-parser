@@ -30,14 +30,17 @@ public class ViewDefinition
    */
   public ViewDefinition(String sql, SQLParser parser)
       throws StandardException {
-    this.parserContext = parser;
-    this.nodeFactory = parserContext.getNodeFactory();
+    this(parser.parseStatement(sql), parser);
+  }
 
-    QueryTreeNode parsed = parser.parseStatement(sql);
+  public ViewDefinition(QueryTreeNode parsed, SQLParser parser)
+      throws StandardException {
+    parserContext = parser;
+    nodeFactory = parserContext.getNodeFactory();
     if (parsed.getNodeType() != NodeTypes.CREATE_VIEW_NODE) {
       throw new StandardException("Parsed statement was not a view");
     }
-    this.definition = (CreateViewNode)parsed;
+    definition = (CreateViewNode)parsed;
   }
 
   /** 

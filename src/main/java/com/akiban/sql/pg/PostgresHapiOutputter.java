@@ -31,87 +31,87 @@ import java.io.*;
 import java.util.*;
 
 public class PostgresHapiOutputter implements HapiOutputter {
-  private PostgresServer m_server;
+  private PostgresMessenger m_messenger;
   private PostgresHapiRequest m_request;
   private Session m_session;
 
-  public PostgresHapiOutputter(PostgresServer server) {
-    m_server = server;
+  public PostgresHapiOutputter(PostgresMessenger messenger) {
+    m_messenger = messenger;
     m_session = new SessionImpl();
   }
 
-  public void run(Session session, PostgresHapiRequest request) 
-      throws HapiRequestException {
+  public void run(PostgresHapiRequest request) throws HapiRequestException {
     m_request = request;
+    // null for OutputStream, since we use the higher level messenger.
     Scanrows.instance().processRequest(m_session, request, this, null);
   }
-
-  int m_ncols;
-  int[] m_tableIds, m_columnIds;
-  NewRow[] m_rows;
 
   public void output(HapiProcessedGetRequest request, Iterable<RowData> rows, 
               OutputStream outputStream) throws IOException {
     List<Column> columns = m_request.getColumns();
-    m_ncols = columns.size();
-    m_tableIds = new int[m_ncols];
-    m_columnIds = new int[m_ncols];
-    for (int i = 0; i < m_ncols; i++) {
-      m_tableIds[i] = m_columnIds[i] = -1;
+    int ncols = columns.size();
+    int[] tableIds = new int[ncols];
+    int[] columnIds = new int[ncols];
+    for (int i = 0; i < ncols; i++) {
+      tableIds[i] = columnIds[i] = -1;
     }
     int ntables = 256;          // TODO: From where?
-    m_rows = new NewRow[ntables];
+    byte[][] outputData = new byte[ncols][];
     boolean[] processedTableIds = new boolean[ntables];
-    int queryTableId = -1;
+    int outputTableId = -1;
     for (RowData rowData : rows) {
+      if (m_messenger.isCancel()) 
+        return;
       NewRow row = new LegacyRowWrapper(rowData).niceRow();
       int tableId = row.getTableId();
       if (!processedTableIds[tableId]) {
         RowDef rowDef = row.getRowDef();
         UserTable table = rowDef.userTable();
-        if (table.getName().equals(request.getUsingTable()))
-          queryTableId = tableId;
-        for (int i = 0; i < m_ncols; i++) {
+        if (table == m_request.getDeepestTable())
+          outputTableId = tableId;
+        for (int i = 0; i < ncols; i++) {
           Column column = columns.get(i);
-          if (column.getTable().equals(table)) {
-            m_tableIds[i] = tableId;
-            m_columnIds[i] = column.getPosition();
+          if (column.getTable() == table) {
+            tableIds[i] = tableId;
+            columnIds[i] = column.getPosition();
           }
         }
         processedTableIds[tableId] = true;
       }
+      for (int i = 0; i < ncols; i++) {
+        if (tableIds[i] == tableId) {
+          Object value = row.get(columnIds[i]);
+          byte[] bv = null;
+          if (value != null) {
+            if (m_request.isColumnBinary(i)) {
+              throw new IOException("Binary encoding not supported yet.");
+            }
+            else {
+              bv = value.toString().getBytes(m_messenger.getEncoding());
+            }
+          }
+          outputData[i] = bv;
+        }
+      }
+      if (tableId == outputTableId)
+        sendDataRow(outputData);
     }
   }
 
   // Send the current row, whose columns may come from ancestors.
-  protected void sendDataRow() throws IOException {
-    m_server.beginMessage(PostgresServer.DATA_ROW_TYPE);
-    m_server.writeShort(m_ncols);
-    boolean binary = false;
-    for (int i = 0; i < m_ncols; i++) {
-      Object value = null;
-      int fromTableId = m_tableIds[i];
-      if (fromTableId != -1) {
-        NewRow fromRow = m_rows[fromTableId];
-        if (fromRow != null) {
-          value = fromRow.get(m_columnIds[i]);
-        }
-      }
-      if (value == null) {
-        m_server.writeInt(-1);
+  protected void sendDataRow(byte[][] row) throws IOException {
+    m_messenger.beginMessage(PostgresMessenger.DATA_ROW_TYPE);
+    m_messenger.writeShort(row.length);
+    for (byte[] col : row) {
+      if (col == null) {
+        m_messenger.writeInt(-1);
       }
       else {
-        byte[] bv;
-        if (binary) {
-          bv = null;            // TODO: Figure out encodings.
-        }
-        else {
-          bv = value.toString().getBytes(m_server.getEncoding());
-        }
-        m_server.writeInt(bv.length);
-        m_server.write(bv);
+        m_messenger.writeInt(col.length);
+        m_messenger.write(col);
       }
     }
-    m_server.sendMessage();
+    m_messenger.sendMessage();
   }
+
 }
