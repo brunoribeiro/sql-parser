@@ -21,7 +21,9 @@ public class SQLClient
   public static void main(String[] args) throws Exception {
     Class.forName(args[0]);
     Connection conn = DriverManager.getConnection(args[1], args[2], args[3]);
-    PreparedStatement stmt = conn.prepareStatement(args[4]);
+    String sql = args[4];
+    System.out.println(sql);
+    PreparedStatement stmt = conn.prepareStatement(sql);
     for (int i = 5; i < args.length; i++) {
       stmt.setString(i - 4, args[i]);
     }

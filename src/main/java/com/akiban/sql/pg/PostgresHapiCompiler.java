@@ -160,7 +160,10 @@ public class PostgresHapiCompiler
       if (!(whereClause instanceof AndNode))
         throw new StandardException("Unsupported complex WHERE");
       AndNode andNode = (AndNode)whereClause;
+      whereClause = andNode.getRightOperand();
       ValueNode condition = andNode.getLeftOperand();
+      if (m_grouper.getJoinConditions().contains(condition))
+        continue;
       HapiPredicate.Operator op;
       switch (condition.getNodeType()) {
       case NodeTypes.BINARY_EQUALS_OPERATOR_NODE:
@@ -204,7 +207,6 @@ public class PostgresHapiCompiler
         predicates.add(new PostgresHapiPredicate(column, op,
                                                  ((ParameterNode)
                                                   rightOperand).getParameterNumber()));
-      whereClause = andNode.getRightOperand();
     }
 
     if (queryTable == null)

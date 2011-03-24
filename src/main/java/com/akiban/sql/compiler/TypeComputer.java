@@ -85,6 +85,9 @@ public class TypeComputer implements Visitor
     ValueNode rightOperand = node.getRightOperand();
     DataTypeDescriptor leftType = leftOperand.getType();
     DataTypeDescriptor rightType = rightOperand.getType();
+    if (leftType == null) 
+      return rightType;
+    // TODO: rightType == null?
     if (!leftType.getTypeId().isBooleanTypeId())
       throw new StandardException("Boolean operation on non-boolean: " + 
                                   leftType.getTypeName());
@@ -178,6 +181,9 @@ public class TypeComputer implements Visitor
     ValueNode rightOperand = node.getRightOperand();
     TypeId leftTypeId = leftOperand.getTypeId();
     TypeId rightTypeId = rightOperand.getTypeId();
+
+    if ((leftTypeId == null) || (rightTypeId == null))
+      return null;
 
     // TODO: See whether this ends up being needed this way.
 

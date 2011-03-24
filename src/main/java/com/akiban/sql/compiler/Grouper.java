@@ -67,6 +67,10 @@ public class Grouper implements Visitor
   private Set<ValueNode> allJoinConditions;
   private int groupNumber;
 
+  public Set<ValueNode> getJoinConditions() {
+    return allJoinConditions;
+  }
+
   public void group(StatementNode stmt) throws StandardException {
     visitMode = VisitMode.GROUP;
     allBoundTables = new HashMap<FromTable,BoundTable>();

@@ -29,6 +29,7 @@ public class PostgresHapiPredicate implements HapiPredicate
     m_column = column;
     m_op = op;
     m_value = value;
+    m_parameterIndex = -1;
   }
 
   public PostgresHapiPredicate(Column column,
@@ -42,6 +43,7 @@ public class PostgresHapiPredicate implements HapiPredicate
     m_column = other.m_column;
     m_op = other.m_op;
     m_value = value;
+    m_parameterIndex = -1;
   }
                                
   public TableName getTableName() {

@@ -255,6 +255,8 @@ public class PostgresServerConnection implements Runnable
   protected void processParse() throws IOException, StandardException {
     String stmtName = m_messenger.readString();
     String sql = m_messenger.readString();
+    // TODO: $n might be out of order.
+    sql = sql.replaceAll("\\$.", "?");
     short nparams = m_messenger.readShort();
     int[] paramTypes = new int[nparams];
     for (int i = 0; i < nparams; i++)
@@ -322,7 +324,7 @@ public class PostgresServerConnection implements Runnable
     m_messenger.sendMessage();
   }
 
-  protected void processDescribe() throws IOException {
+  protected void processDescribe() throws IOException, StandardException {
     byte source = m_messenger.readByte();
     String name = m_messenger.readString();
     PostgresHapiRequest req;    
@@ -338,17 +340,18 @@ public class PostgresServerConnection implements Runnable
     }
     m_messenger.beginMessage(PostgresMessenger.ROW_DESCRIPTION_TYPE);
     List<Column> columns = req.getColumns();
+    List<PostgresType> types = req.getTypes();
     int ncols = columns.size();
     m_messenger.writeShort(ncols);
     for (int i = 0; i < ncols; i++) {
       Column col = columns.get(i);
+      PostgresType type = types.get(i);
       m_messenger.writeString(col.getName()); // attname
       m_messenger.writeInt(0);              // attrelid
       m_messenger.writeShort(0);            // attnum
-      // TODO: better types.
-      m_messenger.writeInt(PostgresType.VARCHAR_TYPE_OID); // atttypid
-      m_messenger.writeShort(-1);           // attlen
-      m_messenger.writeInt(0);              // atttypmod
+      m_messenger.writeInt(type.getOid()); // atttypid
+      m_messenger.writeShort(type.getLength()); // attlen
+      m_messenger.writeInt(type.getModifier()); // atttypmod
       m_messenger.writeShort(req.isColumnBinary(i) ? 1 : 0);
     }
     m_messenger.sendMessage();

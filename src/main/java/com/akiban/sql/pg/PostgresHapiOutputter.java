@@ -14,6 +14,8 @@
 
 package com.akiban.sql.pg;
 
+import com.akiban.sql.StandardException;
+
 import com.akiban.ais.model.Column;
 import com.akiban.ais.model.UserTable;
 import com.akiban.server.RowData;
@@ -53,58 +55,57 @@ public class PostgresHapiOutputter implements HapiOutputter {
 
   public void output(HapiProcessedGetRequest request, Iterable<RowData> rows, 
               OutputStream outputStream) throws IOException {
-    List<Column> columns = m_request.getColumns();
-    int ncols = columns.size();
-    int[] tableIds = new int[ncols];
-    int[] columnIds = new int[ncols];
-    for (int i = 0; i < ncols; i++) {
-      tableIds[i] = columnIds[i] = -1;
-    }
-    int ntables = 256;          // TODO: From where?
-    byte[][] outputData = new byte[ncols][];
-    boolean[] processedTableIds = new boolean[ntables];
-    int outputTableId = -1;
-    for (RowData rowData : rows) {
-      if (m_messenger.isCancel()) {
-        m_nrows = -1;
-      }
-      NewRow row = new LegacyRowWrapper(rowData).niceRow();
-      int tableId = row.getTableId();
-      if (!processedTableIds[tableId]) {
-        RowDef rowDef = row.getRowDef();
-        UserTable table = rowDef.userTable();
-        if (table == m_request.getDeepestTable())
-          outputTableId = tableId;
-        for (int i = 0; i < ncols; i++) {
-          Column column = columns.get(i);
-          if (column.getTable() == table) {
-            tableIds[i] = tableId;
-            columnIds[i] = column.getPosition();
-          }
-        }
-        processedTableIds[tableId] = true;
-      }
+    try {
+      List<Column> columns = m_request.getColumns();
+      List<PostgresType> types = m_request.getTypes();
+      int ncols = columns.size();
+      int[] tableIds = new int[ncols];
       for (int i = 0; i < ncols; i++) {
-        if (tableIds[i] == tableId) {
-          Object value = row.get(columnIds[i]);
-          byte[] bv = null;
-          if (value != null) {
-            if (m_request.isColumnBinary(i)) {
-              throw new IOException("Binary encoding not supported yet.");
-            }
-            else {
-              bv = value.toString().getBytes(m_messenger.getEncoding());
+        tableIds[i] = -1;
+      }
+      int ntables = 256;          // TODO: From where?
+      byte[][] outputData = new byte[ncols][];
+      boolean[] processedTableIds = new boolean[ntables];
+      int outputTableId = -1;
+      for (RowData rowData : rows) {
+        if (m_messenger.isCancel()) {
+          m_nrows = -1;
+        }
+        NewRow row = new LegacyRowWrapper(rowData).niceRow();
+        int tableId = row.getTableId();
+        if (!processedTableIds[tableId]) {
+          RowDef rowDef = row.getRowDef();
+          UserTable table = rowDef.userTable();
+          if (table == m_request.getDeepestTable())
+            outputTableId = tableId;
+          for (int i = 0; i < ncols; i++) {
+            Column column = columns.get(i);
+            if (column.getTable() == table) {
+              tableIds[i] = tableId;
             }
           }
-          outputData[i] = bv;
+          processedTableIds[tableId] = true;
+        }
+        for (int i = 0; i < ncols; i++) {
+          if (tableIds[i] == tableId) {
+            Column column = columns.get(i);
+            Object value = row.get(column.getPosition());
+            PostgresType type = types.get(i);
+            outputData[i] = type.encodeValue(value, column, 
+                                             m_messenger.getEncoding(),
+                                             m_request.isColumnBinary(i));
+          }
+        }
+        if (tableId == outputTableId) {
+          sendDataRow(outputData);
+          m_nrows++;
+          if ((m_maxrows > 0) && (m_nrows >= m_maxrows))
+            return;
         }
       }
-      if (tableId == outputTableId) {
-        sendDataRow(outputData);
-        m_nrows++;
-        if ((m_maxrows > 0) && (m_nrows >= m_maxrows))
-          return;
-      }
+    }
+    catch (StandardException ex) {
+      throw new IOException(ex);
     }
   }
 

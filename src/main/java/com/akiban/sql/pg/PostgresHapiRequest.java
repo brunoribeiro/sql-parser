@@ -14,6 +14,8 @@
 
 package com.akiban.sql.pg;
 
+import com.akiban.sql.StandardException;
+
 import com.akiban.ais.model.Column;
 import com.akiban.ais.model.TableName;
 import com.akiban.ais.model.UserTable;
@@ -31,6 +33,7 @@ public class PostgresHapiRequest implements HapiGetRequest
   private UserTable m_shallowestTable, m_queryTable, m_deepestTable;
   private List<HapiPredicate> m_predicates; // All on m_queryTable.
   private List<Column> m_columns; // Any from m_shallowestTable through m_deepestTable.
+  private List<PostgresType> m_types;
 
   public PostgresHapiRequest(UserTable shallowestTable, UserTable queryTable, 
                              UserTable deepestTable,
@@ -58,6 +61,16 @@ public class PostgresHapiRequest implements HapiGetRequest
 
   public boolean isColumnBinary(int i) {
     return false;
+  }
+
+  public List<PostgresType> getTypes() throws StandardException {
+    if (m_types == null) {
+      m_types = new ArrayList<PostgresType>(m_columns.size());
+      for (Column column : m_columns) {
+        m_types.add(PostgresType.fromAIS(column));
+      }
+    }
+    return m_types;
   }
 
   /*** HapiGetRequest ***/
@@ -93,4 +106,5 @@ public class PostgresHapiRequest implements HapiGetRequest
   public List<HapiPredicate> getPredicates() {
     return m_predicates;
   }
+
 }
