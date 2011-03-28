@@ -122,6 +122,9 @@ public class PostgresServerConnection implements Runnable
         case PostgresMessenger.PASSWORD_MESSAGE_TYPE:
           processPasswordMessage();
           break;
+        case PostgresMessenger.QUERY_TYPE:
+          processQuery();
+          break;
         case PostgresMessenger.PARSE_TYPE:
           processParse();
           break;
@@ -136,6 +139,9 @@ public class PostgresServerConnection implements Runnable
           break;
         case PostgresMessenger.SYNC_TYPE:
           processSync();
+          break;
+        case PostgresMessenger.CLOSE_TYPE:
+          processClose();
           break;
         case PostgresMessenger.TERMINATE_TYPE:
           processTerminate();
@@ -223,7 +229,7 @@ public class PostgresServerConnection implements Runnable
     g_logger.warn("Login {}/{}", user, pass);
     Properties status = new Properties();
     // This is enough to make the JDBC driver happy.
-    status.put("client_encoding", m_properties.getProperty("client_encoding"));
+    status.put("client_encoding", m_properties.getProperty("client_encoding", "UNICODE"));
     status.put("server_encoding", m_messenger.getEncoding());
     status.put("server_version", "8.4.7"); // Not sure what the min it'll accept is.
     status.put("session_authorization", user);
@@ -250,6 +256,33 @@ public class PostgresServerConnection implements Runnable
       m_messenger.writeByte('I'); // Idle ('T' -> xact open; 'E' -> xact abort)
       m_messenger.sendMessage(true);
     }
+  }
+
+  // ODBC driver sends this at the start; returning no rows is fine (and normal).
+  public static final String ODBC_LO_TYPE_QUERY = "select oid, typbasetype from pg_type where typname = 'lo'";
+
+  protected void processQuery() throws IOException, StandardException {
+    String sql = m_messenger.readString();
+    g_logger.warn("Query: {}", sql);
+    if (!sql.equals(ODBC_LO_TYPE_QUERY)) {
+      StatementNode stmt = m_parser.parseStatement(sql);
+      if (!(stmt instanceof CursorNode))
+        throw new StandardException("Not a SELECT");
+      PostgresHapiRequest req = m_compiler.compile((CursorNode)stmt, null);
+      sendRowDescription(req);
+      try {
+        int nrows = m_outputter.run(req, -1);
+      }
+      catch (HapiRequestException ex) {
+        throw new StandardException(ex);
+      }
+    }
+    m_messenger.beginMessage(PostgresMessenger.COMMAND_COMPLETE_TYPE);
+    m_messenger.writeString("SELECT");
+    m_messenger.sendMessage();
+    m_messenger.beginMessage(PostgresMessenger.READY_FOR_QUERY_TYPE);
+    m_messenger.writeByte('I');
+    m_messenger.sendMessage(true);
   }
 
   protected void processParse() throws IOException, StandardException {
@@ -338,6 +371,18 @@ public class PostgresServerConnection implements Runnable
     default:
       throw new IOException("Unknown describe source: " + (char)source);
     }
+    if (false) {
+      // This would be for a query not returning data.
+      m_messenger.beginMessage(PostgresMessenger.NO_DATA_TYPE);
+      m_messenger.sendMessage();
+    }
+    else {
+      sendRowDescription(req);
+    }
+  }
+
+  protected void sendRowDescription(PostgresHapiRequest req) 
+      throws IOException, StandardException {
     m_messenger.beginMessage(PostgresMessenger.ROW_DESCRIPTION_TYPE);
     List<Column> columns = req.getColumns();
     List<PostgresType> types = req.getTypes();
@@ -361,16 +406,11 @@ public class PostgresServerConnection implements Runnable
     String portalName = m_messenger.readString();
     int maxrows = m_messenger.readInt();
     PostgresHapiRequest req = m_boundPortals.get(portalName);
-    int nrows;
     try {
-      nrows = m_outputter.run(req, maxrows);
+      int nrows = m_outputter.run(req, maxrows);
     }
     catch (HapiRequestException ex) {
       throw new StandardException(ex);
-    }
-    if (nrows == 0) {
-      m_messenger.beginMessage(PostgresMessenger.NO_DATA_TYPE);
-      m_messenger.sendMessage();
     }
     m_messenger.beginMessage(PostgresMessenger.COMMAND_COMPLETE_TYPE);
     m_messenger.writeString("SELECT");
@@ -383,6 +423,24 @@ public class PostgresServerConnection implements Runnable
     m_messenger.sendMessage(true);
   }
 
+  protected void processClose() throws IOException {
+    byte source = m_messenger.readByte();
+    String name = m_messenger.readString();
+    PostgresHapiRequest req;    
+    switch (source) {
+    case (byte)'S':
+      req = m_preparedStatements.remove(name);
+      break;
+    case (byte)'P':
+      req = m_boundPortals.remove(name);
+      break;
+    default:
+      throw new IOException("Unknown describe source: " + (char)source);
+    }
+    m_messenger.beginMessage(PostgresMessenger.CLOSE_COMPLETE_TYPE);
+    m_messenger.sendMessage();
+  }
+  
   protected void processTerminate() throws IOException {
     stop();
   }
