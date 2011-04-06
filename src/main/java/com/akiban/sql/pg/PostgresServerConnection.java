@@ -199,7 +199,11 @@ public class PostgresServerConnection implements Runnable
     m_serviceManager = ServiceManagerImpl.get();
     m_ais = m_serviceManager.getDStarL().ddlFunctions().getAIS(m_session);
     m_parser = new SQLParser();
-    m_compiler = new PostgresHapiCompiler(m_parser, m_ais, schema);
+    if (true)
+      m_compiler = new PostgresHapiCompiler(m_parser, m_ais, schema);
+    else
+      m_compiler = new PostgresOperatorCompiler(m_parser, m_ais, schema,
+                                                m_session, m_serviceManager);
 
     {
       m_messenger.beginMessage(PostgresMessenger.AUTHENTICATION_TYPE);
