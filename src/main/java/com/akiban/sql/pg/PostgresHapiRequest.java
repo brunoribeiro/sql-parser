@@ -21,28 +21,30 @@ import com.akiban.ais.model.TableName;
 import com.akiban.ais.model.UserTable;
 import com.akiban.server.api.HapiGetRequest;
 import com.akiban.server.api.HapiPredicate;
+import com.akiban.server.api.HapiRequestException;
+import com.akiban.server.service.memcache.hprocessor.Scanrows;
+import com.akiban.server.service.session.Session;
 
 import java.util.*;
+import java.io.IOException;
 
 /**
  * An SQL SELECT transformed into a Hapi request.
  * @see PostgresHapiCompiler
  */
-public class PostgresHapiRequest implements HapiGetRequest
+public class PostgresHapiRequest extends PostgresStatement implements HapiGetRequest
 {
   private UserTable m_shallowestTable, m_queryTable, m_deepestTable;
   private List<HapiPredicate> m_predicates; // All on m_queryTable.
-  private List<Column> m_columns; // Any from m_shallowestTable through m_deepestTable.
-  private List<PostgresType> m_types;
 
   public PostgresHapiRequest(UserTable shallowestTable, UserTable queryTable, 
                              UserTable deepestTable,
                              List<HapiPredicate> predicates, List<Column> columns) {
+    super(columns);
     m_shallowestTable = shallowestTable;
     m_queryTable = queryTable;
     m_deepestTable = deepestTable;
     m_predicates = predicates;
-    m_columns = columns;
   }
 
   public UserTable getShallowestTable() {
@@ -53,24 +55,6 @@ public class PostgresHapiRequest implements HapiGetRequest
   }
   public UserTable getDeepestTable() {
     return m_deepestTable;
-  }
-
-  public List<Column> getColumns() {
-    return m_columns;
-  }
-
-  public boolean isColumnBinary(int i) {
-    return false;
-  }
-
-  public List<PostgresType> getTypes() throws StandardException {
-    if (m_types == null) {
-      m_types = new ArrayList<PostgresType>(m_columns.size());
-      for (Column column : m_columns) {
-        m_types.add(PostgresType.fromAIS(column));
-      }
-    }
-    return m_types;
   }
 
   /*** HapiGetRequest ***/
@@ -105,6 +89,72 @@ public class PostgresHapiRequest implements HapiGetRequest
 
   public List<HapiPredicate> getPredicates() {
     return m_predicates;
+  }
+
+  /** Only needed in the case where a statement has parameters or the client
+   * specifies that some results should be in binary. */
+  static class BoundRequest extends PostgresHapiRequest {
+    private boolean[] m_columnBinary; // Is this column binary format?
+    private boolean m_defaultColumnBinary;
+
+    public BoundRequest(UserTable shallowestTable, UserTable queryTable, 
+                        UserTable deepestTable,
+                        List<HapiPredicate> predicates, List<Column> columns, 
+                        boolean[] columnBinary, boolean defaultColumnBinary) {
+      super(shallowestTable, queryTable, deepestTable, predicates, columns);
+      m_columnBinary = columnBinary;
+      m_defaultColumnBinary = defaultColumnBinary;
+    }
+
+    public boolean isColumnBinary(int i) {
+      if ((m_columnBinary != null) && (i < m_columnBinary.length))
+        return m_columnBinary[i];
+      else
+        return m_defaultColumnBinary;
+    }
+  }
+
+  /** Get a bound version of a predicate by applying given parameters
+   * and requested result formats. */
+  @Override
+  public PostgresStatement getBoundRequest(String[] parameters,
+                                           boolean[] columnBinary, 
+                                           boolean defaultColumnBinary) {
+    if ((parameters == null) && 
+        (columnBinary == null) && (defaultColumnBinary == false))
+      return this;    // Can be reused.
+
+    List<HapiPredicate> unboundPredicates, boundPredicates;
+    unboundPredicates = getPredicates();
+    boundPredicates = unboundPredicates;
+    if (parameters != null) {
+      boundPredicates = new ArrayList<HapiPredicate>(unboundPredicates);
+      for (int i = 0; i < boundPredicates.size(); i++) {
+        PostgresHapiPredicate pred = (PostgresHapiPredicate)boundPredicates.get(i);
+        if (pred.getParameterIndex() >= 0) {
+          pred = new PostgresHapiPredicate(pred, parameters[pred.getParameterIndex()]);
+          boundPredicates.set(i, pred);
+        }
+      }
+    }
+    return new BoundRequest(getShallowestTable(), getQueryTable(), getDeepestTable(), 
+                            boundPredicates, getColumns(), 
+                            columnBinary, defaultColumnBinary);
+  }
+
+  @Override
+  public int execute(PostgresMessenger messenger, Session session, int maxrows) 
+      throws IOException, StandardException {
+    PostgresHapiOutputter outputter = new PostgresHapiOutputter(messenger, session,
+                                                                this, maxrows);
+    // null as OutputStream, since we use the higher level messenger.
+    try {
+      Scanrows.instance().processRequest(session, this, outputter, null);
+    }
+    catch (HapiRequestException ex) {
+      throw new StandardException(ex);
+    }
+    return outputter.getNRows();
   }
 
 }

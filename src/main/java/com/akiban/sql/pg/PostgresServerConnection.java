@@ -22,9 +22,8 @@ import com.akiban.sql.parser.CursorNode;
 import com.akiban.ais.model.AkibanInformationSchema;
 import com.akiban.ais.model.Column;
 import com.akiban.ais.model.UserTable;
-import com.akiban.server.api.DDLFunctionsImpl;
-import com.akiban.server.api.HapiPredicate;
-import com.akiban.server.api.HapiRequestException;
+import com.akiban.server.service.ServiceManager;
+import com.akiban.server.service.ServiceManagerImpl;
 import com.akiban.server.service.session.Session;
 import com.akiban.server.service.session.SessionImpl;
 
@@ -51,16 +50,16 @@ public class PostgresServerConnection implements Runnable
   private int m_pid, m_secret;
   private int m_version;
   private Properties m_properties;
-  private Map<String,PostgresHapiRequest> m_preparedStatements =
-    new HashMap<String,PostgresHapiRequest>();
-  private Map<String,PostgresHapiRequest> m_boundPortals =
-    new HashMap<String,PostgresHapiRequest>();
+  private Map<String,PostgresStatement> m_preparedStatements =
+    new HashMap<String,PostgresStatement>();
+  private Map<String,PostgresStatement> m_boundPortals =
+    new HashMap<String,PostgresStatement>();
 
   private Session m_session;
+  private ServiceManager m_serviceManager;
   private AkibanInformationSchema m_ais;
   private SQLParser m_parser;
-  private PostgresHapiCompiler m_compiler;
-  private PostgresHapiOutputter m_outputter;
+  private PostgresStatementCompiler m_compiler;
 
   public PostgresServerConnection(PostgresServer server, Socket socket, 
                                   int pid, int secret) {
@@ -197,10 +196,10 @@ public class PostgresServerConnection implements Runnable
     
     String schema = m_properties.getProperty("database");
     m_session = new SessionImpl();
-    m_ais = DDLFunctionsImpl.instance().getAIS(m_session);
+    m_serviceManager = ServiceManagerImpl.get();
+    m_ais = m_serviceManager.getDStarL().ddlFunctions().getAIS(m_session);
     m_parser = new SQLParser();
     m_compiler = new PostgresHapiCompiler(m_parser, m_ais, schema);
-    m_outputter = new PostgresHapiOutputter(m_messenger, m_session);
 
     {
       m_messenger.beginMessage(PostgresMessenger.AUTHENTICATION_TYPE);
@@ -268,14 +267,9 @@ public class PostgresServerConnection implements Runnable
       StatementNode stmt = m_parser.parseStatement(sql);
       if (!(stmt instanceof CursorNode))
         throw new StandardException("Not a SELECT");
-      PostgresHapiRequest req = m_compiler.compile((CursorNode)stmt, null);
-      sendRowDescription(req);
-      try {
-        int nrows = m_outputter.run(req, -1);
-      }
-      catch (HapiRequestException ex) {
-        throw new StandardException(ex);
-      }
+      PostgresStatement pstmt = m_compiler.compile((CursorNode)stmt, null);
+      pstmt.sendRowDescription(m_messenger);
+      int nrows = pstmt.execute(m_messenger, m_session, -1);
     }
     m_messenger.beginMessage(PostgresMessenger.COMMAND_COMPLETE_TYPE);
     m_messenger.writeString("SELECT");
@@ -298,8 +292,8 @@ public class PostgresServerConnection implements Runnable
 
     StatementNode stmt = m_parser.parseStatement(sql);
     if (stmt instanceof CursorNode) {
-      PostgresHapiRequest req = m_compiler.compile((CursorNode)stmt, paramTypes);
-      m_preparedStatements.put(stmtName, req);
+      PostgresStatement pstmt = m_compiler.compile((CursorNode)stmt, paramTypes);
+      m_preparedStatements.put(stmtName, pstmt);
     }
     else
       throw new StandardException("Not a SELECT");
@@ -349,10 +343,10 @@ public class PostgresServerConnection implements Runnable
         defaultResultsBinary = resultsBinary[nresults-1];
       }
     }
-    PostgresHapiRequest req = m_preparedStatements.get(stmtName);
+    PostgresStatement pstmt = m_preparedStatements.get(stmtName);
     m_boundPortals.put(portalName, 
-                       getBoundRequest(req, params, 
-                                       resultsBinary, defaultResultsBinary));
+                       pstmt.getBoundRequest(params, 
+                                             resultsBinary, defaultResultsBinary));
     m_messenger.beginMessage(PostgresMessenger.BIND_COMPLETE_TYPE);
     m_messenger.sendMessage();
   }
@@ -360,13 +354,13 @@ public class PostgresServerConnection implements Runnable
   protected void processDescribe() throws IOException, StandardException {
     byte source = m_messenger.readByte();
     String name = m_messenger.readString();
-    PostgresHapiRequest req;    
+    PostgresStatement pstmt;    
     switch (source) {
     case (byte)'S':
-      req = m_preparedStatements.get(name);
+      pstmt = m_preparedStatements.get(name);
       break;
     case (byte)'P':
-      req = m_boundPortals.get(name);
+      pstmt = m_boundPortals.get(name);
       break;
     default:
       throw new IOException("Unknown describe source: " + (char)source);
@@ -377,41 +371,15 @@ public class PostgresServerConnection implements Runnable
       m_messenger.sendMessage();
     }
     else {
-      sendRowDescription(req);
+      pstmt.sendRowDescription(m_messenger);
     }
-  }
-
-  protected void sendRowDescription(PostgresHapiRequest req) 
-      throws IOException, StandardException {
-    m_messenger.beginMessage(PostgresMessenger.ROW_DESCRIPTION_TYPE);
-    List<Column> columns = req.getColumns();
-    List<PostgresType> types = req.getTypes();
-    int ncols = columns.size();
-    m_messenger.writeShort(ncols);
-    for (int i = 0; i < ncols; i++) {
-      Column col = columns.get(i);
-      PostgresType type = types.get(i);
-      m_messenger.writeString(col.getName()); // attname
-      m_messenger.writeInt(0);              // attrelid
-      m_messenger.writeShort(0);            // attnum
-      m_messenger.writeInt(type.getOid()); // atttypid
-      m_messenger.writeShort(type.getLength()); // attlen
-      m_messenger.writeInt(type.getModifier()); // atttypmod
-      m_messenger.writeShort(req.isColumnBinary(i) ? 1 : 0);
-    }
-    m_messenger.sendMessage();
   }
 
   protected void processExecute() throws IOException, StandardException {
     String portalName = m_messenger.readString();
     int maxrows = m_messenger.readInt();
-    PostgresHapiRequest req = m_boundPortals.get(portalName);
-    try {
-      int nrows = m_outputter.run(req, maxrows);
-    }
-    catch (HapiRequestException ex) {
-      throw new StandardException(ex);
-    }
+    PostgresStatement pstmt = m_boundPortals.get(portalName);
+    int nrows = pstmt.execute(m_messenger, m_session, maxrows);
     m_messenger.beginMessage(PostgresMessenger.COMMAND_COMPLETE_TYPE);
     m_messenger.writeString("SELECT");
     m_messenger.sendMessage();
@@ -426,13 +394,13 @@ public class PostgresServerConnection implements Runnable
   protected void processClose() throws IOException {
     byte source = m_messenger.readByte();
     String name = m_messenger.readString();
-    PostgresHapiRequest req;    
+    PostgresStatement pstmt;    
     switch (source) {
     case (byte)'S':
-      req = m_preparedStatements.remove(name);
+      pstmt = m_preparedStatements.remove(name);
       break;
     case (byte)'P':
-      req = m_boundPortals.remove(name);
+      pstmt = m_boundPortals.remove(name);
       break;
     default:
       throw new IOException("Unknown describe source: " + (char)source);
@@ -443,60 +411,6 @@ public class PostgresServerConnection implements Runnable
   
   protected void processTerminate() throws IOException {
     stop();
-  }
-
-  /** Only needed in the case where a statement has parameters or the client
-   * specifies that some results should be in binary. */
-  static class BoundRequest extends PostgresHapiRequest {
-    private boolean[] m_columnBinary; // Is this column binary format?
-    private boolean m_defaultColumnBinary;
-
-    public BoundRequest(UserTable shallowestTable, UserTable queryTable, 
-                        UserTable deepestTable,
-                        List<HapiPredicate> predicates, List<Column> columns, 
-                        boolean[] columnBinary, boolean defaultColumnBinary) {
-      super(shallowestTable, queryTable, deepestTable, predicates, columns);
-      m_columnBinary = columnBinary;
-      m_defaultColumnBinary = defaultColumnBinary;
-    }
-
-    public boolean isColumnBinary(int i) {
-      if ((m_columnBinary != null) && (i < m_columnBinary.length))
-        return m_columnBinary[i];
-      else
-        return m_defaultColumnBinary;
-    }
-  }
-
-  /** Get a bound version of a predicate by applying given parameters
-   * and requested result formats. */
-  protected PostgresHapiRequest getBoundRequest(PostgresHapiRequest unboundRequest,
-                                                String[] parameters,
-                                                boolean[] columnBinary, 
-                                                boolean defaultColumnBinary) {
-    if ((parameters == null) && 
-        (columnBinary == null) && (defaultColumnBinary == false))
-      return unboundRequest;    // Can be reused.
-
-    List<HapiPredicate> unboundPredicates, boundPredicates;
-    unboundPredicates = unboundRequest.getPredicates();
-    boundPredicates = unboundPredicates;
-    if (parameters != null) {
-      boundPredicates = new ArrayList<HapiPredicate>(unboundPredicates);
-      for (int i = 0; i < boundPredicates.size(); i++) {
-        PostgresHapiPredicate pred = (PostgresHapiPredicate)boundPredicates.get(i);
-        if (pred.getParameterIndex() >= 0) {
-          pred = new PostgresHapiPredicate(pred, parameters[pred.getParameterIndex()]);
-          boundPredicates.set(i, pred);
-        }
-      }
-    }
-    return new BoundRequest(unboundRequest.getShallowestTable(),
-                            unboundRequest.getQueryTable(),
-                            unboundRequest.getDeepestTable(),
-                            boundPredicates,
-                            unboundRequest.getColumns(),
-                            columnBinary, defaultColumnBinary);
   }
 
 }

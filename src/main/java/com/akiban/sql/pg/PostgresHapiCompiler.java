@@ -45,7 +45,7 @@ import java.util.*;
  * <li>No FOR UPDATE.</li>
  * </ul>
  */
-public class PostgresHapiCompiler
+public class PostgresHapiCompiler implements PostgresStatementCompiler
 {
   private SQLParserContext m_parserContext;
   private NodeFactory m_nodeFactory;
@@ -71,7 +71,8 @@ public class PostgresHapiCompiler
     m_binder.addView(view);
   }
 
-  public PostgresHapiRequest compile(CursorNode cursor, int[] paramTypes)
+  @Override
+  public PostgresStatement compile(CursorNode cursor, int[] paramTypes)
       throws StandardException {
     // Get into bound & grouped form.
     m_binder.bind(cursor);

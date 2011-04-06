@@ -25,7 +25,6 @@ import com.akiban.server.api.HapiProcessedGetRequest;
 import com.akiban.server.api.HapiRequestException;
 import com.akiban.server.api.dml.scan.LegacyRowWrapper;
 import com.akiban.server.api.dml.scan.NewRow;
-import com.akiban.server.service.memcache.hprocessor.Scanrows;
 import com.akiban.server.service.session.Session;
 
 import java.io.*;
@@ -37,19 +36,18 @@ public class PostgresHapiOutputter implements HapiOutputter {
   private PostgresHapiRequest m_request;
   private int m_nrows, m_maxrows;
 
-  public PostgresHapiOutputter(PostgresMessenger messenger, Session session) {
+  public PostgresHapiOutputter(PostgresMessenger messenger, Session session,
+                               PostgresHapiRequest request, int maxrows) {
     m_messenger = messenger;
     m_session = session;
-  }
-
-  /** Run this outputter for the given Hapi request and return the
-   * number of (flattened) rows that were output. */
-  public int run(PostgresHapiRequest request, int maxrows) throws HapiRequestException {
     // No way to get from HapiProcessedGetRequest to original HapiGetRequest.
     m_request = request;
+    m_maxrows = maxrows;
     m_nrows = 0;
-    // null as OutputStream, since we use the higher level messenger.
-    Scanrows.instance().processRequest(m_session, request, this, null);
+  }
+
+  /** Return the number of rows output. */
+  public int getNRows() {
     return m_nrows;
   }
 
