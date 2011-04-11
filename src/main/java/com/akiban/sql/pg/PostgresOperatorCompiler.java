@@ -31,6 +31,7 @@ import com.akiban.qp.expression.Expression;
 import com.akiban.qp.expression.Field;
 import com.akiban.qp.expression.Literal;
 import com.akiban.qp.persistitadapter.PersistitAdapter;
+import com.akiban.qp.physicaloperator.Executable;
 import com.akiban.qp.physicaloperator.Flatten_HKeyOrdered;
 import com.akiban.qp.physicaloperator.GroupScan_Default;
 import com.akiban.qp.physicaloperator.PhysicalOperator;
@@ -44,6 +45,9 @@ import com.akiban.server.service.ServiceManager;
 import com.akiban.server.service.session.Session;
 import com.akiban.server.store.PersistitStore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 /**
@@ -51,6 +55,8 @@ import java.util.*;
  */
 public class PostgresOperatorCompiler implements PostgresStatementCompiler
 {
+  private static final Logger g_logger = LoggerFactory.getLogger(PostgresOperatorCompiler.class);
+
   private SQLParserContext m_parserContext;
   private NodeFactory m_nodeFactory;
   private AISBinder m_binder;
@@ -224,7 +230,10 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       resultColumnOffsets[i] = fieldOffsets.get(table) + column.getPosition();
     }
 
-    return new PostgresOperatorStatement(resultOperator, resultRowType, 
+    g_logger.warn("Operator: {}", resultOperator);
+
+    Executable executable = new Executable(m_adapter, resultOperator);
+    return new PostgresOperatorStatement(executable, resultRowType, 
                                          resultColumns, resultColumnOffsets);
   }
 
@@ -235,8 +244,8 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
   protected Expression getExpression(ValueNode operand, 
                                      Map<UserTable,Integer> fieldOffsets)
       throws StandardException {
-    if ((operand instanceof ColumnReference) ||
-        (operand.getUserData() == null)) {
+    if ((operand instanceof ColumnReference) &&
+        (operand.getUserData() != null)) {
       Column column = ((ColumnBinding)operand.getUserData()).getColumn();
       if (column == null)
         throw new StandardException("Unsupported WHERE predicate on non-column");

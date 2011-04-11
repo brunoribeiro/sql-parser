@@ -199,7 +199,7 @@ public class PostgresServerConnection implements Runnable
     m_serviceManager = ServiceManagerImpl.get();
     m_ais = m_serviceManager.getDStarL().ddlFunctions().getAIS(m_session);
     m_parser = new SQLParser();
-    if (true)
+    if (false)
       m_compiler = new PostgresHapiCompiler(m_parser, m_ais, schema);
     else
       m_compiler = new PostgresOperatorCompiler(m_parser, m_ais, schema,

@@ -216,7 +216,7 @@
       <arg value="jdbc:postgresql://daffy:15432/mmcm"/>
       <arg value="mmcm"/>
       <arg value="mmcm"/>
-      <arg value="SELECT * FROM t1"/>
+      <arg value="SELECT * FROM customers"/>
     </java>
   </target> 
   <target name="test-sql-2" depends="compile, jvmargs">
