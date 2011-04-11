@@ -25,9 +25,20 @@ import com.akiban.ais.model.Column;
 import com.akiban.ais.model.Join;
 import com.akiban.ais.model.UserTable;
 
+import com.akiban.qp.expression.Compare;
+import com.akiban.qp.expression.Comparison;
+import com.akiban.qp.expression.Expression;
+import com.akiban.qp.expression.Field;
+import com.akiban.qp.expression.Literal;
 import com.akiban.qp.persistitadapter.PersistitAdapter;
+import com.akiban.qp.physicaloperator.Flatten_HKeyOrdered;
+import com.akiban.qp.physicaloperator.GroupScan_Default;
+import com.akiban.qp.physicaloperator.PhysicalOperator;
+import com.akiban.qp.physicaloperator.Select_HKeyOrdered;
 import com.akiban.qp.physicaloperator.StoreAdapter;
+import com.akiban.qp.rowtype.RowType;
 import com.akiban.qp.rowtype.Schema;
+import com.akiban.qp.rowtype.UserTableRowType;
 
 import com.akiban.server.service.ServiceManager;
 import com.akiban.server.service.session.Session;
@@ -72,6 +83,186 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
   @Override
   public PostgresStatement compile(CursorNode cursor, int[] paramTypes)
       throws StandardException {
-    return null;
+    // Get into bound & grouped form.
+    m_binder.bind(cursor);
+    cursor = (CursorNode)m_booleanNormalizer.normalize(cursor);
+    m_typeComputer.compute(cursor);
+    cursor = (CursorNode)m_subqueryFlattener.flatten(cursor);
+    m_grouper.group(cursor);
+
+    if (cursor.getOrderByList() != null)
+      throw new StandardException("Unsupported ORDER BY");
+    if (cursor.getOffsetClause() != null)
+      throw new StandardException("Unsupported OFFSET");
+    if (cursor.getFetchFirstClause() != null)
+      throw new StandardException("Unsupported FETCH");
+    if (cursor.getUpdateMode() == CursorNode.UpdateMode.UPDATE)
+      throw new StandardException("Unsupported FOR UPDATE");
+
+    SelectNode select = (SelectNode)cursor.getResultSetNode();
+    if (select.getGroupByList() != null)
+      throw new StandardException("Unsupported GROUP BY");
+    if (select.isDistinct())
+      throw new StandardException("Unsupported DISTINCT");
+    if (select.hasWindows())
+      throw new StandardException("Unsupported WINDOW");
+
+    List<UserTable> tables = new ArrayList<UserTable>();
+    GroupBinding group = null;
+    for (FromTable fromTable : select.getFromList()) {
+      if (!(fromTable instanceof FromBaseTable))
+        throw new StandardException("Unsupported FROM non-table: " + fromTable);
+      TableBinding tb = (TableBinding)fromTable.getUserData();
+      if (tb == null) 
+        throw new StandardException("Unsupported FROM table: " + fromTable);
+      GroupBinding gb = tb.getGroupBinding();
+      if (gb == null)
+        throw new StandardException("Unsupported FROM non-group: " + fromTable);
+      if (group == null)
+        group = gb;
+      else if (group != gb)
+        throw new StandardException("Unsupported multiple groups");
+      UserTable table = (UserTable)tb.getTable();
+      tables.add(table);
+    }
+    PhysicalOperator resultOperator = 
+      new GroupScan_Default(m_adapter,
+                            group.getGroup().getGroupTable());
+    RowType resultRowType = null;
+    Map<UserTable,Integer> fieldOffsets = new HashMap<UserTable,Integer>();
+    if (tables.size() == 1) {
+      UserTable table = tables.get(0);
+      resultRowType = userTableRowType(table);
+      fieldOffsets.put(table, 0);
+    }
+    else {
+      Collections.sort(tables, new Comparator<UserTable>() {
+                         public int compare(UserTable t1, UserTable t2) {
+                           return t1.getDepth().compareTo(t2.getDepth());
+                         }
+                       });
+      UserTable prev = null;
+      int nfields = 0;
+      for (UserTable table : tables) {
+        if (prev != null) {
+          if (!isAncestorTable(prev, table))
+            throw new StandardException("Unsupported branching group");
+          // Join result so far to new child.
+          Flatten_HKeyOrdered flatten = 
+            new Flatten_HKeyOrdered(resultOperator,
+                                    resultRowType,
+                                    userTableRowType(table));
+          resultOperator = flatten;
+          resultRowType = flatten.rowType();
+        }
+        else {
+          resultRowType = userTableRowType(table);
+        }
+        prev = table;
+        fieldOffsets.put(table, nfields);
+        nfields += table.getColumns().size();
+      }
+    }
+
+    ValueNode whereClause = select.getWhereClause();
+    while (whereClause != null) {
+      if (whereClause.isBooleanTrue()) break;
+      if (!(whereClause instanceof AndNode))
+        throw new StandardException("Unsupported complex WHERE");
+      AndNode andNode = (AndNode)whereClause;
+      whereClause = andNode.getRightOperand();
+      ValueNode condition = andNode.getLeftOperand();
+      if (m_grouper.getJoinConditions().contains(condition))
+        continue;
+      Comparison op;
+      switch (condition.getNodeType()) {
+      case NodeTypes.BINARY_EQUALS_OPERATOR_NODE:
+        op = Comparison.EQ;
+        break;
+      case NodeTypes.BINARY_GREATER_THAN_OPERATOR_NODE:
+        op = Comparison.GT;
+        break;
+      case NodeTypes.BINARY_GREATER_EQUALS_OPERATOR_NODE:
+        op = Comparison.GE;
+        break;
+      case NodeTypes.BINARY_LESS_THAN_OPERATOR_NODE:
+        op = Comparison.LT;
+        break;
+      case NodeTypes.BINARY_LESS_EQUALS_OPERATOR_NODE:
+        op = Comparison.LE;
+        break;
+      default:
+        throw new StandardException("Unsupported WHERE predicate");
+      }
+      BinaryOperatorNode binop = (BinaryOperatorNode)condition;
+      Expression leftExpr = getExpression(binop.getLeftOperand(), fieldOffsets);
+      Expression rightExpr = getExpression(binop.getRightOperand(), fieldOffsets);
+      Compare predicate = new Compare(leftExpr, op, rightExpr);
+      resultOperator = new Select_HKeyOrdered(resultOperator,
+                                              resultRowType,
+                                              predicate);
+    }
+
+    List<Column> resultColumns = new ArrayList<Column>();
+    for (ResultColumn result : select.getResultColumns()) {
+      if (!(result.getExpression() instanceof ColumnReference))
+        throw new StandardException("Unsupported result column: " + result);
+      ColumnReference cref = (ColumnReference)result.getExpression();
+      ColumnBinding cb = (ColumnBinding)cref.getUserData();
+      if (cb == null)
+        throw new StandardException("Unsupported result column: " + result);
+      Column column = cb.getColumn();
+      if (column == null)
+        throw new StandardException("Unsupported result column: " + result);
+      resultColumns.add(column);
+    }
+    int ncols = resultColumns.size();
+    int[] resultColumnOffsets = new int[ncols];
+    for (int i = 0; i < ncols; i++) {
+      Column column = resultColumns.get(i);
+      UserTable table = column.getUserTable();
+      resultColumnOffsets[i] = fieldOffsets.get(table) + column.getPosition();
+    }
+
+    return new PostgresOperatorStatement(resultOperator, resultRowType, 
+                                         resultColumns, resultColumnOffsets);
+  }
+
+  protected UserTableRowType userTableRowType(UserTable table) {
+    return m_adapter.schema().userTableRowType(table);
+  }
+
+  protected Expression getExpression(ValueNode operand, 
+                                     Map<UserTable,Integer> fieldOffsets)
+      throws StandardException {
+    if ((operand instanceof ColumnReference) ||
+        (operand.getUserData() == null)) {
+      Column column = ((ColumnBinding)operand.getUserData()).getColumn();
+      if (column == null)
+        throw new StandardException("Unsupported WHERE predicate on non-column");
+      UserTable table = column.getUserTable();
+      return new Field(fieldOffsets.get(table) + column.getPosition());
+    }
+    else if (operand instanceof ConstantNode) {
+      return new Literal(((ConstantNode)operand).getValue());
+    }
+    // TODO: Parameters: Literals but with later substitution somehow.
+    else
+      throw new StandardException("Unsupported WHERE predicate on non-constant");
+  }
+
+  /** Is t1 an ancestor of t2? */
+  protected static boolean isAncestorTable(UserTable t1, UserTable t2) {
+    while (true) {
+      Join j = t2.getParentJoin();
+      if (j == null)
+        return false;
+      UserTable parent = j.getParent();
+      if (parent == null)
+        return false;
+      if (parent == t1)
+        return true;
+      t2 = parent;
+    }
   }
 }

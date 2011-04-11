@@ -76,6 +76,7 @@
       <arg value="SELECT * FROM (SELECT z,y FROM t1) AS s"/>
       <arg value="SELECT * FROM t1 WHERE EXISTS ((VALUES 1) INTERSECT (VALUES 2))"/>
       <arg value="CREATE VIEW v1(x,y) AS (SELECT y,z FROM t1 WHERE y IS NOT NULL)"/>
+      <arg value="SELECT * FROM t1,t2 LEFT OUTER JOIN t3 ON t2.x = t3.x RIGHT OUTER JOIN t4 ON t3.x = t4.x"/>
     </java>
   </target> 
 

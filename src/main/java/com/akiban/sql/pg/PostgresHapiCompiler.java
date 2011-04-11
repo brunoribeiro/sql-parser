@@ -208,6 +208,8 @@ public class PostgresHapiCompiler implements PostgresStatementCompiler
         predicates.add(new PostgresHapiPredicate(column, op,
                                                  ((ParameterNode)
                                                   rightOperand).getParameterNumber()));
+      else
+        throw new StandardException("Unsupported WHERE predicate on non-constant");
     }
 
     if (queryTable == null)
