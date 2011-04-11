@@ -230,7 +230,7 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       resultColumnOffsets[i] = fieldOffsets.get(table) + column.getPosition();
     }
 
-    g_logger.warn("Operator: {}", resultOperator);
+    g_logger.warn("Operator:\n{}", explainPlan(resultOperator));
 
     Executable executable = new Executable(m_adapter, resultOperator);
     return new PostgresOperatorStatement(executable, resultRowType, 
@@ -274,4 +274,73 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       t2 = parent;
     }
   }
+
+  protected static String explainPlan(PhysicalOperator operator) {
+    StringBuilder sb = new StringBuilder();
+    explainPlan(operator, sb, 0);
+    return sb.toString();
+  }
+
+  protected static void explainPlan(PhysicalOperator operator, 
+                                    StringBuilder into, int depth) {
+    for (int i = 0; i < depth; i++)
+      into.append("  ");
+    if (operator instanceof Flatten_HKeyOrdered) {
+      Flatten_HKeyOrdered flatten = (Flatten_HKeyOrdered)operator;
+      into.append("Flatten_HKeyOrdered(");
+      into.append(flatten.parentType);
+      into.append(",");
+      into.append(flatten.childType);
+      into.append(")\n");
+      explainPlan(flatten.inputOperator, into, depth+1);
+    }
+    else if (operator instanceof Select_HKeyOrdered) {
+      Select_HKeyOrdered select = (Select_HKeyOrdered)operator;
+      into.append("Select_HKeyOrdered(");
+      into.append(select.predicateRowType);
+      into.append(",");
+      explainExpression(select.predicate, into);
+      into.append(")\n");
+      explainPlan(select.inputOperator, into, depth+1);
+    }
+    else if (operator instanceof GroupScan_Default) {
+      GroupScan_Default group = (GroupScan_Default)operator;
+      into.append("GroupScan_Default(");
+      into.append(group.groupTable);
+      into.append(")\n");
+    }
+    else {
+      into.append(operator);
+      into.append(")\n");
+    }
+  }
+
+  protected static void explainExpression(Expression expression,
+                                          StringBuilder into) {
+    if (expression instanceof Field) {
+      Field field = (Field)expression;
+      into.append("Field(");
+      into.append(field.position);
+      into.append(")");
+    }
+    else if (expression instanceof Literal) {
+      Literal literal = (Literal)expression;
+      into.append("Literal(");
+      into.append(literal.value);
+      into.append(")");
+    }
+    else if (expression instanceof Compare) {
+      Compare compare = (Compare)expression;
+      into.append("Compare(");
+      explainExpression(compare.left, into);
+      into.append(" ");
+      into.append(compare.comparison);
+      into.append(" ");
+      explainExpression(compare.right, into);
+      into.append(")");
+    }
+    else
+      into.append(expression);
+  }
+
 }
