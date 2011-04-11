@@ -253,7 +253,10 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       return new Field(fieldOffsets.get(table) + column.getPosition());
     }
     else if (operand instanceof ConstantNode) {
-      return new Literal(((ConstantNode)operand).getValue());
+      Object value = ((ConstantNode)operand).getValue();
+      if (value instanceof Integer)
+        value = new Long(((Integer)value).intValue());
+      return new Literal(value);
     }
     // TODO: Parameters: Literals but with later substitution somehow.
     else

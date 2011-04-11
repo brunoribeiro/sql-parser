@@ -66,8 +66,8 @@ public class PostgresOperatorStatement extends PostgresStatement
             Object field = row.field(m_resultColumnOffsets[i]);
             PostgresType type = types.get(i);
             byte[] value = type.encodeValue(field, column, 
-                                             messenger.getEncoding(),
-                                             isColumnBinary(i));
+                                            messenger.getEncoding(),
+                                            isColumnBinary(i));
             if (value == null) {
               messenger.writeInt(-1);
             }
