@@ -35,16 +35,20 @@ import com.akiban.qp.expression.IndexKeyRange;
 import static com.akiban.qp.expression.API.*;
 
 import com.akiban.qp.persistitadapter.PersistitAdapter;
+import com.akiban.qp.persistitadapter.PersistitGroupRow;
+
 import com.akiban.qp.physicaloperator.PhysicalOperator;
-import com.akiban.qp.physicaloperator.StoreAdapter;
 import static com.akiban.qp.physicaloperator.API.*;
 
 import com.akiban.qp.row.HKey;
 import com.akiban.qp.row.RowBase;
 import com.akiban.qp.rowtype.IndexKeyType;
+import com.akiban.qp.rowtype.IndexRowType;
 import com.akiban.qp.rowtype.RowType;
 import com.akiban.qp.rowtype.Schema;
 import com.akiban.qp.rowtype.UserTableRowType;
+
+import com.akiban.server.api.dml.scan.NiceRow;
 
 import com.akiban.server.service.ServiceManager;
 import com.akiban.server.service.session.Session;
@@ -69,7 +73,7 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
   private BooleanNormalizer m_booleanNormalizer;
   private SubqueryFlattener m_subqueryFlattener;
   private Grouper m_grouper;
-  private StoreAdapter m_adapter;
+  private PersistitAdapter m_adapter;
 
   public PostgresOperatorCompiler(SQLParser parser, 
                                   AkibanInformationSchema ais, String schema,
@@ -149,12 +153,12 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       // changing operand as necessary.
       index = pickBestIndex(tables, select.getWhereClause(), indexConditions);
     }
-    PhysicalOperator resultOperator, boundOperator;
-    Object resultBinding;
+    PhysicalOperator resultOperator, indexOperator;
+    IndexKeyRange indexKeyRange;
     if (index == null) {
       resultOperator = groupScan_Default(m_adapter, groupTable);
-      resultBinding = null;
-      boundOperator = null;
+      indexKeyRange = null;
+      indexOperator = null;
     }
     else {
       // All selected rows above this need to be output by hkey left
@@ -165,9 +169,9 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
           break;
         addAncestors.add(userTableRowType(table));
       }
-      boundOperator = indexScan_Default(index);
-      resultOperator = indexLookup_Default(boundOperator, groupTable, addAncestors);
-      resultBinding = getIndexKeyRange(index, indexConditions);
+      indexOperator = indexScan_Default(index);
+      resultOperator = indexLookup_Default(indexOperator, groupTable, addAncestors);
+      indexKeyRange = getIndexKeyRange(index, indexConditions);
     }
     RowType resultRowType = null;
     Map<UserTable,Integer> fieldOffsets = new HashMap<UserTable,Integer>();
@@ -256,10 +260,10 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       resultColumnOffsets[i] = fieldOffsets.get(table) + column.getPosition();
     }
 
-    g_logger.warn("Operator:\n{} {}", resultOperator, resultBinding);
+    g_logger.warn("Operator:\n{} {}", resultOperator, indexKeyRange);
 
     return new PostgresOperatorStatement(m_adapter, resultOperator, 
-                                         resultBinding, boundOperator, resultRowType, 
+                                         indexKeyRange, indexOperator, resultRowType, 
                                          resultColumns, resultColumnOffsets);
   }
 
@@ -521,52 +525,18 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
     }
   }
 
-  static class IndexKeyRow extends RowBase {
-    private RowType m_rowType;
-    private Object[] m_keys;
-
-    public IndexKeyRow(RowType rowType, Object[] keys) {
-      m_rowType = rowType;
-      m_keys = keys;
-    }
-
-    @Override
-    public RowType rowType() {
-      return m_rowType;
-    }
-
-    @Override
-    public Object field(int i) {
-      return m_keys[i];
-    }
-
-    @Override
-    public HKey hKey() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder sb = new StringBuilder();
-      sb.append("<");
-      sb.append(m_rowType);
-      sb.append(">{");
-      for (int i = 0; i < m_keys.length; i++) {
-        if (i > 0)
-          sb.append(",");
-        sb.append(m_keys[i]);
-      }
-      sb.append("}");
-      return sb.toString();
-    }
-  }
-
   protected IndexBound getIndexBound(Index index, Object[] keys) {
     if (keys == null) 
       return null;
-    IndexKeyType indexKeyType = new IndexKeyType(m_adapter.schema(), index);
-    IndexKeyRow row = new IndexKeyRow(m_adapter.schema().indexRowType(index), keys);
-    return new IndexBound(indexKeyType, row);
+    IndexRowType rowType = m_adapter.schema().indexRowType(index);
+    IndexKeyType indexKeyType = rowType.keyType();
+    NiceRow niceRow = new NiceRow(index.getTable().getTableId());
+    for (int i = 0; i < keys.length; i++) {
+      niceRow.put(index.getColumns().get(i).getColumn().getPosition(), keys[i]);
+    }
+    return new IndexBound(indexKeyType, 
+                          PersistitGroupRow.newPersistitGroupRow(m_adapter, 
+                                                                 niceRow.toRowData()));
   }
 
   /**
