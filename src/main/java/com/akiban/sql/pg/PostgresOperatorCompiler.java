@@ -22,6 +22,9 @@ import com.akiban.sql.views.ViewDefinition;
 
 import com.akiban.ais.model.AkibanInformationSchema;
 import com.akiban.ais.model.Column;
+import com.akiban.ais.model.GroupTable;
+import com.akiban.ais.model.Index;
+import com.akiban.ais.model.IndexColumn;
 import com.akiban.ais.model.Join;
 import com.akiban.ais.model.UserTable;
 
@@ -31,9 +34,10 @@ import com.akiban.qp.expression.Expression;
 import com.akiban.qp.expression.Field;
 import com.akiban.qp.expression.Literal;
 import com.akiban.qp.persistitadapter.PersistitAdapter;
-import com.akiban.qp.physicaloperator.Executable;
 import com.akiban.qp.physicaloperator.Flatten_HKeyOrdered;
 import com.akiban.qp.physicaloperator.GroupScan_Default;
+import com.akiban.qp.physicaloperator.IndexLookup_Default;
+import com.akiban.qp.physicaloperator.IndexScan_Default;
 import com.akiban.qp.physicaloperator.PhysicalOperator;
 import com.akiban.qp.physicaloperator.Select_HKeyOrdered;
 import com.akiban.qp.physicaloperator.StoreAdapter;
@@ -131,18 +135,37 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       UserTable table = (UserTable)tb.getTable();
       tables.add(table);
     }
+    GroupTable groupTable = group.getGroup().getGroupTable();
     Collections.sort(tables, new Comparator<UserTable>() {
                        public int compare(UserTable t1, UserTable t2) {
                          return t1.getDepth().compareTo(t2.getDepth());
                        }
                      });
-    PhysicalOperator resultOperator = 
-      new GroupScan_Default(m_adapter,
-                            group.getGroup().getGroupTable());
+    Set<ValueNode> indexConditions = new HashSet<ValueNode>();
+    Index index = pickBestIndex(tables, select.getWhereClause(), indexConditions);
+    PhysicalOperator resultOperator;
+    Object resultBinding = null;
+    if (index == null)
+      resultOperator = new GroupScan_Default(m_adapter, groupTable);
+    else {
+      // All selected rows above this need to be output by hkey left
+      // segment random access.
+      List<RowType> addAncestors = new ArrayList<RowType>();
+      for (UserTable table : tables) {
+        if (table == index.getTable())
+          break;
+        addAncestors.add(userTableRowType(table));
+      }
+      IndexScan_Default indexScan = new IndexScan_Default(index);
+      resultOperator = new IndexLookup_Default(indexScan, groupTable, addAncestors);
+    }
     RowType resultRowType = null;
     Map<UserTable,Integer> fieldOffsets = new HashMap<UserTable,Integer>();
     UserTable prev = null;
     int nfields = 0;
+    // TODO: Tables that are only used for join conditions (no
+    // predicates or result columns) can be skipped in flatten (and in
+    // index ancestors above).
     for (UserTable table : tables) {
       if (prev != null) {
         if (!isAncestorTable(prev, table))
@@ -225,8 +248,8 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
 
     g_logger.warn("Operator:\n{}", explainPlan(resultOperator));
 
-    Executable executable = new Executable(m_adapter, resultOperator);
-    return new PostgresOperatorStatement(executable, resultRowType, 
+    return new PostgresOperatorStatement(m_adapter, resultOperator, 
+                                         resultBinding, resultRowType, 
                                          resultColumns, resultColumnOffsets);
   }
 
@@ -269,6 +292,13 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
         return true;
       t2 = parent;
     }
+  }
+
+  protected Index pickBestIndex(List<UserTable> tables, 
+                                ValueNode whereClause,
+                                Set<ValueNode> indexConditions) {
+    
+    return null;
   }
 
   protected static String explainPlan(PhysicalOperator operator) {

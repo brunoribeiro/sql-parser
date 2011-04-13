@@ -20,6 +20,7 @@ import com.akiban.ais.model.Column;
 import com.akiban.qp.physicaloperator.Cursor;
 import com.akiban.qp.physicaloperator.Executable;
 import com.akiban.qp.physicaloperator.PhysicalOperator;
+import com.akiban.qp.physicaloperator.StoreAdapter;
 import com.akiban.qp.row.Row;
 import com.akiban.qp.rowtype.RowType;
 import com.akiban.server.service.session.Session;
@@ -34,21 +35,29 @@ import java.io.IOException;
 public class PostgresOperatorStatement extends PostgresStatement
 {
   private Executable m_executable;
+  private PhysicalOperator m_resultOperator;
+  private Object m_resultBinding;
   private RowType m_resultRowType;
   private int[] m_resultColumnOffsets;
 
-  public PostgresOperatorStatement(Executable executable,
+  public PostgresOperatorStatement(StoreAdapter store,
+                                   PhysicalOperator resultOperator,
+                                   Object resultBinding,
                                    RowType resultRowType,
                                    List<Column> resultColumns,
                                    int[] resultColumnOffsets) {
     super(resultColumns);
-    m_executable = executable;
+    m_executable = new Executable(store, resultOperator);
+    m_resultOperator = resultOperator;
+    m_resultBinding = resultBinding;
     m_resultRowType = resultRowType;
     m_resultColumnOffsets = resultColumnOffsets;
   }
   
   public int execute(PostgresMessenger messenger, Session session, int maxrows)
       throws IOException, StandardException {
+    if (m_resultBinding != null)
+      m_executable.bind(m_resultOperator, m_resultBinding);
     Cursor cursor = m_executable.cursor();
     int nrows = 0;
     try {
