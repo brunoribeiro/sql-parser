@@ -236,7 +236,7 @@ public class BooleanNormalizer implements Visitor
         BetweenOperatorNode betweenOperatorNode = (BetweenOperatorNode)node;
         ValueNode leftOperand = betweenOperatorNode.getLeftOperand();
         ValueNodeList rightOperandList = betweenOperatorNode.getRightOperandList();
-        /* We want to convert the BETWEEN  * into < OR > as described below. */ 
+        /* We want to convert the BETWEEN into < OR > as described below. */ 
         /* Convert:
          *    leftO between rightOList.elementAt(0) and rightOList.elementAt(1)
          * to:
@@ -287,6 +287,7 @@ public class BooleanNormalizer implements Visitor
           newOr.setType(new DataTypeDescriptor(TypeId.BOOLEAN_ID, orNullable));
         return newOr;
       }
+      break;
     case NodeTypes.IN_LIST_OPERATOR_NODE:
       if (underNotNode) {
         InListOperatorNode inListOperatorNode = (InListOperatorNode)node;

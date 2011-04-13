@@ -32,6 +32,7 @@ import com.akiban.qp.expression.Compare;
 import com.akiban.qp.expression.Comparison;
 import com.akiban.qp.expression.Expression;
 import com.akiban.qp.expression.Field;
+import com.akiban.qp.expression.IndexKeyRange;
 import com.akiban.qp.expression.Literal;
 import com.akiban.qp.persistitadapter.PersistitAdapter;
 import com.akiban.qp.physicaloperator.Flatten_HKeyOrdered;
@@ -41,6 +42,10 @@ import com.akiban.qp.physicaloperator.IndexScan_Default;
 import com.akiban.qp.physicaloperator.PhysicalOperator;
 import com.akiban.qp.physicaloperator.Select_HKeyOrdered;
 import com.akiban.qp.physicaloperator.StoreAdapter;
+import com.akiban.qp.row.HKey;
+import com.akiban.qp.row.IndexBound;
+import com.akiban.qp.row.RowBase;
+import com.akiban.qp.rowtype.IndexKeyType;
 import com.akiban.qp.rowtype.RowType;
 import com.akiban.qp.rowtype.Schema;
 import com.akiban.qp.rowtype.UserTableRowType;
@@ -141,12 +146,20 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
                          return t1.getDepth().compareTo(t2.getDepth());
                        }
                      });
-    Set<ValueNode> indexConditions = new HashSet<ValueNode>();
-    Index index = pickBestIndex(tables, select.getWhereClause(), indexConditions);
-    PhysicalOperator resultOperator;
-    Object resultBinding = null;
-    if (index == null)
+    Set<BinaryOperatorNode> indexConditions = new HashSet<BinaryOperatorNode>();
+    Index index = null;
+    if (select.getWhereClause() != null) {
+      // TODO: Put ColumnReferences on the left of any condition with constant in WHERE,
+      // changing operand as necessary.
+      index = pickBestIndex(tables, select.getWhereClause(), indexConditions);
+    }
+    PhysicalOperator resultOperator, boundOperator;
+    Object resultBinding;
+    if (index == null) {
       resultOperator = new GroupScan_Default(m_adapter, groupTable);
+      resultBinding = null;
+      boundOperator = null;
+    }
     else {
       // All selected rows above this need to be output by hkey left
       // segment random access.
@@ -156,8 +169,9 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
           break;
         addAncestors.add(userTableRowType(table));
       }
-      IndexScan_Default indexScan = new IndexScan_Default(index);
-      resultOperator = new IndexLookup_Default(indexScan, groupTable, addAncestors);
+      boundOperator = new IndexScan_Default(index);
+      resultOperator = new IndexLookup_Default(boundOperator, groupTable, addAncestors);
+      resultBinding = getIndexKeyRange(index, indexConditions);
     }
     RowType resultRowType = null;
     Map<UserTable,Integer> fieldOffsets = new HashMap<UserTable,Integer>();
@@ -217,6 +231,8 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
         throw new StandardException("Unsupported WHERE predicate");
       }
       BinaryOperatorNode binop = (BinaryOperatorNode)condition;
+      if (indexConditions.contains(binop))
+        continue;
       Expression leftExpr = getExpression(binop.getLeftOperand(), fieldOffsets);
       Expression rightExpr = getExpression(binop.getRightOperand(), fieldOffsets);
       Compare predicate = new Compare(leftExpr, op, rightExpr);
@@ -246,10 +262,12 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       resultColumnOffsets[i] = fieldOffsets.get(table) + column.getPosition();
     }
 
-    g_logger.warn("Operator:\n{}", explainPlan(resultOperator));
+    g_logger.warn("Operator:\n{} {}", 
+                  explainPlan(resultOperator), 
+                  explainBinding(resultBinding));
 
     return new PostgresOperatorStatement(m_adapter, resultOperator, 
-                                         resultBinding, resultRowType, 
+                                         resultBinding, boundOperator, resultRowType, 
                                          resultColumns, resultColumnOffsets);
   }
 
@@ -296,9 +314,267 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
 
   protected Index pickBestIndex(List<UserTable> tables, 
                                 ValueNode whereClause,
-                                Set<ValueNode> indexConditions) {
+                                Set<BinaryOperatorNode> indexConditions) {
+    if (whereClause == null) 
+      return null;
     
-    return null;
+    Index bestIndex = null;
+    Set<BinaryOperatorNode> bestIndexConditions = null;
+    for (UserTable table : tables) {
+      for (Index index : table.getIndexes()) { // TODO: getIndexesIncludingInternal()
+        Set<BinaryOperatorNode> matchingConditions = matchIndexConditions(index, 
+                                                                          whereClause);
+        if (matchingConditions.size() > ((bestIndex == null) ? 0 : 
+                                         bestIndexConditions.size())) {
+          bestIndex = index;
+          bestIndexConditions = matchingConditions;
+        }
+      }
+    }
+    if (bestIndex != null)
+      indexConditions.addAll(bestIndexConditions);
+    return bestIndex;
+  }
+
+  // Return where conditions matching a left subset of index columns of given index.
+  protected Set<BinaryOperatorNode> matchIndexConditions(Index index,
+                                                         ValueNode whereClause) {
+    Set<BinaryOperatorNode> result = null;
+    boolean alleq = true;
+    for (IndexColumn indexColumn : index.getColumns()) {
+      Column column = indexColumn.getColumn();
+      Set<BinaryOperatorNode> match = matchColumnConditions(column, whereClause);
+      if (match == null)
+        break;
+      else if (result == null)
+        result = match;
+      else
+        result.addAll(match);
+      if (alleq) {
+        for (ValueNode condition : match) {
+          switch (condition.getNodeType()) {
+          case NodeTypes.BINARY_EQUALS_OPERATOR_NODE:
+            break;
+          default:
+            alleq = false;
+            break;
+          }
+          if (!alleq) break;
+        }
+      }
+      if (!alleq) break;
+    }
+    if (result == null)
+      result = Collections.emptySet();
+    return result;
+  }
+
+  // Return where conditions matching given column in supported comparison.
+  protected Set<BinaryOperatorNode> matchColumnConditions(Column column,
+                                                          ValueNode whereClause) {
+    Set<BinaryOperatorNode> result = null;
+    while (whereClause != null) {
+      if (whereClause.isBooleanTrue()) break;
+      if (!(whereClause instanceof AndNode)) break;
+      AndNode andNode = (AndNode)whereClause;
+      whereClause = andNode.getRightOperand();
+      ValueNode condition = andNode.getLeftOperand();
+      if (m_grouper.getJoinConditions().contains(condition))
+        continue;
+      switch (condition.getNodeType()) {
+      case NodeTypes.BINARY_EQUALS_OPERATOR_NODE:
+      case NodeTypes.BINARY_GREATER_THAN_OPERATOR_NODE:
+      case NodeTypes.BINARY_GREATER_EQUALS_OPERATOR_NODE:
+      case NodeTypes.BINARY_LESS_THAN_OPERATOR_NODE:
+      case NodeTypes.BINARY_LESS_EQUALS_OPERATOR_NODE:
+        break;
+      default:
+        continue;
+      }
+      BinaryOperatorNode binop = (BinaryOperatorNode)condition;
+      if ((matchColumnReference(column, binop.getLeftOperand()) &&
+           (binop.getRightOperand() instanceof ConstantNode)) ||
+          (matchColumnReference(column, binop.getRightOperand()) &&
+           (binop.getLeftOperand() instanceof ConstantNode))) {
+        if (result == null)
+          result = new HashSet<BinaryOperatorNode>();
+        result.add(binop);
+      }
+    }
+    return result;
+  }
+
+  protected static boolean matchColumnReference(Column column, ValueNode operand) {
+    if (!(operand instanceof ColumnReference))
+      return false;
+    ColumnBinding cb = (ColumnBinding)operand.getUserData();
+    if (cb == null)
+      return false;
+    return (column == cb.getColumn());
+  }
+  
+  // TODO: Too much work here dealing with multiple conditions that
+  // could have been reconciled earlier as part of normalization.
+  protected IndexKeyRange getIndexKeyRange(Index index, 
+                                           Set<BinaryOperatorNode> indexConditions) 
+      throws StandardException {
+    List<IndexColumn> indexColumns = index.getColumns();
+    int nkeys = indexColumns.size();
+    Object[] keys = new Object[nkeys];
+    Object[] lb = null, ub = null;
+    boolean lbinc = false, ubinc = false;
+    for (int i = 0; i < nkeys; i++) {
+      IndexColumn indexColumn = indexColumns.get(i);
+      Column column = indexColumn.getColumn();
+      Object eqValue = null, ltValue = null, gtValue = null;
+      Comparison ltOp = null, gtOp = null;
+      for (BinaryOperatorNode condition : indexConditions) {
+        boolean reverse;
+        Object value;
+        if (matchColumnReference(column, condition.getLeftOperand()) &&
+            (condition.getRightOperand() instanceof ConstantNode)) {
+          value = ((ConstantNode)condition.getRightOperand()).getValue();
+          reverse = false;
+        }
+        else if (matchColumnReference(column, condition.getRightOperand()) &&
+                 (condition.getLeftOperand() instanceof ConstantNode)) {
+          value = ((ConstantNode)condition.getLeftOperand()).getValue();
+          reverse = true;
+        }
+        else
+          continue;
+        Comparison op;
+        switch (condition.getNodeType()) {
+        case NodeTypes.BINARY_EQUALS_OPERATOR_NODE:
+          op = Comparison.EQ;
+          break;
+        case NodeTypes.BINARY_GREATER_THAN_OPERATOR_NODE:
+          op = (reverse) ? Comparison.LT : Comparison.GT;
+          break;
+        case NodeTypes.BINARY_GREATER_EQUALS_OPERATOR_NODE:
+          op = (reverse) ? Comparison.LE : Comparison.GE;
+          break;
+        case NodeTypes.BINARY_LESS_THAN_OPERATOR_NODE:
+          op = (reverse) ? Comparison.GT : Comparison.LT;
+          break;
+        case NodeTypes.BINARY_LESS_EQUALS_OPERATOR_NODE:
+          op = (reverse) ? Comparison.GE : Comparison.LE;
+          break;
+        default:
+          continue;
+        }
+        switch (op) {
+        case EQ:
+          if (eqValue == null)
+            eqValue = value;
+          else if (!eqValue.equals(value))
+            throw new StandardException("Conflicting equality conditions.");
+          break;
+        case LT:
+        case LE:
+          {
+            int comp = (ltValue == null) ? +1 : ((Comparable)ltValue).compareTo(value);
+            if ((comp > 0) ||
+                ((comp == 0) && (op == Comparison.LT) && (ltOp == Comparison.LE))) {
+              ltValue = value;
+              ltOp = op;
+            }
+          }
+          break;
+        case GT:
+        case GE:
+          {
+            int comp = (gtValue == null) ? -1 : ((Comparable)gtValue).compareTo(value);
+            if ((comp < 0) ||
+                ((comp == 0) && (op == Comparison.GT) && (gtOp == Comparison.GE))) {
+              gtValue = value;
+              gtOp = op;
+            }
+          }
+          break;
+        }
+      }
+      if (eqValue != null) {
+        keys[i] = eqValue;
+      }
+      else {
+        if (gtValue != null) {
+          if (lb == null) {
+            lb = new Object[nkeys];
+            System.arraycopy(keys, 0, lb, 0, nkeys);
+          }
+          lb[i] = gtValue;
+          if (gtOp == Comparison.GE) 
+            lbinc = true;
+        }
+        if (ltValue != null) {
+          if (ub == null) {
+            ub = new Object[nkeys];
+            System.arraycopy(keys, 0, ub, 0, nkeys);
+          }
+          ub[i] = ltValue;
+          if (ltOp == Comparison.LE) 
+            ubinc = true;
+        }
+      }
+    }
+    if ((lb == null) && (ub == null)) {
+      IndexBound eq = getIndexBound(index, keys);
+      return new IndexKeyRange(eq, true, eq, true);
+    }
+    else {
+      IndexBound lo = getIndexBound(index, lb);
+      IndexBound hi = getIndexBound(index, ub);
+      return new IndexKeyRange(lo, lbinc, hi, ubinc);
+    }
+  }
+
+  static class IndexKeyRow extends RowBase {
+    private RowType m_rowType;
+    private Object[] m_keys;
+
+    public IndexKeyRow(RowType rowType, Object[] keys) {
+      m_rowType = rowType;
+      m_keys = keys;
+    }
+
+    @Override
+    public RowType rowType() {
+      return m_rowType;
+    }
+
+    @Override
+    public Object field(int i) {
+      return m_keys[i];
+    }
+
+    @Override
+    public HKey hKey() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder();
+      sb.append("<");
+      sb.append(m_rowType);
+      sb.append(">{");
+      for (int i = 0; i < m_keys.length; i++) {
+        if (i > 0)
+          sb.append(",");
+        sb.append(m_keys[i]);
+      }
+      sb.append("}");
+      return sb.toString();
+    }
+  }
+
+  protected IndexBound getIndexBound(Index index, Object[] keys) {
+    if (keys == null) 
+      return null;
+    IndexKeyType indexKeyType = new IndexKeyType(m_adapter.schema(), index);
+    IndexKeyRow row = new IndexKeyRow(m_adapter.schema().indexRowType(index), keys);
+    return new IndexBound(indexKeyType, row);
   }
 
   protected static String explainPlan(PhysicalOperator operator) {
@@ -335,6 +611,19 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       into.append(group.groupTable);
       into.append(")\n");
     }
+    else if (operator instanceof IndexScan_Default) {
+      IndexScan_Default index = (IndexScan_Default)operator;
+      into.append("IndexScan_Default(");
+      into.append(index.index);
+      into.append(")\n");
+    }
+    else if (operator instanceof IndexLookup_Default) {
+      IndexLookup_Default index = (IndexLookup_Default)operator;
+      into.append("IndexLookup_Default(");
+      into.append(index.groupTable);
+      into.append(")\n");
+      explainPlan(index.inputOperator, into, depth+1);
+    }
     else {
       into.append(operator);
       into.append(")\n");
@@ -369,4 +658,37 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       into.append(expression);
   }
 
+  protected static String explainBinding(Object binding) {
+    if (binding == null)
+      return "";
+    else if (binding instanceof IndexKeyRange) {
+      IndexKeyRange range = (IndexKeyRange)binding;
+      IndexBound lo = range.lo();
+      IndexBound hi = range.hi();
+      boolean loInclusive = range.loInclusive();
+      boolean hiInclusive = range.hiInclusive();
+
+      StringBuilder sb = new StringBuilder();
+      sb.append(loInclusive ? "(" : "[");
+      if (lo != null)
+        sb.append(explainBinding(lo));
+      sb.append(",");
+      if (hi != null)
+        sb.append(explainBinding(hi));
+      sb.append(hiInclusive ? ")" : "]");
+      return sb.toString();
+    }
+    else if (binding instanceof IndexBound) {
+      IndexBound bound = (IndexBound)binding;
+      StringBuilder sb = new StringBuilder();
+      sb.append("IndexBound(");
+      sb.append(bound.indexKeyType);
+      sb.append(",");
+      sb.append(bound.row);
+      sb.append(")");
+      return sb.toString();
+    }
+    else
+      return binding.toString();
+  }
 }

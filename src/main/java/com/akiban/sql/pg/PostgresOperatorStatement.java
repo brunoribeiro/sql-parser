@@ -35,21 +35,22 @@ import java.io.IOException;
 public class PostgresOperatorStatement extends PostgresStatement
 {
   private Executable m_executable;
-  private PhysicalOperator m_resultOperator;
   private Object m_resultBinding;
+  private PhysicalOperator m_boundOperator;
   private RowType m_resultRowType;
   private int[] m_resultColumnOffsets;
 
   public PostgresOperatorStatement(StoreAdapter store,
                                    PhysicalOperator resultOperator,
                                    Object resultBinding,
+                                   PhysicalOperator boundOperator,
                                    RowType resultRowType,
                                    List<Column> resultColumns,
                                    int[] resultColumnOffsets) {
     super(resultColumns);
     m_executable = new Executable(store, resultOperator);
-    m_resultOperator = resultOperator;
     m_resultBinding = resultBinding;
+    m_boundOperator = boundOperator;
     m_resultRowType = resultRowType;
     m_resultColumnOffsets = resultColumnOffsets;
   }
@@ -57,7 +58,7 @@ public class PostgresOperatorStatement extends PostgresStatement
   public int execute(PostgresMessenger messenger, Session session, int maxrows)
       throws IOException, StandardException {
     if (m_resultBinding != null)
-      m_executable.bind(m_resultOperator, m_resultBinding);
+      m_executable.bind(m_boundOperator, m_resultBinding);
     Cursor cursor = m_executable.cursor();
     int nrows = 0;
     try {
