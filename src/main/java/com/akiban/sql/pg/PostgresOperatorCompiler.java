@@ -131,43 +131,36 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       UserTable table = (UserTable)tb.getTable();
       tables.add(table);
     }
+    Collections.sort(tables, new Comparator<UserTable>() {
+                       public int compare(UserTable t1, UserTable t2) {
+                         return t1.getDepth().compareTo(t2.getDepth());
+                       }
+                     });
     PhysicalOperator resultOperator = 
       new GroupScan_Default(m_adapter,
                             group.getGroup().getGroupTable());
     RowType resultRowType = null;
     Map<UserTable,Integer> fieldOffsets = new HashMap<UserTable,Integer>();
-    if (tables.size() == 1) {
-      UserTable table = tables.get(0);
-      resultRowType = userTableRowType(table);
-      fieldOffsets.put(table, 0);
-    }
-    else {
-      Collections.sort(tables, new Comparator<UserTable>() {
-                         public int compare(UserTable t1, UserTable t2) {
-                           return t1.getDepth().compareTo(t2.getDepth());
-                         }
-                       });
-      UserTable prev = null;
-      int nfields = 0;
-      for (UserTable table : tables) {
-        if (prev != null) {
-          if (!isAncestorTable(prev, table))
-            throw new StandardException("Unsupported branching group");
-          // Join result so far to new child.
-          Flatten_HKeyOrdered flatten = 
-            new Flatten_HKeyOrdered(resultOperator,
-                                    resultRowType,
-                                    userTableRowType(table));
-          resultOperator = flatten;
-          resultRowType = flatten.rowType();
-        }
-        else {
-          resultRowType = userTableRowType(table);
-        }
-        prev = table;
-        fieldOffsets.put(table, nfields);
-        nfields += table.getColumns().size();
+    UserTable prev = null;
+    int nfields = 0;
+    for (UserTable table : tables) {
+      if (prev != null) {
+        if (!isAncestorTable(prev, table))
+          throw new StandardException("Unsupported branching group");
+        // Join result so far to new child.
+        Flatten_HKeyOrdered flatten = 
+          new Flatten_HKeyOrdered(resultOperator,
+                                  resultRowType,
+                                  userTableRowType(table));
+        resultOperator = flatten;
+        resultRowType = flatten.rowType();
       }
+      else {
+        resultRowType = userTableRowType(table);
+      }
+      prev = table;
+      fieldOffsets.put(table, nfields);
+      nfields += table.getColumns().size();
     }
 
     ValueNode whereClause = select.getWhereClause();
