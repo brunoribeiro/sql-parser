@@ -17,6 +17,7 @@ package com.akiban.sql.pg;
 import com.akiban.sql.StandardException;
 
 import com.akiban.ais.model.Column;
+import com.akiban.qp.expression.IndexKeyRange;
 import com.akiban.qp.physicaloperator.Cursor;
 import com.akiban.qp.physicaloperator.Executable;
 import com.akiban.qp.physicaloperator.PhysicalOperator;
@@ -35,30 +36,30 @@ import java.io.IOException;
 public class PostgresOperatorStatement extends PostgresStatement
 {
   private Executable m_executable;
-  private Object m_resultBinding;
-  private PhysicalOperator m_boundOperator;
+  private IndexKeyRange m_indexKeyRange;
+  private PhysicalOperator m_indexOperator;
   private RowType m_resultRowType;
   private int[] m_resultColumnOffsets;
 
   public PostgresOperatorStatement(StoreAdapter store,
                                    PhysicalOperator resultOperator,
-                                   Object resultBinding,
-                                   PhysicalOperator boundOperator,
+                                   IndexKeyRange indexKeyRange,
+                                   PhysicalOperator indexOperator,
                                    RowType resultRowType,
                                    List<Column> resultColumns,
                                    int[] resultColumnOffsets) {
     super(resultColumns);
     m_executable = new Executable(store, resultOperator);
-    m_resultBinding = resultBinding;
-    m_boundOperator = boundOperator;
+    m_indexKeyRange = indexKeyRange;
+    m_indexOperator = indexOperator;
     m_resultRowType = resultRowType;
     m_resultColumnOffsets = resultColumnOffsets;
   }
   
   public int execute(PostgresMessenger messenger, Session session, int maxrows)
       throws IOException, StandardException {
-    if (m_resultBinding != null)
-      m_executable.bind(m_boundOperator, m_resultBinding);
+    if (m_indexKeyRange != null)
+      m_executable.bind(m_indexOperator, m_indexKeyRange);
     Cursor cursor = m_executable.cursor();
     int nrows = 0;
     try {

@@ -28,22 +28,18 @@ import com.akiban.ais.model.IndexColumn;
 import com.akiban.ais.model.Join;
 import com.akiban.ais.model.UserTable;
 
-import com.akiban.qp.expression.Compare;
 import com.akiban.qp.expression.Comparison;
 import com.akiban.qp.expression.Expression;
-import com.akiban.qp.expression.Field;
+import com.akiban.qp.expression.IndexBound;
 import com.akiban.qp.expression.IndexKeyRange;
-import com.akiban.qp.expression.Literal;
+import static com.akiban.qp.expression.API.*;
+
 import com.akiban.qp.persistitadapter.PersistitAdapter;
-import com.akiban.qp.physicaloperator.Flatten_HKeyOrdered;
-import com.akiban.qp.physicaloperator.GroupScan_Default;
-import com.akiban.qp.physicaloperator.IndexLookup_Default;
-import com.akiban.qp.physicaloperator.IndexScan_Default;
 import com.akiban.qp.physicaloperator.PhysicalOperator;
-import com.akiban.qp.physicaloperator.Select_HKeyOrdered;
 import com.akiban.qp.physicaloperator.StoreAdapter;
+import static com.akiban.qp.physicaloperator.API.*;
+
 import com.akiban.qp.row.HKey;
-import com.akiban.qp.row.IndexBound;
 import com.akiban.qp.row.RowBase;
 import com.akiban.qp.rowtype.IndexKeyType;
 import com.akiban.qp.rowtype.RowType;
@@ -156,7 +152,7 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
     PhysicalOperator resultOperator, boundOperator;
     Object resultBinding;
     if (index == null) {
-      resultOperator = new GroupScan_Default(m_adapter, groupTable);
+      resultOperator = groupScan_Default(m_adapter, groupTable);
       resultBinding = null;
       boundOperator = null;
     }
@@ -169,8 +165,8 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
           break;
         addAncestors.add(userTableRowType(table));
       }
-      boundOperator = new IndexScan_Default(index);
-      resultOperator = new IndexLookup_Default(boundOperator, groupTable, addAncestors);
+      boundOperator = indexScan_Default(index);
+      resultOperator = indexLookup_Default(boundOperator, groupTable, addAncestors);
       resultBinding = getIndexKeyRange(index, indexConditions);
     }
     RowType resultRowType = null;
@@ -185,12 +181,10 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
         if (!isAncestorTable(prev, table))
           throw new StandardException("Unsupported branching group");
         // Join result so far to new child.
-        Flatten_HKeyOrdered flatten = 
-          new Flatten_HKeyOrdered(resultOperator,
-                                  resultRowType,
-                                  userTableRowType(table));
-        resultOperator = flatten;
-        resultRowType = flatten.rowType();
+        resultOperator = flatten_HKeyOrdered(resultOperator,
+                                             resultRowType,
+                                             userTableRowType(table));
+        resultRowType = resultOperator.rowType();
       }
       else {
         resultRowType = userTableRowType(table);
@@ -235,10 +229,10 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
         continue;
       Expression leftExpr = getExpression(binop.getLeftOperand(), fieldOffsets);
       Expression rightExpr = getExpression(binop.getRightOperand(), fieldOffsets);
-      Compare predicate = new Compare(leftExpr, op, rightExpr);
-      resultOperator = new Select_HKeyOrdered(resultOperator,
-                                              resultRowType,
-                                              predicate);
+      Expression predicate = compare(leftExpr, op, rightExpr);
+      resultOperator = select_HKeyOrdered(resultOperator,
+                                          resultRowType,
+                                          predicate);
     }
 
     List<Column> resultColumns = new ArrayList<Column>();
@@ -262,9 +256,7 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       resultColumnOffsets[i] = fieldOffsets.get(table) + column.getPosition();
     }
 
-    g_logger.warn("Operator:\n{} {}", 
-                  explainPlan(resultOperator), 
-                  explainBinding(resultBinding));
+    g_logger.warn("Operator:\n{} {}", resultOperator, resultBinding);
 
     return new PostgresOperatorStatement(m_adapter, resultOperator, 
                                          resultBinding, boundOperator, resultRowType, 
@@ -284,13 +276,13 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       if (column == null)
         throw new StandardException("Unsupported WHERE predicate on non-column");
       UserTable table = column.getUserTable();
-      return new Field(fieldOffsets.get(table) + column.getPosition());
+      return field(fieldOffsets.get(table) + column.getPosition());
     }
     else if (operand instanceof ConstantNode) {
       Object value = ((ConstantNode)operand).getValue();
       if (value instanceof Integer)
         value = new Long(((Integer)value).intValue());
-      return new Literal(value);
+      return literal(value);
     }
     // TODO: Parameters: Literals but with later substitution somehow.
     else
@@ -577,6 +569,7 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
     return new IndexBound(indexKeyType, row);
   }
 
+  /**
   protected static String explainPlan(PhysicalOperator operator) {
     StringBuilder sb = new StringBuilder();
     explainPlan(operator, sb, 0);
@@ -691,4 +684,6 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
     else
       return binding.toString();
   }
+  **/
+
 }
