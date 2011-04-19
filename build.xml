@@ -283,7 +283,10 @@
 
   <target name="clean">
     <delete dir="${CLASSES}"/>
-    <delete file="${SRC}/com/akiban/sql/parser/SQLGrammar.java"/>
+    <delete>
+      <fileset dir="${SRC}/com/akiban/sql/parser"
+               includes="ParseException.java,SQLGrammar.java,SQLGrammarConstants.java,SQLGrammarTokenManager.java,Token.java,TokenMgrError.java"/>
+    </delete>
   </target>
 
   <target name="dist">

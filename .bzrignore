@@ -1,6 +1,8 @@
 ./classes
 parser-combined.jar
+ParseException.java
 SQLGrammar.java
 SQLGrammarConstants.java
 SQLGrammarTokenManager.java
+Token.java
 TokenMgrError.java

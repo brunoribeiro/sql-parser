@@ -54,6 +54,7 @@ options
   // Next few needed to get a refinement of default stream that records token positions.
   UNICODE_INPUT = true;
   USER_CHAR_STREAM = true;
+  TOKEN_EXTENDS = "BaseToken";
   COMMON_TOKEN_ACTION = true;
   // Some performance gain from this.
   CACHE_TOKENS = true;
