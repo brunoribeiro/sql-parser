@@ -238,7 +238,7 @@
     <java classname="com.akiban.sql.test.SQLClient" fork="yes" failonerror="yes">
       <classpath refid="sql.class.path"/>
       <arg value="org.postgresql.Driver"/>
-      <arg value="jdbc:postgresql://daffy:15432/mmcm?ssm=true"/>
+      <arg value="jdbc:postgresql://daffy:15432/mmcm"/>
       <arg value="mmcm"/>
       <arg value="mmcm"/>
       <arg value="SELECT customers.name,order_date,sku,quan FROM customers,orders,items WHERE customers.cid = orders.cid AND orders.oid = items.oid AND items.sku &lt; '8888'"/>
@@ -248,7 +248,7 @@
     <java classname="com.akiban.sql.test.SQLClient" fork="yes" failonerror="yes">
       <classpath refid="sql.class.path"/>
       <arg value="org.postgresql.Driver"/>
-      <arg value="jdbc:postgresql://daffy:15432/mmcm?ssm=true"/>
+      <arg value="jdbc:postgresql://daffy:15432/mmcm"/>
       <arg value="mmcm"/>
       <arg value="mmcm"/>
       <arg value="SELECT customers.name,order_date,sku,quan FROM customers,orders,items WHERE customers.cid = orders.cid AND orders.oid = items.oid AND items.sku = '1234'"/>
@@ -258,7 +258,7 @@
     <java classname="com.akiban.sql.test.SQLClient" fork="yes" failonerror="yes">
       <classpath refid="sql.class.path"/>
       <arg value="org.postgresql.Driver"/>
-      <arg value="jdbc:postgresql://daffy:15432/mmcm?ssm=true"/>
+      <arg value="jdbc:postgresql://daffy:15432/mmcm"/>
       <arg value="mmcm"/>
       <arg value="mmcm"/>
       <arg value="SELECT customers.name,order_date,sku,quan FROM customers,orders,items WHERE customers.cid = orders.cid AND orders.oid = items.oid AND items.sku >= '0' AND items.sku &lt; '8888'"/>
@@ -279,7 +279,7 @@
     <java classname="com.akiban.sql.test.SQLClient" fork="yes" failonerror="yes">
       <classpath refid="sql.class.path"/>
       <arg value="org.postgresql.Driver"/>
-      <arg value="jdbc:postgresql://daffy:15432/mmcm?ssm=true"/>
+      <arg value="jdbc:postgresql://daffy:15432/mmcm"/>
       <arg value="mmcm"/>
       <arg value="mmcm"/>
       <arg value="SELECT customers.name,order_date,sku,quan FROM customers,orders,items WHERE customers.cid = orders.cid AND orders.oid = items.oid AND items.sku &lt; '8888' AND items.quan = 100"/>

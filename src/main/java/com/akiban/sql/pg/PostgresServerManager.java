@@ -23,7 +23,7 @@ import java.util.*;
 /** The PostgreSQL server service.
  * @see PostgresServer
  * 
- * <code>JVM_OPTS="-Dakserver.services.customload=com.akiban.sql.pg.PostgresServerManager" $AKIBAN_SERVER_HOME/bin/akserver -f -j /opt/akiban/source/parser-latest/parser-combined.jar</code>
+ * <code>JVM_OPTS="-Dakserver.services.customload=com.akiban.sql.pg.PostgresServerManager" $AKIBAN_SERVER_HOME/bin/akserver -f -j /opt/akiban/source/parser-latest/target/akiban-sql-parser-0.0.1-SNAPSHOT-jar-with-dependencies.jar</code>
 */
 public class PostgresServerManager implements PostgresService, Service<PostgresService> {
   private PostgresServer m_server = null;
