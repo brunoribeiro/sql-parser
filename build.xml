@@ -6,8 +6,9 @@
   <property file="build.properties"/>
 
   <property name="SRC" location="src/main/java"/>
+  <property name="JJSRC" location="src/main/javacc"/>
   <property name="CLASSES" value="classes"/>
-  <property name="GRAMMAR" location="${SRC}/com/akiban/sql/parser/SQLGrammar.jj"/>
+  <property name="GRAMMAR" location="${JJSRC}/SQLGrammar.jj"/>
   <property name="JAR" value="parser-combined.jar"/>
 
   <path id="compiler.class.path">
@@ -23,8 +24,12 @@
   </target>
 
   <target name="compile">
+    <copy todir="${SRC}/com/akiban/sql/parser">
+      <fileset dir="${JJSRC}" includes="*.java"/>
+    </copy>
     <javacc javacchome="${JAVACC_HOME}"
-            target="${GRAMMAR}"/>
+            target="${GRAMMAR}"
+            outputdirectory="${SRC}/com/akiban/sql/parser"/>
     <javac srcdir="${SRC}" 
            destdir="${CLASSES}"
            includes="**/*.java" 
@@ -285,7 +290,7 @@
     <delete dir="${CLASSES}"/>
     <delete>
       <fileset dir="${SRC}/com/akiban/sql/parser"
-               includes="ParseException.java,SQLGrammar.java,SQLGrammarConstants.java,SQLGrammarTokenManager.java,Token.java,TokenMgrError.java"/>
+               includes="ParseException.java,SQLGrammar.java,SQLGrammarConstants.java,SQLGrammarTokenManager.java,Token.java,TokenMgrError.java,CharStream.java"/>
     </delete>
   </target>
 
