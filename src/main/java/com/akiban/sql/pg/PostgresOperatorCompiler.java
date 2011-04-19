@@ -260,7 +260,7 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       resultColumnOffsets[i] = fieldOffsets.get(table) + column.getPosition();
     }
 
-    g_logger.warn("Operator:\n{} {}", resultOperator, indexKeyRange);
+    g_logger.warn("Operator:\n{} {}", explainPlan(resultOperator), indexKeyRange);
 
     return new PostgresOperatorStatement(m_adapter, resultOperator, 
                                          indexKeyRange, indexOperator, resultRowType, 
@@ -539,7 +539,6 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
                                                                  niceRow.toRowData()));
   }
 
-  /**
   protected static String explainPlan(PhysicalOperator operator) {
     StringBuilder sb = new StringBuilder();
     explainPlan(operator, sb, 0);
@@ -550,110 +549,11 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
                                     StringBuilder into, int depth) {
     for (int i = 0; i < depth; i++)
       into.append("  ");
-    if (operator instanceof Flatten_HKeyOrdered) {
-      Flatten_HKeyOrdered flatten = (Flatten_HKeyOrdered)operator;
-      into.append("Flatten_HKeyOrdered(");
-      into.append(flatten.parentType);
-      into.append(",");
-      into.append(flatten.childType);
-      into.append(")\n");
-      explainPlan(flatten.inputOperator, into, depth+1);
-    }
-    else if (operator instanceof Select_HKeyOrdered) {
-      Select_HKeyOrdered select = (Select_HKeyOrdered)operator;
-      into.append("Select_HKeyOrdered(");
-      into.append(select.predicateRowType);
-      into.append(",");
-      explainExpression(select.predicate, into);
-      into.append(")\n");
-      explainPlan(select.inputOperator, into, depth+1);
-    }
-    else if (operator instanceof GroupScan_Default) {
-      GroupScan_Default group = (GroupScan_Default)operator;
-      into.append("GroupScan_Default(");
-      into.append(group.groupTable);
-      into.append(")\n");
-    }
-    else if (operator instanceof IndexScan_Default) {
-      IndexScan_Default index = (IndexScan_Default)operator;
-      into.append("IndexScan_Default(");
-      into.append(index.index);
-      into.append(")\n");
-    }
-    else if (operator instanceof IndexLookup_Default) {
-      IndexLookup_Default index = (IndexLookup_Default)operator;
-      into.append("IndexLookup_Default(");
-      into.append(index.groupTable);
-      into.append(")\n");
-      explainPlan(index.inputOperator, into, depth+1);
-    }
-    else {
-      into.append(operator);
-      into.append(")\n");
+    into.append(operator);
+    into.append("\n");
+    for (PhysicalOperator inputOperator : operator.getInputOperators()) {
+      explainPlan(inputOperator, into, depth+1);
     }
   }
-
-  protected static void explainExpression(Expression expression,
-                                          StringBuilder into) {
-    if (expression instanceof Field) {
-      Field field = (Field)expression;
-      into.append("Field(");
-      into.append(field.position);
-      into.append(")");
-    }
-    else if (expression instanceof Literal) {
-      Literal literal = (Literal)expression;
-      into.append("Literal(");
-      into.append(literal.value);
-      into.append(")");
-    }
-    else if (expression instanceof Compare) {
-      Compare compare = (Compare)expression;
-      into.append("Compare(");
-      explainExpression(compare.left, into);
-      into.append(" ");
-      into.append(compare.comparison);
-      into.append(" ");
-      explainExpression(compare.right, into);
-      into.append(")");
-    }
-    else
-      into.append(expression);
-  }
-
-  protected static String explainBinding(Object binding) {
-    if (binding == null)
-      return "";
-    else if (binding instanceof IndexKeyRange) {
-      IndexKeyRange range = (IndexKeyRange)binding;
-      IndexBound lo = range.lo();
-      IndexBound hi = range.hi();
-      boolean loInclusive = range.loInclusive();
-      boolean hiInclusive = range.hiInclusive();
-
-      StringBuilder sb = new StringBuilder();
-      sb.append(loInclusive ? "(" : "[");
-      if (lo != null)
-        sb.append(explainBinding(lo));
-      sb.append(",");
-      if (hi != null)
-        sb.append(explainBinding(hi));
-      sb.append(hiInclusive ? ")" : "]");
-      return sb.toString();
-    }
-    else if (binding instanceof IndexBound) {
-      IndexBound bound = (IndexBound)binding;
-      StringBuilder sb = new StringBuilder();
-      sb.append("IndexBound(");
-      sb.append(bound.indexKeyType);
-      sb.append(",");
-      sb.append(bound.row);
-      sb.append(")");
-      return sb.toString();
-    }
-    else
-      return binding.toString();
-  }
-  **/
 
 }
