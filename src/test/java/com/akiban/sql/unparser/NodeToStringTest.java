@@ -17,9 +17,14 @@ package com.akiban.sql.unparser;
 import com.akiban.sql.TestBase;
 
 import com.akiban.sql.StandardException;
+import com.akiban.sql.compiler.AISBinder;
 import com.akiban.sql.compiler.BoundNodeToString;
-import com.akiban.sql.parser.StatementNode;
 import com.akiban.sql.parser.SQLParser;
+import com.akiban.sql.parser.StatementNode;
+
+import com.akiban.ais.ddl.SchemaDef;
+import com.akiban.ais.ddl.SchemaDefToAis;
+import com.akiban.ais.model.AkibanInformationSchema;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,25 +40,31 @@ public class NodeToStringTest extends TestBase
 
   protected SQLParser parser;
   protected BoundNodeToString unparser;
+  protected AISBinder binder;
 
   @Before
   public void before() throws Exception {
     parser = new SQLParser();
     unparser = new BoundNodeToString();
+
+    String sql = fileContents(new File(RESOURCE_DIR, "bound/schema.ddl"));
+    SchemaDef schemaDef = SchemaDef.parseSchema("use user; " + sql);
+    SchemaDefToAis toAis = new SchemaDefToAis(schemaDef, false);
+    AkibanInformationSchema ais = toAis.getAis();
+    binder = new AISBinder(ais, "user");
   }
 
-  @Test
-  public void testUnparser() throws Exception {
-    unparser.setUseBindings(false);
-
+  protected void testFiles(File dir) throws Exception {
     int npass = 0, nfail = 0;
-    File[] sqlFiles = listSQLFiles(RESOURCE_DIR);
+    File[] sqlFiles = listSQLFiles(dir);
     for (File sqlFile : sqlFiles) {
       String sql_in = fileContents(sqlFile).trim();
       StatementNode stmt = parser.parseStatement(sql_in);
+      if (unparser.isUseBindings())
+        binder.bind(stmt);
       String sql_out = unparser.toString(stmt);
-      String expected = fileContents(expectedFile(sqlFile));
-      if (sql_out.equals(expected.trim()))
+      String expected = fileContents(expectedFile(sqlFile)).trim();
+      if (sql_out.equals(expected))
         npass++;
       else {
         System.out.println("Mismatch for " + sqlFile);
@@ -66,5 +77,17 @@ public class NodeToStringTest extends TestBase
 
     if (nfail > 0)
       fail(nfail + " parses did not match.");
+  }
+
+  @Test
+  public void testUnparser() throws Exception {
+    unparser.setUseBindings(false);
+    testFiles(RESOURCE_DIR);
+  }
+
+  @Test
+  public void testBound() throws Exception {
+    unparser.setUseBindings(true);
+    testFiles(new File(RESOURCE_DIR, "bound"));
   }
 }
