@@ -192,4 +192,23 @@ public class ASTTransformTest extends TestBase
               false);
   }
 
+  @Test
+  public void testFlattener() throws Exception {
+    File dir = new File(RESOURCE_DIR, "flatten");
+    loadSchema(new File(dir, "schema.ddl"));
+    loadView(new File(dir, "view-1.ddl"));
+    unparser.setUseBindings(true);
+    testFiles(dir,
+              new Transformer() {
+                public StatementNode transform(StatementNode stmt) 
+                    throws StandardException {
+                  binder.bind(stmt);
+                  stmt = booleanNormalizer.normalize(stmt);
+                  typeComputer.compute(stmt);
+                  return subqueryFlattener.flatten(stmt);
+                }
+              },
+              false);
+  }
+
 }
