@@ -59,6 +59,7 @@ public class ASTTransformTest extends TestBase
   @Before
   public void before() throws Exception {
     parser = new SQLParser();
+    parser.setNodeFactory(new BindingNodeFactory(parser.getNodeFactory()));
     unparser = new BoundNodeToString();
     typeComputer = new TypeComputer();
     booleanNormalizer = new BooleanNormalizer(parser);
