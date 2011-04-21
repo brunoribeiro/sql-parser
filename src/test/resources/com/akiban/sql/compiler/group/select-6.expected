@@ -1,0 +1,1 @@
+SELECT PARENT.NAME AS PNAME, CHILD.NAME AS CNAME FROM user._akiban_parent AS _G_1, user._akiban_parent AS _G_2 WHERE (PARENT.NAME = 'foo') AND ((PARENT.ID = CHILD.PID) AND true)

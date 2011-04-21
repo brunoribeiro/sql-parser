@@ -211,4 +211,26 @@ public class ASTTransformTest extends TestBase
               false);
   }
 
+  @Test
+  public void testGrouper() throws Exception {
+    File dir = new File(RESOURCE_DIR, "group");
+    loadSchema(new File(dir, "schema.ddl"));
+    loadView(new File(dir, "view-1.ddl"));
+    unparser.setUseBindings(false);
+    testFiles(dir,
+              new Transformer() {
+                public StatementNode transform(StatementNode stmt) 
+                    throws StandardException {
+                  binder.bind(stmt);
+                  stmt = booleanNormalizer.normalize(stmt);
+                  typeComputer.compute(stmt);
+                  stmt = subqueryFlattener.flatten(stmt);
+                  grouper.group(stmt);
+                  grouper.rewrite(stmt);
+                  return stmt;
+                }
+              },
+              false);
+  }
+
 }
