@@ -89,13 +89,16 @@ public class ASTTransformTest extends TestBase
     return str.toString().trim();
   }
 
-  protected boolean compareTree(String tree, String expected) throws IOException {
-    return new CompareWithoutHashes().match(new StringReader(tree), 
-                                            new StringReader(expected));
+  protected void testFiles(File dir, Transformer xform) 
+      throws Exception {
+    testFiles(dir, xform, false, null);
   }
 
-  protected void testFiles(File dir, Transformer xform, boolean expectTree) 
+  protected void testFiles(File dir, Transformer xform, 
+                           boolean expectTree, String compareRegex)
       throws Exception {
+    if (expectTree && (compareRegex == null))
+      compareRegex = CompareWithoutHashes.HASH_REGEX;
     int npass = 0, nfail = 0;
     File[] sqlFiles = listSQLFiles(dir);
     for (File sqlFile : sqlFiles) {
@@ -116,9 +119,10 @@ public class ASTTransformTest extends TestBase
         continue;
       }
       String expected = fileContents(expectedFile(sqlFile)).trim();
-      if (expectTree ?
-          compareTree(sql_out, expected) :
-          sql_out.equals(expected))
+      if ((compareRegex == null) ?
+          sql_out.equals(expected) :
+          new CompareWithoutHashes(compareRegex).match(new StringReader(sql_out), 
+                                                       new StringReader(expected)))
         npass++;
       else {
         System.out.println("Mismatch for " + sqlFile);
@@ -143,8 +147,7 @@ public class ASTTransformTest extends TestBase
                     throws StandardException {
                   return (StatementNode)parser.getNodeFactory().copyNode(stmt, parser);
                 }
-              },
-              false);
+              });
   }
 
   @Test
@@ -159,7 +162,7 @@ public class ASTTransformTest extends TestBase
                   return stmt;
                 }
               },
-              true);
+              true, null);
   }
 
   @Test
@@ -175,7 +178,7 @@ public class ASTTransformTest extends TestBase
                   return stmt;
                 }
               },
-              true);
+              true, null);
   }
 
   @Test
@@ -188,8 +191,7 @@ public class ASTTransformTest extends TestBase
                     throws StandardException {
                   return booleanNormalizer.normalize(stmt);
                 }
-              },
-              false);
+              });
   }
 
   @Test
@@ -207,8 +209,7 @@ public class ASTTransformTest extends TestBase
                   typeComputer.compute(stmt);
                   return subqueryFlattener.flatten(stmt);
                 }
-              },
-              false);
+              });
   }
 
   @Test
@@ -230,7 +231,7 @@ public class ASTTransformTest extends TestBase
                   return stmt;
                 }
               },
-              false);
+              false, "_G_\\d+");
   }
 
 }

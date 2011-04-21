@@ -26,9 +26,17 @@ import java.util.regex.Pattern;
 
 public class CompareWithoutHashes
 {
+  public static final String HASH_REGEX = "[\\p{Alnum}]*\\@[\\p{XDigit}]+";
+
+  private Pattern pattern;
   private Map<String,String> equivalences;
 
   public CompareWithoutHashes() {
+    this(HASH_REGEX);
+  }
+
+  public CompareWithoutHashes(String regex) {
+    this.pattern = Pattern.compile(regex);
     this.equivalences = new HashMap<String,String>();
   }
 
@@ -66,13 +74,18 @@ public class CompareWithoutHashes
       String oh2 = equivalences.put(h1, h2);
       if ((oh2 != null) && !oh2.equals(h2))
         return false;
-      s1 = s1.replace(h1, h2);
+    }
+
+    // It's possible that equivalences swaps two matches, so need intermediate.
+    for (int i = 0; i < ha1.length; i++) {
+      s1 = s1.replace(ha1[i], "%!" + i + "!%");
+    }
+    for (int i = 0; i < ha1.length; i++) {
+      s1 = s1.replace("%!" + i + "!%", ha2[i]);
     }
     
     return s1.equals(s2);
   }
-
-  protected final Pattern pattern = Pattern.compile("[\\p{Alnum}]*\\@[\\p{XDigit}]+");
 
   protected String[] findHashes(String s) {
     Matcher matcher = pattern.matcher(s);
