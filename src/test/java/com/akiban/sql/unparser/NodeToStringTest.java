@@ -59,10 +59,19 @@ public class NodeToStringTest extends TestBase
     File[] sqlFiles = listSQLFiles(dir);
     for (File sqlFile : sqlFiles) {
       String sql_in = fileContents(sqlFile).trim();
-      StatementNode stmt = parser.parseStatement(sql_in);
-      if (unparser.isUseBindings())
-        binder.bind(stmt);
-      String sql_out = unparser.toString(stmt);
+      String sql_out;
+      try {
+        StatementNode stmt = parser.parseStatement(sql_in);
+        if (unparser.isUseBindings())
+          binder.bind(stmt);
+        sql_out = unparser.toString(stmt);
+      }
+      catch (Exception ex) {
+        System.out.println("Error for " + sqlFile);
+        ex.printStackTrace(System.out);
+        nfail++;
+        continue;
+      }
       String expected = fileContents(expectedFile(sqlFile)).trim();
       if (sql_out.equals(expected))
         npass++;
