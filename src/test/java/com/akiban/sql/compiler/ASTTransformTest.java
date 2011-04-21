@@ -51,11 +51,19 @@ public class ASTTransformTest extends TestBase
   protected SQLParser parser;
   protected BoundNodeToString unparser;
   protected AISBinder binder;
+  protected TypeComputer typeComputer;
+  protected BooleanNormalizer booleanNormalizer;
+  protected SubqueryFlattener subqueryFlattener;
+  protected Grouper grouper;
 
   @Before
   public void before() throws Exception {
     parser = new SQLParser();
     unparser = new BoundNodeToString();
+    typeComputer = new TypeComputer();
+    booleanNormalizer = new BooleanNormalizer(parser);
+    subqueryFlattener = new SubqueryFlattener(parser);
+    grouper = new Grouper(parser);
   }
 
   interface Transformer {
@@ -127,8 +135,9 @@ public class ASTTransformTest extends TestBase
   
   @Test
   public void testClone() throws Exception {
+    File dir = new File(RESOURCE_DIR, "clone");
     unparser.setUseBindings(false);
-    testFiles(new File(RESOURCE_DIR, "clone"),
+    testFiles(dir,
               new Transformer() {
                 public StatementNode transform(StatementNode stmt) 
                     throws StandardException {
@@ -167,6 +176,20 @@ public class ASTTransformTest extends TestBase
                 }
               },
               true);
+  }
+
+  @Test
+  public void testNormalizer() throws Exception {
+    File dir = new File(RESOURCE_DIR, "normalize");
+    unparser.setUseBindings(false);
+    testFiles(dir,
+              new Transformer() {
+                public StatementNode transform(StatementNode stmt) 
+                    throws StandardException {
+                  return booleanNormalizer.normalize(stmt);
+                }
+              },
+              false);
   }
 
 }
