@@ -1,0 +1,77 @@
+com.akiban.sql.parser.CreateViewNode@58d9660d
+name: V1
+statementType: CREATE VIEW
+checkOption: 0
+qeText: CREATE VIEW v1(x,y) AS (SELECT y,z FROM t1 WHERE y IS NOT NULL)
+resultColumns: 	
+	com.akiban.sql.parser.ResultColumnList@28bb0d0d
+
+	[0]:	
+	com.akiban.sql.parser.ResultColumn@1055e55f
+	exposedName: X
+	name: X
+	tableName: null
+	isDefaultColumn: false
+	type: null
+	[1]:	
+	com.akiban.sql.parser.ResultColumn@7745c859
+	exposedName: Y
+	name: Y
+	tableName: null
+	isDefaultColumn: false
+	type: null
+queryExpression: 	
+	com.akiban.sql.parser.SelectNode@664883c
+	isDistinct: false
+	resultColumns: 		
+		com.akiban.sql.parser.ResultColumnList@322c1e6b
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@6e811c88
+		exposedName: Y
+		name: Y
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.ColumnReference@5e785d65
+			columnName: Y
+			tableName: null
+			type: null
+		[1]:		
+		com.akiban.sql.parser.ResultColumn@303bc257
+		exposedName: Z
+		name: Z
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.ColumnReference@2353f67e
+			columnName: Z
+			tableName: null
+			type: null
+	fromList: 		
+		com.akiban.sql.parser.FromList@5d5bdc50
+
+		[0]:		
+		com.akiban.sql.parser.FromBaseTable@39dd3812
+		tableName: T1
+		updateOrDelete: null
+		null
+		correlation Name: null
+		null
+	whereClause: 		
+		com.akiban.sql.parser.NotNode@6a8c436b
+		operator: not
+		methodName: not
+		type: null
+		operand: 			
+			com.akiban.sql.parser.IsNullNode@1e9e5c73
+			operator: is null
+			methodName: isNullOp
+			type: null
+			operand: 				
+				com.akiban.sql.parser.ColumnReference@2ec791b9
+				columnName: Y
+				tableName: null
+				type: null

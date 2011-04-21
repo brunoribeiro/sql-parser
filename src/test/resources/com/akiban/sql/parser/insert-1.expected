@@ -1,0 +1,55 @@
+com.akiban.sql.parser.InsertNode@4e76fba0
+null
+statementType: INSERT
+resultSet: 	
+	com.akiban.sql.parser.RowResultSetNode@6581ed9e
+	correlation Name: null
+	null
+	resultColumns: 		
+		com.akiban.sql.parser.ResultColumnList@35175422
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@e949f69
+		exposedName: null
+		name: null
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.NumericConstantNode@3f6dadf9
+			value: 1
+			type: INTEGER NOT NULL
+		[1]:		
+		com.akiban.sql.parser.ResultColumn@39b8d6f7
+		exposedName: null
+		name: null
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.CharConstantNode@16290fbc
+			value: foo
+			type: CHAR(3) NOT NULL
+		[2]:		
+		com.akiban.sql.parser.ResultColumn@144aa0ce
+		exposedName: null
+		name: null
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.BinaryArithmeticOperatorNode@2f833eca
+			operator: *
+			methodName: times
+			type: null
+			leftOperand: 				
+				com.akiban.sql.parser.NumericConstantNode@518f5824
+				value: 3
+				type: INTEGER NOT NULL
+			rightOperand: 				
+				com.akiban.sql.parser.NumericConstantNode@19e3cd51
+				value: 10
+				type: INTEGER NOT NULL
+targetTableName: 	
+	com.akiban.sql.parser.TableName@a5d
+	T1

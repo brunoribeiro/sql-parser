@@ -1,0 +1,28 @@
+com.akiban.sql.parser.CreateTableNode@199836ed
+name: T2
+statementType: CREATE TABLE
+lockGranularity: R
+queryExpression: 	
+	com.akiban.sql.parser.SelectNode@583e0ebb
+	isDistinct: false
+	resultColumns: 		
+		com.akiban.sql.parser.ResultColumnList@5239443f
+
+		[0]:		
+		com.akiban.sql.parser.AllResultColumn@2dafae45
+		tableName: null
+		exposedName: null
+		name: null
+		tableName: null
+		isDefaultColumn: false
+		type: null
+	fromList: 		
+		com.akiban.sql.parser.FromList@68da4b71
+
+		[0]:		
+		com.akiban.sql.parser.FromBaseTable@538f1d7e
+		tableName: T1
+		updateOrDelete: null
+		null
+		correlation Name: null
+		null

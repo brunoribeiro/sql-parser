@@ -43,6 +43,9 @@ import com.akiban.sql.types.DataTypeDescriptor;
 import java.sql.Types;
 import java.util.Map;
 
+import java.io.IOException;
+import java.io.Writer;
+
 /**
  * QueryTreeNode is the root class for all query tree nodes. All
  * query tree nodes inherit from QueryTreeNode.
@@ -235,6 +238,20 @@ public abstract class QueryTreeNode implements Visitable
   }
 
   /**
+   * Print this tree to the given stream.
+   */
+  public void treePrint(Writer writer) {
+    Writer oldWriter = getDebugOutput();
+    try {
+      setDebugOutput(writer);
+      treePrint();
+    }
+    finally {
+      setDebugOutput(oldWriter);
+    }
+  }
+
+  /**
    * Print call stack for debug purposes
    */
 
@@ -291,6 +308,15 @@ public abstract class QueryTreeNode implements Visitable
     return false;
   }
 
+  private static Writer debugOutput = null;
+
+  public static Writer getDebugOutput() {
+    return debugOutput;
+  }
+  public static void setDebugOutput(Writer writer) {
+    debugOutput = writer;
+  }
+
   /**
    * Print a String for debugging
    *
@@ -298,13 +324,30 @@ public abstract class QueryTreeNode implements Visitable
    */
 
   public static void debugPrint(String outputString) {
-    System.out.print(outputString);
+    if (debugOutput == null)
+      System.out.print(outputString);
+    else {
+      try {
+        debugOutput.write(outputString);
+      }
+      catch (IOException ex) {
+        throw new RuntimeException(ex);
+      }
+    }
   }
 
   /**
    * Flush the debug stream out
    */
   protected static void debugFlush() {
+    if (debugOutput != null) {
+      try {
+        debugOutput.flush();
+      }
+      catch (IOException ex) {
+        throw new RuntimeException(ex);        
+      }
+    }
   }
 
   /**
