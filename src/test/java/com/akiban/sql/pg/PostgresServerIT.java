@@ -156,24 +156,58 @@ public class PostgresServerIT extends ApiTestBase
   }
   
   @Test
-  public void foo() throws Exception {
-    String sql = "SELECT * FROM customers";
-    System.out.println(sql);
-    PreparedStatement stmt = connection.prepareStatement(sql);
-    ResultSet rs = stmt.executeQuery();
-    ResultSetMetaData md = rs.getMetaData();
-    for (int i = 1; i <= md.getColumnCount(); i++) {
-      if (i > 1) System.out.print("\t");
-      System.out.print(md.getColumnName(i));
-    }
-    System.out.println();
-    while (rs.next()) {
-      for (int i = 1; i <= md.getColumnCount(); i++) {
-        if (i > 1) System.out.print("\t");
-        System.out.print(rs.getString(i));
-      }
-      System.out.println();
-    }
-    stmt.close();
+  public void testQueries() throws Exception {
+    testFiles(RESOURCE_DIR);
   }
+
+  protected void testFiles(File dir) throws Exception {
+    int npass = 0, nfail = 0;
+    File[] sqlFiles = listSQLFiles(dir);
+    for (File sqlFile : sqlFiles) {
+      String sql = fileContents(sqlFile).trim();
+      String data;
+      try {
+        StringBuilder dstr = new StringBuilder();
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+        ResultSetMetaData md = rs.getMetaData();
+        for (int i = 1; i <= md.getColumnCount(); i++) {
+          if (i > 1) dstr.append('\t');
+          dstr.append(md.getColumnName(i));
+        }
+        dstr.append('\n');
+        while (rs.next()) {
+          for (int i = 1; i <= md.getColumnCount(); i++) {
+            if (i > 1) dstr.append('\t');
+            dstr.append(rs.getString(i));
+          }
+          dstr.append('\n');
+        }
+        stmt.close();
+        data = dstr.toString();
+      }
+      catch (Exception ex) {
+        System.out.println("Error for " + sqlFile);
+        ex.printStackTrace(System.out);
+        nfail++;
+        continue;
+      }
+      String expected = fileContents(expectedFile(sqlFile)).trim();
+      if (!expected.endsWith("\n\n"))
+        expected += "\n";
+      if (data.equals(expected))
+        npass++;
+      else {
+        System.out.println("Mismatch for " + sqlFile);
+        System.out.println(sql);
+        System.out.println(expected);
+        System.out.println(data);
+        nfail++;
+      }
+    }
+
+    if (nfail > 0)
+      fail(nfail + " parses did not match.");
+  }
+
 }
