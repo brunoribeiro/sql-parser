@@ -14,10 +14,8 @@
 
 package com.akiban.sql.parser;
 
-import com.akiban.sql.CompareWithoutHashes;
 import com.akiban.sql.TestBase;
 
-import com.akiban.sql.StandardException;
 import com.akiban.sql.parser.SQLParser;
 import com.akiban.sql.parser.StatementNode;
 
@@ -30,7 +28,6 @@ import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collection;
 

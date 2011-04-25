@@ -16,9 +16,7 @@ package com.akiban.sql.compiler;
 
 import com.akiban.sql.parser.StatementNode;
 
-import org.junit.Before;
 import org.junit.Test;
-import static junit.framework.Assert.*;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.junit.runner.RunWith;

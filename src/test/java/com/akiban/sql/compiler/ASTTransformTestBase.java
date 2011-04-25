@@ -14,10 +14,8 @@
 
 package com.akiban.sql.compiler;
 
-import com.akiban.sql.CompareWithoutHashes;
 import com.akiban.sql.TestBase;
 
-import com.akiban.sql.StandardException;
 import com.akiban.sql.parser.StatementNode;
 import com.akiban.sql.parser.SQLParser;
 import com.akiban.sql.compiler.AISBinder;
