@@ -91,7 +91,8 @@ public class PostgresServerConnection implements Runnable
       topLevel();
     }
     catch (Exception ex) {
-      g_logger.warn("Error in server", ex);
+      if (m_running)
+        g_logger.warn("Error in server", ex);
     }
     finally {
       try {
