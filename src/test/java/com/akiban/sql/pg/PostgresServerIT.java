@@ -14,7 +14,7 @@
 
 package com.akiban.sql.pg;
 import com.akiban.sql.RegexFilenameFilter;
-import static com.akiban.sql.TestBase.*;
+import com.akiban.sql.TestBase;
 
 import com.akiban.server.api.dml.scan.NewRow;
 import com.akiban.server.api.dml.scan.NiceRow;
@@ -26,6 +26,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static junit.framework.Assert.*;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.junit.runner.RunWith;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -44,6 +47,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+@RunWith(Parameterized.class)
 public class PostgresServerIT extends ApiTestBase
 {
   public static final File RESOURCE_DIR = 
@@ -154,60 +158,38 @@ public class PostgresServerIT extends ApiTestBase
       connection = null;
     }
   }
-  
+
+  @Parameters
+  public static Collection<Object[]> queries() throws Exception {
+    return TestBase.sqlAndExpected(RESOURCE_DIR);
+  }
+
+  protected String sql, expected;
+
+  public PostgresServerIT(String sql, String expected) {
+    this.sql = sql.trim();
+    this.expected = expected;
+  }
+
   @Test
-  public void testQueries() throws Exception {
-    testFiles(RESOURCE_DIR);
-  }
-
-  protected void testFiles(File dir) throws Exception {
-    int npass = 0, nfail = 0;
-    File[] sqlFiles = listSQLFiles(dir);
-    for (File sqlFile : sqlFiles) {
-      String sql = fileContents(sqlFile).trim();
-      String data;
-      try {
-        StringBuilder dstr = new StringBuilder();
-        PreparedStatement stmt = connection.prepareStatement(sql);
-        ResultSet rs = stmt.executeQuery();
-        ResultSetMetaData md = rs.getMetaData();
-        for (int i = 1; i <= md.getColumnCount(); i++) {
-          if (i > 1) dstr.append('\t');
-          dstr.append(md.getColumnName(i));
-        }
-        dstr.append('\n');
-        while (rs.next()) {
-          for (int i = 1; i <= md.getColumnCount(); i++) {
-            if (i > 1) dstr.append('\t');
-            dstr.append(rs.getString(i));
-          }
-          dstr.append('\n');
-        }
-        stmt.close();
-        data = dstr.toString();
-      }
-      catch (Exception ex) {
-        System.out.println("Error for " + sqlFile);
-        ex.printStackTrace(System.out);
-        nfail++;
-        continue;
-      }
-      String expected = fileContents(expectedFile(sqlFile)).trim();
-      if (!expected.endsWith("\n\n"))
-        expected += "\n";
-      if (data.equals(expected))
-        npass++;
-      else {
-        System.out.println("Mismatch for " + sqlFile);
-        System.out.println(sql);
-        System.out.println(expected);
-        System.out.println(data);
-        nfail++;
-      }
+  public void testQuery() throws Exception {
+    StringBuilder data = new StringBuilder();
+    PreparedStatement stmt = connection.prepareStatement(sql);
+    ResultSet rs = stmt.executeQuery();
+    ResultSetMetaData md = rs.getMetaData();
+    for (int i = 1; i <= md.getColumnCount(); i++) {
+      if (i > 1) data.append('\t');
+      data.append(md.getColumnName(i));
     }
-
-    if (nfail > 0)
-      fail(nfail + " parses did not match.");
+    data.append('\n');
+    while (rs.next()) {
+      for (int i = 1; i <= md.getColumnCount(); i++) {
+        if (i > 1) data.append('\t');
+        data.append(rs.getString(i));
+      }
+      data.append('\n');
+    }
+    stmt.close();
+    assertEquals(data.toString(), expected);
   }
-
 }

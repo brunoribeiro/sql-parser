@@ -14,18 +14,32 @@
 
 package com.akiban.sql;
 
+import org.junit.Ignore;
+import static junit.framework.Assert.fail;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.CharBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
-
-import org.junit.Ignore;
 
 @Ignore
 public class TestBase
 {
+  protected TestBase() {
+  }
+
+  protected String sql, expected;
+
+  protected TestBase(String sql, String expected) {
+    this.sql = sql;
+    this.expected = expected;
+  }
+
   public static File[] listSQLFiles(File dir) {
     File[] result = dir.listFiles(new RegexFilenameFilter(".*\\.sql"));
     Arrays.sort(result, new Comparator<File>() {
@@ -63,6 +77,30 @@ public class TestBase
         }
       }
     }
+  }
+
+  public static Collection<Object[]> sqlAndExpected(File dir) throws IOException {
+    Collection<Object[]> result = new ArrayList<Object[]>();
+    for (File sqlFile : listSQLFiles(dir)) {
+      result.add(new Object[] {
+                   fileContents(sqlFile),
+                   fileContents(expectedFile(sqlFile))
+                 });
+    }
+    return result;
+  }
+
+  protected static void assertEqualsWithoutHashes(String expected, String actual) 
+      throws IOException {
+    assertEqualsWithoutPattern(expected, actual, CompareWithoutHashes.HASH_REGEX);
+  }
+
+  protected static void assertEqualsWithoutPattern(String expected, String actual, 
+                                                   String regex) 
+      throws IOException {
+    if (!new CompareWithoutHashes(regex).match(new StringReader(expected), 
+                                               new StringReader(actual)))
+      fail("expected='" + expected + "' actual='" + actual + "'");
   }
 
 }

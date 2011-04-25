@@ -16,8 +16,14 @@ package com.akiban.sql.unparser;
 
 import com.akiban.sql.TestBase;
 
+import com.akiban.sql.compiler.AISBinder;
+import com.akiban.sql.compiler.BoundNodeToString;
 import com.akiban.sql.parser.SQLParser;
 import com.akiban.sql.parser.StatementNode;
+
+import com.akiban.ais.ddl.SchemaDef;
+import com.akiban.ais.ddl.SchemaDefToAis;
+import com.akiban.ais.model.AkibanInformationSchema;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,19 +36,26 @@ import java.io.File;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class NodeToStringTest extends TestBase
+public class BoundNodeToStringTest extends TestBase
 {
-  public static final File RESOURCE_DIR = 
-    new File("src/test/resources/"
-             + NodeToStringTest.class.getPackage().getName().replace('.', '/'));
+  public static final File RESOURCE_DIR =
+    new File(NodeToStringTest.RESOURCE_DIR, "bound");
 
   protected SQLParser parser;
-  protected NodeToString unparser;
+  protected BoundNodeToString unparser;
+  protected AISBinder binder;
 
   @Before
   public void before() throws Exception {
     parser = new SQLParser();
-    unparser = new NodeToString();
+    unparser = new BoundNodeToString();
+    unparser.setUseBindings(true);
+
+    String sql = fileContents(new File(RESOURCE_DIR, "schema.ddl"));
+    SchemaDef schemaDef = SchemaDef.parseSchema("use user; " + sql);
+    SchemaDefToAis toAis = new SchemaDefToAis(schemaDef, false);
+    AkibanInformationSchema ais = toAis.getAis();
+    binder = new AISBinder(ais, "user");
   }
 
   @Parameters
@@ -50,13 +63,14 @@ public class NodeToStringTest extends TestBase
     return sqlAndExpected(RESOURCE_DIR);
   }
 
-  public NodeToStringTest(String sql, String expected) {
+  public BoundNodeToStringTest(String sql, String expected) {
     super(sql, expected);
   }
 
   @Test
-  public void testUnparser() throws Exception {
+  public void testBound() throws Exception {
     StatementNode stmt = parser.parseStatement(sql);
+    binder.bind(stmt);
     assertEquals(expected, unparser.toString(stmt));
   }
 

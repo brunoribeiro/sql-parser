@@ -24,12 +24,17 @@ import com.akiban.sql.parser.StatementNode;
 import org.junit.Before;
 import org.junit.Test;
 import static junit.framework.Assert.*;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collection;
 
+@RunWith(Parameterized.class)
 public class SQLParserTest extends TestBase
 {
   public static final File RESOURCE_DIR = 
@@ -49,45 +54,18 @@ public class SQLParserTest extends TestBase
     return str.toString().trim();
   }
 
-  protected boolean compare(String tree, String expected) throws IOException {
-    return new CompareWithoutHashes().match(new StringReader(tree), 
-                                            new StringReader(expected));
+  @Parameters
+  public static Collection<Object[]> queries() throws Exception {
+    return sqlAndExpected(RESOURCE_DIR);
   }
 
-  protected void testFiles(File dir) throws Exception {
-    int npass = 0, nfail = 0;
-    File[] sqlFiles = listSQLFiles(dir);
-    for (File sqlFile : sqlFiles) {
-      String sql = fileContents(sqlFile).trim();
-      String tree;
-      try {
-        StatementNode stmt = parser.parseStatement(sql);
-        tree = getTree(stmt);
-      }
-      catch (Exception ex) {
-        System.out.println("Error for " + sqlFile);
-        ex.printStackTrace(System.out);
-        nfail++;
-        continue;
-      }
-      String expected = fileContents(expectedFile(sqlFile)).trim();
-      if (compare(tree, expected))
-        npass++;
-      else {
-        System.out.println("Mismatch for " + sqlFile);
-        System.out.println(sql);
-        System.out.println(expected);
-        System.out.println(tree);
-        nfail++;
-      }
-    }
-
-    if (nfail > 0)
-      fail(nfail + " parses did not match.");
+  public SQLParserTest(String sql, String expected) {
+    super(sql, expected);
   }
 
   @Test
   public void testParser() throws Exception {
-    testFiles(RESOURCE_DIR);
+    StatementNode stmt = parser.parseStatement(sql);
+    assertEqualsWithoutHashes(expected, getTree(stmt));
   }
 }
