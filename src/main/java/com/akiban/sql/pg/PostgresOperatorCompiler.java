@@ -123,29 +123,8 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
       throw new StandardException("Unsupported WINDOW");
 
     List<UserTable> tables = new ArrayList<UserTable>();
-    GroupBinding group = null;
-    for (FromTable fromTable : select.getFromList()) {
-      if (!(fromTable instanceof FromBaseTable))
-        throw new StandardException("Unsupported FROM non-table: " + fromTable);
-      TableBinding tb = (TableBinding)fromTable.getUserData();
-      if (tb == null) 
-        throw new StandardException("Unsupported FROM table: " + fromTable);
-      GroupBinding gb = tb.getGroupBinding();
-      if (gb == null)
-        throw new StandardException("Unsupported FROM non-group: " + fromTable);
-      if (group == null)
-        group = gb;
-      else if (group != gb)
-        throw new StandardException("Unsupported multiple groups");
-      UserTable table = (UserTable)tb.getTable();
-      tables.add(table);
-    }
+    GroupBinding group = addTables(select.getFromList(), tables);
     GroupTable groupTable = group.getGroup().getGroupTable();
-    Collections.sort(tables, new Comparator<UserTable>() {
-                       public int compare(UserTable t1, UserTable t2) {
-                         return t1.getDepth().compareTo(t2.getDepth());
-                       }
-                     });
     Set<BinaryOperatorNode> indexConditions = new HashSet<BinaryOperatorNode>();
     Index index = null;
     if (select.getWhereClause() != null) {
@@ -265,6 +244,49 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
     return new PostgresOperatorStatement(m_adapter, resultOperator, 
                                          indexKeyRange, indexOperator, resultRowType, 
                                          resultColumns, resultColumnOffsets);
+  }
+
+  protected GroupBinding addTables(FromList fromTables, List<UserTable> tables) 
+      throws StandardException {
+    GroupBinding group = null;
+    for (FromTable fromTable : fromTables) {
+      group = addTable(fromTable, tables, group);
+    }
+    Collections.sort(tables, new Comparator<UserTable>() {
+                       public int compare(UserTable t1, UserTable t2) {
+                         return t1.getDepth().compareTo(t2.getDepth());
+                       }
+                     });
+    return group;
+  }
+
+  protected GroupBinding addTable(FromTable fromTable, 
+                                  List<UserTable> tables, GroupBinding group)
+      throws StandardException {
+    if (fromTable instanceof FromBaseTable) {
+      TableBinding tb = (TableBinding)fromTable.getUserData();
+      if (tb == null) 
+        throw new StandardException("Unsupported FROM table: " + fromTable);
+      GroupBinding gb = tb.getGroupBinding();
+      if (gb == null)
+        throw new StandardException("Unsupported FROM non-group: " + fromTable);
+      if (group == null)
+        group = gb;
+      else if (group != gb)
+        throw new StandardException("Unsupported multiple groups");
+      UserTable table = (UserTable)tb.getTable();
+      tables.add(table);
+    }
+    else if (fromTable instanceof JoinNode) {
+      if (fromTable instanceof HalfOuterJoinNode)
+        throw new StandardException("Unsupported OUTER JOIN: " + fromTable);
+      JoinNode joinNode = (JoinNode)fromTable;
+      group = addTable((FromTable)joinNode.getLeftResultSet(), tables, group);
+      group = addTable((FromTable)joinNode.getRightResultSet(), tables, group);
+    }
+    else
+      throw new StandardException("Unsupported FROM non-table: " + fromTable);
+    return group;
   }
 
   protected UserTableRowType userTableRowType(UserTable table) {
