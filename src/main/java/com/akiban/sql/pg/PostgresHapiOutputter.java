@@ -51,8 +51,9 @@ public class PostgresHapiOutputter implements HapiOutputter {
     return m_nrows;
   }
 
-  public void output(HapiProcessedGetRequest request, Iterable<RowData> rows, 
-              OutputStream outputStream) throws IOException {
+  public void output(HapiProcessedGetRequest request, boolean hKeyOrdered,
+                     Iterable<RowData> rows, OutputStream outputStream) 
+      throws IOException {
     try {
       List<Column> columns = m_request.getColumns();
       List<PostgresType> types = m_request.getTypes();

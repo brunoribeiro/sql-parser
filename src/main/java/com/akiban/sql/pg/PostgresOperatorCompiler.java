@@ -73,6 +73,7 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
   private BooleanNormalizer m_booleanNormalizer;
   private SubqueryFlattener m_subqueryFlattener;
   private Grouper m_grouper;
+  private Schema m_schema;
   private PersistitAdapter m_adapter;
 
   public PostgresOperatorCompiler(SQLParser parser, 
@@ -86,7 +87,8 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
     m_booleanNormalizer = new BooleanNormalizer(parser);
     m_subqueryFlattener = new SubqueryFlattener(parser);
     m_grouper = new Grouper(parser);
-    m_adapter = new PersistitAdapter(new Schema(ais),
+    m_schema = new Schema(ais);
+    m_adapter = new PersistitAdapter(m_schema,
                                      (PersistitStore)serviceManager.getStore(),
                                      session);
   }
@@ -135,7 +137,7 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
     PhysicalOperator resultOperator, indexOperator;
     IndexKeyRange indexKeyRange;
     if (index == null) {
-      resultOperator = groupScan_Default(m_adapter, groupTable);
+      resultOperator = groupScan_Default(groupTable);
       indexKeyRange = null;
       indexOperator = null;
     }
@@ -149,7 +151,12 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
         addAncestors.add(userTableRowType(table));
       }
       indexOperator = indexScan_Default(index);
-      resultOperator = indexLookup_Default(indexOperator, groupTable, addAncestors);
+      if (addAncestors.isEmpty())
+        resultOperator = indexLookup_Default(indexOperator, groupTable);
+      else
+        resultOperator = ancestorLookup_Default(indexOperator, groupTable, 
+                                                userTableRowType((UserTable)index.getTable()),
+                                                addAncestors);
       indexKeyRange = getIndexKeyRange(index, indexConditions);
     }
     RowType resultRowType = null;
@@ -290,7 +297,7 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
   }
 
   protected UserTableRowType userTableRowType(UserTable table) {
-    return m_adapter.schema().userTableRowType(table);
+    return m_schema.userTableRowType(table);
   }
 
   protected Expression getExpression(ValueNode operand, 
@@ -550,13 +557,12 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
   protected IndexBound getIndexBound(Index index, Object[] keys) {
     if (keys == null) 
       return null;
-    IndexRowType rowType = m_adapter.schema().indexRowType(index);
-    IndexKeyType indexKeyType = rowType.keyType();
+    IndexRowType rowType = m_schema.indexRowType(index);
     NiceRow niceRow = new NiceRow(index.getTable().getTableId());
     for (int i = 0; i < keys.length; i++) {
       niceRow.put(index.getColumns().get(i).getColumn().getPosition(), keys[i]);
     }
-    return new IndexBound(indexKeyType, 
+    return new IndexBound((UserTable)index.getTable(), 
                           PersistitGroupRow.newPersistitGroupRow(m_adapter, 
                                                                  niceRow.toRowData()));
   }
