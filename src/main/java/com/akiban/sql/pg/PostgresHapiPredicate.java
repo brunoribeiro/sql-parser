@@ -20,49 +20,49 @@ import com.akiban.server.api.HapiPredicate;
 
 public class PostgresHapiPredicate implements HapiPredicate
 {
-  private Column m_column;
-  private Operator m_op;
-  private String m_value;
-  private int m_parameterIndex;
+  private Column column;
+  private Operator op;
+  private String value;
+  private int parameterIndex;
 
   public PostgresHapiPredicate(Column column, Operator op, String value) {
-    m_column = column;
-    m_op = op;
-    m_value = value;
-    m_parameterIndex = -1;
+    this.column = column;
+    this.op = op;
+    this.value = value;
+    this.parameterIndex = -1;
   }
 
   public PostgresHapiPredicate(Column column,
                                Operator op, int parameterIndex) {
-    m_column = column;
-    m_op = op;
-    m_parameterIndex = parameterIndex;
+    this.column = column;
+    this.op = op;
+    this.parameterIndex = parameterIndex;
   }
 
   public PostgresHapiPredicate(PostgresHapiPredicate other, String value) {
-    m_column = other.m_column;
-    m_op = other.m_op;
-    m_value = value;
-    m_parameterIndex = -1;
+    this.column = other.column;
+    this.op = other.op;
+    this.value = value;
+    this.parameterIndex = -1;
   }
                                
   public TableName getTableName() {
-    return m_column.getUserTable().getName();
+    return column.getUserTable().getName();
   }
 
   public String getColumnName() {
-    return m_column.getName();
+    return column.getName();
   }
 
   public Operator getOp() {
-    return m_op;
+    return op;
   }
 
   public String getValue() {
-    return m_value;
+    return value;
   }
 
   public int getParameterIndex() {
-    return m_parameterIndex;
+    return parameterIndex;
   }
 }

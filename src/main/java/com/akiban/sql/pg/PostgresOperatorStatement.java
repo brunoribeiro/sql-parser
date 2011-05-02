@@ -35,11 +35,11 @@ import java.io.IOException;
  */
 public class PostgresOperatorStatement extends PostgresStatement
 {
-  private Executable m_executable;
-  private IndexKeyRange m_indexKeyRange;
-  private PhysicalOperator m_indexOperator;
-  private RowType m_resultRowType;
-  private int[] m_resultColumnOffsets;
+  private Executable executable;
+  private IndexKeyRange indexKeyRange;
+  private PhysicalOperator indexOperator;
+  private RowType resultRowType;
+  private int[] resultColumnOffsets;
 
   public PostgresOperatorStatement(StoreAdapter store,
                                    PhysicalOperator resultOperator,
@@ -49,18 +49,18 @@ public class PostgresOperatorStatement extends PostgresStatement
                                    List<Column> resultColumns,
                                    int[] resultColumnOffsets) {
     super(resultColumns);
-    m_executable = new Executable(store, resultOperator);
-    m_indexKeyRange = indexKeyRange;
-    m_indexOperator = indexOperator;
-    m_resultRowType = resultRowType;
-    m_resultColumnOffsets = resultColumnOffsets;
+    this.executable = new Executable(store, resultOperator);
+    this.indexKeyRange = indexKeyRange;
+    this.indexOperator = indexOperator;
+    this.resultRowType = resultRowType;
+    this.resultColumnOffsets = resultColumnOffsets;
   }
   
   public int execute(PostgresMessenger messenger, Session session, int maxrows)
       throws IOException, StandardException {
-    if (m_indexKeyRange != null)
-      m_executable.bind(m_indexOperator, m_indexKeyRange);
-    Cursor cursor = m_executable.cursor();
+    if (indexKeyRange != null)
+      executable.bind(indexOperator, indexKeyRange);
+    Cursor cursor = executable.cursor();
     int nrows = 0;
     try {
       cursor.open();
@@ -69,12 +69,12 @@ public class PostgresOperatorStatement extends PostgresStatement
       int ncols = columns.size();
       while (cursor.next()) {
         Row row = cursor.currentRow();
-        if (row.rowType() == m_resultRowType) {
+        if (row.rowType() == resultRowType) {
           messenger.beginMessage(PostgresMessenger.DATA_ROW_TYPE);
           messenger.writeShort(ncols);
           for (int i = 0; i < ncols; i++) {
             Column column = columns.get(i);
-            Object field = row.field(m_resultColumnOffsets[i]);
+            Object field = row.field(resultColumnOffsets[i]);
             PostgresType type = types.get(i);
             byte[] value = type.encodeValue(field, column, 
                                             messenger.getEncoding(),

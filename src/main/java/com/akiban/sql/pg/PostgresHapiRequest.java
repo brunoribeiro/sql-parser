@@ -34,27 +34,27 @@ import java.io.IOException;
  */
 public class PostgresHapiRequest extends PostgresStatement implements HapiGetRequest
 {
-  private UserTable m_shallowestTable, m_queryTable, m_deepestTable;
-  private List<HapiPredicate> m_predicates; // All on m_queryTable.
+  private UserTable shallowestTable, queryTable, deepestTable;
+  private List<HapiPredicate> predicates; // All on queryTable.
 
   public PostgresHapiRequest(UserTable shallowestTable, UserTable queryTable, 
                              UserTable deepestTable,
                              List<HapiPredicate> predicates, List<Column> columns) {
     super(columns);
-    m_shallowestTable = shallowestTable;
-    m_queryTable = queryTable;
-    m_deepestTable = deepestTable;
-    m_predicates = predicates;
+    this.shallowestTable = shallowestTable;
+    this.queryTable = queryTable;
+    this.deepestTable = deepestTable;
+    this.predicates = predicates;
   }
 
   public UserTable getShallowestTable() {
-    return m_shallowestTable;
+    return shallowestTable;
   }
   public UserTable getQueryTable() {
-    return m_queryTable;
+    return queryTable;
   }
   public UserTable getDeepestTable() {
-    return m_deepestTable;
+    return deepestTable;
   }
 
   /*** HapiGetRequest ***/
@@ -64,7 +64,7 @@ public class PostgresHapiRequest extends PostgresStatement implements HapiGetReq
    * @return The name of the schema containing the tables involved in this request.
    */
   public String getSchema() {
-    return m_shallowestTable.getName().getSchemaName();
+    return shallowestTable.getName().getSchemaName();
   }
   
   /**
@@ -72,7 +72,7 @@ public class PostgresHapiRequest extends PostgresStatement implements HapiGetReq
    * @return The name (without schema) of the rootmost table to be retrieved.
    */
   public String getTable() {
-    return m_shallowestTable.getName().getTableName();
+    return shallowestTable.getName().getTableName();
   }
 
   /**
@@ -80,7 +80,7 @@ public class PostgresHapiRequest extends PostgresStatement implements HapiGetReq
    * @return The schema and table name of the table whose columns are restricted by this request.
    */
   public TableName getUsingTable() {
-    return m_queryTable.getName();
+    return queryTable.getName();
   }
 
   public int getLimit() {
@@ -88,29 +88,29 @@ public class PostgresHapiRequest extends PostgresStatement implements HapiGetReq
   }
 
   public List<HapiPredicate> getPredicates() {
-    return m_predicates;
+    return predicates;
   }
 
   /** Only needed in the case where a statement has parameters or the client
    * specifies that some results should be in binary. */
   static class BoundRequest extends PostgresHapiRequest {
-    private boolean[] m_columnBinary; // Is this column binary format?
-    private boolean m_defaultColumnBinary;
+    private boolean[] columnBinary; // Is this column binary format?
+    private boolean defaultColumnBinary;
 
     public BoundRequest(UserTable shallowestTable, UserTable queryTable, 
                         UserTable deepestTable,
                         List<HapiPredicate> predicates, List<Column> columns, 
                         boolean[] columnBinary, boolean defaultColumnBinary) {
       super(shallowestTable, queryTable, deepestTable, predicates, columns);
-      m_columnBinary = columnBinary;
-      m_defaultColumnBinary = defaultColumnBinary;
+      this.columnBinary = columnBinary;
+      this.defaultColumnBinary = defaultColumnBinary;
     }
 
     public boolean isColumnBinary(int i) {
-      if ((m_columnBinary != null) && (i < m_columnBinary.length))
-        return m_columnBinary[i];
+      if ((columnBinary != null) && (i < columnBinary.length))
+        return columnBinary[i];
       else
-        return m_defaultColumnBinary;
+        return defaultColumnBinary;
     }
   }
 

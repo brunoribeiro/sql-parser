@@ -74,37 +74,37 @@ public class PostgresMessenger implements DataInput, DataOutput
   public static final int AUTHENTICATION_SSPI = 9;
   public static final int AUTHENTICATION_GSS_CONTINUE = 8;
 
-  private InputStream m_inputStream;
-  private OutputStream m_outputStream;
-  private DataInputStream m_dataInput;
-  private DataInputStream m_messageInput;
-  private ByteArrayOutputStream m_byteOutput;
-  private DataOutputStream m_messageOutput;
-  private String m_encoding = "ISO-8859-1";
-  private boolean m_cancel = false;
+  private InputStream inputStream;
+  private OutputStream outputStream;
+  private DataInputStream dataInput;
+  private DataInputStream messageInput;
+  private ByteArrayOutputStream byteOutput;
+  private DataOutputStream messageOutput;
+  private String encoding = "ISO-8859-1";
+  private boolean cancel = false;
 
   public PostgresMessenger(InputStream inputStream, OutputStream outputStream) {
-    m_inputStream = inputStream;
-    m_outputStream = outputStream;
-    m_dataInput = new DataInputStream(m_inputStream);
+    this.inputStream = inputStream;
+    this.outputStream = outputStream;
+    this.dataInput = new DataInputStream(inputStream);
   }
 
   /** The encoding used for strings. */
   public String getEncoding() {
-    return m_encoding;
+    return encoding;
   }
   public void setEncoding(String encoding) {
-    m_encoding = encoding;
+    this.encoding = encoding;
   }
 
   /** Has a cancel been sent? */
   public synchronized boolean isCancel() {
-    return m_cancel;
+    return cancel;
   }
   /** Mark as cancelled. Cleared at the start of results. 
    * Usually set from a thread running a request just for that purpose. */
   public synchronized void setCancel(boolean cancel) {
-    m_cancel = cancel;
+    this.cancel = cancel;
   }
 
   /** Read the next message from the stream, without any type opcode. */
@@ -115,25 +115,25 @@ public class PostgresMessenger implements DataInput, DataOutput
   protected int readMessage(boolean hasType) throws IOException {
     int type;
     if (hasType)
-      type = m_dataInput.read();
+      type = dataInput.read();
     else
       type = STARTUP_MESSAGE_TYPE;
     if (type < 0) 
       return type;              // EOF
-    int len = m_dataInput.readInt();
+    int len = dataInput.readInt();
     len -= 4;
     byte[] msg = new byte[len];
-    m_dataInput.readFully(msg, 0, len);
-    m_messageInput = new DataInputStream(new ByteArrayInputStream(msg));
+    dataInput.readFully(msg, 0, len);
+    messageInput = new DataInputStream(new ByteArrayInputStream(msg));
     return type;
   }
 
   /** Begin outgoing message of given type. */
   protected void beginMessage(int type) throws IOException {
-    m_byteOutput = new ByteArrayOutputStream();
-    m_messageOutput = new DataOutputStream(m_byteOutput);
-    m_messageOutput.write(type);
-    m_messageOutput.writeInt(0);
+    byteOutput = new ByteArrayOutputStream();
+    messageOutput = new DataOutputStream(byteOutput);
+    messageOutput.write(type);
+    messageOutput.writeInt(0);
   }
 
   /** Send outgoing message. */
@@ -142,126 +142,126 @@ public class PostgresMessenger implements DataInput, DataOutput
   }
   /** Send outgoing message and optionally flush stream. */
   protected void sendMessage(boolean flush) throws IOException {
-    m_messageOutput.flush();
-    byte[] msg = m_byteOutput.toByteArray();
+    messageOutput.flush();
+    byte[] msg = byteOutput.toByteArray();
     int len = msg.length - 1;
     msg[1] = (byte)(len >> 24);
     msg[2] = (byte)(len >> 16);
     msg[3] = (byte)(len >> 8);
     msg[4] = (byte)len;
-    m_outputStream.write(msg);
-    if (flush) m_outputStream.flush();
+    outputStream.write(msg);
+    if (flush) outputStream.flush();
   }
 
   /** Read null-terminated string. */
   public String readString() throws IOException {
     ByteArrayOutputStream bs = new ByteArrayOutputStream();
     while (true) {
-      int b = m_messageInput.read();
+      int b = messageInput.read();
       if (b < 0) throw new IOException("EOF in the middle of a string");
       if (b == 0) break;
       bs.write(b);
     }
-    return bs.toString(m_encoding);
+    return bs.toString(encoding);
   }
 
   /** Write null-terminated string. */
   public void writeString(String s) throws IOException {
-    byte[] ba = s.getBytes(m_encoding);
-    m_messageOutput.write(ba);
-    m_messageOutput.write(0);
+    byte[] ba = s.getBytes(encoding);
+    messageOutput.write(ba);
+    messageOutput.write(0);
   }
 
   /*** DataInput ***/
   public boolean readBoolean() throws IOException {
-    return m_messageInput.readBoolean();
+    return messageInput.readBoolean();
   }
   public byte readByte() throws IOException {
-    return m_messageInput.readByte();
+    return messageInput.readByte();
   }
   public char readChar() throws IOException {
-    return m_messageInput.readChar();
+    return messageInput.readChar();
   }
   public double readDouble() throws IOException {
-    return m_messageInput.readDouble();
+    return messageInput.readDouble();
   }
   public float readFloat() throws IOException {
-    return m_messageInput.readFloat();
+    return messageInput.readFloat();
   }
   public void readFully(byte[] b) throws IOException {
-    m_messageInput.readFully(b);
+    messageInput.readFully(b);
   }
   public void readFully(byte[] b, int off, int len) throws IOException {
-    m_messageInput.readFully(b, off, len);
+    messageInput.readFully(b, off, len);
   }
   public int readInt() throws IOException {
-    return m_messageInput.readInt();
+    return messageInput.readInt();
   }
   @SuppressWarnings("deprecation")
   public String readLine() throws IOException {
-    return m_messageInput.readLine();
+    return messageInput.readLine();
   }
   public long readLong() throws IOException {
-    return m_messageInput.readLong();
+    return messageInput.readLong();
   }
   public short readShort() throws IOException {
-    return m_messageInput.readShort();
+    return messageInput.readShort();
   }
   public String readUTF() throws IOException {
-    return m_messageInput.readUTF();
+    return messageInput.readUTF();
   }
   public int readUnsignedByte() throws IOException {
-    return m_messageInput.readUnsignedByte();
+    return messageInput.readUnsignedByte();
   }
   public int readUnsignedShort() throws IOException {
-    return m_messageInput.readUnsignedShort();
+    return messageInput.readUnsignedShort();
   }
   public int skipBytes(int n) throws IOException {
-    return m_messageInput.skipBytes(n);
+    return messageInput.skipBytes(n);
   }
 
   /*** DataOutput ***/
   public void write(byte[] data) throws IOException {
-    m_messageOutput.write(data);
+    messageOutput.write(data);
   }
   public void write(byte[] data, int ofs, int len) throws IOException {
-    m_messageOutput.write(data, ofs, len);
+    messageOutput.write(data, ofs, len);
   }
   public void write(int v) throws IOException {
-    m_messageOutput.write(v);
+    messageOutput.write(v);
   }
   public void writeBoolean(boolean v) throws IOException {
-    m_messageOutput.writeBoolean(v);
+    messageOutput.writeBoolean(v);
   }
   public void writeByte(int v) throws IOException {
-    m_messageOutput.writeByte(v);
+    messageOutput.writeByte(v);
   }
   public void writeBytes(String s) throws IOException {
-    m_messageOutput.writeBytes(s);
+    messageOutput.writeBytes(s);
   }
   public void writeChar(int v) throws IOException {
-    m_messageOutput.writeChar(v);
+    messageOutput.writeChar(v);
   }
   public void writeChars(String s) throws IOException {
-    m_messageOutput.writeChars(s);
+    messageOutput.writeChars(s);
   }
   public void writeDouble(double v) throws IOException {
-    m_messageOutput.writeDouble(v);
+    messageOutput.writeDouble(v);
   }
   public void writeFloat(float v) throws IOException {
-    m_messageOutput.writeFloat(v);
+    messageOutput.writeFloat(v);
   }
   public void writeInt(int v) throws IOException {
-    m_messageOutput.writeInt(v);
+    messageOutput.writeInt(v);
   }
   public void writeLong(long v) throws IOException {
-    m_messageOutput.writeLong(v);
+    messageOutput.writeLong(v);
   }
   public void writeShort(int v) throws IOException {
-    m_messageOutput.writeShort(v);
+    messageOutput.writeShort(v);
   }
   public void writeUTF(String s) throws IOException {
-    m_messageOutput.writeUTF(s);
+    messageOutput.writeUTF(s);
   }
 
 }

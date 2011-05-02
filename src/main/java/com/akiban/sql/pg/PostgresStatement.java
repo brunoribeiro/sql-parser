@@ -28,15 +28,15 @@ import java.io.IOException;
  */
 public abstract class PostgresStatement
 {
-  private List<Column> m_columns; // Any from m_shallowestTable through m_deepestTable.
-  private List<PostgresType> m_types;
+  private List<Column> columns; // Any from shallowestTable through deepestTable.
+  private List<PostgresType> types;
 
   public PostgresStatement(List<Column> columns) {
-    m_columns = columns;
+    this.columns = columns;
   }
 
   public List<Column> getColumns() {
-    return m_columns;
+    return columns;
   }
 
   public boolean isColumnBinary(int i) {
@@ -44,13 +44,13 @@ public abstract class PostgresStatement
   }
 
   public List<PostgresType> getTypes() throws StandardException {
-    if (m_types == null) {
-      m_types = new ArrayList<PostgresType>(m_columns.size());
-      for (Column column : m_columns) {
-        m_types.add(PostgresType.fromAIS(column));
+    if (types == null) {
+      types = new ArrayList<PostgresType>(columns.size());
+      for (Column column : columns) {
+        types.add(PostgresType.fromAIS(column));
       }
     }
-    return m_types;
+    return types;
   }
 
   public void sendRowDescription(PostgresMessenger messenger) 

@@ -47,39 +47,39 @@ import java.util.*;
  */
 public class PostgresHapiCompiler implements PostgresStatementCompiler
 {
-  private SQLParserContext m_parserContext;
-  private NodeFactory m_nodeFactory;
-  private AISBinder m_binder;
-  private TypeComputer m_typeComputer;
-  private BooleanNormalizer m_booleanNormalizer;
-  private SubqueryFlattener m_subqueryFlattener;
-  private Grouper m_grouper;
+  private SQLParserContext parserContext;
+  private NodeFactory nodeFactory;
+  private AISBinder binder;
+  private TypeComputer typeComputer;
+  private BooleanNormalizer booleanNormalizer;
+  private SubqueryFlattener subqueryFlattener;
+  private Grouper grouper;
 
   public PostgresHapiCompiler(SQLParser parser, 
-                              AkibanInformationSchema ais, String schema) {
-    m_parserContext = parser;
-    m_nodeFactory = m_parserContext.getNodeFactory();
-    m_binder = new AISBinder(ais, schema);
-    parser.setNodeFactory(new BindingNodeFactory(m_nodeFactory));
-    m_typeComputer = new TypeComputer();
-    m_booleanNormalizer = new BooleanNormalizer(parser);
-    m_subqueryFlattener = new SubqueryFlattener(parser);
-    m_grouper = new Grouper(parser);
+                              AkibanInformationSchema ais, String defaultSchemaName) {
+    parserContext = parser;
+    nodeFactory = parserContext.getNodeFactory();
+    binder = new AISBinder(ais, defaultSchemaName);
+    parser.setNodeFactory(new BindingNodeFactory(nodeFactory));
+    typeComputer = new TypeComputer();
+    booleanNormalizer = new BooleanNormalizer(parser);
+    subqueryFlattener = new SubqueryFlattener(parser);
+    grouper = new Grouper(parser);
   }
 
   public void addView(ViewDefinition view) throws StandardException {
-    m_binder.addView(view);
+    binder.addView(view);
   }
 
   @Override
   public PostgresStatement compile(CursorNode cursor, int[] paramTypes)
       throws StandardException {
     // Get into bound & grouped form.
-    m_binder.bind(cursor);
-    cursor = (CursorNode)m_booleanNormalizer.normalize(cursor);
-    m_typeComputer.compute(cursor);
-    cursor = (CursorNode)m_subqueryFlattener.flatten(cursor);
-    m_grouper.group(cursor);
+    binder.bind(cursor);
+    cursor = (CursorNode)booleanNormalizer.normalize(cursor);
+    typeComputer.compute(cursor);
+    cursor = (CursorNode)subqueryFlattener.flatten(cursor);
+    grouper.group(cursor);
 
     if (cursor.getOrderByList() != null)
       throw new StandardException("Unsupported ORDER BY");
@@ -163,7 +163,7 @@ public class PostgresHapiCompiler implements PostgresStatementCompiler
       AndNode andNode = (AndNode)whereClause;
       whereClause = andNode.getRightOperand();
       ValueNode condition = andNode.getLeftOperand();
-      if (m_grouper.getJoinConditions().contains(condition))
+      if (grouper.getJoinConditions().contains(condition))
         continue;
       HapiPredicate.Operator op;
       switch (condition.getNodeType()) {

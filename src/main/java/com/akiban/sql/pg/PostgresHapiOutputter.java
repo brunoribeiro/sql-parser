@@ -31,32 +31,32 @@ import java.io.*;
 import java.util.*;
 
 public class PostgresHapiOutputter implements HapiOutputter {
-  private PostgresMessenger m_messenger;
-  private Session m_session;
-  private PostgresHapiRequest m_request;
-  private int m_nrows, m_maxrows;
+  private PostgresMessenger messenger;
+  private Session session;
+  private PostgresHapiRequest request;
+  private int nrows, maxrows;
 
   public PostgresHapiOutputter(PostgresMessenger messenger, Session session,
                                PostgresHapiRequest request, int maxrows) {
-    m_messenger = messenger;
-    m_session = session;
+    this.messenger = messenger;
+    this.session = session;
     // No way to get from HapiProcessedGetRequest to original HapiGetRequest.
-    m_request = request;
-    m_maxrows = maxrows;
-    m_nrows = 0;
+    this.request = request;
+    this.maxrows = maxrows;
+    this.nrows = 0;
   }
 
   /** Return the number of rows output. */
   public int getNRows() {
-    return m_nrows;
+    return nrows;
   }
 
-  public void output(HapiProcessedGetRequest request, boolean hKeyOrdered,
+  public void output(HapiProcessedGetRequest processedRequest, boolean hKeyOrdered,
                      Iterable<RowData> rows, OutputStream outputStream) 
       throws IOException {
     try {
-      List<Column> columns = m_request.getColumns();
-      List<PostgresType> types = m_request.getTypes();
+      List<Column> columns = request.getColumns();
+      List<PostgresType> types = request.getTypes();
       int ncols = columns.size();
       int[] tableIds = new int[ncols];
       for (int i = 0; i < ncols; i++) {
@@ -67,15 +67,15 @@ public class PostgresHapiOutputter implements HapiOutputter {
       boolean[] processedTableIds = new boolean[ntables];
       int outputTableId = -1;
       for (RowData rowData : rows) {
-        if (m_messenger.isCancel()) {
-          m_nrows = -1;
+        if (messenger.isCancel()) {
+          nrows = -1;
         }
         NewRow row = new LegacyRowWrapper(rowData).niceRow();
         int tableId = row.getTableId();
         if (!processedTableIds[tableId]) {
           RowDef rowDef = row.getRowDef();
           UserTable table = rowDef.userTable();
-          if (table == m_request.getDeepestTable())
+          if (table == request.getDeepestTable())
             outputTableId = tableId;
           for (int i = 0; i < ncols; i++) {
             Column column = columns.get(i);
@@ -91,14 +91,14 @@ public class PostgresHapiOutputter implements HapiOutputter {
             Object value = row.get(column.getPosition());
             PostgresType type = types.get(i);
             outputData[i] = type.encodeValue(value, column, 
-                                             m_messenger.getEncoding(),
-                                             m_request.isColumnBinary(i));
+                                             messenger.getEncoding(),
+                                             request.isColumnBinary(i));
           }
         }
         if (tableId == outputTableId) {
           sendDataRow(outputData);
-          m_nrows++;
-          if ((m_maxrows > 0) && (m_nrows >= m_maxrows))
+          nrows++;
+          if ((maxrows > 0) && (nrows >= maxrows))
             return;
         }
       }
@@ -110,18 +110,18 @@ public class PostgresHapiOutputter implements HapiOutputter {
 
   // Send the current row, whose columns may come from ancestors.
   protected void sendDataRow(byte[][] row) throws IOException {
-    m_messenger.beginMessage(PostgresMessenger.DATA_ROW_TYPE);
-    m_messenger.writeShort(row.length);
+    messenger.beginMessage(PostgresMessenger.DATA_ROW_TYPE);
+    messenger.writeShort(row.length);
     for (byte[] col : row) {
       if (col == null) {
-        m_messenger.writeInt(-1);
+        messenger.writeInt(-1);
       }
       else {
-        m_messenger.writeInt(col.length);
-        m_messenger.write(col);
+        messenger.writeInt(col.length);
+        messenger.write(col);
       }
     }
-    m_messenger.sendMessage();
+    messenger.sendMessage();
   }
 
 }

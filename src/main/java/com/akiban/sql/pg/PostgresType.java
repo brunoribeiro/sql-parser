@@ -133,24 +133,24 @@ public class PostgresType
   public static final int REGOPERATOR_TYPE_OID = 2204;
   
   /*** Representation. ***/
-  private int m_oid;
-  private short m_length;
-  private int m_modifier;
+  private int oid;
+  private short length;
+  private int modifier;
 
   public PostgresType(int oid, short length, int modifier) {
-    m_oid = oid;
-    m_length = length;
-    m_modifier = modifier;
+    this.oid = oid;
+    this.length = length;
+    this.modifier = modifier;
   }
 
   public int getOid() {
-    return m_oid;
+    return oid;
   }
   public short getLength() {
-    return m_length;
+    return length;
   }
   public int getModifier() {
-    return m_modifier;
+    return modifier;
   }
 
   public static PostgresType fromAIS(Column aisColumn) throws StandardException {
@@ -194,7 +194,7 @@ public class PostgresType
         throw new StandardException("Binary encoding not yet supported.");
       }
       else {
-        switch (m_oid) {
+        switch (oid) {
         case DATE_TYPE_OID:
           value = g_dateFormatter.format((Date)value);
           break;

@@ -49,15 +49,15 @@ public class PostgresOperatorCompiler extends OperatorCompiler
 {
   private static final Logger g_logger = LoggerFactory.getLogger(PostgresOperatorCompiler.class);
 
-  private PersistitAdapter m_adapter;
+  private PersistitAdapter adapter;
 
   public PostgresOperatorCompiler(SQLParser parser, 
                                   AkibanInformationSchema ais, String defaultSchemaName,
                                   Session session, ServiceManager serviceManager) {
     super(parser, ais, defaultSchemaName);
-    m_adapter = new PersistitAdapter(schema,
-                                     (PersistitStore)serviceManager.getStore(),
-                                     session);
+    adapter = new PersistitAdapter(schema,
+                                   (PersistitStore)serviceManager.getStore(),
+                                   session);
   }
 
   @Override
@@ -67,7 +67,7 @@ public class PostgresOperatorCompiler extends OperatorCompiler
 
     g_logger.warn("Operator:\n{}", result);
 
-    return new PostgresOperatorStatement(m_adapter, 
+    return new PostgresOperatorStatement(adapter, 
                                          result.getResultOperator(),
                                          result.getIndexKeyRange(),
                                          result.getIndexOperator(),
@@ -82,7 +82,7 @@ public class PostgresOperatorCompiler extends OperatorCompiler
     for (int i = 0; i < keys.length; i++) {
       niceRow.put(index.getColumns().get(i).getColumn().getPosition(), keys[i]);
     }
-    return PersistitGroupRow.newPersistitGroupRow(m_adapter, niceRow.toRowData());
+    return PersistitGroupRow.newPersistitGroupRow(adapter, niceRow.toRowData());
   }
 
 }

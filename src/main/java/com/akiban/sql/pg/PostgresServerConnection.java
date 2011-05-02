@@ -43,42 +43,42 @@ public class PostgresServerConnection implements Runnable
 {
   private static final Logger g_logger = LoggerFactory.getLogger(PostgresServerConnection.class);
 
-  private PostgresServer m_server;
-  private boolean m_running = false, m_ignoreUntilSync = false;
-  private Socket m_socket;
-  private PostgresMessenger m_messenger;
-  private int m_pid, m_secret;
-  private int m_version;
-  private Properties m_properties;
-  private Map<String,PostgresStatement> m_preparedStatements =
+  private PostgresServer server;
+  private boolean running = false, ignoreUntilSync = false;
+  private Socket socket;
+  private PostgresMessenger messenger;
+  private int pid, secret;
+  private int version;
+  private Properties properties;
+  private Map<String,PostgresStatement> preparedStatements =
     new HashMap<String,PostgresStatement>();
-  private Map<String,PostgresStatement> m_boundPortals =
+  private Map<String,PostgresStatement> boundPortals =
     new HashMap<String,PostgresStatement>();
 
-  private Session m_session;
-  private ServiceManager m_serviceManager;
-  private AkibanInformationSchema m_ais;
-  private SQLParser m_parser;
-  private PostgresStatementCompiler m_compiler;
+  private Session session;
+  private ServiceManager serviceManager;
+  private AkibanInformationSchema ais;
+  private SQLParser parser;
+  private PostgresStatementCompiler compiler;
 
   public PostgresServerConnection(PostgresServer server, Socket socket, 
                                   int pid, int secret) {
-    m_server = server;
-    m_socket = socket;
-    m_pid = pid;
-    m_secret = secret;
+    this.server = server;
+    this.socket = socket;
+    this.pid = pid;
+    this.secret = secret;
   }
 
   public void start() {
-    m_running = true;
+    running = true;
     new Thread(this).start();
   }
 
   public void stop() {
-    m_running = false;
+    running = false;
     // Can only wake up stream read by closing down socket.
     try {
-      m_socket.close();
+      socket.close();
     }
     catch (IOException ex) {
     }
@@ -86,17 +86,17 @@ public class PostgresServerConnection implements Runnable
 
   public void run() {
     try {
-      m_messenger = new PostgresMessenger(m_socket.getInputStream(),
-                                          m_socket.getOutputStream());
+      messenger = new PostgresMessenger(socket.getInputStream(),
+                                        socket.getOutputStream());
       topLevel();
     }
     catch (Exception ex) {
-      if (m_running)
+      if (running)
         g_logger.warn("Error in server", ex);
     }
     finally {
       try {
-        m_socket.close();
+        socket.close();
       }
       catch (IOException ex) {
       }
@@ -104,15 +104,15 @@ public class PostgresServerConnection implements Runnable
   }
 
   protected void topLevel() throws IOException {
-    g_logger.warn("Connect from {}" + m_socket.getRemoteSocketAddress());
-    m_messenger.readMessage(false);
+    g_logger.warn("Connect from {}" + socket.getRemoteSocketAddress());
+    messenger.readMessage(false);
     processStartupMessage();
-    while (m_running) {
-      int type = m_messenger.readMessage();
-      if (m_ignoreUntilSync) {
+    while (running) {
+      int type = messenger.readMessage();
+      if (ignoreUntilSync) {
         if ((type != -1) && (type != PostgresMessenger.SYNC_TYPE))
           continue;
-        m_ignoreUntilSync = false;
+        ignoreUntilSync = false;
       }
       try {
         switch (type) {
@@ -152,22 +152,22 @@ public class PostgresServerConnection implements Runnable
       }
       catch (StandardException ex) {
         g_logger.warn("Error in query", ex);
-        m_messenger.beginMessage(PostgresMessenger.ERROR_RESPONSE_TYPE);
-        m_messenger.write('S');
-        m_messenger.writeString("ERROR");
+        messenger.beginMessage(PostgresMessenger.ERROR_RESPONSE_TYPE);
+        messenger.write('S');
+        messenger.writeString("ERROR");
         // TODO: Could dummy up an SQLSTATE, etc.
-        m_messenger.write('M');
-        m_messenger.writeString(ex.getMessage());
-        m_messenger.write(0);
-        m_messenger.sendMessage(true);
-        m_ignoreUntilSync = true;
+        messenger.write('M');
+        messenger.writeString(ex.getMessage());
+        messenger.write(0);
+        messenger.sendMessage(true);
+        ignoreUntilSync = true;
       }
     }
-    m_server.removeConnection(m_pid);
+    server.removeConnection(pid);
   }
 
   protected void processStartupMessage() throws IOException {
-    int version = m_messenger.readInt();
+    int version = messenger.readInt();
     switch (version) {
     case PostgresMessenger.VERSION_CANCEL:
       processCancelRequest();
@@ -176,50 +176,50 @@ public class PostgresServerConnection implements Runnable
       processSSLMessage();
       return;
     default:
-      m_version = version;
+      version = version;
       g_logger.warn("Version {}.{}", (version >> 16), (version & 0xFFFF));
     }
-    m_properties = new Properties();
+    properties = new Properties();
     while (true) {
-      String param = m_messenger.readString();
+      String param = messenger.readString();
       if (param.length() == 0) break;
-      String value = m_messenger.readString();
-      m_properties.put(param, value);
+      String value = messenger.readString();
+      properties.put(param, value);
     }
-    g_logger.warn("Properties: {}", m_properties);
-    String enc = m_properties.getProperty("client_encoding");
+    g_logger.warn("Properties: {}", properties);
+    String enc = properties.getProperty("client_encoding");
     if (enc != null) {
       if ("UNICODE".equals(enc))
-        m_messenger.setEncoding("UTF-8");
+        messenger.setEncoding("UTF-8");
       else
-        m_messenger.setEncoding(enc);
+        messenger.setEncoding(enc);
     }
     
-    String schema = m_properties.getProperty("database");
-    m_session = new SessionImpl();
-    m_serviceManager = ServiceManagerImpl.get();
-    m_ais = m_serviceManager.getDStarL().ddlFunctions().getAIS(m_session);
-    m_parser = new SQLParser();
+    String schema = properties.getProperty("database");
+    session = new SessionImpl();
+    serviceManager = ServiceManagerImpl.get();
+    ais = serviceManager.getDStarL().ddlFunctions().getAIS(session);
+    parser = new SQLParser();
     if (false)
-      m_compiler = new PostgresHapiCompiler(m_parser, m_ais, schema);
+      compiler = new PostgresHapiCompiler(parser, ais, schema);
     else
-      m_compiler = new PostgresOperatorCompiler(m_parser, m_ais, schema,
-                                                m_session, m_serviceManager);
+      compiler = new PostgresOperatorCompiler(parser, ais, schema,
+                                              session, serviceManager);
 
     {
-      m_messenger.beginMessage(PostgresMessenger.AUTHENTICATION_TYPE);
-      m_messenger.writeInt(PostgresMessenger.AUTHENTICATION_CLEAR_TEXT);
-      m_messenger.sendMessage(true);
+      messenger.beginMessage(PostgresMessenger.AUTHENTICATION_TYPE);
+      messenger.writeInt(PostgresMessenger.AUTHENTICATION_CLEAR_TEXT);
+      messenger.sendMessage(true);
     }
   }
 
   protected void processCancelRequest() throws IOException {
-    int pid = m_messenger.readInt();
-    int secret = m_messenger.readInt();
-    PostgresServerConnection connection = m_server.getConnection(pid);
-    if ((connection != null) && (secret == connection.m_secret))
+    int pid = messenger.readInt();
+    int secret = messenger.readInt();
+    PostgresServerConnection connection = server.getConnection(pid);
+    if ((connection != null) && (secret == connection.secret))
       // No easy way to signal in another thread.
-      connection.m_messenger.setCancel(true);
+      connection.messenger.setCancel(true);
     stop();                     // That's all for this connection.
   }
 
@@ -228,37 +228,37 @@ public class PostgresServerConnection implements Runnable
   }
 
   protected void processPasswordMessage() throws IOException {
-    String user = m_properties.getProperty("user");
-    String pass = m_messenger.readString();
+    String user = properties.getProperty("user");
+    String pass = messenger.readString();
     g_logger.warn("Login {}/{}", user, pass);
     Properties status = new Properties();
     // This is enough to make the JDBC driver happy.
-    status.put("client_encoding", m_properties.getProperty("client_encoding", "UNICODE"));
-    status.put("server_encoding", m_messenger.getEncoding());
+    status.put("client_encoding", properties.getProperty("client_encoding", "UNICODE"));
+    status.put("server_encoding", messenger.getEncoding());
     status.put("server_version", "8.4.7"); // Not sure what the min it'll accept is.
     status.put("session_authorization", user);
     
     {
-      m_messenger.beginMessage(PostgresMessenger.AUTHENTICATION_TYPE);
-      m_messenger.writeInt(PostgresMessenger.AUTHENTICATION_OK);
-      m_messenger.sendMessage();
+      messenger.beginMessage(PostgresMessenger.AUTHENTICATION_TYPE);
+      messenger.writeInt(PostgresMessenger.AUTHENTICATION_OK);
+      messenger.sendMessage();
     }
     for (String prop : status.stringPropertyNames()) {
-      m_messenger.beginMessage(PostgresMessenger.PARAMETER_STATUS_TYPE);
-      m_messenger.writeString(prop);
-      m_messenger.writeString(status.getProperty(prop));
-      m_messenger.sendMessage();
+      messenger.beginMessage(PostgresMessenger.PARAMETER_STATUS_TYPE);
+      messenger.writeString(prop);
+      messenger.writeString(status.getProperty(prop));
+      messenger.sendMessage();
     }
     {
-      m_messenger.beginMessage(PostgresMessenger.BACKEND_KEY_DATA_TYPE);
-      m_messenger.writeInt(m_pid);
-      m_messenger.writeInt(m_secret);
-      m_messenger.sendMessage();
+      messenger.beginMessage(PostgresMessenger.BACKEND_KEY_DATA_TYPE);
+      messenger.writeInt(pid);
+      messenger.writeInt(secret);
+      messenger.sendMessage();
     }
     {
-      m_messenger.beginMessage(PostgresMessenger.READY_FOR_QUERY_TYPE);
-      m_messenger.writeByte('I'); // Idle ('T' -> xact open; 'E' -> xact abort)
-      m_messenger.sendMessage(true);
+      messenger.beginMessage(PostgresMessenger.READY_FOR_QUERY_TYPE);
+      messenger.writeByte('I'); // Idle ('T' -> xact open; 'E' -> xact abort)
+      messenger.sendMessage(true);
     }
   }
 
@@ -266,152 +266,152 @@ public class PostgresServerConnection implements Runnable
   public static final String ODBC_LO_TYPE_QUERY = "select oid, typbasetype from pg_type where typname = 'lo'";
 
   protected void processQuery() throws IOException, StandardException {
-    String sql = m_messenger.readString();
+    String sql = messenger.readString();
     g_logger.warn("Query: {}", sql);
     if (!sql.equals(ODBC_LO_TYPE_QUERY)) {
-      StatementNode stmt = m_parser.parseStatement(sql);
+      StatementNode stmt = parser.parseStatement(sql);
       if (!(stmt instanceof CursorNode))
         throw new StandardException("Not a SELECT");
-      PostgresStatement pstmt = m_compiler.compile((CursorNode)stmt, null);
-      pstmt.sendRowDescription(m_messenger);
-      int nrows = pstmt.execute(m_messenger, m_session, -1);
+      PostgresStatement pstmt = compiler.compile((CursorNode)stmt, null);
+      pstmt.sendRowDescription(messenger);
+      int nrows = pstmt.execute(messenger, session, -1);
     }
-    m_messenger.beginMessage(PostgresMessenger.COMMAND_COMPLETE_TYPE);
-    m_messenger.writeString("SELECT");
-    m_messenger.sendMessage();
-    m_messenger.beginMessage(PostgresMessenger.READY_FOR_QUERY_TYPE);
-    m_messenger.writeByte('I');
-    m_messenger.sendMessage(true);
+    messenger.beginMessage(PostgresMessenger.COMMAND_COMPLETE_TYPE);
+    messenger.writeString("SELECT");
+    messenger.sendMessage();
+    messenger.beginMessage(PostgresMessenger.READY_FOR_QUERY_TYPE);
+    messenger.writeByte('I');
+    messenger.sendMessage(true);
   }
 
   protected void processParse() throws IOException, StandardException {
-    String stmtName = m_messenger.readString();
-    String sql = m_messenger.readString();
+    String stmtName = messenger.readString();
+    String sql = messenger.readString();
     // TODO: $n might be out of order.
     sql = sql.replaceAll("\\$.", "?");
-    short nparams = m_messenger.readShort();
+    short nparams = messenger.readShort();
     int[] paramTypes = new int[nparams];
     for (int i = 0; i < nparams; i++)
-      paramTypes[i] = m_messenger.readInt();
+      paramTypes[i] = messenger.readInt();
     g_logger.warn("Parse: {}", sql);
 
-    StatementNode stmt = m_parser.parseStatement(sql);
+    StatementNode stmt = parser.parseStatement(sql);
     if (stmt instanceof CursorNode) {
-      PostgresStatement pstmt = m_compiler.compile((CursorNode)stmt, paramTypes);
-      m_preparedStatements.put(stmtName, pstmt);
+      PostgresStatement pstmt = compiler.compile((CursorNode)stmt, paramTypes);
+      preparedStatements.put(stmtName, pstmt);
     }
     else
       throw new StandardException("Not a SELECT");
 
-    m_messenger.beginMessage(PostgresMessenger.PARSE_COMPLETE_TYPE);
-    m_messenger.sendMessage();
+    messenger.beginMessage(PostgresMessenger.PARSE_COMPLETE_TYPE);
+    messenger.sendMessage();
   }
 
   protected void processBind() throws IOException {
-    String portalName = m_messenger.readString();
-    String stmtName = m_messenger.readString();
+    String portalName = messenger.readString();
+    String stmtName = messenger.readString();
     String[] params = null;
     {
-      short nformats = m_messenger.readShort();
+      short nformats = messenger.readShort();
       boolean[] paramsBinary = new boolean[nformats];
       for (int i = 0; i < nformats; i++)
-        paramsBinary[i] = (m_messenger.readShort() == 1);
-      short nparams = m_messenger.readShort();
+        paramsBinary[i] = (messenger.readShort() == 1);
+      short nparams = messenger.readShort();
       params = new String[nparams];
       boolean binary = false;
       for (int i = 0; i < nparams; i++) {
         if (i < nformats)
           binary = paramsBinary[i];
-        int len = m_messenger.readInt();
+        int len = messenger.readInt();
         if (len < 0) continue;    // Null
         byte[] param = new byte[len];
-        m_messenger.readFully(param, 0, len);
+        messenger.readFully(param, 0, len);
         if (binary) {
           throw new IOException("Don't know how to parse binary format.");
         }
         else {
-          params[i] = new String(param, m_messenger.getEncoding());
+          params[i] = new String(param, messenger.getEncoding());
         }
       }
     }
     boolean[] resultsBinary = null; 
     boolean defaultResultsBinary = false;
     {    
-      short nresults = m_messenger.readShort();
+      short nresults = messenger.readShort();
       if (nresults == 1)
-        defaultResultsBinary = (m_messenger.readShort() == 1);
+        defaultResultsBinary = (messenger.readShort() == 1);
       else if (nresults > 0) {
         resultsBinary = new boolean[nresults];
         for (int i = 0; i < nresults; i++) {
-          resultsBinary[i] = (m_messenger.readShort() == 1);
+          resultsBinary[i] = (messenger.readShort() == 1);
         }
         defaultResultsBinary = resultsBinary[nresults-1];
       }
     }
-    PostgresStatement pstmt = m_preparedStatements.get(stmtName);
-    m_boundPortals.put(portalName, 
+    PostgresStatement pstmt = preparedStatements.get(stmtName);
+    boundPortals.put(portalName, 
                        pstmt.getBoundRequest(params, 
                                              resultsBinary, defaultResultsBinary));
-    m_messenger.beginMessage(PostgresMessenger.BIND_COMPLETE_TYPE);
-    m_messenger.sendMessage();
+    messenger.beginMessage(PostgresMessenger.BIND_COMPLETE_TYPE);
+    messenger.sendMessage();
   }
 
   protected void processDescribe() throws IOException, StandardException {
-    byte source = m_messenger.readByte();
-    String name = m_messenger.readString();
+    byte source = messenger.readByte();
+    String name = messenger.readString();
     PostgresStatement pstmt;    
     switch (source) {
     case (byte)'S':
-      pstmt = m_preparedStatements.get(name);
+      pstmt = preparedStatements.get(name);
       break;
     case (byte)'P':
-      pstmt = m_boundPortals.get(name);
+      pstmt = boundPortals.get(name);
       break;
     default:
       throw new IOException("Unknown describe source: " + (char)source);
     }
     if (false) {
       // This would be for a query not returning data.
-      m_messenger.beginMessage(PostgresMessenger.NO_DATA_TYPE);
-      m_messenger.sendMessage();
+      messenger.beginMessage(PostgresMessenger.NO_DATA_TYPE);
+      messenger.sendMessage();
     }
     else {
-      pstmt.sendRowDescription(m_messenger);
+      pstmt.sendRowDescription(messenger);
     }
   }
 
   protected void processExecute() throws IOException, StandardException {
-    String portalName = m_messenger.readString();
-    int maxrows = m_messenger.readInt();
-    PostgresStatement pstmt = m_boundPortals.get(portalName);
-    int nrows = pstmt.execute(m_messenger, m_session, maxrows);
-    m_messenger.beginMessage(PostgresMessenger.COMMAND_COMPLETE_TYPE);
-    m_messenger.writeString("SELECT");
-    m_messenger.sendMessage();
+    String portalName = messenger.readString();
+    int maxrows = messenger.readInt();
+    PostgresStatement pstmt = boundPortals.get(portalName);
+    int nrows = pstmt.execute(messenger, session, maxrows);
+    messenger.beginMessage(PostgresMessenger.COMMAND_COMPLETE_TYPE);
+    messenger.writeString("SELECT");
+    messenger.sendMessage();
   }
 
   protected void processSync() throws IOException {
-    m_messenger.beginMessage(PostgresMessenger.READY_FOR_QUERY_TYPE);
-    m_messenger.writeByte('I'); // Idle ('T' -> xact open; 'E' -> xact abort)
-    m_messenger.sendMessage(true);
+    messenger.beginMessage(PostgresMessenger.READY_FOR_QUERY_TYPE);
+    messenger.writeByte('I'); // Idle ('T' -> xact open; 'E' -> xact abort)
+    messenger.sendMessage(true);
   }
 
   protected void processClose() throws IOException {
-    byte source = m_messenger.readByte();
-    String name = m_messenger.readString();
+    byte source = messenger.readByte();
+    String name = messenger.readString();
     PostgresStatement pstmt;    
     switch (source) {
     case (byte)'S':
-      pstmt = m_preparedStatements.remove(name);
+      pstmt = preparedStatements.remove(name);
       break;
     case (byte)'P':
-      pstmt = m_boundPortals.remove(name);
+      pstmt = boundPortals.remove(name);
       break;
     default:
       throw new IOException("Unknown describe source: " + (char)source);
     }
-    m_messenger.beginMessage(PostgresMessenger.CLOSE_COMPLETE_TYPE);
-    m_messenger.sendMessage();
+    messenger.beginMessage(PostgresMessenger.CLOSE_COMPLETE_TYPE);
+    messenger.sendMessage();
   }
   
   protected void processTerminate() throws IOException {

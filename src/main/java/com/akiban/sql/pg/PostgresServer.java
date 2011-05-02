@@ -31,22 +31,22 @@ import java.util.*;
 public class PostgresServer implements Runnable {
   public static final int DEFAULT_PORT = 15432; // Real one is 5432
   
-  private int m_port = DEFAULT_PORT;
-  private ServerSocket m_socket = null;
-  private boolean m_running = false;
-  private Map<Integer,PostgresServerConnection> m_connections =
+  private int port = DEFAULT_PORT;
+  private ServerSocket socket = null;
+  private boolean running = false;
+  private Map<Integer,PostgresServerConnection> connections =
       new HashMap<Integer,PostgresServerConnection>();
 
   private static final Logger g_logger = LoggerFactory.getLogger(PostgresServer.class);
 
   public PostgresServer(int port) {
-    m_port = port;
+    this.port = port;
   }
 
   /** Called from the (AkServer's) main thread to start a server
       running in its own thread. */
   public void start() {
-    m_running = true;
+    running = true;
     new Thread(this).start();
   }
 
@@ -55,8 +55,8 @@ public class PostgresServer implements Runnable {
     ServerSocket socket;
     synchronized(this) {
       // Service might shutdown before we've even got server socket created.
-      m_running = false;
-      socket = m_socket;
+      running = false;
+      socket = this.socket;
     }
     if (socket != null) {
       // Can only wake up by closing socket inside whose accept() we are blocked.
@@ -67,51 +67,51 @@ public class PostgresServer implements Runnable {
       }
     }
 
-    for (PostgresServerConnection connection : m_connections.values()) {
+    for (PostgresServerConnection connection : connections.values()) {
       connection.stop();
     }
   }
 
   public void run() {
-    g_logger.warn("Postgres server listening on port {}", m_port);
+    g_logger.warn("Postgres server listening on port {}", port);
     int pid = 0;
     Random rand = new Random();
     try {
       synchronized(this) {
-        if (!m_running) return;
-        m_socket = new ServerSocket(m_port);
+        if (!running) return;
+        socket = new ServerSocket(port);
       }
-      while (m_running) {
-        Socket socket = m_socket.accept();
+      while (running) {
+        Socket sock = socket.accept();
         pid++;
         int secret = rand.nextInt();
         PostgresServerConnection connection = 
-          new PostgresServerConnection(this, socket, pid, secret);
-        m_connections.put(pid, connection);
+          new PostgresServerConnection(this, sock, pid, secret);
+        connections.put(pid, connection);
         connection.start();
       }
     }
     catch (Exception ex) {
-      if (m_running)
+      if (running)
         g_logger.warn("Error in server", ex);
     }
     finally {
-      if (m_socket != null) {
+      if (socket != null) {
         try {
-          m_socket.close();
+          socket.close();
         }
         catch (IOException ex) {
         }
       }
-      m_running = false;
+      running = false;
     }
   }
 
   public PostgresServerConnection getConnection(int pid) {
-    return m_connections.get(pid);
+    return connections.get(pid);
   }
   public void removeConnection(int pid) {
-    m_connections.remove(pid);
+    connections.remove(pid);
   }
 
 }
