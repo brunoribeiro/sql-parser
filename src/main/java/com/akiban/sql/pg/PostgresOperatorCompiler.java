@@ -28,7 +28,6 @@ import com.akiban.qp.persistitadapter.PersistitAdapter;
 import com.akiban.qp.persistitadapter.PersistitGroupRow;
 
 import com.akiban.qp.row.Row;
-import com.akiban.qp.rowtype.IndexRowType;
 
 import com.akiban.server.api.dml.scan.NiceRow;
 
@@ -77,7 +76,6 @@ public class PostgresOperatorCompiler extends OperatorCompiler
   }
 
   protected Row getIndexRow(Index index, Object[] keys) {
-    IndexRowType rowType = schema.indexRowType(index);
     NiceRow niceRow = new NiceRow(index.getTable().getTableId());
     for (int i = 0; i < keys.length; i++) {
       niceRow.put(index.getColumns().get(i).getColumn().getPosition(), keys[i]);
