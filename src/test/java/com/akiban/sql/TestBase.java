@@ -33,9 +33,10 @@ public class TestBase
   protected TestBase() {
   }
 
-  protected String sql, expected;
+  protected String caseName, sql, expected;
 
-  protected TestBase(String sql, String expected) {
+  protected TestBase(String caseName, String sql, String expected) {
+    this.caseName = caseName;
     this.sql = sql;
     this.expected = expected;
   }
@@ -83,6 +84,7 @@ public class TestBase
     Collection<Object[]> result = new ArrayList<Object[]>();
     for (File sqlFile : listSQLFiles(dir)) {
       result.add(new Object[] {
+                   sqlFile.getName().replace(".sql", ""),
                    fileContents(sqlFile),
                    fileContents(expectedFile(sqlFile))
                  });
@@ -90,17 +92,22 @@ public class TestBase
     return result;
   }
 
-  protected static void assertEqualsWithoutHashes(String expected, String actual) 
+  protected static void assertEqualsWithoutHashes(String caseName,
+                                                  String expected, String actual) 
       throws IOException {
-    assertEqualsWithoutPattern(expected, actual, CompareWithoutHashes.HASH_REGEX);
+    assertEqualsWithoutPattern(caseName, 
+                               expected, actual, 
+                               CompareWithoutHashes.HASH_REGEX);
   }
 
-  protected static void assertEqualsWithoutPattern(String expected, String actual, 
+  protected static void assertEqualsWithoutPattern(String caseName,
+                                                   String expected, String actual, 
                                                    String regex) 
       throws IOException {
     if (!new CompareWithoutHashes(regex).match(new StringReader(expected), 
                                                new StringReader(actual)))
-      fail("expected='" + expected + "' actual='" + actual + "'");
+      fail("Difference in " + caseName + 
+           ": expected='" + expected + "' actual='" + actual + "'");
   }
 
 }

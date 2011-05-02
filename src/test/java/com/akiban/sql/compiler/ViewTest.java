@@ -37,8 +37,8 @@ public class ViewTest extends ASTTransformTestBase
     return sqlAndExpected(RESOURCE_DIR);
   }
 
-  public ViewTest(String sql, String expected) {
-    super(sql, expected);
+  public ViewTest(String caseName, String sql, String expected) {
+    super(caseName, sql, expected);
   }
 
   @Before
@@ -51,7 +51,7 @@ public class ViewTest extends ASTTransformTestBase
   public void testView() throws Exception {
     StatementNode stmt = parser.parseStatement(sql);
     binder.bind(stmt);
-    assertEqualsWithoutHashes(expected, getTree(stmt));
+    assertEqualsWithoutHashes(caseName, expected, getTree(stmt));
   }
 
 }

@@ -50,8 +50,8 @@ public class NodeToStringTest extends TestBase
     return sqlAndExpected(RESOURCE_DIR);
   }
 
-  public NodeToStringTest(String sql, String expected) {
-    super(sql, expected);
+  public NodeToStringTest(String caseName, String sql, String expected) {
+    super(caseName, sql, expected);
   }
 
   @Test

@@ -151,10 +151,9 @@ public class PostgresOperatorCompiler implements PostgresStatementCompiler
         addAncestors.add(userTableRowType(table));
       }
       indexOperator = indexScan_Default(index);
-      if (addAncestors.isEmpty())
-        resultOperator = indexLookup_Default(indexOperator, groupTable);
-      else
-        resultOperator = ancestorLookup_Default(indexOperator, groupTable, 
+      resultOperator = indexLookup_Default(indexOperator, groupTable);
+      if (!addAncestors.isEmpty())
+        resultOperator = ancestorLookup_Default(resultOperator, groupTable, 
                                                 userTableRowType((UserTable)index.getTable()),
                                                 addAncestors);
       indexKeyRange = getIndexKeyRange(index, indexConditions);

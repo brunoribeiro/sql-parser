@@ -37,8 +37,8 @@ public class GrouperTest extends ASTTransformTestBase
     return sqlAndExpected(RESOURCE_DIR);
   }
 
-  public GrouperTest(String sql, String expected) {
-    super(sql, expected);
+  public GrouperTest(String caseName, String sql, String expected) {
+    super(caseName, sql, expected);
   }
 
   @Before
@@ -56,7 +56,9 @@ public class GrouperTest extends ASTTransformTestBase
     stmt = subqueryFlattener.flatten(stmt);
     grouper.group(stmt);
     grouper.rewrite(stmt);
-    assertEqualsWithoutPattern(expected.trim(), unparser.toString(stmt), "_G_\\d+");
+    assertEqualsWithoutPattern(caseName,
+                               expected.trim(), unparser.toString(stmt), 
+                               "_G_\\d+");
   }
 
 }

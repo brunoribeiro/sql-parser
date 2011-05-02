@@ -164,9 +164,10 @@ public class PostgresServerIT extends ApiTestBase
     return TestBase.sqlAndExpected(RESOURCE_DIR);
   }
 
-  protected String sql, expected;
+  protected String caseName, sql, expected;
 
-  public PostgresServerIT(String sql, String expected) {
+  public PostgresServerIT(String caseName, String sql, String expected) {
+    this.caseName = caseName;
     this.sql = sql.trim();
     this.expected = expected;
   }
@@ -190,6 +191,6 @@ public class PostgresServerIT extends ApiTestBase
       data.append('\n');
     }
     stmt.close();
-    assertEquals(data.toString(), expected);
+    assertEquals("Difference in " + caseName, expected, data.toString());
   }
 }

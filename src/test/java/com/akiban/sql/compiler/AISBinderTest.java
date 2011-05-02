@@ -35,8 +35,8 @@ public class AISBinderTest extends ASTTransformTestBase
     return sqlAndExpected(RESOURCE_DIR);
   }
 
-  public AISBinderTest(String sql, String expected) {
-    super(sql, expected);
+  public AISBinderTest(String caseName, String sql, String expected) {
+    super(caseName, sql, expected);
   }
 
   @Test
@@ -44,7 +44,7 @@ public class AISBinderTest extends ASTTransformTestBase
     loadSchema(new File(RESOURCE_DIR, "schema.ddl"));
     StatementNode stmt = parser.parseStatement(sql);
     binder.bind(stmt);
-    assertEqualsWithoutHashes(expected, getTree(stmt));
+    assertEqualsWithoutHashes(caseName, expected, getTree(stmt));
   }
 
 }

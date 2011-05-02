@@ -36,8 +36,8 @@ public class BooleanNormalizerTest extends ASTTransformTestBase
     return sqlAndExpected(RESOURCE_DIR);
   }
 
-  public BooleanNormalizerTest(String sql, String expected) {
-    super(sql, expected);
+  public BooleanNormalizerTest(String caseName, String sql, String expected) {
+    super(caseName, sql, expected);
   }
 
   @Test

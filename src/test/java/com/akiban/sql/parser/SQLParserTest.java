@@ -56,13 +56,13 @@ public class SQLParserTest extends TestBase
     return sqlAndExpected(RESOURCE_DIR);
   }
 
-  public SQLParserTest(String sql, String expected) {
-    super(sql, expected);
+  public SQLParserTest(String caseName, String sql, String expected) {
+    super(caseName, sql, expected);
   }
 
   @Test
   public void testParser() throws Exception {
     StatementNode stmt = parser.parseStatement(sql);
-    assertEqualsWithoutHashes(expected, getTree(stmt));
+    assertEqualsWithoutHashes(caseName, expected, getTree(stmt));
   }
 }

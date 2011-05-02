@@ -41,8 +41,8 @@ import java.io.StringWriter;
 @Ignore
 public class ASTTransformTestBase extends TestBase
 {
-  protected ASTTransformTestBase(String sql, String expected) {
-    super(sql, expected);
+  protected ASTTransformTestBase(String caseName, String sql, String expected) {
+    super(caseName, sql, expected);
   }
 
   public static final File RESOURCE_DIR = 

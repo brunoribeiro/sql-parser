@@ -36,8 +36,8 @@ public class CloneTest extends ASTTransformTestBase
     return sqlAndExpected(RESOURCE_DIR);
   }
 
-  public CloneTest(String sql, String expected) {
-    super(sql, expected);
+  public CloneTest(String caseName, String sql, String expected) {
+    super(caseName, sql, expected);
   }
 
   @Test

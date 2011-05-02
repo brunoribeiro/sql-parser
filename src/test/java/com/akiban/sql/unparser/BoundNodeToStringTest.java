@@ -63,8 +63,8 @@ public class BoundNodeToStringTest extends TestBase
     return sqlAndExpected(RESOURCE_DIR);
   }
 
-  public BoundNodeToStringTest(String sql, String expected) {
-    super(sql, expected);
+  public BoundNodeToStringTest(String caseName, String sql, String expected) {
+    super(caseName, sql, expected);
   }
 
   @Test

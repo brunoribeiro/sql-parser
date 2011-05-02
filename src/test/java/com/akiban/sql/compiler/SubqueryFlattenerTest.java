@@ -37,8 +37,8 @@ public class SubqueryFlattenerTest extends ASTTransformTestBase
     return sqlAndExpected(RESOURCE_DIR);
   }
 
-  public SubqueryFlattenerTest(String sql, String expected) {
-    super(sql, expected);
+  public SubqueryFlattenerTest(String caseName, String sql, String expected) {
+    super(caseName, sql, expected);
   }
 
   @Before
