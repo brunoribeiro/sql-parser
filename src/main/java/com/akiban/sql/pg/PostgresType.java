@@ -182,7 +182,7 @@ public class PostgresType
     return new PostgresType(oid, length, modifier);
   }
 
-  public static final DateFormat g_dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+  public static final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
   public byte[] encodeValue(Object value, Column aisColumn, 
                             String encoding, boolean binary) 
@@ -196,7 +196,7 @@ public class PostgresType
       else {
         switch (oid) {
         case DATE_TYPE_OID:
-          value = g_dateFormatter.format((Date)value);
+          value = dateFormatter.format((Date)value);
           break;
         }
       }

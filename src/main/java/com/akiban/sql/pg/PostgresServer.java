@@ -37,7 +37,7 @@ public class PostgresServer implements Runnable {
   private Map<Integer,PostgresServerConnection> connections =
       new HashMap<Integer,PostgresServerConnection>();
 
-  private static final Logger g_logger = LoggerFactory.getLogger(PostgresServer.class);
+  private static final Logger logger = LoggerFactory.getLogger(PostgresServer.class);
 
   public PostgresServer(int port) {
     this.port = port;
@@ -73,7 +73,7 @@ public class PostgresServer implements Runnable {
   }
 
   public void run() {
-    g_logger.warn("Postgres server listening on port {}", port);
+    logger.warn("Postgres server listening on port {}", port);
     int pid = 0;
     Random rand = new Random();
     try {
@@ -93,7 +93,7 @@ public class PostgresServer implements Runnable {
     }
     catch (Exception ex) {
       if (running)
-        g_logger.warn("Error in server", ex);
+        logger.warn("Error in server", ex);
     }
     finally {
       if (socket != null) {

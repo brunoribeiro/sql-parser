@@ -47,7 +47,7 @@ import java.util.*;
 public class PostgresOperatorCompiler extends OperatorCompiler
                                       implements PostgresStatementCompiler
 {
-  private static final Logger g_logger = LoggerFactory.getLogger(PostgresOperatorCompiler.class);
+  private static final Logger logger = LoggerFactory.getLogger(PostgresOperatorCompiler.class);
 
   private PersistitAdapter adapter;
 
@@ -65,7 +65,7 @@ public class PostgresOperatorCompiler extends OperatorCompiler
       throws StandardException {
     Result result = compile(cursor);
 
-    g_logger.warn("Operator:\n{}", result);
+    logger.warn("Operator:\n{}", result);
 
     return new PostgresOperatorStatement(adapter, 
                                          result.getResultOperator(),

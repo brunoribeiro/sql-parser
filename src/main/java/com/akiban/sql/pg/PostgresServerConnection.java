@@ -41,7 +41,7 @@ import java.util.*;
  */
 public class PostgresServerConnection implements Runnable
 {
-  private static final Logger g_logger = LoggerFactory.getLogger(PostgresServerConnection.class);
+  private static final Logger logger = LoggerFactory.getLogger(PostgresServerConnection.class);
 
   private PostgresServer server;
   private boolean running = false, ignoreUntilSync = false;
@@ -92,7 +92,7 @@ public class PostgresServerConnection implements Runnable
     }
     catch (Exception ex) {
       if (running)
-        g_logger.warn("Error in server", ex);
+        logger.warn("Error in server", ex);
     }
     finally {
       try {
@@ -104,7 +104,7 @@ public class PostgresServerConnection implements Runnable
   }
 
   protected void topLevel() throws IOException {
-    g_logger.warn("Connect from {}" + socket.getRemoteSocketAddress());
+    logger.warn("Connect from {}" + socket.getRemoteSocketAddress());
     messenger.readMessage(false);
     processStartupMessage();
     while (running) {
@@ -151,7 +151,7 @@ public class PostgresServerConnection implements Runnable
         }
       }
       catch (StandardException ex) {
-        g_logger.warn("Error in query", ex);
+        logger.warn("Error in query", ex);
         messenger.beginMessage(PostgresMessenger.ERROR_RESPONSE_TYPE);
         messenger.write('S');
         messenger.writeString("ERROR");
@@ -177,7 +177,7 @@ public class PostgresServerConnection implements Runnable
       return;
     default:
       version = version;
-      g_logger.warn("Version {}.{}", (version >> 16), (version & 0xFFFF));
+      logger.warn("Version {}.{}", (version >> 16), (version & 0xFFFF));
     }
     properties = new Properties();
     while (true) {
@@ -186,7 +186,7 @@ public class PostgresServerConnection implements Runnable
       String value = messenger.readString();
       properties.put(param, value);
     }
-    g_logger.warn("Properties: {}", properties);
+    logger.warn("Properties: {}", properties);
     String enc = properties.getProperty("client_encoding");
     if (enc != null) {
       if ("UNICODE".equals(enc))
@@ -230,7 +230,7 @@ public class PostgresServerConnection implements Runnable
   protected void processPasswordMessage() throws IOException {
     String user = properties.getProperty("user");
     String pass = messenger.readString();
-    g_logger.warn("Login {}/{}", user, pass);
+    logger.warn("Login {}/{}", user, pass);
     Properties status = new Properties();
     // This is enough to make the JDBC driver happy.
     status.put("client_encoding", properties.getProperty("client_encoding", "UNICODE"));
@@ -267,7 +267,7 @@ public class PostgresServerConnection implements Runnable
 
   protected void processQuery() throws IOException, StandardException {
     String sql = messenger.readString();
-    g_logger.warn("Query: {}", sql);
+    logger.warn("Query: {}", sql);
     if (!sql.equals(ODBC_LO_TYPE_QUERY)) {
       StatementNode stmt = parser.parseStatement(sql);
       if (!(stmt instanceof CursorNode))
@@ -293,7 +293,7 @@ public class PostgresServerConnection implements Runnable
     int[] paramTypes = new int[nparams];
     for (int i = 0; i < nparams; i++)
       paramTypes[i] = messenger.readInt();
-    g_logger.warn("Parse: {}", sql);
+    logger.warn("Parse: {}", sql);
 
     StatementNode stmt = parser.parseStatement(sql);
     if (stmt instanceof CursorNode) {
