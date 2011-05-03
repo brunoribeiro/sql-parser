@@ -19,6 +19,8 @@ import com.akiban.sql.StandardException;
 import com.akiban.ais.model.Column;
 import com.akiban.ais.model.Type;
 
+import com.akiban.server.encoding.EncoderFactory;
+
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -196,7 +198,10 @@ public class PostgresType
       else {
         switch (oid) {
         case DATE_TYPE_OID:
-          value = dateFormatter.format((Date)value);
+          if (value instanceof Date)
+            value = dateFormatter.format((Date)value);
+          else
+            value = EncoderFactory.DATE.decodeToString((Long)value);
           break;
         }
       }
