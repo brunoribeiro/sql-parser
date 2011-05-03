@@ -30,6 +30,7 @@ import com.akiban.ais.model.AkibanInformationSchema;
 import com.akiban.ais.model.Index;
 import com.akiban.ais.model.UserTable;
 import com.akiban.server.RowDef;
+import com.akiban.server.TableStatus;
 
 import com.akiban.qp.row.Row;
 import com.akiban.qp.rowtype.IndexRowType;
@@ -53,11 +54,12 @@ public class OperatorCompilerTest extends TestBase
   public void makeCompiler() throws Exception {
     parser = new SQLParser();
     AkibanInformationSchema ais = loadSchema(new File(RESOURCE_DIR, "schema.ddl"));
-    /*
+    // This just needs to be enough to keep from UserTableRowType
+    // constructor from getting NPE.
+    int tableId = 0;
     for (UserTable userTable : ais.getUserTables().values()) {
-      new RowDef(userTable);
+      new RowDef(userTable, new TableStatus(++tableId));
     }
-    */
     compiler = new TestOperatorCompiler(parser, ais, "user");
   }
 
