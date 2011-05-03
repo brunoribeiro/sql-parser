@@ -27,6 +27,8 @@ import com.akiban.ais.model.IndexColumn;
 import com.akiban.ais.model.Join;
 import com.akiban.ais.model.UserTable;
 
+import com.akiban.server.api.dml.ColumnSelector;
+
 import com.akiban.qp.expression.Comparison;
 import com.akiban.qp.expression.Expression;
 import com.akiban.qp.expression.IndexBound;
@@ -591,7 +593,23 @@ public abstract class OperatorCompiler
   protected IndexBound getIndexBound(Index index, Object[] keys) {
     if (keys == null) 
       return null;
-    return new IndexBound((UserTable)index.getTable(), getIndexRow(index, keys));
+    return new IndexBound((UserTable)index.getTable(), 
+			  getIndexRow(index, keys),
+			  getIndexColumnSelector(index));
+  }
+
+  protected ColumnSelector getIndexColumnSelector(final Index index) {
+    return new ColumnSelector() {
+            public boolean includesColumn(int columnPosition) {
+              for (IndexColumn indexColumn : index.getColumns()) {
+                Column column = indexColumn.getColumn();
+                if (column.getPosition() == columnPosition) {
+                  return true;
+                }
+              }
+              return false;
+            }
+        };
   }
 
   protected abstract Row getIndexRow(Index index, Object[] keys);

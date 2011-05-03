@@ -25,7 +25,6 @@ import com.akiban.ais.model.UserTable;
 import com.akiban.server.service.ServiceManager;
 import com.akiban.server.service.ServiceManagerImpl;
 import com.akiban.server.service.session.Session;
-import com.akiban.server.service.session.SessionImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,9 +195,9 @@ public class PostgresServerConnection implements Runnable
     }
     
     String schema = properties.getProperty("database");
-    session = new SessionImpl();
+    session = ServiceManagerImpl.newSession();
     serviceManager = ServiceManagerImpl.get();
-    ais = serviceManager.getDStarL().ddlFunctions().getAIS(session);
+    ais = serviceManager.getDXL().ddlFunctions().getAIS(session);
     parser = new SQLParser();
     if (false)
       compiler = new PostgresHapiCompiler(parser, ais, schema);

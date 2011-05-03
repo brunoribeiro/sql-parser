@@ -33,7 +33,7 @@ import com.akiban.server.RowDef;
 
 import com.akiban.qp.row.Row;
 import com.akiban.qp.rowtype.IndexRowType;
-import com.akiban.server.itests.qp.TestRow;
+import com.akiban.server.test.it.qp.TestRow;
 
 import org.junit.Before;
 
@@ -53,9 +53,11 @@ public class OperatorCompilerTest extends TestBase
   public void makeCompiler() throws Exception {
     parser = new SQLParser();
     AkibanInformationSchema ais = loadSchema(new File(RESOURCE_DIR, "schema.ddl"));
+    /*
     for (UserTable userTable : ais.getUserTables().values()) {
       new RowDef(userTable);
     }
+    */
     compiler = new TestOperatorCompiler(parser, ais, "user");
   }
 

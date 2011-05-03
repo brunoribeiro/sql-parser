@@ -53,4 +53,8 @@ public class PostgresServerManager implements PostgresService, Service<PostgresS
     }
   }
 
+  public void crash() throws Exception {
+    stop();
+  }
+
 }

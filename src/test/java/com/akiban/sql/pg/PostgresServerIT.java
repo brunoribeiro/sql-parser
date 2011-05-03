@@ -18,7 +18,7 @@ import com.akiban.sql.TestBase;
 
 import com.akiban.server.api.dml.scan.NewRow;
 import com.akiban.server.api.dml.scan.NiceRow;
-import com.akiban.server.itests.ApiTestBase;
+import com.akiban.server.test.it.ITBase;
 import com.akiban.server.service.ServiceManagerImpl;
 import com.akiban.server.service.config.Property;
 
@@ -48,7 +48,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RunWith(Parameterized.class)
-public class PostgresServerIT extends ApiTestBase
+public class PostgresServerIT extends ITBase
 {
   public static final File RESOURCE_DIR = 
     new File("src/test/resources/"
