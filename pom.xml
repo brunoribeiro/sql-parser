@@ -111,6 +111,63 @@
            </includes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>com.atlassian.maven.plugins</groupId>
+        <artifactId>maven-clover2-plugin</artifactId>
+        <version>3.0.1</version>
+        <configuration>
+          <generateHistorical>true</generateHistorical>
+          <historyDir>/clover/history</historyDir>
+          <license>${clover.license}</license>
+          <generateXml>true</generateXml>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <version>1.2</version>
+        <configuration>
+          <findbugsXmlOutput>true</findbugsXmlOutput>
+          <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+          <xmlOutput>true</xmlOutput>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.mycila.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+        <configuration>
+          <header>src/etc/header.txt</header>
+          <failIfMissing>true</failIfMissing>
+          <excludes>
+            <!-- General files that can't have or don't need header -->
+            <exclude>**/*.expected</exclude>
+            <exclude>**/*.dat</exclude>
+            <exclude>**/*.ddl</exclude>
+            <exclude>**/*.sql</exclude>
+            <exclude>**/*.jj</exclude>
+            <exclude>.bzrignore</exclude>
+            <exclude>velocity.log</exclude>
+            <!-- No extension. Manually add header and ignore -->
+            <exclude>bin/tester.sh</exclude>
+            <exclude>debian/*</exclude>
+            <exclude>redhat/*</exclude>
+          </excludes>
+          <mapping>
+            <g>JAVADOC_STYLE</g>
+            <yml>SCRIPT_STYLE</yml>
+          </mapping>
+          <properties>
+            <year>2011</year>
+          </properties>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>
