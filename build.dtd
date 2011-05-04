@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+    Copyright (C) 2011 Akiban Technologies Inc.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License, version 3,
+    as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see http://www.gnu.org/licenses.
+
+-->
+
 <!ENTITY % boolean "(true|false|on|off|yes|no)">
 <!ENTITY % tasks "propertyfile | ccmkdir | importtypelib | vsscheckin | sql | cvspass | p4reopen | csc | loadresource | dirname | wlrun | p4label | p4revert | replaceregexp | get | jjtree | sleep | jarlib-display | length | dependset | zip | patch | jspc | style | nice | tstamp | unwar | vsshistory | cvschangelog | retry | p4submit | ccmcheckin | p4change | bzip2 | sync | p4delete | vssadd | javadoc | makeurl | p4integrate | translate | signjar | cclock | classloader | chown | jarlib-available | rexec | WsdlToDotnet | buildnumber | resourcecount | cvsversion | apt | ejbjar | war | stlist | copypath | rename | sequential | serverdeploy | property | subant | move | ildasm | copydir | schemavalidate | cccheckin | ccunlock | wljspc | fixcrlf | telnet | sosget | pathconvert | record | p4sync | exec | ccmklabel | p4edit | manifest | antlr | netrexxc | ftp | execon | ccmcheckout | ant | xmlvalidate | xslt | p4resolve | iplanet-ejbc | ccmcheckintask | gzip | native2ascii | ccrmtype | starteam | ear | input | presetdef | rmic | checksum | mail | loadfile | vsscheckout | stylebook | soscheckin | mimemail | stlabel | gunzip | concat | cab | touch | parallel | splash | antcall | ccmkbl | cccheckout | typedef | p4have | filter | xmlproperty | import | copy | jsharpc | symlink | antstructure | script | ccmcreatetask | rpm | delete | replace | attrib | verifyjar | waitfor | untar | loadproperties | available | echoproperties | junit | stcheckin | chgrp | stcheckout | bunzip2 | whichresource | copyfile | p4labelsync | manifestclasspath | vsscreate | macrodef | unjar | ejbc | echoxml | vbc | wsdltodotnet | mkdir | cvs | condition | tempfile | junitreport | ccmkattr | taskdef | echo | ccupdate | java | vsslabel | renameext | basename | javadoc2 | tar | vsscp | p4fstat | setproxy | antversion | p4counter | wlstop | diagnostics | ilasm | soscheckout | apply | jarlib-resolve | ccuncheckout | cvstagdiff | jlink | javacc | chmod | jarlib-manifest | pvcs | jar | ccmklbtype | sound | truncate | scriptdef | defaultexcludes | blgenclient | uptodate | jjdoc | genkey | javah | ccmkelem | ccmreconfigure | fail | unzip | javac | p4add | soslabel | depend | vssget | deltree | ddcreator">
 <!ENTITY % types "difference | isfileselected | mergemapper | extensionSet | stringtokenizer | url | scriptcondition | filterreader | selector | propertyset | dirset | chainedmapper | tarfileset | regexpmapper | zipentry | resources | scriptmapper | unpackagemapper | compositemapper | first | string | propertyresource | flattenmapper | description | scriptfilter | last | concatfilter | scriptselector | xmlcatalog | extension | file | filetokenizer | filtermapper | packagemapper | regexp | bzip2resource | filterchain | filterset | classfileset | linetokenizer | files | patternset | intersect | mapper | union | resource | tokens | assertions | substitution | libfileset | zipfileset | signedselector | tarentry | redirector | filelist | path | fileset | restrict | globmapper | identitymapper | javaresource | gzipresource | sort">
