@@ -938,7 +938,7 @@ public class TypeId
       unqualifiedName = className;
     }
     javaTypeName = className;
-    classNameWasDelimitedIdentifier = classNameWasDelimitedIdentifier;
+    this.classNameWasDelimitedIdentifier = classNameWasDelimitedIdentifier;
   }
 
   private TypeId(String schemaName, String unqualifiedName, String className) {

@@ -42,5 +42,7 @@ public class SQLClient
       }
       System.out.println();
     }
+    stmt.close();
+    conn.close();
   }
 }

@@ -176,7 +176,7 @@ public class PostgresServerConnection implements Runnable
       processSSLMessage();
       return;
     default:
-      version = version;
+      this.version = version;
       logger.warn("Version {}.{}", (version >> 16), (version & 0xFFFF));
     }
     properties = new Properties();
