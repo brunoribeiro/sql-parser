@@ -69,8 +69,6 @@ public class PostgresOperatorCompiler extends OperatorCompiler
 
     return new PostgresOperatorStatement(adapter, 
                                          result.getResultOperator(),
-                                         result.getIndexKeyRange(),
-                                         result.getIndexOperator(),
                                          result.getResultRowType(),
                                          result.getResultColumns(),
                                          result.getResultColumnOffsets());

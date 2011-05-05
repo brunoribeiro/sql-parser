@@ -36,6 +36,7 @@ import com.akiban.qp.expression.IndexBound;
 import com.akiban.qp.expression.IndexKeyRange;
 import static com.akiban.qp.expression.API.*;
 
+import com.akiban.qp.physicaloperator.ConstantValueBindable;
 import com.akiban.qp.physicaloperator.PhysicalOperator;
 import static com.akiban.qp.physicaloperator.API.*;
 
@@ -80,21 +81,15 @@ public abstract class OperatorCompiler
 
   public static class Result {
     private PhysicalOperator resultOperator;
-    private IndexKeyRange indexKeyRange;
-    private PhysicalOperator indexOperator;
     private RowType resultRowType;
     private List<Column> resultColumns;
     private int[] resultColumnOffsets;
 
     public Result(PhysicalOperator resultOperator,
-                  IndexKeyRange indexKeyRange,
-                  PhysicalOperator indexOperator,
                   RowType resultRowType,
                   List<Column> resultColumns,
                   int[] resultColumnOffsets) {
       this.resultOperator = resultOperator;
-      this.indexKeyRange = indexKeyRange;
-      this.indexOperator = indexOperator;
       this.resultRowType = resultRowType;
       this.resultColumns = resultColumns;
       this.resultColumnOffsets = resultColumnOffsets;
@@ -102,12 +97,6 @@ public abstract class OperatorCompiler
 
     public PhysicalOperator getResultOperator() {
       return resultOperator;
-    }
-    public IndexKeyRange getIndexKeyRange() {
-      return indexKeyRange;
-    }
-    public PhysicalOperator getIndexOperator() {
-      return indexOperator;
     }
     public RowType getResultRowType() {
       return resultRowType;
@@ -123,8 +112,6 @@ public abstract class OperatorCompiler
     public String toString() {
       StringBuilder sb = new StringBuilder();
       explainPlan(resultOperator, sb, 0);
-      if (indexKeyRange != null)
-        sb.append(indexKeyRange.toString());
       return sb.toString();
     }
 
@@ -175,14 +162,15 @@ public abstract class OperatorCompiler
       // changing operand as necessary.
       index = pickBestIndex(tables, select.getWhereClause(), indexConditions);
     }
-    PhysicalOperator resultOperator, indexOperator;
-    IndexKeyRange indexKeyRange;
+    PhysicalOperator resultOperator;
     if (index == null) {
       resultOperator = groupScan_Default(groupTable);
-      indexKeyRange = null;
-      indexOperator = null;
     }
     else {
+      IndexKeyRange indexKeyRange = getIndexKeyRange(index, indexConditions);
+      PhysicalOperator indexOperator = indexScan_Default(index, false,
+                                                         ConstantValueBindable.of(indexKeyRange));
+      resultOperator = indexLookup_Default(indexOperator, groupTable);
       // All selected rows above this need to be output by hkey left
       // segment random access.
       List<RowType> addAncestors = new ArrayList<RowType>();
@@ -191,13 +179,10 @@ public abstract class OperatorCompiler
           break;
         addAncestors.add(userTableRowType(table));
       }
-      indexOperator = indexScan_Default(index);
-      resultOperator = indexLookup_Default(indexOperator, groupTable);
       if (!addAncestors.isEmpty())
         resultOperator = ancestorLookup_Default(resultOperator, groupTable, 
                                                 userTableRowType((UserTable)index.getTable()),
                                                 addAncestors);
-      indexKeyRange = getIndexKeyRange(index, indexConditions);
     }
     RowType resultRowType = null;
     Map<UserTable,Integer> fieldOffsets = new HashMap<UserTable,Integer>();
@@ -286,8 +271,8 @@ public abstract class OperatorCompiler
       resultColumnOffsets[i] = fieldOffsets.get(table) + column.getPosition();
     }
 
-    return new Result(resultOperator, indexKeyRange, indexOperator, 
-                      resultRowType, resultColumns, resultColumnOffsets);
+    return new Result(resultOperator, resultRowType, 
+                      resultColumns, resultColumnOffsets);
   }
 
   protected GroupBinding addTables(FromList fromTables, List<UserTable> tables) 

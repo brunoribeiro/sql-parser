@@ -18,9 +18,9 @@ package com.akiban.sql.pg;
 import com.akiban.sql.StandardException;
 
 import com.akiban.ais.model.Column;
-import com.akiban.qp.expression.IndexKeyRange;
+import com.akiban.qp.physicaloperator.ArrayBindings;
+import com.akiban.qp.physicaloperator.Bindings;
 import com.akiban.qp.physicaloperator.Cursor;
-import com.akiban.qp.physicaloperator.Executable;
 import com.akiban.qp.physicaloperator.PhysicalOperator;
 import com.akiban.qp.physicaloperator.StoreAdapter;
 import com.akiban.qp.row.Row;
@@ -36,32 +36,27 @@ import java.io.IOException;
  */
 public class PostgresOperatorStatement extends PostgresStatement
 {
-  private Executable executable;
-  private IndexKeyRange indexKeyRange;
-  private PhysicalOperator indexOperator;
+  private StoreAdapter store;
+  private PhysicalOperator resultOperator;
   private RowType resultRowType;
   private int[] resultColumnOffsets;
 
   public PostgresOperatorStatement(StoreAdapter store,
                                    PhysicalOperator resultOperator,
-                                   IndexKeyRange indexKeyRange,
-                                   PhysicalOperator indexOperator,
                                    RowType resultRowType,
                                    List<Column> resultColumns,
                                    int[] resultColumnOffsets) {
     super(resultColumns);
-    this.executable = new Executable(store, resultOperator);
-    this.indexKeyRange = indexKeyRange;
-    this.indexOperator = indexOperator;
+    this.store = store;
+    this.resultOperator = resultOperator;
     this.resultRowType = resultRowType;
     this.resultColumnOffsets = resultColumnOffsets;
   }
   
   public int execute(PostgresMessenger messenger, Session session, int maxrows)
       throws IOException, StandardException {
-    if (indexKeyRange != null)
-      executable.bind(indexOperator, indexKeyRange);
-    Cursor cursor = executable.cursor();
+    Bindings bindings = new ArrayBindings(0);
+    Cursor cursor = resultOperator.cursor(store, bindings);
     int nrows = 0;
     try {
       cursor.open();
