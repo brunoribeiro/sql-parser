@@ -115,7 +115,7 @@ public final class WindowDefinitionNode extends WindowNode
     super.printSubNodes(depth);
 
     if (orderByList != null) {
-      printLabel(depth, "orderByList: "  + depth);
+      printLabel(depth, "orderByList: ");
       orderByList.treePrint(depth + 1);
     }
   }

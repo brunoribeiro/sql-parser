@@ -161,8 +161,16 @@ public class CursorNode extends DMLStatementNode
     super.printSubNodes(depth);
 
     if (orderByList != null) {
-      printLabel(depth, "orderByList: "  + depth);
+      printLabel(depth, "orderByList: ");
       orderByList.treePrint(depth + 1);
+    }
+    if (offset != null) {
+      printLabel(depth, "offset: ");
+      offset.treePrint(depth + 1);
+    }
+    if (fetchFirst != null) {
+      printLabel(depth, "fetchFirst: ");
+      fetchFirst.treePrint(depth + 1);
     }
   }
 
@@ -178,6 +186,12 @@ public class CursorNode extends DMLStatementNode
 
     if (orderByList != null) {
       orderByList = (OrderByList)orderByList.accept(v);
+    }
+    if (offset != null) {
+      offset = (ValueNode)offset.accept(v);
+    }
+    if (fetchFirst != null) {
+      fetchFirst = (ValueNode)fetchFirst.accept(v);
     }
   }
 
