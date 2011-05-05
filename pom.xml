@@ -43,29 +43,6 @@
           <target>1.6</target>
         </configuration>
       </plugin>
-      <!-- Generate jar-with-dependencies -->
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <archive>
-            <manifest>
-              <mainClass>com.akiban.server.AkServer</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>install</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <!-- JavaCC plugin -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
