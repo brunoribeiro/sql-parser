@@ -1,6 +1,5 @@
 ./classes
 ./target
-parser-combined.jar
 ParseException.java
 SQLGrammar.java
 SQLGrammarConstants.java

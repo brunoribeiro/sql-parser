@@ -19,18 +19,7 @@ import com.akiban.sql.TestBase;
 
 import com.akiban.sql.parser.StatementNode;
 import com.akiban.sql.parser.SQLParser;
-import com.akiban.sql.compiler.AISBinder;
-import com.akiban.sql.compiler.BindingNodeFactory;
-import com.akiban.sql.compiler.BooleanNormalizer;
-import com.akiban.sql.compiler.BoundNodeToString;
-import com.akiban.sql.compiler.Grouper;
-import com.akiban.sql.compiler.SubqueryFlattener;
-import com.akiban.sql.compiler.TypeComputer;
-import com.akiban.sql.views.ViewDefinition;
-
-import com.akiban.ais.ddl.SchemaDef;
-import com.akiban.ais.ddl.SchemaDefToAis;
-import com.akiban.ais.model.AkibanInformationSchema;
+import com.akiban.sql.unparser.NodeToString;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -50,37 +39,13 @@ public class ASTTransformTestBase extends TestBase
     new File("src/test/resources/"
              + ASTTransformTestBase.class.getPackage().getName().replace('.', '/'));
 
-  // Base class has all possible transformers for convenience.
   protected SQLParser parser;
-  protected BoundNodeToString unparser;
-  protected AISBinder binder;
-  protected TypeComputer typeComputer;
-  protected BooleanNormalizer booleanNormalizer;
-  protected SubqueryFlattener subqueryFlattener;
-  protected Grouper grouper;
+  protected NodeToString unparser;
 
   @Before
   public void makeTransformers() throws Exception {
     parser = new SQLParser();
-    parser.setNodeFactory(new BindingNodeFactory(parser.getNodeFactory()));
-    unparser = new BoundNodeToString();
-    typeComputer = new TypeComputer();
-    booleanNormalizer = new BooleanNormalizer(parser);
-    subqueryFlattener = new SubqueryFlattener(parser);
-    grouper = new Grouper(parser);
-  }
-
-  protected void loadSchema(File schema) throws Exception {
-    String sql = fileContents(schema);
-    SchemaDef schemaDef = SchemaDef.parseSchema("use user; " + sql);
-    SchemaDefToAis toAis = new SchemaDefToAis(schemaDef, false);
-    AkibanInformationSchema ais = toAis.getAis();
-    binder = new AISBinder(ais, "user");
-  }
-
-  protected void loadView(File view) throws Exception {
-    String sql = fileContents(view);
-    binder.addView(new ViewDefinition(sql, parser));
+    unparser = new NodeToString();
   }
 
   protected String getTree(StatementNode stmt) throws IOException {

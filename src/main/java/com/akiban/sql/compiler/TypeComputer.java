@@ -33,10 +33,10 @@ public class TypeComputer implements Visitor
     stmt.accept(this);
   }
   
+  /** Probably need to subclass and handle <code>NodeTypes.COLUMN_REFERENCE</code>
+   * to get type propagation started. */
   protected DataTypeDescriptor computeType(ValueNode node) throws StandardException {
     switch (node.getNodeType()) {
-    case NodeTypes.COLUMN_REFERENCE:
-      return columnReference((ColumnReference)node);
     case NodeTypes.RESULT_COLUMN:
       return resultColumn((ResultColumn)node);
     case NodeTypes.AND_NODE:
@@ -64,13 +64,6 @@ public class TypeComputer implements Visitor
       // assert false;
       return null;
     }
-  }
-
-  protected DataTypeDescriptor columnReference(ColumnReference node) 
-      throws StandardException {
-    ColumnBinding columnBinding = (ColumnBinding)node.getUserData();
-    assert (columnBinding != null) : "column is not bound yet";
-    return columnBinding.getType();
   }
 
   protected DataTypeDescriptor resultColumn(ResultColumn node)

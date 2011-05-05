@@ -17,6 +17,7 @@ package com.akiban.sql.compiler;
 
 import com.akiban.sql.parser.StatementNode;
 
+import org.junit.Before;
 import org.junit.Test;
 import static junit.framework.Assert.*;
 import org.junit.runners.Parameterized;
@@ -31,6 +32,13 @@ public class BooleanNormalizerTest extends ASTTransformTestBase
 {
   public static final File RESOURCE_DIR = 
     new File(ASTTransformTestBase.RESOURCE_DIR, "normalize");
+
+  protected BooleanNormalizer booleanNormalizer;
+
+  @Before
+  public void makeNormalizer() throws Exception {
+    booleanNormalizer = new BooleanNormalizer(parser);
+  }
 
   @Parameters
   public static Collection<Object[]> statements() throws Exception {
