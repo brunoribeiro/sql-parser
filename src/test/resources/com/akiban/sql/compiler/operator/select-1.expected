@@ -1,1 +1,0 @@
-GroupScan_Default(GroupTable(user._akiban_customers -> user.customers) limit NO LIMIT)
