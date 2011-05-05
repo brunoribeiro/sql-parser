@@ -2029,6 +2029,7 @@ TOKEN [IGNORE_CASE] :
 | <DATABASE: "database">
 | <GET_CURRENT_CONNECTION: "getCurrentConnection">
 | <EXPLAIN: "explain">
+| <LIMIT: "limit">
 | <LONGINT: "bigint">
 | <LONG: "long">
 | <LTRIM: "ltrim">
@@ -2813,14 +2814,12 @@ preparableSelectStatement() throws StandardException :
   IsolationLevel isolationLevel = IsolationLevel.UNSPECIFIED_ISOLATION_LEVEL;
   CursorNode retval;
   OrderByList orderCols = null;
-  ValueNode offset = null;
-  ValueNode fetchFirst = null;
+  ValueNode[] offsetAndFetchFirst = new ValueNode[2];
 }
 {
   queryExpression = queryExpression(null, NO_SET_OP) 
   [ orderCols = orderByClause() ]
-  [ offset = offsetClause() ]
-  [ fetchFirst = fetchFirstClause() ]
+  ( offsetOrFetchFirstClause(offsetAndFetchFirst) )*
   [ <FOR> forUpdateState = forUpdateClause(updateColumns) ]
   [ isolationLevel = atIsolationLevel() ]
   {
@@ -2832,8 +2831,8 @@ preparableSelectStatement() throws StandardException :
                                              queryExpression,
                                              null,
                                              orderCols,
-                                             offset,
-                                             fetchFirst,
+                                             offsetAndFetchFirst[0],
+                                             offsetAndFetchFirst[1],
                                              forUpdateState,
                                              (forUpdateState == CursorNode.UpdateMode.READ_ONLY ? null : updateColumns),
                                              parserContext);
@@ -6915,6 +6914,29 @@ nullOrdering(OrderByColumn orderCol) :
   }
 }
 
+void 
+offsetOrFetchFirstClause(ValueNode[] offsetAndFetchFirst) throws StandardException :
+{
+  ValueNode value;
+}
+{
+  value = offsetClause()
+  {
+    if (offsetAndFetchFirst[0] != null)
+      throw new StandardException("OFFSET specified more than one");
+    offsetAndFetchFirst[0] = value;
+  }
+|
+  value = fetchFirstClause()
+  {
+    if (offsetAndFetchFirst[1] != null)
+      throw new StandardException("FETCH FIRST specified more than one");
+    offsetAndFetchFirst[1] = value;
+  }
+|
+  limitClause(offsetAndFetchFirst)
+}
+
 ValueNode
 offsetClause() throws StandardException :
 {
@@ -6955,6 +6977,57 @@ fetchFirstClause() throws StandardException :
     if (result == null)
       result = getNumericNode("1", true);
     return result;
+  }
+}
+
+void 
+limitClause(ValueNode[] offsetAndFetchFirst) throws StandardException :
+{
+  ValueNode v1, v2 = null;
+  Token tok = null;
+}
+{
+  <LIMIT>
+  ( 
+    v1 = intLiteral()
+  | 
+    v1 = dynamicParameterSpecification()
+  )
+  [ ( tok = <COMMA>
+      ( 
+        v2 = intLiteral()
+      | 
+        v2 = dynamicParameterSpecification()
+      )
+    |
+      // This LOOKAHEAD is required to distinguish the Derby OFFSET from the MySQL.
+      LOOKAHEAD ( { getToken(1).kind == OFFSET && 
+                    getToken(3).kind != ROW &&
+                    getToken(3).kind != ROWS  } )
+      tok = <OFFSET>
+      ( 
+        v2 = intLiteral()
+      | 
+        v2 = dynamicParameterSpecification()
+      )
+     ) ]
+  {
+    if (offsetAndFetchFirst[1] != null)
+      throw new StandardException("LIMIT specified more than one");
+    if (v2 == null)
+      offsetAndFetchFirst[1] = v1;
+    else {
+      if (offsetAndFetchFirst[0] != null)
+        throw new StandardException("LIMIT offset specified more than one");
+      if (tok.kind == OFFSET) {
+        offsetAndFetchFirst[0] = v2;
+        offsetAndFetchFirst[1] = v1;
+      }
+      else {
+        offsetAndFetchFirst[0] = v1;
+        offsetAndFetchFirst[1] = v2;
+      }
+    }
   }
 }
 
@@ -7078,8 +7151,7 @@ insertColumnsAndSource(QueryTreeNode targetTable) throws StandardException :
   ResultSetNode queryExpression;
   ResultColumnList columnList = null;
   OrderByList orderCols = null;
-  ValueNode offset = null;
-  ValueNode fetchFirst = null;
+  ValueNode[] offsetAndFetchFirst = new ValueNode[2];
 }
 {
   [
@@ -7094,8 +7166,7 @@ insertColumnsAndSource(QueryTreeNode targetTable) throws StandardException :
   [ targetProperties = propertyList(false) <CHECK_PROPERTIES>]
   queryExpression = queryExpression(null, NO_SET_OP)
   [ orderCols = orderByClause() ]
-  [ offset = offsetClause() ]
-  [ fetchFirst = fetchFirstClause() ]
+  ( offsetOrFetchFirstClause(offsetAndFetchFirst) )*
   {
     if (orderCols != null && isTableValueConstructor(queryExpression)) {
       // Not allowed by the standard since this is a <contextually typed
@@ -7106,10 +7177,10 @@ insertColumnsAndSource(QueryTreeNode targetTable) throws StandardException :
       throw new StandardException("ORDER BY not allowed");
     }
 
-    if ((offset != null || fetchFirst != null) &&
+    if ((offsetAndFetchFirst[0] != null || offsetAndFetchFirst[1] != null) &&
         isTableValueConstructor(queryExpression)) {
       throw new StandardException("Not allowed: " + 
-                                  ((offset != null) ? "OFFSET" : "FETCH"));
+                                  ((offsetAndFetchFirst[0] != null) ? "OFFSET" : "FETCH"));
     }
 
     return (StatementNode)nodeFactory.getNode(NodeTypes.INSERT_NODE,
@@ -7118,8 +7189,8 @@ insertColumnsAndSource(QueryTreeNode targetTable) throws StandardException :
                                               queryExpression,
                                               targetProperties,
                                               orderCols,
-                                              offset,
-                                              fetchFirst,
+                                              offsetAndFetchFirst[0],
+                                              offsetAndFetchFirst[1],
                                               parserContext);
   }
   /* RESOLVE: Ignoring default values for now
@@ -7313,22 +7384,20 @@ subquery(SubqueryNode.SubqueryType subqueryType, ValueNode leftOperand) throws S
   ResultSetNode queryExpression;
   SubqueryNode subqueryNode;
   OrderByList orderCols = null;
-  ValueNode offset = null;
-  ValueNode fetchFirst = null;
+  ValueNode[] offsetAndFetchFirst = new ValueNode[2];
 }
 {
   queryExpression = queryExpression(null, NO_SET_OP)
   [ orderCols = orderByClause() ]
-  [ offset = offsetClause() ]
-  [ fetchFirst = fetchFirstClause() ]
+  ( offsetOrFetchFirstClause(offsetAndFetchFirst) )*
   {
     subqueryNode = (SubqueryNode)nodeFactory.getNode(NodeTypes.SUBQUERY_NODE,
                                                      queryExpression, 
                                                      subqueryType,
                                                      leftOperand,
                                                      orderCols,
-                                                     offset,
-                                                     fetchFirst,
+                                                     offsetAndFetchFirst[0],
+                                                     offsetAndFetchFirst[1],
                                                      parserContext);
     return subqueryNode;
   }
@@ -9341,16 +9410,14 @@ viewDefinition(Token beginToken) throws StandardException :
   Token checkTok = null;
   Token endToken;
   OrderByList orderCols = null;
-  ValueNode offset = null;
-  ValueNode fetchFirst = null;
+  ValueNode[] offsetAndFetchFirst = new ValueNode[2];
 }
 {
   <VIEW> tableName = qualifiedName() 
   [ <LEFT_PAREN> resultColumns = viewColumnList() <RIGHT_PAREN> ]
   <AS> queryExpression = queryExpression(null, NO_SET_OP)
   [ orderCols = orderByClause() ]
-  [ offset = offsetClause() ]
-  [ fetchFirst = fetchFirstClause() ]
+  ( offsetOrFetchFirstClause(offsetAndFetchFirst) )*
   {
     checkOptionType = CreateViewNode.NO_CHECK_OPTION;
     endToken = getToken(0);
@@ -9369,8 +9436,8 @@ viewDefinition(Token beginToken) throws StandardException :
                                               checkOptionType,
                                               sliceSQLText(beginToken.beginOffset, endToken.endOffset, false),
                                               orderCols,
-                                              offset,
-                                              fetchFirst,
+                                              offsetAndFetchFirst[0],
+                                              offsetAndFetchFirst[1],
                                               parserContext);
   }
 }
@@ -12298,6 +12365,7 @@ reservedKeyword() :
 | tok = <LEADING>
 | tok = <LEFT>
 | tok = <LIKE>
+| tok = <LIMIT>
 | tok = <LOWER>
 | tok = <MATCH>
 | tok = <MAX>
