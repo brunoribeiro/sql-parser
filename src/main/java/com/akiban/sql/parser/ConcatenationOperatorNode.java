@@ -47,17 +47,17 @@ import com.akiban.sql.types.ValueClassName;
 
 public class ConcatenationOperatorNode extends BinaryOperatorNode 
 {
-  /**
-   * Initializer for a ConcatenationOperatorNode
-   * 
-   * @param leftOperand
-   *            The left operand of the concatenation
-   * @param rightOperand
-   *            The right operand of the concatenation
-   */
-  public void init(Object leftOperand, Object rightOperand) {
-    super.init(leftOperand, rightOperand, "||", "concatenate",
-               ValueClassName.ConcatableDataValue, ValueClassName.ConcatableDataValue);
-  }
+    /**
+     * Initializer for a ConcatenationOperatorNode
+     * 
+     * @param leftOperand
+     *                      The left operand of the concatenation
+     * @param rightOperand
+     *                      The right operand of the concatenation
+     */
+    public void init(Object leftOperand, Object rightOperand) {
+        super.init(leftOperand, rightOperand, "||", "concatenate",
+                   ValueClassName.ConcatableDataValue, ValueClassName.ConcatableDataValue);
+    }
 
 }

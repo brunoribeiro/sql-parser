@@ -48,47 +48,47 @@ import com.akiban.sql.StandardException;
 
 public class DropSchemaNode extends DDLStatementNode
 {
-  private int dropBehavior;
-  private String schemaName;
+    private int dropBehavior;
+    private String schemaName;
 
-  /**
-   * Initializer for a DropSchemaNode
-   *
-   * @param schemaName The name of the object being dropped
-   * @param dropBehavior Drop behavior (RESTRICT | CASCADE)
-   *
-   */
-  public void init(Object schemaName, Object dropBehavior) throws StandardException {
-    initAndCheck(null);
-    this.schemaName = (String)schemaName;
-    this.dropBehavior = ((Integer)dropBehavior).intValue();
-  }
+    /**
+     * Initializer for a DropSchemaNode
+     *
+     * @param schemaName The name of the object being dropped
+     * @param dropBehavior Drop behavior (RESTRICT | CASCADE)
+     *
+     */
+    public void init(Object schemaName, Object dropBehavior) throws StandardException {
+        initAndCheck(null);
+        this.schemaName = (String)schemaName;
+        this.dropBehavior = ((Integer)dropBehavior).intValue();
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    DropSchemaNode other = (DropSchemaNode)node;
-    this.dropBehavior = other.dropBehavior;
-    this.schemaName = other.schemaName;
-  }
+        DropSchemaNode other = (DropSchemaNode)node;
+        this.dropBehavior = other.dropBehavior;
+        this.schemaName = other.schemaName;
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
-  public String toString() {
-    return super.toString() +
-      "dropBehavior: " + "\n" + dropBehavior + "\n";
-  }
+    public String toString() {
+        return super.toString() +
+            "dropBehavior: " + "\n" + dropBehavior + "\n";
+    }
 
-  public String statementToString() {
-    return "DROP SCHEMA";
-  }
+    public String statementToString() {
+        return "DROP SCHEMA";
+    }
 
 }

@@ -45,18 +45,18 @@ package com.akiban.sql.parser;
 public class TimestampOperatorNode extends BinaryOperatorNode
 {
 
-  /**
-   * Initailizer for a TimestampOperatorNode.
-   *
-   * @param date The date
-   * @param time The time
-   */
+    /**
+     * Initailizer for a TimestampOperatorNode.
+     *
+     * @param date The date
+     * @param time The time
+     */
 
-  public void init(Object date, Object time) {
-    leftOperand = (ValueNode)date;
-    rightOperand = (ValueNode)time;
-    operator = "timestamp";
-    methodName = "getTimestamp";
-  }
+    public void init(Object date, Object time) {
+        leftOperand = (ValueNode)date;
+        rightOperand = (ValueNode)time;
+        operator = "timestamp";
+        methodName = "getTimestamp";
+    }
 
 }

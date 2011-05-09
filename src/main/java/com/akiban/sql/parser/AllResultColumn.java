@@ -42,62 +42,62 @@ import com.akiban.sql.StandardException;
 
 /**
  * An AllResultColumn represents a "*" result column in a SELECT
- * statement.  It gets replaced with the appropriate set of columns
+ * statement.    It gets replaced with the appropriate set of columns
  * at bind time.
  *
  */
 
 public class AllResultColumn extends ResultColumn
 {
-  private TableName tableName;
+    private TableName tableName;
 
-  /**
-   * This initializer is for use in the parser for a "*".
-   * 
-   * @param tableName Dot expression qualifying "*"
-   */
-  public void init(Object tableName) {
-    this.tableName = (TableName)tableName;
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    AllResultColumn other = (AllResultColumn)node;
-    this.tableName = (TableName)getNodeFactory().copyNode(other.tableName,
-                                                          getParserContext());
-  }
-
-  /** 
-   * Return the full table name qualification for this node
-   *
-   * @return Full table name qualification as a String
-   */
-  public String getFullTableName() {
-    if (tableName == null) {
-      return null;
+    /**
+     * This initializer is for use in the parser for a "*".
+     * 
+     * @param tableName Dot expression qualifying "*"
+     */
+    public void init(Object tableName) {
+        this.tableName = (TableName)tableName;
     }
-    else {
-      return tableName.getFullTableName();
+
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
+
+        AllResultColumn other = (AllResultColumn)node;
+        this.tableName = (TableName)getNodeFactory().copyNode(other.tableName,
+                                                              getParserContext());
     }
-  }
 
-  public TableName getTableNameObject() {
-    return tableName;
-  }
+    /** 
+     * Return the full table name qualification for this node
+     *
+     * @return Full table name qualification as a String
+     */
+    public String getFullTableName() {
+        if (tableName == null) {
+            return null;
+        }
+        else {
+            return tableName.getFullTableName();
+        }
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
-  // TODO: Somewhat of a mess: the superclass has a tableName field of a different type.
-  public String toString() {
-    return "tableName: " + tableName + "\n" +
-      super.toString();
-  }
+    public TableName getTableNameObject() {
+        return tableName;
+    }
+
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+    // TODO: Somewhat of a mess: the superclass has a tableName field of a different type.
+    public String toString() {
+        return "tableName: " + tableName + "\n" +
+            super.toString();
+    }
 }

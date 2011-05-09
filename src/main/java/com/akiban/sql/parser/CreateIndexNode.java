@@ -51,93 +51,93 @@ import java.util.Properties;
 
 public class CreateIndexNode extends DDLStatementNode
 {
-  boolean unique;
-  String indexType;
-  TableName indexName;
-  TableName tableName;
-  List<String> columnNameList;
-  Properties properties;
+    boolean unique;
+    String indexType;
+    TableName indexName;
+    TableName tableName;
+    List<String> columnNameList;
+    Properties properties;
 
-  /**
-   * Initializer for a CreateIndexNode
-   *
-   * @param unique True means it's a unique index
-   * @param indexType The type of index
-   * @param indexName The name of the index
-   * @param tableName The name of the table the index will be on
-   * @param columnNameList A list of column names, in the order they
-   *        appear in the index.
-   * @param properties The optional properties list associated with the index.
-   *
-   * @exception StandardException Thrown on error
-   */
-  public void init(Object unique,
-                   Object indexType,
-                   Object indexName,
-                   Object tableName,
-                   Object columnNameList,
-                   Object properties) 
-      throws StandardException {
-    initAndCheck(indexName);
-    this.unique = ((Boolean)unique).booleanValue();
-    this.indexType = (String)indexType;
-    this.indexName = (TableName)indexName;
-    this.tableName = (TableName)tableName;
-    this.columnNameList = (List<String>)columnNameList;
-    this.properties = (Properties)properties;
-  }
+    /**
+     * Initializer for a CreateIndexNode
+     *
+     * @param unique True means it's a unique index
+     * @param indexType The type of index
+     * @param indexName The name of the index
+     * @param tableName The name of the table the index will be on
+     * @param columnNameList A list of column names, in the order they
+     *              appear in the index.
+     * @param properties The optional properties list associated with the index.
+     *
+     * @exception StandardException Thrown on error
+     */
+    public void init(Object unique,
+                     Object indexType,
+                     Object indexName,
+                     Object tableName,
+                     Object columnNameList,
+                     Object properties) 
+            throws StandardException {
+        initAndCheck(indexName);
+        this.unique = ((Boolean)unique).booleanValue();
+        this.indexType = (String)indexType;
+        this.indexName = (TableName)indexName;
+        this.tableName = (TableName)tableName;
+        this.columnNameList = (List<String>)columnNameList;
+        this.properties = (Properties)properties;
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    CreateIndexNode other = (CreateIndexNode)node;
-    this.unique = other.unique;
-    this.indexType = other.indexType;
-    this.indexName = (TableName)
-      getNodeFactory().copyNode(other.indexName, getParserContext());
-    this.tableName = (TableName)
-      getNodeFactory().copyNode(other.tableName, getParserContext());
-    this.columnNameList = other.columnNameList; // TODO: Clone?
-    this.properties = other.properties; // TODO: Clone?
-  }
+        CreateIndexNode other = (CreateIndexNode)node;
+        this.unique = other.unique;
+        this.indexType = other.indexType;
+        this.indexName = (TableName)
+            getNodeFactory().copyNode(other.indexName, getParserContext());
+        this.tableName = (TableName)
+            getNodeFactory().copyNode(other.tableName, getParserContext());
+        this.columnNameList = other.columnNameList; // TODO: Clone?
+        this.properties = other.properties; // TODO: Clone?
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
-  public String toString() {
-    return super.toString() +
-      "unique: " + unique + "\n" +
-      "indexType: " + indexType + "\n" +
-      "indexName: " + indexName + "\n" +
-      "tableName: " + tableName + "\n" +
-      "properties: " + properties + "\n";
-  }
+    public String toString() {
+        return super.toString() +
+            "unique: " + unique + "\n" +
+            "indexType: " + indexType + "\n" +
+            "indexName: " + indexName + "\n" +
+            "tableName: " + tableName + "\n" +
+            "properties: " + properties + "\n";
+    }
 
-  public String statementToString() {
-    return "CREATE INDEX";
-  }
+    public String statementToString() {
+        return "CREATE INDEX";
+    }
 
-  public boolean getUniqueness() { 
-    return unique; 
-  }
-  public String getIndexType() { 
-    return indexType;
-  }
-  public TableName getIndexName() { 
-    return indexName; 
-  }
-  public Properties getProperties() { 
-    return properties; 
-  }
-  public TableName getIndexTableName() {
-    return tableName; 
-  }
+    public boolean getUniqueness() { 
+        return unique; 
+    }
+    public String getIndexType() { 
+        return indexType;
+    }
+    public TableName getIndexName() { 
+        return indexName; 
+    }
+    public Properties getProperties() { 
+        return properties; 
+    }
+    public TableName getIndexTableName() {
+        return tableName; 
+    }
 
 }

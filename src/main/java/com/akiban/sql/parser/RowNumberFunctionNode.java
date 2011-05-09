@@ -48,21 +48,21 @@ import java.sql.Types;
 public final class RowNumberFunctionNode extends WindowFunctionNode
 {
 
-  /**
-   * Initializer. QueryTreeNode override.
-   *
-   * @param arg1 null (Operand)
-   * @param arg2 The window definition or reference
-   *
-   * @exception StandardException
-   */
-  public void init(Object arg1, Object arg2) throws StandardException {
-    super.init(arg1, "ROW_NUMBER", arg2);
-    setType(TypeId.getBuiltInTypeId(Types.BIGINT),
-            TypeId.LONGINT_PRECISION,
-            TypeId.LONGINT_SCALE,
-            false,
-            TypeId.LONGINT_MAXWIDTH);
-  }
+    /**
+     * Initializer. QueryTreeNode override.
+     *
+     * @param arg1 null (Operand)
+     * @param arg2 The window definition or reference
+     *
+     * @exception StandardException
+     */
+    public void init(Object arg1, Object arg2) throws StandardException {
+        super.init(arg1, "ROW_NUMBER", arg2);
+        setType(TypeId.getBuiltInTypeId(Types.BIGINT),
+                TypeId.LONGINT_PRECISION,
+                TypeId.LONGINT_SCALE,
+                false,
+                TypeId.LONGINT_MAXWIDTH);
+    }
 
 }

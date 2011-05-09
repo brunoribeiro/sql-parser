@@ -65,40 +65,40 @@ import com.akiban.sql.StandardException;
  */
 public interface ASTVisitor extends Visitor
 {
-  // Compilation phases for tree handling
+    // Compilation phases for tree handling
 
-  public static final int AFTER_PARSE = 0;
-  public static final int AFTER_BIND = 1;
-  public static final int AFTER_OPTIMIZE = 2;
+    public static final int AFTER_PARSE = 0;
+    public static final int AFTER_BIND = 1;
+    public static final int AFTER_OPTIMIZE = 2;
 
-  /**
-   * Initialize the Visitor before processing any trees. User-written code
-   * calls this method before poking the Visitor into the
-   * LanguageConnectionContext. For example, an
-   * implementation of this method might open a trace file.
-   */
-  public void initializeVisitor() throws StandardException;
+    /**
+     * Initialize the Visitor before processing any trees. User-written code
+     * calls this method before poking the Visitor into the
+     * LanguageConnectionContext. For example, an
+     * implementation of this method might open a trace file.
+     */
+    public void initializeVisitor() throws StandardException;
 
-  /**
-   * Final call to the Visitor. User-written code calls this method when it is
-   * done inspecting query trees. For instance, an implementation of this method
-   * might release resources, closing files it has opened.
-   */
-  public void teardownVisitor() throws StandardException;
+    /**
+     * Final call to the Visitor. User-written code calls this method when it is
+     * done inspecting query trees. For instance, an implementation of this method
+     * might release resources, closing files it has opened.
+     */
+    public void teardownVisitor() throws StandardException;
 
-  /**
-   * The compiler calls this method just before walking a query tree.
-   *
-   * @param statementText Text used to create the tree.
-   * @param phase of compilation (AFTER_PARSE, AFTER_BIND, or AFTER_OPTIMIZE).
-   */
-  public void begin(String statementText, int phase) throws StandardException;
-    
-  /**
-   * The compiler calls this method when it's done walking a tree.
-   *
-   * @param phase of compilation (AFTER_PARSE, AFTER_BIND, or AFTER_OPTIMIZE).
-   */
-  public void end(int phase) throws StandardException;
-    
+    /**
+     * The compiler calls this method just before walking a query tree.
+     *
+     * @param statementText Text used to create the tree.
+     * @param phase of compilation (AFTER_PARSE, AFTER_BIND, or AFTER_OPTIMIZE).
+     */
+    public void begin(String statementText, int phase) throws StandardException;
+        
+    /**
+     * The compiler calls this method when it's done walking a tree.
+     *
+     * @param phase of compilation (AFTER_PARSE, AFTER_BIND, or AFTER_OPTIMIZE).
+     */
+    public void end(int phase) throws StandardException;
+        
 }

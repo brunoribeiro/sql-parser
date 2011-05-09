@@ -44,78 +44,78 @@ import com.akiban.sql.StandardException;
  */
 public abstract class WindowFunctionNode extends UnaryOperatorNode
 {
-  private WindowNode window;    // definition or reference
+    private WindowNode window;      // definition or reference
 
-  /**
-   * Initializer for a WindowFunctionNode
-   * @param arg1 null (operand)
-   * @param arg2 function mame (operator)
-   * @param arg3 window node (definition or reference)
-   * @exception StandardException
-   */
-  public void init(Object arg1, Object arg2, Object arg3) throws StandardException {
-    super.init(arg1, arg2, null);
-    this.window = (WindowNode)arg3;
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    WindowFunctionNode other = (WindowFunctionNode)node;
-    this.window = (WindowNode)getNodeFactory().copyNode(other.window,
-                                                        getParserContext());
-  }
-
-  /**
-   * ValueNode override.
-   * @see ValueNode#isConstantExpression
-   */
-  public boolean isConstantExpression() {
-    return false;
-  }
-
-  /**
-   * @return window associated with this window function
-   */
-  public WindowNode getWindow() {
-    return window;
-  }
-
-  /**
-   * Set window associated with this window function call.
-   * @param wdn window definition
-   */
-  public void setWindow(WindowDefinitionNode wdn) {
-    this.window = wdn;
-  }
-
-  /**
-   * @return if name matches a defined window (in windows), return the
-   * definition of that window, else null.
-   */
-  private WindowDefinitionNode definedWindow(WindowList windows, String name) {
-    for (int i = 0; i < windows.size(); i++) {
-      WindowDefinitionNode wdn = windows.get(i);
-      if (wdn.getName().equals(name)) {
-        return wdn;
-      }
+    /**
+     * Initializer for a WindowFunctionNode
+     * @param arg1 null (operand)
+     * @param arg2 function mame (operator)
+     * @param arg3 window node (definition or reference)
+     * @exception StandardException
+     */
+    public void init(Object arg1, Object arg2, Object arg3) throws StandardException {
+        super.init(arg1, arg2, null);
+        this.window = (WindowNode)arg3;
     }
-    return null;
-  }
 
-  /**
-   * QueryTreeNode override.
-   * @see QueryTreeNode#printSubNodes
-   */
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
+        WindowFunctionNode other = (WindowFunctionNode)node;
+        this.window = (WindowNode)getNodeFactory().copyNode(other.window,
+                                                            getParserContext());
+    }
 
-    printLabel(depth, "window: ");
-    window.treePrint(depth + 1);
-  }
+    /**
+     * ValueNode override.
+     * @see ValueNode#isConstantExpression
+     */
+    public boolean isConstantExpression() {
+        return false;
+    }
+
+    /**
+     * @return window associated with this window function
+     */
+    public WindowNode getWindow() {
+        return window;
+    }
+
+    /**
+     * Set window associated with this window function call.
+     * @param wdn window definition
+     */
+    public void setWindow(WindowDefinitionNode wdn) {
+        this.window = wdn;
+    }
+
+    /**
+     * @return if name matches a defined window (in windows), return the
+     * definition of that window, else null.
+     */
+    private WindowDefinitionNode definedWindow(WindowList windows, String name) {
+        for (int i = 0; i < windows.size(); i++) {
+            WindowDefinitionNode wdn = windows.get(i);
+            if (wdn.getName().equals(name)) {
+                return wdn;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * QueryTreeNode override.
+     * @see QueryTreeNode#printSubNodes
+     */
+
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+
+        printLabel(depth, "window: ");
+        window.treePrint(depth + 1);
+    }
 
 }

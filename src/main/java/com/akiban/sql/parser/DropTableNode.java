@@ -48,46 +48,46 @@ import com.akiban.sql.StandardException;
 
 public class DropTableNode extends DDLStatementNode
 {
-  private int dropBehavior;
+    private int dropBehavior;
 
-  /**
-   * Intializer for a DropTableNode
-   *
-   * @param dropObjectName The name of the object being dropped
-   * @param dropBehavior Drop behavior (RESTRICT | CASCADE)
-   *
-   */
+    /**
+     * Intializer for a DropTableNode
+     *
+     * @param dropObjectName The name of the object being dropped
+     * @param dropBehavior Drop behavior (RESTRICT | CASCADE)
+     *
+     */
 
-  public void init(Object dropObjectName, Object dropBehavior)
-      throws StandardException {
-    initAndCheck(dropObjectName);
-    this.dropBehavior = ((Integer)dropBehavior).intValue();
-  }
+    public void init(Object dropObjectName, Object dropBehavior)
+            throws StandardException {
+        initAndCheck(dropObjectName);
+        this.dropBehavior = ((Integer)dropBehavior).intValue();
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    DropTableNode other = (DropTableNode)node;
-    this.dropBehavior = other.dropBehavior;
-  }
+        DropTableNode other = (DropTableNode)node;
+        this.dropBehavior = other.dropBehavior;
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
-  public String toString() {
-    return super.toString() +
-      "dropBehavior: " + "\n" + dropBehavior + "\n";
-  }
+    public String toString() {
+        return super.toString() +
+            "dropBehavior: " + "\n" + dropBehavior + "\n";
+    }
 
-  public String statementToString() {
-    return "DROP TABLE";
-  }
+    public String statementToString() {
+        return "DROP TABLE";
+    }
 
 }

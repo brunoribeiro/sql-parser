@@ -45,26 +45,26 @@ package com.akiban.sql.parser;
 
 public final class InListOperatorNode extends BinaryListOperatorNode
 {
-  /**
-   * Initializer for a InListOperatorNode
-   *
-   * @param leftOperand The left operand of the node
-   * @param rightOperandList The right operand list of the node
-   */
+    /**
+     * Initializer for a InListOperatorNode
+     *
+     * @param leftOperand The left operand of the node
+     * @param rightOperandList The right operand list of the node
+     */
 
-  public void init(Object leftOperand, Object rightOperandList) {
-    init(leftOperand, rightOperandList, "IN", "in");
-  }
+    public void init(Object leftOperand, Object rightOperandList) {
+        init(leftOperand, rightOperandList, "IN", "in");
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
-  public String toString() {
-    return super.toString();
-  }
+    public String toString() {
+        return super.toString();
+    }
 
 }

@@ -51,31 +51,31 @@ import java.sql.Types;
  */
 public class UnaryDateTimestampOperatorNode extends UnaryOperatorNode
 {
-  private static final String TIMESTAMP_METHOD_NAME = "getTimestamp";
-  private static final String DATE_METHOD_NAME = "getDate";
-    
-  /**
-   * @param operand The operand of the function
-   * @param targetType The type of the result. Timestamp or Date.
-   *
-   * @exception StandardException Thrown on error
-   */
+    private static final String TIMESTAMP_METHOD_NAME = "getTimestamp";
+    private static final String DATE_METHOD_NAME = "getDate";
+        
+    /**
+     * @param operand The operand of the function
+     * @param targetType The type of the result. Timestamp or Date.
+     *
+     * @exception StandardException Thrown on error
+     */
 
-  public void init(Object operand, Object targetType) throws StandardException {
-    setType((DataTypeDescriptor)targetType);
-    switch(getType().getJDBCTypeId()) {
-    case Types.DATE:
-      super.init(operand, "date", DATE_METHOD_NAME);
-      break;
+    public void init(Object operand, Object targetType) throws StandardException {
+        setType((DataTypeDescriptor)targetType);
+        switch(getType().getJDBCTypeId()) {
+        case Types.DATE:
+            super.init(operand, "date", DATE_METHOD_NAME);
+            break;
 
-    case Types.TIMESTAMP:
-      super.init(operand, "timestamp", TIMESTAMP_METHOD_NAME);
-      break;
+        case Types.TIMESTAMP:
+            super.init(operand, "timestamp", TIMESTAMP_METHOD_NAME);
+            break;
 
-    default:
-      assert false;
-      super.init(operand);
+        default:
+            assert false;
+            super.init(operand);
+        }
     }
-  }
-    
+        
 }

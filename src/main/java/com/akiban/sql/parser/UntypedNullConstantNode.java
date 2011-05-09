@@ -46,13 +46,13 @@ package com.akiban.sql.parser;
 
 public final class UntypedNullConstantNode extends ConstantNode
 {
-  /**
-   * Constructor for an UntypedNullConstantNode.  Untyped constants
-   * contain no state (not too surprising).
-   */
+    /**
+     * Constructor for an UntypedNullConstantNode.  Untyped constants
+     * contain no state (not too surprising).
+     */
 
-  public UntypedNullConstantNode() {
-    super();
-  }
+    public UntypedNullConstantNode() {
+        super();
+    }
 
 }

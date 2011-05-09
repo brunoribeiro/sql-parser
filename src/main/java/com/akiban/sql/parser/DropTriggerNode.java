@@ -45,8 +45,8 @@ package com.akiban.sql.parser;
  */
 public class DropTriggerNode extends DDLStatementNode
 {
-  public String statementToString() {
-    return "DROP TRIGGER";
-  }
+    public String statementToString() {
+        return "DROP TRIGGER";
+    }
 
 }

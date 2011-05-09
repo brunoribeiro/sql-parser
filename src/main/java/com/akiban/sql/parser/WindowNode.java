@@ -45,40 +45,40 @@ import com.akiban.sql.StandardException;
  */
 public abstract class WindowNode extends QueryTreeNode
 {
-  /**
-   * The provided name of the window if explicitly defined in a window
-   * clause. If the definition is inlined, currently the definition has
-   * windowName "IN_LINE".  The standard 2003 sec. 4.14.9 calls for a
-   * impl. defined one.
-   */
-  private String windowName;
+    /**
+     * The provided name of the window if explicitly defined in a window
+     * clause. If the definition is inlined, currently the definition has
+     * windowName "IN_LINE".    The standard 2003 sec. 4.14.9 calls for a
+     * impl. defined one.
+     */
+    private String windowName;
 
-  /**
-   * Initializer
-   *
-   * @param arg1 The window name
-   *
-   * @exception StandardException
-   */
-  public void init(Object arg1) throws StandardException {
-    windowName = (String)arg1;
-  }
+    /**
+     * Initializer
+     *
+     * @param arg1 The window name
+     *
+     * @exception StandardException
+     */
+    public void init(Object arg1) throws StandardException {
+        windowName = (String)arg1;
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    WindowNode other = (WindowNode)node;
-    this.windowName = other.windowName;
-  }
+        WindowNode other = (WindowNode)node;
+        this.windowName = other.windowName;
+    }
 
-  /**
-   * @return the name of this window
-   */
-  public String getName() {
-    return windowName;
-  }
+    /**
+     * @return the name of this window
+     */
+    public String getName() {
+        return windowName;
+    }
 
 }

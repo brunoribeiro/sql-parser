@@ -46,76 +46,76 @@ import com.akiban.sql.StandardException;
  */
 public class GroupByColumn extends OrderedColumn 
 {
-  private ValueNode columnExpression;
+    private ValueNode columnExpression;
 
-  /**
-   * Initializer.
-   *
-   * @param colRef The ColumnReference for the grouping column
-   */
-  public void init(Object colRef) {
-    this.columnExpression = (ValueNode)colRef;
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    GroupByColumn other = (GroupByColumn)node;
-    this.columnExpression = (ValueNode)getNodeFactory().copyNode(other.columnExpression,
-                                                                 getParserContext());
-  }
-
-  /**
-   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-   * how tree printing is supposed to work.
-   *
-   * @param depth The depth of this node in the tree
-   */
-
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
-
-    if (columnExpression != null) {
-      printLabel(depth, "columnExpression: ");
-      columnExpression.treePrint(depth + 1);
+    /**
+     * Initializer.
+     *
+     * @param colRef The ColumnReference for the grouping column
+     */
+    public void init(Object colRef) {
+        this.columnExpression = (ValueNode)colRef;
     }
-  }
 
-  /**
-   * Get the name of this column
-   *
-   * @return The name of this column
-   */
-  public String getColumnName() {
-    return columnExpression.getColumnName();
-  }
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-  public ValueNode getColumnExpression() {
-    return columnExpression;
-  }
-
-  public void setColumnExpression(ValueNode cexpr) {
-    this.columnExpression = cexpr;
-
-  }
-
-  /**
-   * Accept the visitor for all visitable children of this node.
-   *
-   * @param v the visitor
-   *
-   * @exception StandardException on error
-   */
-  void acceptChildren(Visitor v) throws StandardException {
-
-    super.acceptChildren(v);
-
-    if (columnExpression != null) {
-      columnExpression = (ValueNode)columnExpression.accept(v);
+        GroupByColumn other = (GroupByColumn)node;
+        this.columnExpression = (ValueNode)getNodeFactory().copyNode(other.columnExpression,
+                                                                     getParserContext());
     }
-  }
+
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
+
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+
+        if (columnExpression != null) {
+            printLabel(depth, "columnExpression: ");
+            columnExpression.treePrint(depth + 1);
+        }
+    }
+
+    /**
+     * Get the name of this column
+     *
+     * @return The name of this column
+     */
+    public String getColumnName() {
+        return columnExpression.getColumnName();
+    }
+
+    public ValueNode getColumnExpression() {
+        return columnExpression;
+    }
+
+    public void setColumnExpression(ValueNode cexpr) {
+        this.columnExpression = cexpr;
+
+    }
+
+    /**
+     * Accept the visitor for all visitable children of this node.
+     *
+     * @param v the visitor
+     *
+     * @exception StandardException on error
+     */
+    void acceptChildren(Visitor v) throws StandardException {
+
+        super.acceptChildren(v);
+
+        if (columnExpression != null) {
+            columnExpression = (ValueNode)columnExpression.accept(v);
+        }
+    }
 
 }

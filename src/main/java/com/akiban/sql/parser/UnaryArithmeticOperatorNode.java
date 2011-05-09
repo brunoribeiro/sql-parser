@@ -47,54 +47,54 @@ import com.akiban.sql.StandardException;
 
 public class UnaryArithmeticOperatorNode extends UnaryOperatorNode
 {
-  public static enum OperatorType {
-    PLUS("+", "plus"), 
-    MINUS("-", "minus"), 
-    SQRT("SQRT", "sqrt"), 
-    ABSOLUTE("ABS/ABSVAL", "absolute");
+    public static enum OperatorType {
+        PLUS("+", "plus"), 
+            MINUS("-", "minus"), 
+            SQRT("SQRT", "sqrt"), 
+            ABSOLUTE("ABS/ABSVAL", "absolute");
 
-    String operator, methodName;
-    OperatorType(String operator, String methodName) {
-      this.operator = operator;
-      this.methodName = methodName;
+        String operator, methodName;
+        OperatorType(String operator, String methodName) {
+            this.operator = operator;
+            this.methodName = methodName;
+        }
     }
-  }
-  private OperatorType operatorType;
-  
-  /**
-   * Initializer for a UnaryArithmeticOperatorNode
-   *
-   * @param operand The operand of the node
-   */
-  public void init(Object operand) throws StandardException {
-    switch(getNodeType()) {
-    case NodeTypes.UNARY_PLUS_OPERATOR_NODE:
-      operatorType = OperatorType.PLUS;
-      break;
-    case NodeTypes.UNARY_MINUS_OPERATOR_NODE:
-      operatorType = OperatorType.MINUS;
-      break;
-    case NodeTypes.SQRT_OPERATOR_NODE:
-      operatorType = OperatorType.SQRT;
-      break;
-    case NodeTypes.ABSOLUTE_OPERATOR_NODE:
-      operatorType = OperatorType.ABSOLUTE;
-      break;
-    default:
-      assert false : "init for UnaryArithmeticOperator called with wrong nodeType = " + getNodeType();
-      break;
-    }
-    init(operand, operatorType.operator, operatorType.methodName);
-  }
+    private OperatorType operatorType;
     
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Initializer for a UnaryArithmeticOperatorNode
+     *
+     * @param operand The operand of the node
+     */
+    public void init(Object operand) throws StandardException {
+        switch(getNodeType()) {
+        case NodeTypes.UNARY_PLUS_OPERATOR_NODE:
+            operatorType = OperatorType.PLUS;
+            break;
+        case NodeTypes.UNARY_MINUS_OPERATOR_NODE:
+            operatorType = OperatorType.MINUS;
+            break;
+        case NodeTypes.SQRT_OPERATOR_NODE:
+            operatorType = OperatorType.SQRT;
+            break;
+        case NodeTypes.ABSOLUTE_OPERATOR_NODE:
+            operatorType = OperatorType.ABSOLUTE;
+            break;
+        default:
+            assert false : "init for UnaryArithmeticOperator called with wrong nodeType = " + getNodeType();
+            break;
+        }
+        init(operand, operatorType.operator, operatorType.methodName);
+    }
+        
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    UnaryArithmeticOperatorNode other = (UnaryArithmeticOperatorNode)node;
-    this.operatorType = other.operatorType;
-  }
+        UnaryArithmeticOperatorNode other = (UnaryArithmeticOperatorNode)node;
+        this.operatorType = other.operatorType;
+    }
 
 }

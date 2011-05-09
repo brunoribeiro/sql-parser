@@ -42,18 +42,18 @@ import com.akiban.sql.StandardException;
 
 public final class VarbitConstantNode extends BitConstantNode
 {
-  /**
-   * Initializer for a VarbitConstantNode.
-   *
-   * @param arg1  The TypeId for the type of the node OR A Bit containing the value of the constant
-   *
-   * @exception StandardException
-   */
+    /**
+     * Initializer for a VarbitConstantNode.
+     *
+     * @param arg1  The TypeId for the type of the node OR A Bit containing the value of the constant
+     *
+     * @exception StandardException
+     */
 
-  public void init(Object arg1) throws StandardException {
-    init(arg1,
-         Boolean.TRUE,
-         0);
-  }
+    public void init(Object arg1) throws StandardException {
+        init(arg1,
+             Boolean.TRUE,
+             0);
+    }
 
 }

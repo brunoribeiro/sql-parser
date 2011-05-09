@@ -45,42 +45,42 @@ import com.akiban.sql.StandardException;
  */
 public class NextSequenceNode extends ValueNode 
 {
-  private TableName sequenceName;
+    private TableName sequenceName;
 
-  /**
-   * Initializer for a NextSequenceNode
-   *
-   * @param sequenceName The name of the sequence being called
-   * @throws StandardException Thrown on error
-   */
-  public void init(Object sequenceName) throws StandardException {
-    this.sequenceName = (TableName)sequenceName;
-  }
+    /**
+     * Initializer for a NextSequenceNode
+     *
+     * @param sequenceName The name of the sequence being called
+     * @throws StandardException Thrown on error
+     */
+    public void init(Object sequenceName) throws StandardException {
+        this.sequenceName = (TableName)sequenceName;
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    NextSequenceNode other = (NextSequenceNode)node;
-    this.sequenceName = (TableName)getNodeFactory().copyNode(other.sequenceName,
-                                                             getParserContext());
-  }
+        NextSequenceNode other = (NextSequenceNode)node;
+        this.sequenceName = (TableName)getNodeFactory().copyNode(other.sequenceName,
+                                                                 getParserContext());
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
-  public String toString() {
-    return super.toString();
-  }
+    public String toString() {
+        return super.toString();
+    }
 
-  protected boolean isEquivalent(ValueNode other) throws StandardException {
-    return false;
-  }
+    protected boolean isEquivalent(ValueNode other) throws StandardException {
+        return false;
+    }
 
 }

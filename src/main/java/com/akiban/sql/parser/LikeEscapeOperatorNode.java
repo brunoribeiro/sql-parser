@@ -39,78 +39,78 @@
 package com.akiban.sql.parser;
 
 /**
-    This node represents a like comparison operator (no escape)
+        This node represents a like comparison operator (no escape)
 
-    If the like pattern is a constant or a parameter then if possible
-    the like is modified to include a >= and < operator. In some cases
-    the like can be eliminated.  By adding =, >= or < operators it may
-    allow indexes to be used to greatly narrow the search range of the
-    query, and allow optimizer to estimate number of rows to affected.
-
-
-    constant or parameter LIKE pattern with prefix followed by optional wild 
-    card e.g. Derby%
-
-    CHAR(n), VARCHAR(n) where n < 255
-
-        >=   prefix padded with '\u0000' to length n -- e.g. Derby\u0000\u0000
-        <=   prefix appended with '\uffff' -- e.g. Derby\uffff
-
-        [ can eliminate LIKE if constant. ]
+        If the like pattern is a constant or a parameter then if possible
+        the like is modified to include a >= and < operator. In some cases
+        the like can be eliminated.  By adding =, >= or < operators it may
+        allow indexes to be used to greatly narrow the search range of the
+        query, and allow optimizer to estimate number of rows to affected.
 
 
-    CHAR(n), VARCHAR(n), LONG VARCHAR where n >= 255
+        constant or parameter LIKE pattern with prefix followed by optional wild 
+        card e.g. Derby%
 
-        >= prefix backed up one characer
-        <= prefix appended with '\uffff'
+        CHAR(n), VARCHAR(n) where n < 255
 
-        no elimination of like
+                >=   prefix padded with '\u0000' to length n -- e.g. Derby\u0000\u0000
+                <=   prefix appended with '\uffff' -- e.g. Derby\uffff
 
-
-    parameter like pattern starts with wild card e.g. %Derby
-
-    CHAR(n), VARCHAR(n) where n <= 256
-
-        >= '\u0000' padded with '\u0000' to length n
-        <= '\uffff'
-
-        no elimination of like
-
-    CHAR(n), VARCHAR(n), LONG VARCHAR where n > 256
-
-        >= NULL
-
-        <= '\uffff'
+                [ can eliminate LIKE if constant. ]
 
 
-    Note that the Unicode value '\uffff' is defined as not a character value
-    and can be used by a program for any purpose. We use it to set an upper
-    bound on a character range with a less than predicate. We only need a single
-    '\uffff' appended because the string 'Derby\uffff\uffff' is not a valid
-    String because '\uffff' is not a valid character.
+        CHAR(n), VARCHAR(n), LONG VARCHAR where n >= 255
+
+                >= prefix backed up one characer
+                <= prefix appended with '\uffff'
+
+                no elimination of like
+
+
+        parameter like pattern starts with wild card e.g. %Derby
+
+        CHAR(n), VARCHAR(n) where n <= 256
+
+                >= '\u0000' padded with '\u0000' to length n
+                <= '\uffff'
+
+                no elimination of like
+
+        CHAR(n), VARCHAR(n), LONG VARCHAR where n > 256
+
+                >= NULL
+
+                <= '\uffff'
+
+
+        Note that the Unicode value '\uffff' is defined as not a character value
+        and can be used by a program for any purpose. We use it to set an upper
+        bound on a character range with a less than predicate. We only need a single
+        '\uffff' appended because the string 'Derby\uffff\uffff' is not a valid
+        String because '\uffff' is not a valid character.
 
 **/
 
 public final class LikeEscapeOperatorNode extends TernaryOperatorNode
 {
 
-  /**
-   * Initializer for a LikeEscapeOperatorNode
-   *
-   * receiver like pattern [ escape escapeValue ]
-   *
-   * @param receiver      The left operand of the like: 
-   *                              column, CharConstant or Parameter
-   * @param leftOperand   The right operand of the like: the pattern
-   * @param rightOperand  The optional escape clause, null if not present
-   */
-  public void init(Object receiver,
-                   Object leftOperand,
-                   Object rightOperand)
-  {
-    /* By convention, the method name for the like operator is "like" */
-    super.init(receiver, leftOperand, rightOperand, 
-               TernaryOperatorNode.OperatorType.LIKE, null); 
-  }
+    /**
+     * Initializer for a LikeEscapeOperatorNode
+     *
+     * receiver like pattern [ escape escapeValue ]
+     *
+     * @param receiver          The left operand of the like: 
+     *                                                          column, CharConstant or Parameter
+     * @param leftOperand       The right operand of the like: the pattern
+     * @param rightOperand  The optional escape clause, null if not present
+     */
+    public void init(Object receiver,
+                     Object leftOperand,
+                     Object rightOperand)
+    {
+        /* By convention, the method name for the like operator is "like" */
+        super.init(receiver, leftOperand, rightOperand, 
+                   TernaryOperatorNode.OperatorType.LIKE, null); 
+    }
 
 }

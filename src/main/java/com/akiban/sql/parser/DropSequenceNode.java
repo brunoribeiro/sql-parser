@@ -41,37 +41,37 @@ package com.akiban.sql.parser;
 import com.akiban.sql.StandardException;
 
 /**
- * A DropSequenceNode  represents a DROP SEQUENCE statement.
+ * A DropSequenceNode    represents a DROP SEQUENCE statement.
  */
 
 public class DropSequenceNode extends DDLStatementNode 
 {
-  private TableName dropItem;
+    private TableName dropItem;
 
-  /**
-   * Initializer for a DropSequenceNode
-   *
-   * @param dropSequenceName The name of the sequence being dropped
-   * @throws StandardException
-   */
-  public void init(Object dropSequenceName) throws StandardException {
-    dropItem = (TableName)dropSequenceName;
-    initAndCheck(dropItem);
-  }
+    /**
+     * Initializer for a DropSequenceNode
+     *
+     * @param dropSequenceName The name of the sequence being dropped
+     * @throws StandardException
+     */
+    public void init(Object dropSequenceName) throws StandardException {
+        dropItem = (TableName)dropSequenceName;
+        initAndCheck(dropItem);
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    DropSequenceNode other = (DropSequenceNode)node;
-    this.dropItem = (TableName)getNodeFactory().copyNode(other.dropItem,
-                                                         getParserContext());
-  }
+        DropSequenceNode other = (DropSequenceNode)node;
+        this.dropItem = (TableName)getNodeFactory().copyNode(other.dropItem,
+                                                             getParserContext());
+    }
 
-  public String statementToString() {
-    return "DROP ".concat(dropItem.getTableName());
-  }
+    public String statementToString() {
+        return "DROP ".concat(dropItem.getTableName());
+    }
 
 }

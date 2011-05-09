@@ -41,16 +41,16 @@ package com.akiban.sql.parser;
 public class AndNode extends BinaryLogicalOperatorNode
 {
 
-  /**
-   * Initializer for an AndNode
-   *
-   * @param leftOperand The left operand of the AND
-   * @param rightOperand The right operand of the AND
-   */
+    /**
+     * Initializer for an AndNode
+     *
+     * @param leftOperand The left operand of the AND
+     * @param rightOperand The right operand of the AND
+     */
 
-  public void init(Object leftOperand, Object rightOperand) {
-    super.init(leftOperand, rightOperand, "and");
-    this.shortCircuitValue = false;
-  }
+    public void init(Object leftOperand, Object rightOperand) {
+        super.init(leftOperand, rightOperand, "and");
+        this.shortCircuitValue = false;
+    }
 
 }

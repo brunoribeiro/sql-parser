@@ -47,82 +47,82 @@ import com.akiban.sql.StandardException;
 
 abstract class SingleChildResultSetNode extends FromTable
 {
-  /**
-   * ResultSetNode under the SingleChildResultSetNode
-   */
-  ResultSetNode childResult;
+    /**
+     * ResultSetNode under the SingleChildResultSetNode
+     */
+    ResultSetNode childResult;
 
-  /**
-   * Initialilzer for a SingleChildResultSetNode.
-   *
-   * @param childResult The child ResultSetNode
-   * @param tableProperties Properties list associated with the table
-   */
+    /**
+     * Initialilzer for a SingleChildResultSetNode.
+     *
+     * @param childResult The child ResultSetNode
+     * @param tableProperties Properties list associated with the table
+     */
 
-  public void init(Object childResult, Object tableProperties) {
-    /* correlationName is always null */
-    super.init(null, tableProperties);
-    this.childResult = (ResultSetNode)childResult;
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    SingleChildResultSetNode other = (SingleChildResultSetNode)node;
-    this.childResult = (ResultSetNode)getNodeFactory().copyNode(other.childResult,
-                                                                getParserContext());
-  }
-
-  /**
-   * Return the childResult from this node.
-   *
-   * @return ResultSetNode The childResult from this node.
-   */
-  public ResultSetNode getChildResult() {
-    return childResult;
-  }
-
-  /**
-   * Set the childResult for this node.
-   *
-   * @param childResult The new childResult for this node.
-   */
-  void setChildResult(ResultSetNode childResult) {
-    this.childResult = childResult;
-  }
-
-  /**
-   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-   * how tree printing is supposed to work.
-   *
-   * @param depth The depth of this node in the tree
-   */
-
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
-
-    if (childResult != null) {
-      printLabel(depth, "childResult: ");
-      childResult.treePrint(depth + 1);
+    public void init(Object childResult, Object tableProperties) {
+        /* correlationName is always null */
+        super.init(null, tableProperties);
+        this.childResult = (ResultSetNode)childResult;
     }
-  }
 
-  /**
-   * Accept the visitor for all visitable children of this node.
-   * 
-   * @param v the visitor
-   *
-   * @exception StandardException on error
-   */
-  void acceptChildren(Visitor v) throws StandardException {
-    super.acceptChildren(v);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    if (childResult != null) {
-      childResult = (ResultSetNode)childResult.accept(v);
+        SingleChildResultSetNode other = (SingleChildResultSetNode)node;
+        this.childResult = (ResultSetNode)getNodeFactory().copyNode(other.childResult,
+                                                                    getParserContext());
     }
-  }
+
+    /**
+     * Return the childResult from this node.
+     *
+     * @return ResultSetNode The childResult from this node.
+     */
+    public ResultSetNode getChildResult() {
+        return childResult;
+    }
+
+    /**
+     * Set the childResult for this node.
+     *
+     * @param childResult The new childResult for this node.
+     */
+    void setChildResult(ResultSetNode childResult) {
+        this.childResult = childResult;
+    }
+
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
+
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+
+        if (childResult != null) {
+            printLabel(depth, "childResult: ");
+            childResult.treePrint(depth + 1);
+        }
+    }
+
+    /**
+     * Accept the visitor for all visitable children of this node.
+     * 
+     * @param v the visitor
+     *
+     * @exception StandardException on error
+     */
+    void acceptChildren(Visitor v) throws StandardException {
+        super.acceptChildren(v);
+
+        if (childResult != null) {
+            childResult = (ResultSetNode)childResult.accept(v);
+        }
+    }
 
 }

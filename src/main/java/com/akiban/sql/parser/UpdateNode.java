@@ -39,7 +39,7 @@
 package com.akiban.sql.parser;
 
 /**
- * An UpdateNode represents an UPDATE statement.  It is the top node of the
+ * An UpdateNode represents an UPDATE statement.    It is the top node of the
  * query tree for that statement.
  * For positioned update, there may be no from table specified.
  * The from table will be derived from the cursor specification of
@@ -50,55 +50,55 @@ package com.akiban.sql.parser;
 public final class UpdateNode extends DMLModStatementNode
 {
 
-  /**
-   * Initializer for an UpdateNode.
-   *
-   * @param targetTableName The name of the table to update
-   * @param resultSet The ResultSet that will generate
-   *                  the rows to update from the given table
-   */
+    /**
+     * Initializer for an UpdateNode.
+     *
+     * @param targetTableName The name of the table to update
+     * @param resultSet The ResultSet that will generate
+     *                                  the rows to update from the given table
+     */
 
-  public void init(Object targetTableName,
-                   Object resultSet) {
-    super.init(resultSet);
-    this.targetTableName = (TableName)targetTableName;
-  }
+    public void init(Object targetTableName,
+                     Object resultSet) {
+        super.init(resultSet);
+        this.targetTableName = (TableName)targetTableName;
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
-  public String toString() {
-    return targetTableName.toString() + "\n" +
-      super.toString();
-  }
+    public String toString() {
+        return targetTableName.toString() + "\n" +
+            super.toString();
+    }
 
-  public String statementToString() {
-    return "UPDATE";
-  }
+    public String statementToString() {
+        return "UPDATE";
+    }
 
-  /**
-   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-   * how tree printing is supposed to work.
-   *
-   * @param depth The depth of this node in the tree
-   */
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
 
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
-  }
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+    }
 
-  /**
-   * Return the type of statement, something from
-   * StatementType.
-   *
-   * @return the type of statement
-   */
-  protected final int getStatementType() {
-    return StatementType.UPDATE;
-  }
+    /**
+     * Return the type of statement, something from
+     * StatementType.
+     *
+     * @return the type of statement
+     */
+    protected final int getStatementType() {
+        return StatementType.UPDATE;
+    }
 
 }

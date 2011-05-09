@@ -48,41 +48,41 @@ import com.akiban.sql.StandardException;
 
 public class TestConstraintNode extends UnaryLogicalOperatorNode
 {
-  private String sqlState;
-  private String tableName;
-  private String constraintName;
+    private String sqlState;
+    private String tableName;
+    private String constraintName;
 
-  /**
-   * Initializer for a TestConstraintNode
-   *
-   * @param booleanValue The operand of the constraint test
-   * @param sqlState The SQLState of the exception to throw if the
-   *                 constraint has failed
-   * @param tableName The name of the table that the constraint is on
-   * @param constraintName The name of the constraint being checked
-   */
+    /**
+     * Initializer for a TestConstraintNode
+     *
+     * @param booleanValue The operand of the constraint test
+     * @param sqlState The SQLState of the exception to throw if the
+     *                               constraint has failed
+     * @param tableName The name of the table that the constraint is on
+     * @param constraintName The name of the constraint being checked
+     */
 
-  public void init(Object booleanValue,
-                   Object sqlState,
-                   Object tableName,
-                   Object constraintName) 
-      throws StandardException {
-    super.init(booleanValue, "throwExceptionIfFalse");
-    this.sqlState = (String)sqlState;
-    this.tableName = (String)tableName;
-    this.constraintName = (String)constraintName;
-  }
+    public void init(Object booleanValue,
+                     Object sqlState,
+                     Object tableName,
+                     Object constraintName) 
+            throws StandardException {
+        super.init(booleanValue, "throwExceptionIfFalse");
+        this.sqlState = (String)sqlState;
+        this.tableName = (String)tableName;
+        this.constraintName = (String)constraintName;
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    TestConstraintNode other = (TestConstraintNode)node;
-    this.sqlState = other.sqlState;
-    this.tableName = other.tableName;
-    this.constraintName = other.constraintName;
-  }
+        TestConstraintNode other = (TestConstraintNode)node;
+        this.sqlState = other.sqlState;
+        this.tableName = other.tableName;
+        this.constraintName = other.constraintName;
+    }
 
 }

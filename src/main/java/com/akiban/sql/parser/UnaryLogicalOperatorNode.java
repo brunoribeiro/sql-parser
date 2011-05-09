@@ -42,20 +42,20 @@ import com.akiban.sql.StandardException;
 
 public abstract class UnaryLogicalOperatorNode extends UnaryOperatorNode
 {
-  /**
-   * Initializer for a UnaryLogicalOperatorNode
-   *
-   * @param operand The operand of the operator
-   * @param methodName The name of the method to call in the generated
-   *                   class.  In this case, it's actually an operator
-   *                   name.
-   */
+    /**
+     * Initializer for a UnaryLogicalOperatorNode
+     *
+     * @param operand The operand of the operator
+     * @param methodName The name of the method to call in the generated
+     *                                   class.  In this case, it's actually an operator
+     *                                   name.
+     */
 
-  public void init(Object operand,
-                   Object methodName) 
-      throws StandardException {
-    /* For logical operators, the operator and method names are the same */
-    super.init(operand, methodName, methodName);
-  }
+    public void init(Object operand,
+                     Object methodName) 
+            throws StandardException {
+        /* For logical operators, the operator and method names are the same */
+        super.init(operand, methodName, methodName);
+    }
 
 }

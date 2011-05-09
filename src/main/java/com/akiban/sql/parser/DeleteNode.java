@@ -51,32 +51,32 @@ package com.akiban.sql.parser;
 public class DeleteNode extends DMLModStatementNode
 {
 
-  /**
-   * Initializer for a DeleteNode.
-   *
-   * @param targetTableName The name of the table to delete from
-   * @param queryExpression The query expression that will generate
-   *                        the rows to delete from the given table
-   */
+    /**
+     * Initializer for a DeleteNode.
+     *
+     * @param targetTableName The name of the table to delete from
+     * @param queryExpression The query expression that will generate
+     *                                              the rows to delete from the given table
+     */
 
-  public void init(Object targetTableName,
-                   Object queryExpression) {
-    super.init(queryExpression);
-    this.targetTableName = (TableName)targetTableName;
-  }
+    public void init(Object targetTableName,
+                     Object queryExpression) {
+        super.init(queryExpression);
+        this.targetTableName = (TableName)targetTableName;
+    }
 
-  public String statementToString() {
-    return "DELETE";
-  }
+    public String statementToString() {
+        return "DELETE";
+    }
 
-  /**
-   * Return the type of statement, something from
-   * StatementType.
-   *
-   * @return the type of statement
-   */
-  protected final int getStatementType() {
-    return StatementType.DELETE;
-  }
+    /**
+     * Return the type of statement, something from
+     * StatementType.
+     *
+     * @return the type of statement
+     */
+    protected final int getStatementType() {
+        return StatementType.DELETE;
+    }
 
 }

@@ -45,7 +45,7 @@ import java.util.Properties;
 /**
  * The CurrentOf operator is used by positioned DELETE 
  * and UPDATE to get the current row and location
- * for the target cursor.  The bind() operations for 
+ * for the target cursor.    The bind() operations for 
  * positioned DELETE and UPDATE add a column to 
  * the select list under the statement for the row location 
  * accessible from this node.
@@ -58,52 +58,52 @@ import java.util.Properties;
  */
 public class CurrentOfNode extends FromTable 
 {
-  private String cursorName;
+    private String cursorName;
 
-  //
-  // initializer
-  //
-  public void init(Object correlationName, Object cursor, Object tableProperties) {
-    super.init(correlationName, tableProperties);
-    cursorName = (String)cursor;
-  }
+    //
+    // initializer
+    //
+    public void init(Object correlationName, Object cursor, Object tableProperties) {
+        super.init(correlationName, tableProperties);
+        cursorName = (String)cursor;
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    CurrentOfNode other = (CurrentOfNode)node;
-    this.cursorName = other.cursorName;
-  }
+        CurrentOfNode other = (CurrentOfNode)node;
+        this.cursorName = other.cursorName;
+    }
 
-  /**
-   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-   * how tree printing is supposed to work.
-   *
-   * @param depth The depth of this node in the tree
-   */
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
 
-    printLabel(depth, "cursor: ");
-  }
+        printLabel(depth, "cursor: ");
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
-  public String toString() {
-    return "preparedStatement: " +
-      cursorName + "\n" +
-      super.toString();
-  }
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+    public String toString() {
+        return "preparedStatement: " +
+            cursorName + "\n" +
+            super.toString();
+    }
 
-  public String getCursorName() {
-    return cursorName;
-  }
+    public String getCursorName() {
+        return cursorName;
+    }
 
 }

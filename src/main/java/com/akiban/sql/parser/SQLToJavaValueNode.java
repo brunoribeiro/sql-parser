@@ -48,81 +48,81 @@ import com.akiban.sql.types.DataTypeDescriptor;
 
 public class SQLToJavaValueNode extends JavaValueNode
 {
-  ValueNode value;
+    ValueNode value;
 
-  /**
-   * Constructor for a SQLToJavaValueNode
-   *
-   * @param value A ValueNode representing a SQL value to convert to
-   *              the Java domain.
-   */
+    /**
+     * Constructor for a SQLToJavaValueNode
+     *
+     * @param value A ValueNode representing a SQL value to convert to
+     *                          the Java domain.
+     */
 
-  public void init(Object value) {
-    this.value = (ValueNode)value;
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    SQLToJavaValueNode other = (SQLToJavaValueNode)node;
-    this.value = (ValueNode)getNodeFactory().copyNode(other.value,
-                                                      getParserContext());
-  }
-
-  /**
-   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-   * how tree printing is supposed to work.
-   *
-   * @param depth The depth of this node in the tree
-   */
-
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
-    if (value != null) {
-      printLabel(depth, "value: ");
-      value.treePrint(depth + 1);
+    public void init(Object value) {
+        this.value = (ValueNode)value;
     }
-  }
 
-  /**
-   * Override behavior in superclass.
-   */
-  public DataTypeDescriptor getType() throws StandardException {
-    return value.getType();
-  }
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-  /**
-   * Get the SQL ValueNode that is being converted to a JavaValueNode
-   *
-   * @return The underlying SQL ValueNode
-   */
-  ValueNode getSQLValueNode() {
-    return value;
-  }
-
-  /** @see ValueNode#getConstantValueAsObject 
-   *
-   * @exception StandardException Thrown on error
-   */
-  Object getConstantValueAsObject() throws StandardException {
-    return value.getConstantValueAsObject();
-  }
-
-  /**
-   * Accept the visitor for all visitable children of this node.
-   * 
-   * @param v the visitor
-   *
-   * @exception StandardException on error
-   */
-  void acceptChildren(Visitor v) throws StandardException {
-    super.acceptChildren(v);
-
-    if (value != null) {
-      value = (ValueNode)value.accept(v);
+        SQLToJavaValueNode other = (SQLToJavaValueNode)node;
+        this.value = (ValueNode)getNodeFactory().copyNode(other.value,
+                                                          getParserContext());
     }
-  }
+
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
+
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+        if (value != null) {
+            printLabel(depth, "value: ");
+            value.treePrint(depth + 1);
+        }
+    }
+
+    /**
+     * Override behavior in superclass.
+     */
+    public DataTypeDescriptor getType() throws StandardException {
+        return value.getType();
+    }
+
+    /**
+     * Get the SQL ValueNode that is being converted to a JavaValueNode
+     *
+     * @return The underlying SQL ValueNode
+     */
+    ValueNode getSQLValueNode() {
+        return value;
+    }
+
+    /** @see ValueNode#getConstantValueAsObject 
+     *
+     * @exception StandardException Thrown on error
+     */
+    Object getConstantValueAsObject() throws StandardException {
+        return value.getConstantValueAsObject();
+    }
+
+    /**
+     * Accept the visitor for all visitable children of this node.
+     * 
+     * @param v the visitor
+     *
+     * @exception StandardException on error
+     */
+    void acceptChildren(Visitor v) throws StandardException {
+        super.acceptChildren(v);
+
+        if (value != null) {
+            value = (ValueNode)value.accept(v);
+        }
+    }
 }

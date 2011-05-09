@@ -48,99 +48,99 @@ import com.akiban.sql.StandardException;
 
 public abstract class DMLModStatementNode extends DMLStatementNode
 {
-  protected FromVTI targetVTI;
-  protected TableName targetTableName;
-  private int statementType;
+    protected FromVTI targetVTI;
+    protected TableName targetTableName;
+    private int statementType;
 
-  /**
-   * Initializer for a DMLModStatementNode -- delegate to DMLStatementNode
-   *
-   * @param resultSet A ResultSetNode for the result set of the
-   *                  DML statement
-   */
-  public void init(Object resultSet) {
-    super.init(resultSet);
-    statementType = getStatementType();
-  }
-
-  /**
-   * Initializer for a DMLModStatementNode -- delegate to DMLStatementNode
-   *
-   * @param resultSet A ResultSetNode for the result set of the
-   *                  DML statement
-   * @param statementType used by nodes that allocate a DMLMod directly
-   *                      (rather than inheriting it).
-   */
-  public void init(Object resultSet, Object statementType) {
-    super.init(resultSet);
-    this.statementType = ((Integer)statementType).intValue();
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    DMLModStatementNode other = (DMLModStatementNode)node;
-    this.targetVTI = (FromVTI)getNodeFactory().copyNode(other.targetVTI,
-                                                        getParserContext());
-    this.targetTableName = (TableName)getNodeFactory().copyNode(other.targetTableName,
-                                                                getParserContext());
-    this.statementType = other.statementType;
-  }
-
-  void setTarget(QueryTreeNode targetName) {
-    if (targetName instanceof TableName) {
-      this.targetTableName = (TableName)targetName;
+    /**
+     * Initializer for a DMLModStatementNode -- delegate to DMLStatementNode
+     *
+     * @param resultSet A ResultSetNode for the result set of the
+     *                                  DML statement
+     */
+    public void init(Object resultSet) {
+        super.init(resultSet);
+        statementType = getStatementType();
     }
-    else {
-      this.targetVTI = (FromVTI)targetName;
-      targetVTI.setTarget();
+
+    /**
+     * Initializer for a DMLModStatementNode -- delegate to DMLStatementNode
+     *
+     * @param resultSet A ResultSetNode for the result set of the
+     *                                  DML statement
+     * @param statementType used by nodes that allocate a DMLMod directly
+     *                                          (rather than inheriting it).
+     */
+    public void init(Object resultSet, Object statementType) {
+        super.init(resultSet);
+        this.statementType = ((Integer)statementType).intValue();
     }
-  }
 
-  /**
-   *
-   * INSERT/UPDATE/DELETE are always atomic.
-   *
-   * @return true 
-   */
-  public boolean isAtomic() {
-    return true;
-  }
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-  public TableName getTargetTableName() {
-    return targetTableName;
-  }
-
-  /**
-   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-   * how tree printing is supposed to work.
-   *
-   * @param depth The depth of this node in the tree
-   */
-
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
-
-    printLabel(depth, "targetTableName: ");
-    targetTableName.treePrint(depth + 1);
-  }
-
-  /**
-   * Accept the visitor for all visitable children of this node.
-   * 
-   * @param v the visitor
-   *
-   * @exception StandardException on error
-   */
-  void acceptChildren(Visitor v) throws StandardException {
-    super.acceptChildren(v);
-
-    if (targetTableName != null) {
-      targetTableName.accept(v);
+        DMLModStatementNode other = (DMLModStatementNode)node;
+        this.targetVTI = (FromVTI)getNodeFactory().copyNode(other.targetVTI,
+                                                            getParserContext());
+        this.targetTableName = (TableName)getNodeFactory().copyNode(other.targetTableName,
+                                                                    getParserContext());
+        this.statementType = other.statementType;
     }
-  }
+
+    void setTarget(QueryTreeNode targetName) {
+        if (targetName instanceof TableName) {
+            this.targetTableName = (TableName)targetName;
+        }
+        else {
+            this.targetVTI = (FromVTI)targetName;
+            targetVTI.setTarget();
+        }
+    }
+
+    /**
+     *
+     * INSERT/UPDATE/DELETE are always atomic.
+     *
+     * @return true 
+     */
+    public boolean isAtomic() {
+        return true;
+    }
+
+    public TableName getTargetTableName() {
+        return targetTableName;
+    }
+
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
+
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+
+        printLabel(depth, "targetTableName: ");
+        targetTableName.treePrint(depth + 1);
+    }
+
+    /**
+     * Accept the visitor for all visitable children of this node.
+     * 
+     * @param v the visitor
+     *
+     * @exception StandardException on error
+     */
+    void acceptChildren(Visitor v) throws StandardException {
+        super.acceptChildren(v);
+
+        if (targetTableName != null) {
+            targetTableName.accept(v);
+        }
+    }
 
 }

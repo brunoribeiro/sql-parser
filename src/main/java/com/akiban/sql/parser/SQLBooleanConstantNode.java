@@ -43,34 +43,34 @@ import com.akiban.sql.types.TypeId;
 
 public class SQLBooleanConstantNode extends ConstantNode
 {
-  /**
-   * Initializer for a SQLBooleanConstantNode.
-   *
-   * @param newValue A String containing the value of the constant: true, false, unknown
-   *
-   * @exception StandardException
-   */
+    /**
+     * Initializer for a SQLBooleanConstantNode.
+     *
+     * @param newValue A String containing the value of the constant: true, false, unknown
+     *
+     * @exception StandardException
+     */
 
-  public void init(Object newValue) throws StandardException {
-    String strVal = (String)newValue;
-    Boolean val = null;
+    public void init(Object newValue) throws StandardException {
+        String strVal = (String)newValue;
+        Boolean val = null;
 
-    if ("true".equalsIgnoreCase(strVal))
-      val = Boolean.TRUE;
-    else if ("false".equalsIgnoreCase(strVal))
-      val = Boolean.FALSE;
+        if ("true".equalsIgnoreCase(strVal))
+            val = Boolean.TRUE;
+        else if ("false".equalsIgnoreCase(strVal))
+            val = Boolean.FALSE;
 
-    /*
-    ** RESOLVE: The length is fixed at 1, even for nulls.
-    ** Is that OK?
-    */
+        /*
+        ** RESOLVE: The length is fixed at 1, even for nulls.
+        ** Is that OK?
+        */
 
-    /* Fill in the type information in the parent ValueNode */
-    super.init(TypeId.BOOLEAN_ID,
-               Boolean.TRUE,
-               1);
+        /* Fill in the type information in the parent ValueNode */
+        super.init(TypeId.BOOLEAN_ID,
+                   Boolean.TRUE,
+                   1);
 
-    setValue(val);
-  }
+        setValue(val);
+    }
 
 }

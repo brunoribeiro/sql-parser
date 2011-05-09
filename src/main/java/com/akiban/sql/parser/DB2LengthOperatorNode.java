@@ -50,14 +50,14 @@ import java.sql.Types;
 
 public class DB2LengthOperatorNode extends UnaryOperatorNode
 {
-    
-  /**
-   * Initializer for a DB2LengthOperatorNode
-   *
-   * @param operand The operand of the node
-   */
-  public void init(Object operand) throws StandardException {
-    super.init(operand, "length", "getDB2Length");
-  }
+		
+	/**
+	 * Initializer for a DB2LengthOperatorNode
+	 *
+	 * @param operand The operand of the node
+	 */
+	public void init(Object operand) throws StandardException {
+		super.init(operand, "length", "getDB2Length");
+	}
 
 }

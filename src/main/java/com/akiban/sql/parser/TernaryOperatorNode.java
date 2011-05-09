@@ -51,262 +51,262 @@ import com.akiban.sql.types.ValueClassName;
 
 public class TernaryOperatorNode extends ValueNode
 {
-  public static enum OperatorType {
-    TRIM("trim", "ansiTrim", 
-         ValueClassName.StringDataValue, 
-         new String[] { ValueClassName.StringDataValue, 
-                        ValueClassName.StringDataValue, 
-                        "java.lang.Integer" }),
-    LOCATE("LOCATE", "locate",
-           ValueClassName.NumberDataValue,
-           new String[] { ValueClassName.StringDataValue, 
-                          ValueClassName.StringDataValue, 
-                          ValueClassName.NumberDataValue }),
-    SUBSTRING("substring" , "substring",
-              ValueClassName.ConcatableDataValue,
-              new String[] { ValueClassName.ConcatableDataValue, 
-                             ValueClassName.NumberDataValue, 
-                             ValueClassName.NumberDataValue }),
-    LIKE("like", "like",
-         ValueClassName.BooleanDataValue,
-         new String[] { ValueClassName.DataValueDescriptor, 
-                        ValueClassName.DataValueDescriptor, 
-                        ValueClassName.DataValueDescriptor }),
-    TIMESTAMPADD("TIMESTAMPADD", "timestampAdd",
-                 ValueClassName.DateTimeDataValue, 
-                 // time.timestampadd(interval, count)
-                 new String[] { ValueClassName.DateTimeDataValue, 
-                                "java.lang.Integer", 
-                                ValueClassName.NumberDataValue }),
-    TIMESTAMPDIFF("TIMESTAMPDIFF", "timestampDiff",
-                  ValueClassName.NumberDataValue,
-                  // time2.timestampDiff(interval, time1)
-                  new String[] { ValueClassName.DateTimeDataValue, 
-                                 "java.lang.Integer", 
-                                 ValueClassName.DateTimeDataValue });
+    public static enum OperatorType {
+        TRIM("trim", "ansiTrim", 
+             ValueClassName.StringDataValue, 
+             new String[] { ValueClassName.StringDataValue, 
+                            ValueClassName.StringDataValue, 
+                            "java.lang.Integer" }),
+            LOCATE("LOCATE", "locate",
+                   ValueClassName.NumberDataValue,
+                   new String[] { ValueClassName.StringDataValue, 
+                                  ValueClassName.StringDataValue, 
+                                  ValueClassName.NumberDataValue }),
+            SUBSTRING("substring" , "substring",
+                      ValueClassName.ConcatableDataValue,
+                      new String[] { ValueClassName.ConcatableDataValue, 
+                                     ValueClassName.NumberDataValue, 
+                                     ValueClassName.NumberDataValue }),
+            LIKE("like", "like",
+                 ValueClassName.BooleanDataValue,
+                 new String[] { ValueClassName.DataValueDescriptor, 
+                                ValueClassName.DataValueDescriptor, 
+                                ValueClassName.DataValueDescriptor }),
+            TIMESTAMPADD("TIMESTAMPADD", "timestampAdd",
+                         ValueClassName.DateTimeDataValue, 
+                         // time.timestampadd(interval, count)
+                         new String[] { ValueClassName.DateTimeDataValue, 
+                                        "java.lang.Integer", 
+                                        ValueClassName.NumberDataValue }),
+            TIMESTAMPDIFF("TIMESTAMPDIFF", "timestampDiff",
+                          ValueClassName.NumberDataValue,
+                          // time2.timestampDiff(interval, time1)
+                          new String[] { ValueClassName.DateTimeDataValue, 
+                                         "java.lang.Integer", 
+                                         ValueClassName.DateTimeDataValue });
 
-    String operator, methodName;
-    String resultType;
-    String[] argTypes;
-    OperatorType(String operator, String methodName,
-                 String resultType, String[] argTypes) {
-      this.operator = operator;
-      this.methodName = methodName;
-      this.resultType = resultType;
-      this.argTypes = argTypes;
+        String operator, methodName;
+        String resultType;
+        String[] argTypes;
+        OperatorType(String operator, String methodName,
+                     String resultType, String[] argTypes) {
+            this.operator = operator;
+            this.methodName = methodName;
+            this.resultType = resultType;
+            this.argTypes = argTypes;
+        }
     }
-  }
 
-  protected String operator;
-  protected String methodName;
-  protected OperatorType operatorType;
-  protected ValueNode receiver; 
+    protected String operator;
+    protected String methodName;
+    protected OperatorType operatorType;
+    protected ValueNode receiver; 
 
-  protected ValueNode leftOperand;
-  protected ValueNode rightOperand;
+    protected ValueNode leftOperand;
+    protected ValueNode rightOperand;
 
-  protected String resultInterfaceType;
-  protected String receiverInterfaceType;
-  protected String leftInterfaceType;
-  protected String rightInterfaceType;
+    protected String resultInterfaceType;
+    protected String receiverInterfaceType;
+    protected String leftInterfaceType;
+    protected String rightInterfaceType;
 
-  public static enum TrimType {
-    LEADING, TRAILING, BOTH
-  }
-  protected TrimType trimType;
+    public static enum TrimType {
+        LEADING, TRAILING, BOTH
+            }
+    protected TrimType trimType;
 
-  // TODO: Could be enum, but note how passed as Integer constant.
-  public static final int YEAR_INTERVAL = 0;
-  public static final int QUARTER_INTERVAL = 1;
-  public static final int MONTH_INTERVAL = 2;
-  public static final int WEEK_INTERVAL = 3;
-  public static final int DAY_INTERVAL = 4;
-  public static final int HOUR_INTERVAL = 5;
-  public static final int MINUTE_INTERVAL = 6;
-  public static final int SECOND_INTERVAL = 7;
-  public static final int FRAC_SECOND_INTERVAL = 8;
+    // TODO: Could be enum, but note how passed as Integer constant.
+    public static final int YEAR_INTERVAL = 0;
+    public static final int QUARTER_INTERVAL = 1;
+    public static final int MONTH_INTERVAL = 2;
+    public static final int WEEK_INTERVAL = 3;
+    public static final int DAY_INTERVAL = 4;
+    public static final int HOUR_INTERVAL = 5;
+    public static final int MINUTE_INTERVAL = 6;
+    public static final int SECOND_INTERVAL = 7;
+    public static final int FRAC_SECOND_INTERVAL = 8;
 
-  /**
-   * Initializer for a TernaryOperatorNode
-   *
-   * @param receiver The receiver (eg, string being operated on in substr())
-   * @param leftOperand The left operand of the node
-   * @param rightOperand The right operand of the node
-   * @param operatorType The type of the operand
-   */
+    /**
+     * Initializer for a TernaryOperatorNode
+     *
+     * @param receiver The receiver (eg, string being operated on in substr())
+     * @param leftOperand The left operand of the node
+     * @param rightOperand The right operand of the node
+     * @param operatorType The type of the operand
+     */
 
-  public void init(Object receiver,
-                   Object leftOperand,
-                   Object rightOperand,
-                   Object operatorType,
-                   Object trimType) {
-    this.receiver = (ValueNode)receiver;
-    this.leftOperand = (ValueNode)leftOperand;
-    this.rightOperand = (ValueNode)rightOperand;
-    this.operatorType = (OperatorType)operatorType;
-    this.operator = this.operatorType.operator;
-    this.methodName = this.operatorType.methodName;
-    this.resultInterfaceType = this.operatorType.resultType;
-    this.receiverInterfaceType = this.operatorType.argTypes[0];
-    this.leftInterfaceType = this.operatorType.argTypes[1];
-    this.rightInterfaceType = this.operatorType.argTypes[2];
-    this.trimType = (TrimType)trimType;
-  }
+    public void init(Object receiver,
+                     Object leftOperand,
+                     Object rightOperand,
+                     Object operatorType,
+                     Object trimType) {
+        this.receiver = (ValueNode)receiver;
+        this.leftOperand = (ValueNode)leftOperand;
+        this.rightOperand = (ValueNode)rightOperand;
+        this.operatorType = (OperatorType)operatorType;
+        this.operator = this.operatorType.operator;
+        this.methodName = this.operatorType.methodName;
+        this.resultInterfaceType = this.operatorType.resultType;
+        this.receiverInterfaceType = this.operatorType.argTypes[0];
+        this.leftInterfaceType = this.operatorType.argTypes[1];
+        this.rightInterfaceType = this.operatorType.argTypes[2];
+        this.trimType = (TrimType)trimType;
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    TernaryOperatorNode other = (TernaryOperatorNode)node;
-    this.operator = other.operator;
-    this.methodName = other.methodName;
-    this.operatorType = other.operatorType;
-    this.receiver = (ValueNode)getNodeFactory().copyNode(other.receiver,
-                                                         getParserContext());
-    this.leftOperand = (ValueNode)getNodeFactory().copyNode(other.leftOperand,
-                                                            getParserContext());
-    this.rightOperand = (ValueNode)getNodeFactory().copyNode(other.rightOperand,
+        TernaryOperatorNode other = (TernaryOperatorNode)node;
+        this.operator = other.operator;
+        this.methodName = other.methodName;
+        this.operatorType = other.operatorType;
+        this.receiver = (ValueNode)getNodeFactory().copyNode(other.receiver,
                                                              getParserContext());
-    this.resultInterfaceType = other.resultInterfaceType;
-    this.receiverInterfaceType = other.receiverInterfaceType;
-    this.leftInterfaceType = other.leftInterfaceType;
-    this.rightInterfaceType = other.rightInterfaceType;
-    this.trimType = other.trimType;
-  }
-
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
-
-  public String toString() {
-    return "operator: " + operator + "\n" +
-      "methodName: " + methodName + "\n" + 
-      "resultInterfaceType: " + resultInterfaceType + "\n" + 
-      "receiverInterfaceType: " + receiverInterfaceType + "\n" + 
-      "leftInterfaceType: " + leftInterfaceType + "\n" + 
-      "rightInterfaceType: " + rightInterfaceType + "\n" + 
-      super.toString();
-  }
-
-  /**
-   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-   * how tree printing is supposed to work.
-   *
-   * @param depth The depth of this node in the tree
-   */
-
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
-
-    if (receiver != null) {
-      printLabel(depth, "receiver: ");
-      receiver.treePrint(depth + 1);
+        this.leftOperand = (ValueNode)getNodeFactory().copyNode(other.leftOperand,
+                                                                getParserContext());
+        this.rightOperand = (ValueNode)getNodeFactory().copyNode(other.rightOperand,
+                                                                 getParserContext());
+        this.resultInterfaceType = other.resultInterfaceType;
+        this.receiverInterfaceType = other.receiverInterfaceType;
+        this.leftInterfaceType = other.leftInterfaceType;
+        this.rightInterfaceType = other.rightInterfaceType;
+        this.trimType = other.trimType;
     }
 
-    if (leftOperand != null) {
-      printLabel(depth, "leftOperand: ");
-      leftOperand.treePrint(depth + 1);
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+
+    public String toString() {
+        return "operator: " + operator + "\n" +
+            "methodName: " + methodName + "\n" + 
+            "resultInterfaceType: " + resultInterfaceType + "\n" + 
+            "receiverInterfaceType: " + receiverInterfaceType + "\n" + 
+            "leftInterfaceType: " + leftInterfaceType + "\n" + 
+            "rightInterfaceType: " + rightInterfaceType + "\n" + 
+            super.toString();
     }
 
-    if (rightOperand != null) {
-      printLabel(depth, "rightOperand: ");
-      rightOperand.treePrint(depth + 1);
-    }
-  }
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
 
-  public String getOperator() {
-    return operator;
-  }
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
 
-  public String getMethodName() {
-    return methodName;
-  }
+        if (receiver != null) {
+            printLabel(depth, "receiver: ");
+            receiver.treePrint(depth + 1);
+        }
 
-  public ValueNode getReceiver() {
-    return receiver;
-  }
+        if (leftOperand != null) {
+            printLabel(depth, "leftOperand: ");
+            leftOperand.treePrint(depth + 1);
+        }
 
-  /**
-   * Set the leftOperand to the specified ValueNode
-   *
-   * @param newLeftOperand The new leftOperand
-   */
-  public void setLeftOperand(ValueNode newLeftOperand) {
-    leftOperand = newLeftOperand;
-  }
-
-  /**
-   * Get the leftOperand
-   *
-   * @return The current leftOperand.
-   */
-  public ValueNode getLeftOperand() {
-    return leftOperand;
-  }
-
-  /**
-   * Set the rightOperand to the specified ValueNode
-   *
-   * @param newRightOperand The new rightOperand
-   */
-  public void setRightOperand(ValueNode newRightOperand) {
-    rightOperand = newRightOperand;
-  }
-
-  /**
-   * Get the rightOperand
-   *
-   * @return The current rightOperand.
-   */
-  public ValueNode getRightOperand() {
-    return rightOperand;
-  }
-
-  /**
-   * Accept the visitor for all visitable children of this node.
-   * 
-   * @param v the visitor
-   *
-   * @exception StandardException on error
-   */
-  void acceptChildren(Visitor v) throws StandardException {
-    super.acceptChildren(v);
-
-    if (receiver != null) {
-      receiver = (ValueNode)receiver.accept(v);
+        if (rightOperand != null) {
+            printLabel(depth, "rightOperand: ");
+            rightOperand.treePrint(depth + 1);
+        }
     }
 
-    if (leftOperand != null) {
-      leftOperand = (ValueNode)leftOperand.accept(v);
+    public String getOperator() {
+        return operator;
     }
 
-    if (rightOperand != null) {
-      rightOperand = (ValueNode)rightOperand.accept(v);
+    public String getMethodName() {
+        return methodName;
     }
-  }
-        
-  protected boolean isEquivalent(ValueNode o) throws StandardException {
-    if (isSameNodeType(o)) {
-      TernaryOperatorNode other = (TernaryOperatorNode)o;
 
-      /*
-       * SUBSTR function can either have 2 or 3 arguments.  In the 
-       * 2-args case, rightOperand will be null and thus needs 
-       * additional handling in the equivalence check.
-       */
-      return (other.methodName.equals(methodName)
-              && other.receiver.isEquivalent(receiver)
-              && other.leftOperand.isEquivalent(leftOperand)
-              && ( (rightOperand == null && other.rightOperand == null) || 
-                   (other.rightOperand != null && 
-                    other.rightOperand.isEquivalent(rightOperand)) ) );
+    public ValueNode getReceiver() {
+        return receiver;
     }
-    return false;
-  }
+
+    /**
+     * Set the leftOperand to the specified ValueNode
+     *
+     * @param newLeftOperand The new leftOperand
+     */
+    public void setLeftOperand(ValueNode newLeftOperand) {
+        leftOperand = newLeftOperand;
+    }
+
+    /**
+     * Get the leftOperand
+     *
+     * @return The current leftOperand.
+     */
+    public ValueNode getLeftOperand() {
+        return leftOperand;
+    }
+
+    /**
+     * Set the rightOperand to the specified ValueNode
+     *
+     * @param newRightOperand The new rightOperand
+     */
+    public void setRightOperand(ValueNode newRightOperand) {
+        rightOperand = newRightOperand;
+    }
+
+    /**
+     * Get the rightOperand
+     *
+     * @return The current rightOperand.
+     */
+    public ValueNode getRightOperand() {
+        return rightOperand;
+    }
+
+    /**
+     * Accept the visitor for all visitable children of this node.
+     * 
+     * @param v the visitor
+     *
+     * @exception StandardException on error
+     */
+    void acceptChildren(Visitor v) throws StandardException {
+        super.acceptChildren(v);
+
+        if (receiver != null) {
+            receiver = (ValueNode)receiver.accept(v);
+        }
+
+        if (leftOperand != null) {
+            leftOperand = (ValueNode)leftOperand.accept(v);
+        }
+
+        if (rightOperand != null) {
+            rightOperand = (ValueNode)rightOperand.accept(v);
+        }
+    }
+                
+    protected boolean isEquivalent(ValueNode o) throws StandardException {
+        if (isSameNodeType(o)) {
+            TernaryOperatorNode other = (TernaryOperatorNode)o;
+
+            /*
+             * SUBSTR function can either have 2 or 3 arguments.    In the 
+             * 2-args case, rightOperand will be null and thus needs 
+             * additional handling in the equivalence check.
+             */
+            return (other.methodName.equals(methodName)
+                    && other.receiver.isEquivalent(receiver)
+                    && other.leftOperand.isEquivalent(leftOperand)
+                    && ( (rightOperand == null && other.rightOperand == null) || 
+                         (other.rightOperand != null && 
+                          other.rightOperand.isEquivalent(rightOperand)) ) );
+        }
+        return false;
+    }
 
 }

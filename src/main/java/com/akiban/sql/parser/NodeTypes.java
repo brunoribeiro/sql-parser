@@ -47,226 +47,226 @@ package com.akiban.sql.parser;
  */
 public interface NodeTypes
 {
-  /** Node types, for use with getNode methods */
-  public static final int TEST_CONSTRAINT_NODE = 1;
-  public static final int CURRENT_ROW_LOCATION_NODE = 2;
-  public static final int GROUP_BY_LIST = 3;
-  public static final int CURRENT_ISOLATION_NODE = 4;
-  public static final int IDENTITY_VAL_NODE = 5;
-  public static final int CURRENT_SCHEMA_NODE = 6;
-  public static final int ORDER_BY_LIST = 7;
-  public static final int PREDICATE_LIST = 8;
-  public static final int RESULT_COLUMN_LIST = 9;
-  // 10 available
-  public static final int SUBQUERY_LIST = 11;
-  public static final int TABLE_ELEMENT_LIST = 12;
-  public static final int UNTYPED_NULL_CONSTANT_NODE = 13;
-  public static final int TABLE_ELEMENT_NODE = 14;
-  public static final int VALUE_NODE_LIST = 15;
-  public static final int ALL_RESULT_COLUMN = 16;
-  // 17 is available
-  public static final int GET_CURRENT_CONNECTION_NODE = 18;
-  public static final int NOP_STATEMENT_NODE = 19;
-  public static final int DB2_LENGTH_OPERATOR_NODE = 20;
-  public static final int SET_TRANSACTION_ISOLATION_NODE = 21;
-  // 22 is available
-  public static final int CHAR_LENGTH_OPERATOR_NODE = 23;
-  public static final int IS_NOT_NULL_NODE = 24;
-  public static final int IS_NULL_NODE = 25;
-  public static final int NOT_NODE = 26;
-  // 27 is available
-  public static final int SQL_TO_JAVA_VALUE_NODE = 28;
-  public static final int UNARY_MINUS_OPERATOR_NODE = 29;
-  public static final int UNARY_PLUS_OPERATOR_NODE = 30;
-  public static final int SQL_BOOLEAN_CONSTANT_NODE = 31;
-  public static final int UNARY_DATE_TIMESTAMP_OPERATOR_NODE = 32;
-  public static final int TIMESTAMP_OPERATOR_NODE = 33;
-  public static final int TABLE_NAME = 34;
-  public static final int GROUP_BY_COLUMN = 35;
-  public static final int JAVA_TO_SQL_VALUE_NODE = 36;
-  public static final int FROM_LIST = 37;
-  public static final int BOOLEAN_CONSTANT_NODE = 38;
-  public static final int AND_NODE = 39;
-  public static final int BINARY_DIVIDE_OPERATOR_NODE = 40;
-  public static final int BINARY_EQUALS_OPERATOR_NODE = 41;
-  public static final int BINARY_GREATER_EQUALS_OPERATOR_NODE = 42;
-  public static final int BINARY_GREATER_THAN_OPERATOR_NODE = 43;
-  public static final int BINARY_LESS_EQUALS_OPERATOR_NODE = 44;
-  public static final int BINARY_LESS_THAN_OPERATOR_NODE = 45;
-  public static final int BINARY_MINUS_OPERATOR_NODE = 46;
-  public static final int BINARY_NOT_EQUALS_OPERATOR_NODE = 47;
-  public static final int BINARY_PLUS_OPERATOR_NODE = 48;
-  public static final int BINARY_TIMES_OPERATOR_NODE = 49;
-  public static final int CONCATENATION_OPERATOR_NODE = 50;
-  public static final int LIKE_OPERATOR_NODE = 51;
-  public static final int OR_NODE = 52;
-  public static final int BETWEEN_OPERATOR_NODE = 53;
-  public static final int CONDITIONAL_NODE = 54;
-  public static final int IN_LIST_OPERATOR_NODE = 55;
-  public static final int NOT_BETWEEN_OPERATOR_NODE = 56;
-  public static final int NOT_IN_LIST_OPERATOR_NODE = 57;
-  public static final int BIT_CONSTANT_NODE = 58;
-  public static final int VARBIT_CONSTANT_NODE = 59;
-  public static final int CAST_NODE = 60;
-  public static final int CHAR_CONSTANT_NODE = 61;
-  public static final int COLUMN_REFERENCE = 62;
-  public static final int DROP_INDEX_NODE = 63;
-  // 64 available;
-  public static final int DROP_TRIGGER_NODE = 65;
-  // 66 available;
-  public static final int DECIMAL_CONSTANT_NODE = 67;
-  public static final int DOUBLE_CONSTANT_NODE = 68;
-  public static final int FLOAT_CONSTANT_NODE = 69;
-  public static final int INT_CONSTANT_NODE = 70;
-  public static final int LONGINT_CONSTANT_NODE = 71;
-  public static final int LONGVARBIT_CONSTANT_NODE = 72;
-  public static final int LONGVARCHAR_CONSTANT_NODE = 73;
-  public static final int SMALLINT_CONSTANT_NODE = 74;
-  public static final int TINYINT_CONSTANT_NODE = 75;
-  public static final int USERTYPE_CONSTANT_NODE = 76;
-  public static final int VARCHAR_CONSTANT_NODE = 77;
-  public static final int PREDICATE = 78;
-  // 79 available
-  public static final int RESULT_COLUMN = 80;
-  public static final int SET_SCHEMA_NODE = 81;
-  public static final int UPDATE_COLUMN = 82;
-  public static final int SIMPLE_STRING_OPERATOR_NODE = 83;
-  public static final int STATIC_CLASS_FIELD_REFERENCE_NODE = 84;
-  public static final int STATIC_METHOD_CALL_NODE = 85;
-  public static final int REVOKE_NODE = 86;
-  public static final int EXTRACT_OPERATOR_NODE = 87;
-  public static final int PARAMETER_NODE = 88;
-  public static final int GRANT_NODE = 89;
-  public static final int DROP_SCHEMA_NODE = 90;
-  public static final int DROP_TABLE_NODE = 91;
-  public static final int DROP_VIEW_NODE = 92;
-  public static final int SUBQUERY_NODE = 93;
-  public static final int BASE_COLUMN_NODE = 94;
-  public static final int CALL_STATEMENT_NODE = 95;
-  public static final int MODIFY_COLUMN_DEFAULT_NODE = 97;
-  public static final int NON_STATIC_METHOD_CALL_NODE = 98;
-  public static final int CURRENT_OF_NODE = 99;
-  public static final int DEFAULT_NODE = 100;
-  public static final int DELETE_NODE = 101;
-  public static final int UPDATE_NODE = 102;
-  public static final int PRIVILEGE_NODE = 103;
-  public static final int ORDER_BY_COLUMN = 104;
-  public static final int ROW_RESULT_SET_NODE = 105;
-  public static final int TABLE_PRIVILEGES_NODE = 106;
-  public static final int VIRTUAL_COLUMN_NODE = 107;
-  public static final int CURRENT_DATETIME_OPERATOR_NODE = 108;
-  public static final int CURRENT_USER_NODE = 109; // special function CURRENT_USER
-  public static final int USER_NODE = 110; // // special function USER
-  public static final int IS_NODE = 111;
-  public static final int LOCK_TABLE_NODE = 112;
-  public static final int DROP_COLUMN_NODE = 113;
-  public static final int ALTER_TABLE_NODE = 114;
-  public static final int AGGREGATE_NODE = 115;
-  public static final int COLUMN_DEFINITION_NODE = 116;
-  // 117 is available
-  public static final int EXEC_SPS_NODE = 118;
-  public static final int FK_CONSTRAINT_DEFINITION_NODE = 119;
-  public static final int FROM_VTI = 120;
-  public static final int MATERIALIZE_RESULT_SET_NODE = 121;
-  public static final int NORMALIZE_RESULT_SET_NODE = 122;
-  public static final int SCROLL_INSENSITIVE_RESULT_SET_NODE = 123;
-  public static final int DISTINCT_NODE = 124;
-  public static final int SESSION_USER_NODE = 125; // // special function SESSION_USER
-  public static final int SYSTEM_USER_NODE = 126; // // special function SYSTEM_USER
-  public static final int TRIM_OPERATOR_NODE = 127;
-  // 128 is available
-  public static final int SELECT_NODE = 129;
-  public static final int CREATE_VIEW_NODE = 130;
-  public static final int CONSTRAINT_DEFINITION_NODE = 131;
-  // 132 available;
-  public static final int NEW_INVOCATION_NODE = 133;
-  public static final int CREATE_SCHEMA_NODE = 134;
-  public static final int FROM_BASE_TABLE = 135;
-  public static final int FROM_SUBQUERY = 136;
-  public static final int GROUP_BY_NODE = 137;
-  public static final int INSERT_NODE = 138;
-  public static final int JOIN_NODE = 139;
-  public static final int ORDER_BY_NODE = 140;
-  public static final int CREATE_TABLE_NODE = 141;
-  public static final int UNION_NODE = 142;
-  public static final int CREATE_TRIGGER_NODE = 143;
-  public static final int HALF_OUTER_JOIN_NODE = 144;
-  // UNUSED public static final int CREATE_SPS_NODE = 145;
-  public static final int CREATE_INDEX_NODE = 146;
-  public static final int CURSOR_NODE = 147;
-  public static final int HASH_TABLE_NODE = 148;
-  public static final int INDEX_TO_BASE_ROW_NODE = 149;
-  public static final int CREATE_ALIAS_NODE = 150;
-  public static final int PROJECT_RESTRICT_NODE = 151;
-  // UNUSED public static final int BOOLEAN_TRUE_NODE = 152;
-  // UNUSED public static final int BOOLEAN_FALSE_NODE = 153;
-  public static final int SUBSTRING_OPERATOR_NODE = 154;
-  // UNUSED public static final int BOOLEAN_NODE = 155;
-  public static final int DROP_ALIAS_NODE = 156;
-  public static final int INTERSECT_OR_EXCEPT_NODE = 157;
-  // 158 - 183 available
-  public static final int TIMESTAMP_ADD_FN_NODE = 184;
-  public static final int TIMESTAMP_DIFF_FN_NODE = 185;
-  public static final int MODIFY_COLUMN_TYPE_NODE = 186;
-  public static final int MODIFY_COLUMN_CONSTRAINT_NODE = 187;
-  public static final int ABSOLUTE_OPERATOR_NODE = 188;
-  public static final int SQRT_OPERATOR_NODE = 189;
-  public static final int LOCATE_FUNCTION_NODE = 190;
-  //for rename table/column/index
-  public static final int RENAME_NODE = 191;
+    /** Node types, for use with getNode methods */
+    public static final int TEST_CONSTRAINT_NODE = 1;
+    public static final int CURRENT_ROW_LOCATION_NODE = 2;
+    public static final int GROUP_BY_LIST = 3;
+    public static final int CURRENT_ISOLATION_NODE = 4;
+    public static final int IDENTITY_VAL_NODE = 5;
+    public static final int CURRENT_SCHEMA_NODE = 6;
+    public static final int ORDER_BY_LIST = 7;
+    public static final int PREDICATE_LIST = 8;
+    public static final int RESULT_COLUMN_LIST = 9;
+    // 10 available
+    public static final int SUBQUERY_LIST = 11;
+    public static final int TABLE_ELEMENT_LIST = 12;
+    public static final int UNTYPED_NULL_CONSTANT_NODE = 13;
+    public static final int TABLE_ELEMENT_NODE = 14;
+    public static final int VALUE_NODE_LIST = 15;
+    public static final int ALL_RESULT_COLUMN = 16;
+    // 17 is available
+    public static final int GET_CURRENT_CONNECTION_NODE = 18;
+    public static final int NOP_STATEMENT_NODE = 19;
+    public static final int DB2_LENGTH_OPERATOR_NODE = 20;
+    public static final int SET_TRANSACTION_ISOLATION_NODE = 21;
+    // 22 is available
+    public static final int CHAR_LENGTH_OPERATOR_NODE = 23;
+    public static final int IS_NOT_NULL_NODE = 24;
+    public static final int IS_NULL_NODE = 25;
+    public static final int NOT_NODE = 26;
+    // 27 is available
+    public static final int SQL_TO_JAVA_VALUE_NODE = 28;
+    public static final int UNARY_MINUS_OPERATOR_NODE = 29;
+    public static final int UNARY_PLUS_OPERATOR_NODE = 30;
+    public static final int SQL_BOOLEAN_CONSTANT_NODE = 31;
+    public static final int UNARY_DATE_TIMESTAMP_OPERATOR_NODE = 32;
+    public static final int TIMESTAMP_OPERATOR_NODE = 33;
+    public static final int TABLE_NAME = 34;
+    public static final int GROUP_BY_COLUMN = 35;
+    public static final int JAVA_TO_SQL_VALUE_NODE = 36;
+    public static final int FROM_LIST = 37;
+    public static final int BOOLEAN_CONSTANT_NODE = 38;
+    public static final int AND_NODE = 39;
+    public static final int BINARY_DIVIDE_OPERATOR_NODE = 40;
+    public static final int BINARY_EQUALS_OPERATOR_NODE = 41;
+    public static final int BINARY_GREATER_EQUALS_OPERATOR_NODE = 42;
+    public static final int BINARY_GREATER_THAN_OPERATOR_NODE = 43;
+    public static final int BINARY_LESS_EQUALS_OPERATOR_NODE = 44;
+    public static final int BINARY_LESS_THAN_OPERATOR_NODE = 45;
+    public static final int BINARY_MINUS_OPERATOR_NODE = 46;
+    public static final int BINARY_NOT_EQUALS_OPERATOR_NODE = 47;
+    public static final int BINARY_PLUS_OPERATOR_NODE = 48;
+    public static final int BINARY_TIMES_OPERATOR_NODE = 49;
+    public static final int CONCATENATION_OPERATOR_NODE = 50;
+    public static final int LIKE_OPERATOR_NODE = 51;
+    public static final int OR_NODE = 52;
+    public static final int BETWEEN_OPERATOR_NODE = 53;
+    public static final int CONDITIONAL_NODE = 54;
+    public static final int IN_LIST_OPERATOR_NODE = 55;
+    public static final int NOT_BETWEEN_OPERATOR_NODE = 56;
+    public static final int NOT_IN_LIST_OPERATOR_NODE = 57;
+    public static final int BIT_CONSTANT_NODE = 58;
+    public static final int VARBIT_CONSTANT_NODE = 59;
+    public static final int CAST_NODE = 60;
+    public static final int CHAR_CONSTANT_NODE = 61;
+    public static final int COLUMN_REFERENCE = 62;
+    public static final int DROP_INDEX_NODE = 63;
+    // 64 available;
+    public static final int DROP_TRIGGER_NODE = 65;
+    // 66 available;
+    public static final int DECIMAL_CONSTANT_NODE = 67;
+    public static final int DOUBLE_CONSTANT_NODE = 68;
+    public static final int FLOAT_CONSTANT_NODE = 69;
+    public static final int INT_CONSTANT_NODE = 70;
+    public static final int LONGINT_CONSTANT_NODE = 71;
+    public static final int LONGVARBIT_CONSTANT_NODE = 72;
+    public static final int LONGVARCHAR_CONSTANT_NODE = 73;
+    public static final int SMALLINT_CONSTANT_NODE = 74;
+    public static final int TINYINT_CONSTANT_NODE = 75;
+    public static final int USERTYPE_CONSTANT_NODE = 76;
+    public static final int VARCHAR_CONSTANT_NODE = 77;
+    public static final int PREDICATE = 78;
+    // 79 available
+    public static final int RESULT_COLUMN = 80;
+    public static final int SET_SCHEMA_NODE = 81;
+    public static final int UPDATE_COLUMN = 82;
+    public static final int SIMPLE_STRING_OPERATOR_NODE = 83;
+    public static final int STATIC_CLASS_FIELD_REFERENCE_NODE = 84;
+    public static final int STATIC_METHOD_CALL_NODE = 85;
+    public static final int REVOKE_NODE = 86;
+    public static final int EXTRACT_OPERATOR_NODE = 87;
+    public static final int PARAMETER_NODE = 88;
+    public static final int GRANT_NODE = 89;
+    public static final int DROP_SCHEMA_NODE = 90;
+    public static final int DROP_TABLE_NODE = 91;
+    public static final int DROP_VIEW_NODE = 92;
+    public static final int SUBQUERY_NODE = 93;
+    public static final int BASE_COLUMN_NODE = 94;
+    public static final int CALL_STATEMENT_NODE = 95;
+    public static final int MODIFY_COLUMN_DEFAULT_NODE = 97;
+    public static final int NON_STATIC_METHOD_CALL_NODE = 98;
+    public static final int CURRENT_OF_NODE = 99;
+    public static final int DEFAULT_NODE = 100;
+    public static final int DELETE_NODE = 101;
+    public static final int UPDATE_NODE = 102;
+    public static final int PRIVILEGE_NODE = 103;
+    public static final int ORDER_BY_COLUMN = 104;
+    public static final int ROW_RESULT_SET_NODE = 105;
+    public static final int TABLE_PRIVILEGES_NODE = 106;
+    public static final int VIRTUAL_COLUMN_NODE = 107;
+    public static final int CURRENT_DATETIME_OPERATOR_NODE = 108;
+    public static final int CURRENT_USER_NODE = 109; // special function CURRENT_USER
+    public static final int USER_NODE = 110; // // special function USER
+    public static final int IS_NODE = 111;
+    public static final int LOCK_TABLE_NODE = 112;
+    public static final int DROP_COLUMN_NODE = 113;
+    public static final int ALTER_TABLE_NODE = 114;
+    public static final int AGGREGATE_NODE = 115;
+    public static final int COLUMN_DEFINITION_NODE = 116;
+    // 117 is available
+    public static final int EXEC_SPS_NODE = 118;
+    public static final int FK_CONSTRAINT_DEFINITION_NODE = 119;
+    public static final int FROM_VTI = 120;
+    public static final int MATERIALIZE_RESULT_SET_NODE = 121;
+    public static final int NORMALIZE_RESULT_SET_NODE = 122;
+    public static final int SCROLL_INSENSITIVE_RESULT_SET_NODE = 123;
+    public static final int DISTINCT_NODE = 124;
+    public static final int SESSION_USER_NODE = 125; // // special function SESSION_USER
+    public static final int SYSTEM_USER_NODE = 126; // // special function SYSTEM_USER
+    public static final int TRIM_OPERATOR_NODE = 127;
+    // 128 is available
+    public static final int SELECT_NODE = 129;
+    public static final int CREATE_VIEW_NODE = 130;
+    public static final int CONSTRAINT_DEFINITION_NODE = 131;
+    // 132 available;
+    public static final int NEW_INVOCATION_NODE = 133;
+    public static final int CREATE_SCHEMA_NODE = 134;
+    public static final int FROM_BASE_TABLE = 135;
+    public static final int FROM_SUBQUERY = 136;
+    public static final int GROUP_BY_NODE = 137;
+    public static final int INSERT_NODE = 138;
+    public static final int JOIN_NODE = 139;
+    public static final int ORDER_BY_NODE = 140;
+    public static final int CREATE_TABLE_NODE = 141;
+    public static final int UNION_NODE = 142;
+    public static final int CREATE_TRIGGER_NODE = 143;
+    public static final int HALF_OUTER_JOIN_NODE = 144;
+    // UNUSED public static final int CREATE_SPS_NODE = 145;
+    public static final int CREATE_INDEX_NODE = 146;
+    public static final int CURSOR_NODE = 147;
+    public static final int HASH_TABLE_NODE = 148;
+    public static final int INDEX_TO_BASE_ROW_NODE = 149;
+    public static final int CREATE_ALIAS_NODE = 150;
+    public static final int PROJECT_RESTRICT_NODE = 151;
+    // UNUSED public static final int BOOLEAN_TRUE_NODE = 152;
+    // UNUSED public static final int BOOLEAN_FALSE_NODE = 153;
+    public static final int SUBSTRING_OPERATOR_NODE = 154;
+    // UNUSED public static final int BOOLEAN_NODE = 155;
+    public static final int DROP_ALIAS_NODE = 156;
+    public static final int INTERSECT_OR_EXCEPT_NODE = 157;
+    // 158 - 183 available
+    public static final int TIMESTAMP_ADD_FN_NODE = 184;
+    public static final int TIMESTAMP_DIFF_FN_NODE = 185;
+    public static final int MODIFY_COLUMN_TYPE_NODE = 186;
+    public static final int MODIFY_COLUMN_CONSTRAINT_NODE = 187;
+    public static final int ABSOLUTE_OPERATOR_NODE = 188;
+    public static final int SQRT_OPERATOR_NODE = 189;
+    public static final int LOCATE_FUNCTION_NODE = 190;
+    //for rename table/column/index
+    public static final int RENAME_NODE = 191;
 
-  public static final int COALESCE_FUNCTION_NODE = 192;
+    public static final int COALESCE_FUNCTION_NODE = 192;
 
-  public static final int MODIFY_COLUMN_CONSTRAINT_NOT_NULL_NODE = 193;
+    public static final int MODIFY_COLUMN_CONSTRAINT_NOT_NULL_NODE = 193;
 
-  public static final int MOD_OPERATOR_NODE = 194;
-  // LOB
-  public static final int BLOB_CONSTANT_NODE = 195;
-  public static final int CLOB_CONSTANT_NODE = 196;
-  //public static final int NCLOB_CONSTANT_NODE = 197;
-  // for SAVEPOINT sql
-  public static final int SAVEPOINT_NODE = 198;
+    public static final int MOD_OPERATOR_NODE = 194;
+    // LOB
+    public static final int BLOB_CONSTANT_NODE = 195;
+    public static final int CLOB_CONSTANT_NODE = 196;
+    //public static final int NCLOB_CONSTANT_NODE = 197;
+    // for SAVEPOINT sql
+    public static final int SAVEPOINT_NODE = 198;
 
-  // XML
-  public static final int XML_CONSTANT_NODE = 199;
-  public static final int XML_PARSE_OPERATOR_NODE = 200;
-  public static final int XML_SERIALIZE_OPERATOR_NODE = 201;
-  public static final int XML_EXISTS_OPERATOR_NODE = 202;
-  public static final int XML_QUERY_OPERATOR_NODE = 203;
+    // XML
+    public static final int XML_CONSTANT_NODE = 199;
+    public static final int XML_PARSE_OPERATOR_NODE = 200;
+    public static final int XML_SERIALIZE_OPERATOR_NODE = 201;
+    public static final int XML_EXISTS_OPERATOR_NODE = 202;
+    public static final int XML_QUERY_OPERATOR_NODE = 203;
 
-  // Roles
-  public static final int CURRENT_ROLE_NODE = 210;
-  public static final int CREATE_ROLE_NODE = 211;
-  public static final int SET_ROLE_NODE = 212;
-  public static final int SET_ROLE_DYNAMIC = 213;
-  public static final int DROP_ROLE_NODE = 214;
-  public static final int GRANT_ROLE_NODE = 215;
-  public static final int REVOKE_ROLE_NODE = 216;
+    // Roles
+    public static final int CURRENT_ROLE_NODE = 210;
+    public static final int CREATE_ROLE_NODE = 211;
+    public static final int SET_ROLE_NODE = 212;
+    public static final int SET_ROLE_DYNAMIC = 213;
+    public static final int DROP_ROLE_NODE = 214;
+    public static final int GRANT_ROLE_NODE = 215;
+    public static final int REVOKE_ROLE_NODE = 216;
 
-  // generated columns
-  public static final int GENERATION_CLAUSE_NODE = 222;
+    // generated columns
+    public static final int GENERATION_CLAUSE_NODE = 222;
 
-  // OFFSET, FETCH FIRST node
-  public static final int ROW_COUNT_NODE = 223;
+    // OFFSET, FETCH FIRST node
+    public static final int ROW_COUNT_NODE = 223;
 
-  // sequences
-  public static final int CREATE_SEQUENCE_NODE = 224;
-  public static final int DROP_SEQUENCE_NODE = 225;
-  public static final int NEXT_SEQUENCE_NODE = 231;
+    // sequences
+    public static final int CREATE_SEQUENCE_NODE = 224;
+    public static final int DROP_SEQUENCE_NODE = 225;
+    public static final int NEXT_SEQUENCE_NODE = 231;
 
-  // Windowing
-  public static final int AGGREGATE_WINDOW_FUNCTION_NODE = 226;
-  public static final int ROW_NUMBER_FUNCTION_NODE = 227;
-  public static final int WINDOW_DEFINITION_NODE = 228;
-  public static final int WINDOW_REFERENCE_NODE = 229;
-  public static final int WINDOW_RESULTSET_NODE = 230;
+    // Windowing
+    public static final int AGGREGATE_WINDOW_FUNCTION_NODE = 226;
+    public static final int ROW_NUMBER_FUNCTION_NODE = 227;
+    public static final int WINDOW_DEFINITION_NODE = 228;
+    public static final int WINDOW_REFERENCE_NODE = 229;
+    public static final int WINDOW_RESULTSET_NODE = 230;
 
-  // Final value in set, keep up to date!
-  public static final int FINAL_VALUE = NEXT_SEQUENCE_NODE;
+    // Final value in set, keep up to date!
+    public static final int FINAL_VALUE = NEXT_SEQUENCE_NODE;
 
-  /**
-   * Extensions to this interface can use nodetypes > MAX_NODE_TYPE with out fear of collision
-   * with C_NodeTypes
-   */
-  public static final int MAX_NODE_TYPE = 999;
+    /**
+     * Extensions to this interface can use nodetypes > MAX_NODE_TYPE with out fear of collision
+     * with C_NodeTypes
+     */
+    public static final int MAX_NODE_TYPE = 999;
 }

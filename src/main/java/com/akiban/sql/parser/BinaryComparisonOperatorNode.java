@@ -49,51 +49,51 @@ import com.akiban.sql.types.ValueClassName;
 
 public abstract class BinaryComparisonOperatorNode extends BinaryOperatorNode
 {
-  private boolean forQueryRewrite;
+    private boolean forQueryRewrite;
 
-  /**
-   * Initializer for a BinaryComparisonOperatorNode
-   *
-   * @param leftOperand The left operand of the comparison
-   * @param rightOperand The right operand of the comparison
-   * @param operator The name of the operator
-   * @param methodName The name of the method to call in the generated class
-   */
+    /**
+     * Initializer for a BinaryComparisonOperatorNode
+     *
+     * @param leftOperand The left operand of the comparison
+     * @param rightOperand The right operand of the comparison
+     * @param operator The name of the operator
+     * @param methodName The name of the method to call in the generated class
+     */
 
-  public void init(Object leftOperand,
-                   Object rightOperand,
-                   Object operator,
-                   Object methodName) {
-    super.init(leftOperand, rightOperand, operator, methodName,
-               ValueClassName.DataValueDescriptor, ValueClassName.DataValueDescriptor);
-  }
+    public void init(Object leftOperand,
+                     Object rightOperand,
+                     Object operator,
+                     Object methodName) {
+        super.init(leftOperand, rightOperand, operator, methodName,
+                   ValueClassName.DataValueDescriptor, ValueClassName.DataValueDescriptor);
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    BinaryComparisonOperatorNode other = (BinaryComparisonOperatorNode)node;
-    this.forQueryRewrite = other.forQueryRewrite;
-  }
+        BinaryComparisonOperatorNode other = (BinaryComparisonOperatorNode)node;
+        this.forQueryRewrite = other.forQueryRewrite;
+    }
 
-  /**
-   * This node was generated as part of a query rewrite. Bypass the
-   * normal comparability checks.
-   * @param val  true if this was for a query rewrite
-   */
-  public void setForQueryRewrite(boolean val) {
-    forQueryRewrite=val;
-  }
+    /**
+     * This node was generated as part of a query rewrite. Bypass the
+     * normal comparability checks.
+     * @param val    true if this was for a query rewrite
+     */
+    public void setForQueryRewrite(boolean val) {
+        forQueryRewrite=val;
+    }
 
-  /**
-   * Was this node generated in a query rewrite?
-   *
-   * @return true if it was generated in a query rewrite.
-   */
-  public boolean isForQueryRewrite() {
-    return forQueryRewrite;
-  }
+    /**
+     * Was this node generated in a query rewrite?
+     *
+     * @return true if it was generated in a query rewrite.
+     */
+    public boolean isForQueryRewrite() {
+        return forQueryRewrite;
+    }
 
 }

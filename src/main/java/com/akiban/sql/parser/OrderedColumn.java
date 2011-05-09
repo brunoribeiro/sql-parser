@@ -46,70 +46,70 @@ import com.akiban.sql.StandardException;
  */
 public abstract class OrderedColumn extends QueryTreeNode 
 {
-  protected static final int UNMATCHEDPOSITION = -1;
-  protected int columnPosition = UNMATCHEDPOSITION;
+    protected static final int UNMATCHEDPOSITION = -1;
+    protected int columnPosition = UNMATCHEDPOSITION;
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    OrderedColumn other = (OrderedColumn)node;
-    this.columnPosition = other.columnPosition;
-  }
+        OrderedColumn other = (OrderedColumn)node;
+        this.columnPosition = other.columnPosition;
+    }
 
-  /**
-   * Indicate whether this column is ascending or not.
-   * By default assume that all ordered columns are
-   * necessarily ascending.  If this class is inherited
-   * by someone that can be desceneded, they are expected
-   * to override this method.
-   *
-   * @return true
-   */
-  public boolean isAscending() {
-    return true;
-  }
+    /**
+     * Indicate whether this column is ascending or not.
+     * By default assume that all ordered columns are
+     * necessarily ascending.    If this class is inherited
+     * by someone that can be desceneded, they are expected
+     * to override this method.
+     *
+     * @return true
+     */
+    public boolean isAscending() {
+        return true;
+    }
 
-  /**
-   * Indicate whether this column should be ordered NULLS low.
-   * By default we assume that all ordered columns are ordered
-   * with NULLS higher than non-null values. If this class is inherited
-   * by someone that can be specified to have NULLs ordered lower than
-   * non-null values, they are expected to override this method.
-   *
-   * @return false
-   */
-  public boolean isNullsOrderedLow() {
-    return false;
-  }
+    /**
+     * Indicate whether this column should be ordered NULLS low.
+     * By default we assume that all ordered columns are ordered
+     * with NULLS higher than non-null values. If this class is inherited
+     * by someone that can be specified to have NULLs ordered lower than
+     * non-null values, they are expected to override this method.
+     *
+     * @return false
+     */
+    public boolean isNullsOrderedLow() {
+        return false;
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
-  public String toString() {
-    return "columnPosition: " + columnPosition + "\n" +
-      super.toString();
-  }
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+    public String toString() {
+        return "columnPosition: " + columnPosition + "\n" +
+            super.toString();
+    }
 
-  /**
-   * Get the position of this column
-   *
-   * @return The position of this column
-   */
-  public int getColumnPosition() {
-    return columnPosition;
-  }
+    /**
+     * Get the position of this column
+     *
+     * @return The position of this column
+     */
+    public int getColumnPosition() {
+        return columnPosition;
+    }
 
-  /**
-   * Set the position of this column
-   */
-  public void setColumnPosition(int columnPosition) {
-    this.columnPosition = columnPosition;
-  }
+    /**
+     * Set the position of this column
+     */
+    public void setColumnPosition(int columnPosition) {
+        this.columnPosition = columnPosition;
+    }
 
 }

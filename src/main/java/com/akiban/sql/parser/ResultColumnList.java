@@ -47,198 +47,198 @@ import com.akiban.sql.StandardException;
 
 public class ResultColumnList extends QueryTreeNodeList<ResultColumn>
 {
-  int orderBySelect = 0; // the number of result columns pulled up
-  // from ORDERBY list
-  /*
-   * A comment on 'orderBySelect'. When we encounter a SELECT .. ORDER BY
-   * statement, the columns (or expressions) in the ORDER BY clause may
-   * or may not have been explicitly mentioned in the SELECT column list.
-   * If the columns were NOT explicitly mentioned in the SELECT column
-   * list, then the parsing of the ORDER BY clause implicitly generates
-   * them into the result column list, because we'll need to have those
-   * columns present at execution time in order to sort by them. Those
-   * generated columns are added to the *end* of the ResultColumnList, and
-   * we keep track of the *number* of those columns in 'orderBySelect',
-   * so we can tell whether we are looking at a generated column by seeing
-   * whether its position in the ResultColumnList is in the last
-   * 'orderBySelect' number of columns. If the SELECT .. ORDER BY
-   * statement uses the "*" token to select all the columns from a table,
-   * then during ORDER BY parsing we redundantly generate the columns
-   * mentioned in the ORDER BY clause into the ResultColumnlist, but then
-   * later in getOrderByColumnToBind we determine that these are
-   * duplicates and we take them back out again.
-   */
-
-  /*
-  ** Is this ResultColumnList for a FromBaseTable for an index
-  ** that is to be updated?
-  */
-  protected boolean forUpdate;
-
-  // Number of RCs in this RCL at "init" time, before additional
-  // ones were added internally.
-  private int initialListSize = 0;
-
-  public ResultColumnList() {
-  }
-
-  /**
-   * Add a ResultColumn (at this point, ResultColumn or
-   * AllResultColumn) to the list
-   *
-   * @param resultColumn The ResultColumn to add to the list
-   */
-
-  public void addResultColumn(ResultColumn resultColumn) {
-    /* Lists are 0-based, ResultColumns are 1-based */
-    resultColumn.setVirtualColumnId(size() + 1);
-    add(resultColumn);
-  }
-
-  /**
-   * Append a given ResultColumnList to this one, resetting the virtual
-   * column ids in the appended portion.
-   *
-   * @param resultColumns The ResultColumnList to be appended
-   * @param destructiveCopy Whether or not this is a destructive copy
-   *        from resultColumns
-   */
-  public void appendResultColumns(ResultColumnList resultColumns,
-                                  boolean destructiveCopy) {
-    int oldSize = size();
-    int newID = oldSize + 1;
+    int orderBySelect = 0; // the number of result columns pulled up
+    // from ORDERBY list
+    /*
+     * A comment on 'orderBySelect'. When we encounter a SELECT .. ORDER BY
+     * statement, the columns (or expressions) in the ORDER BY clause may
+     * or may not have been explicitly mentioned in the SELECT column list.
+     * If the columns were NOT explicitly mentioned in the SELECT column
+     * list, then the parsing of the ORDER BY clause implicitly generates
+     * them into the result column list, because we'll need to have those
+     * columns present at execution time in order to sort by them. Those
+     * generated columns are added to the *end* of the ResultColumnList, and
+     * we keep track of the *number* of those columns in 'orderBySelect',
+     * so we can tell whether we are looking at a generated column by seeing
+     * whether its position in the ResultColumnList is in the last
+     * 'orderBySelect' number of columns. If the SELECT .. ORDER BY
+     * statement uses the "*" token to select all the columns from a table,
+     * then during ORDER BY parsing we redundantly generate the columns
+     * mentioned in the ORDER BY clause into the ResultColumnlist, but then
+     * later in getOrderByColumnToBind we determine that these are
+     * duplicates and we take them back out again.
+     */
 
     /*
-    ** Set the virtual column ids in the list being appended.
-    ** Lists are zero-based, and virtual column ids are one-based,
-    ** so the new virtual column ids start at the original size
-    ** of this list, plus one.
+    ** Is this ResultColumnList for a FromBaseTable for an index
+    ** that is to be updated?
     */
-    int otherSize = resultColumns.size();
-    for (int index = 0; index < otherSize; index++) {
-      /* ResultColumns are 1-based */
-      resultColumns.get(index).setVirtualColumnId(newID);
-      newID++;
+    protected boolean forUpdate;
+
+    // Number of RCs in this RCL at "init" time, before additional
+    // ones were added internally.
+    private int initialListSize = 0;
+
+    public ResultColumnList() {
     }
 
-    if (destructiveCopy) {
-      destructiveAddAll(resultColumns);
-    }
-    else {
-      addAll(resultColumns);
-    }
-  }
+    /**
+     * Add a ResultColumn (at this point, ResultColumn or
+     * AllResultColumn) to the list
+     *
+     * @param resultColumn The ResultColumn to add to the list
+     */
 
-  /**
-   * Get a ResultColumn from a column position (1-based) in the list
-   *
-   * @param position The ResultColumn to get from the list (1-based)
-   *
-   * @return the column at that position.
-   */
-
-  public ResultColumn getResultColumn(int position) {
-    /*
-    ** First see if it falls in position x.  If not,
-    ** search the whole shebang
-    */
-    if (position <= size()) {
-      // this wraps the cast needed, 
-      // and the 0-based nature of the Lists.
-      ResultColumn rc = (ResultColumn)get(position-1);
-      if (rc.getColumnPosition() == position) {
-        return rc;
-      }
+    public void addResultColumn(ResultColumn resultColumn) {
+        /* Lists are 0-based, ResultColumns are 1-based */
+        resultColumn.setVirtualColumnId(size() + 1);
+        add(resultColumn);
     }
 
-    /*
-    ** Check each column
-    */
-    int size = size();
-    for (int index = 0; index < size; index++) {
-      ResultColumn rc = get(index);
-      if (rc.getColumnPosition() == position) {
-        return rc;
-      }
+    /**
+     * Append a given ResultColumnList to this one, resetting the virtual
+     * column ids in the appended portion.
+     *
+     * @param resultColumns The ResultColumnList to be appended
+     * @param destructiveCopy Whether or not this is a destructive copy
+     *              from resultColumns
+     */
+    public void appendResultColumns(ResultColumnList resultColumns,
+                                    boolean destructiveCopy) {
+        int oldSize = size();
+        int newID = oldSize + 1;
+
+        /*
+        ** Set the virtual column ids in the list being appended.
+        ** Lists are zero-based, and virtual column ids are one-based,
+        ** so the new virtual column ids start at the original size
+        ** of this list, plus one.
+        */
+        int otherSize = resultColumns.size();
+        for (int index = 0; index < otherSize; index++) {
+            /* ResultColumns are 1-based */
+            resultColumns.get(index).setVirtualColumnId(newID);
+            newID++;
+        }
+
+        if (destructiveCopy) {
+            destructiveAddAll(resultColumns);
+        }
+        else {
+            addAll(resultColumns);
+        }
     }
-    return null;
-  }
 
-  /**
-   * Get a ResultColumn from a column position (1-based) in the list,
-   * null if out of range (for order by).
-   *
-   * @param position The ResultColumn to get from the list (1-based)
-   *
-   * @return the column at that position, null if out of range
-   */
-  public ResultColumn getOrderByColumn(int position) {
-    // this wraps the cast needed, and the 0-based nature of the Lists.
-    if (position == 0) 
-      return null;
+    /**
+     * Get a ResultColumn from a column position (1-based) in the list
+     *
+     * @param position The ResultColumn to get from the list (1-based)
+     *
+     * @return the column at that position.
+     */
 
-    return getResultColumn(position);
-  }
+    public ResultColumn getResultColumn(int position) {
+        /*
+        ** First see if it falls in position x.  If not,
+        ** search the whole shebang
+        */
+        if (position <= size()) {
+            // this wraps the cast needed, 
+            // and the 0-based nature of the Lists.
+            ResultColumn rc = (ResultColumn)get(position-1);
+            if (rc.getColumnPosition() == position) {
+                return rc;
+            }
+        }
 
-  /**
-   * Get a ResultColumn that matches the specified columnName. If requested
-   * to, mark the column as referenced.
-   *
-   * @param columnName The ResultColumn to get from the list
-   * @param markIfReferenced True if we should mark this column as referenced.
-   *
-   * @return the column that matches that name.
-   */
-
-  public ResultColumn getResultColumn(String columnName) {
-    int size = size();
-    for (int index = 0; index < size; index++) {
-      ResultColumn resultColumn = get(index);
-
-      if (columnName.equals(resultColumn.getName())) {
-        return resultColumn;
-      }
+        /*
+        ** Check each column
+        */
+        int size = size();
+        for (int index = 0; index < size; index++) {
+            ResultColumn rc = get(index);
+            if (rc.getColumnPosition() == position) {
+                return rc;
+            }
+        }
+        return null;
     }
-    return null;
-  }
 
-  /**
-   * Get an array of strings for all the columns
-   * in this RCL.
-   *
-   * @return the array of strings
-   */
-  public String[] getColumnNames() {
-    String strings[] = new String[size()];
+    /**
+     * Get a ResultColumn from a column position (1-based) in the list,
+     * null if out of range (for order by).
+     *
+     * @param position The ResultColumn to get from the list (1-based)
+     *
+     * @return the column at that position, null if out of range
+     */
+    public ResultColumn getOrderByColumn(int position) {
+        // this wraps the cast needed, and the 0-based nature of the Lists.
+        if (position == 0) 
+            return null;
 
-    int size = size();
-
-    for (int index = 0; index < size; index++) {
-      ResultColumn resultColumn = get(index);
-      strings[index] = resultColumn.getName();
+        return getResultColumn(position);
     }
-    return strings;
-  }
 
-  /* ****
-   * Take note of the size of this RCL _before_ we start
-   * processing/binding it.  This is so that, at bind time,
-   * we can tell if any columns in the RCL were added
-   * internally by us (i.e. they were not specified by the
-   * user and thus will not be returned to the user).
-   */
-  protected void markInitialSize() {
-    initialListSize = size();
-  }
+    /**
+     * Get a ResultColumn that matches the specified columnName. If requested
+     * to, mark the column as referenced.
+     *
+     * @param columnName The ResultColumn to get from the list
+     * @param markIfReferenced True if we should mark this column as referenced.
+     *
+     * @return the column that matches that name.
+     */
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
-  public String toString() {
-    return super.toString();
-  }
+    public ResultColumn getResultColumn(String columnName) {
+        int size = size();
+        for (int index = 0; index < size; index++) {
+            ResultColumn resultColumn = get(index);
+
+            if (columnName.equals(resultColumn.getName())) {
+                return resultColumn;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get an array of strings for all the columns
+     * in this RCL.
+     *
+     * @return the array of strings
+     */
+    public String[] getColumnNames() {
+        String strings[] = new String[size()];
+
+        int size = size();
+
+        for (int index = 0; index < size; index++) {
+            ResultColumn resultColumn = get(index);
+            strings[index] = resultColumn.getName();
+        }
+        return strings;
+    }
+
+    /* ****
+     * Take note of the size of this RCL _before_ we start
+     * processing/binding it.    This is so that, at bind time,
+     * we can tell if any columns in the RCL were added
+     * internally by us (i.e. they were not specified by the
+     * user and thus will not be returned to the user).
+     */
+    protected void markInitialSize() {
+        initialListSize = size();
+    }
+
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+    public String toString() {
+        return super.toString();
+    }
 
 }

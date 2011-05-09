@@ -48,148 +48,148 @@ import com.akiban.sql.StandardException;
 
 public class CreateViewNode extends DDLStatementNode
 {
-  // TODO: Need the rest.
-  public static final int NO_CHECK_OPTION = 0;
+    // TODO: Need the rest.
+    public static final int NO_CHECK_OPTION = 0;
 
-  private ResultColumnList resultColumns;
-  private ResultSetNode queryExpression;
-  private String qeText;
-  private int checkOption;
-  private OrderByList orderByList;
-  private ValueNode offset;
-  private ValueNode fetchFirst;
+    private ResultColumnList resultColumns;
+    private ResultSetNode queryExpression;
+    private String qeText;
+    private int checkOption;
+    private OrderByList orderByList;
+    private ValueNode offset;
+    private ValueNode fetchFirst;
 
-  /**
-   * Initializer for a CreateViewNode
-   *
-   * @param newObjectName The name of the table to be created
-   * @param resultColumns The column list from the view definition, 
-   *        if specified
-   * @param queryExpression The query expression for the view
-   * @param checkOption The type of WITH CHECK OPTION that was specified
-   *        (NONE for now)
-   * @param qeText The text for the queryExpression
-   * @param orderCols ORDER BY list
-   * @param offset OFFSET if any, or null
-   * @param fetchFirst FETCH FIRST if any, or null
-   *
-   * @exception StandardException Thrown on error
-   */
+    /**
+     * Initializer for a CreateViewNode
+     *
+     * @param newObjectName The name of the table to be created
+     * @param resultColumns The column list from the view definition, 
+     *              if specified
+     * @param queryExpression The query expression for the view
+     * @param checkOption The type of WITH CHECK OPTION that was specified
+     *              (NONE for now)
+     * @param qeText The text for the queryExpression
+     * @param orderCols ORDER BY list
+     * @param offset OFFSET if any, or null
+     * @param fetchFirst FETCH FIRST if any, or null
+     *
+     * @exception StandardException Thrown on error
+     */
 
-  public void init(Object newObjectName,
-                   Object resultColumns,
-                   Object queryExpression,
-                   Object checkOption,
-                   Object qeText,
-                   Object orderCols,
-                   Object offset,
-                   Object fetchFirst) 
-      throws StandardException {
-    initAndCheck(newObjectName);
-    this.resultColumns = (ResultColumnList)resultColumns;
-    this.queryExpression = (ResultSetNode)queryExpression;
-    this.checkOption = ((Integer)checkOption).intValue();
-    this.qeText = ((String)qeText).trim();
-    this.orderByList = (OrderByList)orderCols;
-    this.offset = (ValueNode)offset;
-    this.fetchFirst = (ValueNode)fetchFirst;
+    public void init(Object newObjectName,
+                     Object resultColumns,
+                     Object queryExpression,
+                     Object checkOption,
+                     Object qeText,
+                     Object orderCols,
+                     Object offset,
+                     Object fetchFirst) 
+            throws StandardException {
+        initAndCheck(newObjectName);
+        this.resultColumns = (ResultColumnList)resultColumns;
+        this.queryExpression = (ResultSetNode)queryExpression;
+        this.checkOption = ((Integer)checkOption).intValue();
+        this.qeText = ((String)qeText).trim();
+        this.orderByList = (OrderByList)orderCols;
+        this.offset = (ValueNode)offset;
+        this.fetchFirst = (ValueNode)fetchFirst;
 
-    implicitCreateSchema = true;
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    CreateViewNode other = (CreateViewNode)node;
-    this.resultColumns = (ResultColumnList)
-      getNodeFactory().copyNode(other.resultColumns, getParserContext());
-    this.queryExpression = (ResultSetNode)
-      getNodeFactory().copyNode(other.queryExpression, getParserContext());
-    this.qeText = other.qeText;
-    this.checkOption = other.checkOption;
-    this.orderByList = (OrderByList)
-      getNodeFactory().copyNode(other.orderByList, getParserContext());
-    this.offset = (ValueNode)
-      getNodeFactory().copyNode(other.offset, getParserContext());
-    this.fetchFirst = (ValueNode)
-      getNodeFactory().copyNode(other.fetchFirst, getParserContext());
-  }
-
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
-
-  public String toString() {
-    return super.toString() +
-      "checkOption: " + checkOption + "\n" +
-      "qeText: " + qeText + "\n";
-  }
-
-  public String statementToString() {
-    return "CREATE VIEW";
-  }
-
-  /**
-   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-   * how tree printing is supposed to work.
-   *
-   * @param depth The depth of this node in the tree
-   */
-
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
-
-    if (resultColumns != null) {
-      printLabel(depth, "resultColumns: ");
-      resultColumns.treePrint(depth + 1);
+        implicitCreateSchema = true;
     }
 
-    printLabel(depth, "queryExpression: ");
-    queryExpression.treePrint(depth + 1);
-  }
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-  /**
-   * Accept the visitor for all visitable children of this node.
-   * 
-   * @param v the visitor
-   *
-   * @exception StandardException on error
-   */
-  void acceptChildren(Visitor v) throws StandardException {
-    super.acceptChildren(v);
+        CreateViewNode other = (CreateViewNode)node;
+        this.resultColumns = (ResultColumnList)
+            getNodeFactory().copyNode(other.resultColumns, getParserContext());
+        this.queryExpression = (ResultSetNode)
+            getNodeFactory().copyNode(other.queryExpression, getParserContext());
+        this.qeText = other.qeText;
+        this.checkOption = other.checkOption;
+        this.orderByList = (OrderByList)
+            getNodeFactory().copyNode(other.orderByList, getParserContext());
+        this.offset = (ValueNode)
+            getNodeFactory().copyNode(other.offset, getParserContext());
+        this.fetchFirst = (ValueNode)
+            getNodeFactory().copyNode(other.fetchFirst, getParserContext());
+    }
 
-    if (queryExpression != null) {
-        queryExpression = (ResultSetNode)queryExpression.accept(v);
-      }
-  }
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
-  public int getCheckOption() { 
-    return checkOption; 
-  }
+    public String toString() {
+        return super.toString() +
+            "checkOption: " + checkOption + "\n" +
+            "qeText: " + qeText + "\n";
+    }
 
-  public ResultColumnList getResultColumns() {
-    return resultColumns;
-  }
+    public String statementToString() {
+        return "CREATE VIEW";
+    }
 
-  public ResultSetNode getParsedQueryExpression() { 
-    return queryExpression; 
-  }
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
 
-  public OrderByList getOrderByList() {
-    return orderByList;
-  }
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
 
-  public ValueNode getOffset() {
-    return offset;
-  }
+        if (resultColumns != null) {
+            printLabel(depth, "resultColumns: ");
+            resultColumns.treePrint(depth + 1);
+        }
 
-  public ValueNode getFetchFirst() {
-    return fetchFirst;
-  }
+        printLabel(depth, "queryExpression: ");
+        queryExpression.treePrint(depth + 1);
+    }
+
+    /**
+     * Accept the visitor for all visitable children of this node.
+     * 
+     * @param v the visitor
+     *
+     * @exception StandardException on error
+     */
+    void acceptChildren(Visitor v) throws StandardException {
+        super.acceptChildren(v);
+
+        if (queryExpression != null) {
+            queryExpression = (ResultSetNode)queryExpression.accept(v);
+        }
+    }
+
+    public int getCheckOption() { 
+        return checkOption; 
+    }
+
+    public ResultColumnList getResultColumns() {
+        return resultColumns;
+    }
+
+    public ResultSetNode getParsedQueryExpression() { 
+        return queryExpression; 
+    }
+
+    public OrderByList getOrderByList() {
+        return orderByList;
+    }
+
+    public ValueNode getOffset() {
+        return offset;
+    }
+
+    public ValueNode getFetchFirst() {
+        return fetchFirst;
+    }
 }

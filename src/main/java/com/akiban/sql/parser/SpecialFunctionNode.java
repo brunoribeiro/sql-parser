@@ -41,58 +41,58 @@ package com.akiban.sql.parser;
 import java.sql.Types;
 
 /**
-     SpecialFunctionNode handles system SQL functions.
-     A function value is either obtained by a method
-     call off the LanguageConnectionContext or Activation.
-     LanguageConnectionContext functions are state related to the connection.
-     Activation functions are those related to the statement execution.
+         SpecialFunctionNode handles system SQL functions.
+         A function value is either obtained by a method
+         call off the LanguageConnectionContext or Activation.
+         LanguageConnectionContext functions are state related to the connection.
+         Activation functions are those related to the statement execution.
 
-     Each SQL function takes no arguments and returns a SQLvalue.
-     <P>
-     Functions supported:
-     <UL>
-     <LI> USER
-     <LI> CURRENT_USER
-     <LI> CURRENT_ROLE
-     <LI> SESSION_USER
-     <LI> SYSTEM_USER
-     <LI> CURRENT SCHEMA
-     <LI> CURRENT ISOLATION
-     <LI> IDENTITY_VAL_LOCAL
+         Each SQL function takes no arguments and returns a SQLvalue.
+         <P>
+         Functions supported:
+         <UL>
+         <LI> USER
+         <LI> CURRENT_USER
+         <LI> CURRENT_ROLE
+         <LI> SESSION_USER
+         <LI> SYSTEM_USER
+         <LI> CURRENT SCHEMA
+         <LI> CURRENT ISOLATION
+         <LI> IDENTITY_VAL_LOCAL
 
-     </UL>
+         </UL>
 
 
-    <P>
+        <P>
 
-     This node is used rather than some use of MethodCallNode for
-     runtime performance. MethodCallNode does not provide a fast access
-     to the current language connection or activatation, since it is geared
-     towards user defined routines.
+         This node is used rather than some use of MethodCallNode for
+         runtime performance. MethodCallNode does not provide a fast access
+         to the current language connection or activatation, since it is geared
+         towards user defined routines.
 
 
 */
 public class SpecialFunctionNode extends ValueNode 
 {
-  /**
-     Name of SQL function
-  */
-  String sqlName;
+    /**
+       Name of SQL function
+    */
+    String sqlName;
 
-  /*
-    print the non-node subfields
-  */
-  public String toString() {
-    return "sqlName: " + sqlName + "\n" +
-      super.toString();
-  }
-        
-  protected boolean isEquivalent(ValueNode o) {
-    if (isSameNodeType(o)) {
-      SpecialFunctionNode other = (SpecialFunctionNode)o;
-      return sqlName.equals(other.sqlName);
+    /*
+      print the non-node subfields
+    */
+    public String toString() {
+        return "sqlName: " + sqlName + "\n" +
+            super.toString();
     }
-    return false;
-  }
+                
+    protected boolean isEquivalent(ValueNode o) {
+        if (isSameNodeType(o)) {
+            SpecialFunctionNode other = (SpecialFunctionNode)o;
+            return sqlName.equals(other.sqlName);
+        }
+        return false;
+    }
 
 }

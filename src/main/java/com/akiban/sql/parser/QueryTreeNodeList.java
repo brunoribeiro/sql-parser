@@ -52,97 +52,97 @@ import java.util.List;
  */
 
 public abstract class QueryTreeNodeList<N extends QueryTreeNode> 
-  extends QueryTreeNode implements Iterable<N>
+    extends QueryTreeNode implements Iterable<N>
 {
-  private List<N> list = new ArrayList<N>();
+    private List<N> list = new ArrayList<N>();
 
-  public final int size() {
-    return list.size();
-  }
-
-  public N get(int index) {
-    return list.get(index);
-  }
-
-  public final void add(N n) {
-    list.add(n);
-  }
-
-  public final N remove(int index) {
-    return list.remove(index);
-  }
-
-  public final void remove(N n) {
-    list.remove(n);
-  }
-
-  public final int indexOf(N n) {
-    return list.indexOf(n);
-  }
-
-  public final void set(int index, N n) {
-    list.set(index, n);
-  }
-
-  public final void add(int index, N n) {
-    list.add(index, n);
-  }
-
-  public final void addAll(QueryTreeNodeList<N> other) {
-    list.addAll(other.list);
-  }
-
-  public final void clear() {
-    list.clear();
-  }
-
-  public final Iterator<N> iterator() {
-    return list.iterator();
-  }
-
-  public final void destructiveAddAll(QueryTreeNodeList<N> other) {
-    addAll(other);
-    other.clear();
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    QueryTreeNodeList<N> other = (QueryTreeNodeList<N>)node;
-    for (N n : other.list)
-      list.add((N)getNodeFactory().copyNode(n, getParserContext()));
-  }
-
-  /**
-   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-   * how tree printing is supposed to work.
-   * @param depth		The depth to indent the sub-nodes
-   */
-  public void printSubNodes(int depth) {
-    for (int index = 0; index < size(); index++) {
-      debugPrint(formatNodeString("[" + index + "]:", depth));
-      N elt = get(index);
-      elt.treePrint(depth);
+    public final int size() {
+        return list.size();
     }
-  }
 
-  /**
-   * Accept the visitor for all visitable children of this node.
-   * 
-   * @param v the visitor
-   *
-   * @exception StandardException on error
-   */
-  void acceptChildren(Visitor v) throws StandardException {
-    super.acceptChildren(v);
-
-    int size = size();
-    for (int index = 0; index < size; index++) {
-      set(index, (N)get(index).accept(v));
+    public N get(int index) {
+        return list.get(index);
     }
-  }
+
+    public final void add(N n) {
+        list.add(n);
+    }
+
+    public final N remove(int index) {
+        return list.remove(index);
+    }
+
+    public final void remove(N n) {
+        list.remove(n);
+    }
+
+    public final int indexOf(N n) {
+        return list.indexOf(n);
+    }
+
+    public final void set(int index, N n) {
+        list.set(index, n);
+    }
+
+    public final void add(int index, N n) {
+        list.add(index, n);
+    }
+
+    public final void addAll(QueryTreeNodeList<N> other) {
+        list.addAll(other.list);
+    }
+
+    public final void clear() {
+        list.clear();
+    }
+
+    public final Iterator<N> iterator() {
+        return list.iterator();
+    }
+
+    public final void destructiveAddAll(QueryTreeNodeList<N> other) {
+        addAll(other);
+        other.clear();
+    }
+
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
+
+        QueryTreeNodeList<N> other = (QueryTreeNodeList<N>)node;
+        for (N n : other.list)
+            list.add((N)getNodeFactory().copyNode(n, getParserContext()));
+    }
+
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     * @param depth     The depth to indent the sub-nodes
+     */
+    public void printSubNodes(int depth) {
+        for (int index = 0; index < size(); index++) {
+            debugPrint(formatNodeString("[" + index + "]:", depth));
+            N elt = get(index);
+            elt.treePrint(depth);
+        }
+    }
+
+    /**
+     * Accept the visitor for all visitable children of this node.
+     * 
+     * @param v the visitor
+     *
+     * @exception StandardException on error
+     */
+    void acceptChildren(Visitor v) throws StandardException {
+        super.acceptChildren(v);
+
+        int size = size();
+        for (int index = 0; index < size; index++) {
+            set(index, (N)get(index).accept(v));
+        }
+    }
 
 }

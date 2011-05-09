@@ -46,8 +46,8 @@ package com.akiban.sql.parser;
 
 public class DropIndexNode extends DDLStatementNode
 {
-  public String statementToString() {
-    return "DROP INDEX";
-  }
+    public String statementToString() {
+        return "DROP INDEX";
+    }
 
 }

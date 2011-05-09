@@ -44,42 +44,42 @@ import com.akiban.sql.StandardException;
  */
 public final class AggregateWindowFunctionNode extends WindowFunctionNode
 {
-  private AggregateNode aggregateFunction;
+    private AggregateNode aggregateFunction;
 
-  /**
-   * Initializer. QueryTreeNode override.
-   *
-   * @param arg1 The window definition or reference
-   * @param arg2 aggregate function node
-   *
-   * @exception StandardException
-   */
-  public void init(Object arg1, Object arg2) throws StandardException {
-    super.init(null, "?", arg1);
-    aggregateFunction = (AggregateNode)arg2;
-  }
+    /**
+     * Initializer. QueryTreeNode override.
+     *
+     * @param arg1 The window definition or reference
+     * @param arg2 aggregate function node
+     *
+     * @exception StandardException
+     */
+    public void init(Object arg1, Object arg2) throws StandardException {
+        super.init(null, "?", arg1);
+        aggregateFunction = (AggregateNode)arg2;
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-    
-    AggregateWindowFunctionNode other = (AggregateWindowFunctionNode)node;
-    aggregateFunction = (AggregateNode)getNodeFactory().copyNode(other.aggregateFunction,
-                                                                 getParserContext());
-  }
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
+        
+        AggregateWindowFunctionNode other = (AggregateWindowFunctionNode)node;
+        aggregateFunction = (AggregateNode)getNodeFactory().copyNode(other.aggregateFunction,
+                                                                     getParserContext());
+    }
 
-  /**
-   * QueryTreeNode override. Prints the sub-nodes of this object.
-   * @see QueryTreeNode#printSubNodes
-   *
-   * @param depth     The depth of this node in the tree
-   */
+    /**
+     * QueryTreeNode override. Prints the sub-nodes of this object.
+     * @see QueryTreeNode#printSubNodes
+     *
+     * @param depth         The depth of this node in the tree
+     */
 
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
-    printLabel(depth, "aggregate: ");
-    aggregateFunction.treePrint(depth + 1);
-  }
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+        printLabel(depth, "aggregate: ");
+        aggregateFunction.treePrint(depth + 1);
+    }
 }

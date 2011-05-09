@@ -39,16 +39,16 @@
 package com.akiban.sql.parser;
 
 /**
- * A NOPStatement node is for statements that don't do anything.  At the
+ * A NOPStatement node is for statements that don't do anything.    At the
  * time of this writing, the only statements that use it are
- * SET DB2J_DEBUG ON and SET DB2J_DEBUG OFF.  Both of these are
+ * SET DB2J_DEBUG ON and SET DB2J_DEBUG OFF.    Both of these are
  * executed in the parser, so the statements don't do anything at execution
  */
 
 public class NOPStatementNode extends StatementNode
 {
-  public String statementToString() {
-    return "NO-OP";
-  }
+    public String statementToString() {
+        return "NO-OP";
+    }
 
 }

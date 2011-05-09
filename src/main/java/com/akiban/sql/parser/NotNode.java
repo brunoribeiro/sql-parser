@@ -49,14 +49,14 @@ import com.akiban.sql.StandardException;
 
 public final class NotNode extends UnaryLogicalOperatorNode
 {
-  /**
-   * Initializer for a NotNode
-   *
-   * @param operand The operand of the NOT
-   */
+    /**
+     * Initializer for a NotNode
+     *
+     * @param operand The operand of the NOT
+     */
 
-  public void init(Object operand) throws StandardException {
-    super.init(operand, "not");
-  }
+    public void init(Object operand) throws StandardException {
+        super.init(operand, "not");
+    }
 
 }

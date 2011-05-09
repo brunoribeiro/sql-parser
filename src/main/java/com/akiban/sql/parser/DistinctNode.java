@@ -53,34 +53,34 @@ import com.akiban.sql.StandardException;
  */
 public class DistinctNode extends SingleChildResultSetNode
 {
-  boolean inSortedOrder;
+    boolean inSortedOrder;
 
-  /**
-   * Initializer for a DistinctNode.
-   *
-   * @param childResult The child ResultSetNode
-   * @param inSortedOrder Whether or not the child ResultSetNode returns its
-   *                      output in sorted order.
-   * @param tableProperties Properties list associated with the table
-   *
-   * @exception StandardException Thrown on error
-   */
-  public void init(Object childResult,
-                   Object inSortedOrder,
-                   Object tableProperties) 
-      throws StandardException {
-    super.init(childResult, tableProperties);
-    this.inSortedOrder = ((Boolean)inSortedOrder).booleanValue();
-  }
+    /**
+     * Initializer for a DistinctNode.
+     *
+     * @param childResult The child ResultSetNode
+     * @param inSortedOrder Whether or not the child ResultSetNode returns its
+     *                                          output in sorted order.
+     * @param tableProperties Properties list associated with the table
+     *
+     * @exception StandardException Thrown on error
+     */
+    public void init(Object childResult,
+                     Object inSortedOrder,
+                     Object tableProperties) 
+            throws StandardException {
+        super.init(childResult, tableProperties);
+        this.inSortedOrder = ((Boolean)inSortedOrder).booleanValue();
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    DistinctNode other = (DistinctNode)node;
-    this.inSortedOrder = other.inSortedOrder;
-  }
+        DistinctNode other = (DistinctNode)node;
+        this.inSortedOrder = other.inSortedOrder;
+    }
 
 }

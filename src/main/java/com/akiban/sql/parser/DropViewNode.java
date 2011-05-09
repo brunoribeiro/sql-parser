@@ -49,19 +49,19 @@ import com.akiban.sql.StandardException;
 public class DropViewNode extends DDLStatementNode
 {
 
-  /**
-   * Initializer for a DropViewNode
-   *
-   * @param dropObjectName The name of the object being dropped
-   *
-   */
+    /**
+     * Initializer for a DropViewNode
+     *
+     * @param dropObjectName The name of the object being dropped
+     *
+     */
 
-  public void init(Object dropObjectName) throws StandardException {
-    initAndCheck(dropObjectName);
-  }
+    public void init(Object dropObjectName) throws StandardException {
+        initAndCheck(dropObjectName);
+    }
 
-  public String statementToString() {
-    return "DROP VIEW";
-  }
+    public String statementToString() {
+        return "DROP VIEW";
+    }
 
 }

@@ -40,16 +40,16 @@ package com.akiban.sql.parser;
 
 public class OrNode extends BinaryLogicalOperatorNode
 {
-  /**
-   * Initializer for an OrNode
-   *
-   * @param leftOperand	The left operand of the OR
-   * @param rightOperand	The right operand of the OR
-   */
+    /**
+     * Initializer for an OrNode
+     *
+     * @param leftOperand The left operand of the OR
+     * @param rightOperand  The right operand of the OR
+     */
 
-  public void init(Object leftOperand, Object rightOperand) {
-    super.init(leftOperand, rightOperand, "or");
-    this.shortCircuitValue = true;
-  }
+    public void init(Object leftOperand, Object rightOperand) {
+        super.init(leftOperand, rightOperand, "or");
+        this.shortCircuitValue = true;
+    }
 
 }

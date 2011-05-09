@@ -48,55 +48,55 @@ import com.akiban.sql.StandardException;
 
 public class CreateSchemaNode extends DDLStatementNode
 {
-  private String name;
-  private String aid;
+    private String name;
+    private String aid;
 
-  /**
-   * Initializer for a CreateSchemaNode
-   *
-   * @param schemaName The name of the new schema
-   * @param aid The authorization id
-   *
-   * @exception StandardException Thrown on error
-   */
-  public void init(Object schemaName, Object aid) throws StandardException {
-    /*
-    ** DDLStatementNode expects tables, null out
-    ** objectName explicitly to clarify that we
-    ** can't hang with schema.object specifiers.
-    */
-    initAndCheck(null);
+    /**
+     * Initializer for a CreateSchemaNode
+     *
+     * @param schemaName The name of the new schema
+     * @param aid The authorization id
+     *
+     * @exception StandardException Thrown on error
+     */
+    public void init(Object schemaName, Object aid) throws StandardException {
+        /*
+        ** DDLStatementNode expects tables, null out
+        ** objectName explicitly to clarify that we
+        ** can't hang with schema.object specifiers.
+        */
+        initAndCheck(null);
 
-    this.name = (String)schemaName;
-    this.aid = (String)aid;
-  }
+        this.name = (String)schemaName;
+        this.aid = (String)aid;
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    CreateSchemaNode other = (CreateSchemaNode)node;
-    this.name = other.name;
-    this.aid = other.aid;
-  }
+        CreateSchemaNode other = (CreateSchemaNode)node;
+        this.name = other.name;
+        this.aid = other.aid;
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
-  public String toString() {
-    return super.toString() +
-      "schemaName: " + "\n" + name + "\n" +
-      "authorizationId: " + "\n" + aid + "\n";
-  }
+    public String toString() {
+        return super.toString() +
+            "schemaName: " + "\n" + name + "\n" +
+            "authorizationId: " + "\n" + aid + "\n";
+    }
 
-  public String statementToString() {
-    return "CREATE SCHEMA";
-  }
+    public String statementToString() {
+        return "CREATE SCHEMA";
+    }
 
 }

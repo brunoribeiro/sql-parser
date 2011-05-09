@@ -46,58 +46,58 @@ import com.akiban.sql.StandardException;
  */
 public class GenerationClauseNode extends ValueNode
 {
-  private ValueNode generationExpression;
-  private String expressionText;
+    private ValueNode generationExpression;
+    private String expressionText;
 
-  public void init(Object generationExpression, Object expressionText) {
-    this.generationExpression = (ValueNode)generationExpression;
-    this.expressionText = (String)expressionText;
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    GenerationClauseNode other = (GenerationClauseNode)node;
-    this.generationExpression = (ValueNode)
-      getNodeFactory().copyNode(other.generationExpression, getParserContext());
-    this.expressionText = other.expressionText;
-  }
-
-  /** Get the defining text of this generation clause */
-  public String getExpressionText() { 
-    return expressionText; 
-  }
-
-  protected boolean isEquivalent(ValueNode other) throws StandardException {
-    if (!(other instanceof GenerationClauseNode)) { 
-      return false; 
+    public void init(Object generationExpression, Object expressionText) {
+        this.generationExpression = (ValueNode)generationExpression;
+        this.expressionText = (String)expressionText;
     }
 
-    GenerationClauseNode that = (GenerationClauseNode)other;
-    return this.generationExpression.isEquivalent(that.generationExpression);
-  }
-    
-  public String toString() {
-    return
-      "expressionText: GENERATED ALWAYS AS ( " +
-      expressionText + " )\n" +
-      super.toString();
-  }
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-  /**
-   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-   * how tree printing is supposed to work.
-   *
-   * @param depth The depth of this node in the tree
-   */
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
+        GenerationClauseNode other = (GenerationClauseNode)node;
+        this.generationExpression = (ValueNode)
+            getNodeFactory().copyNode(other.generationExpression, getParserContext());
+        this.expressionText = other.expressionText;
+    }
 
-    printLabel(depth, "generationExpression: ");
-    generationExpression.treePrint(depth + 1);
-  }
+    /** Get the defining text of this generation clause */
+    public String getExpressionText() { 
+        return expressionText; 
+    }
+
+    protected boolean isEquivalent(ValueNode other) throws StandardException {
+        if (!(other instanceof GenerationClauseNode)) { 
+            return false; 
+        }
+
+        GenerationClauseNode that = (GenerationClauseNode)other;
+        return this.generationExpression.isEquivalent(that.generationExpression);
+    }
+        
+    public String toString() {
+        return
+            "expressionText: GENERATED ALWAYS AS ( " +
+            expressionText + " )\n" +
+            super.toString();
+    }
+
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+
+        printLabel(depth, "generationExpression: ");
+        generationExpression.treePrint(depth + 1);
+    }
 
 }

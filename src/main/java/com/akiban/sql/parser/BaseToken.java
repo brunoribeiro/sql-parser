@@ -39,11 +39,11 @@
 package com.akiban.sql.parser;
 
 class BaseToken implements java.io.Serializable {
-  /**
-   * beginOffset and endOffset are useful for siphoning substrings out of
-   * the Statement so that we can recompile the substrings at upgrade time.
-   * For instance, VIEW definitions and the Restrictions on Published Tables
-   * need to be recompiled at upgrade time.
-   */
-  public int beginOffset, endOffset;
+    /**
+     * beginOffset and endOffset are useful for siphoning substrings out of
+     * the Statement so that we can recompile the substrings at upgrade time.
+     * For instance, VIEW definitions and the Restrictions on Published Tables
+     * need to be recompiled at upgrade time.
+     */
+    public int beginOffset, endOffset;
 }

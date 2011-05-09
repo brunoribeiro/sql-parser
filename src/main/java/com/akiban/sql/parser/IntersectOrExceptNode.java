@@ -47,54 +47,54 @@ import com.akiban.sql.StandardException;
 
 public class IntersectOrExceptNode extends SetOperatorNode
 {
-  public static enum OpType { 
-    INTERSECT("INTERSECT"), 
-    EXCEPT("EXCEPT");
+    public static enum OpType { 
+        INTERSECT("INTERSECT"), 
+            EXCEPT("EXCEPT");
 
-    String operatorName;
-    OpType(String operatorName) {
-      this.operatorName = operatorName;
+        String operatorName;
+        OpType(String operatorName) {
+            this.operatorName = operatorName;
+        }
     }
-  }
-  private OpType opType;
+    private OpType opType;
 
-  /**
-   * Initializer for an IntersectOrExceptNode.
-   *
-   * @param leftResult The ResultSetNode on the left side of this union
-   * @param rightResult The ResultSetNode on the right side of this union
-   * @param all Whether or not this is an ALL.
-   * @param tableProperties Properties list associated with the table
-   *
-   * @exception StandardException Thrown on error
-   */
+    /**
+     * Initializer for an IntersectOrExceptNode.
+     *
+     * @param leftResult The ResultSetNode on the left side of this union
+     * @param rightResult The ResultSetNode on the right side of this union
+     * @param all Whether or not this is an ALL.
+     * @param tableProperties Properties list associated with the table
+     *
+     * @exception StandardException Thrown on error
+     */
 
-  public void init(Object opType,
-                   Object leftResult,
-                   Object rightResult,
-                   Object all,
-                   Object tableProperties) 
-      throws StandardException {
-    super.init(leftResult, rightResult, all, tableProperties);
-    this.opType = (OpType)opType;
-  }
+    public void init(Object opType,
+                     Object leftResult,
+                     Object rightResult,
+                     Object all,
+                     Object tableProperties) 
+            throws StandardException {
+        super.init(leftResult, rightResult, all, tableProperties);
+        this.opType = (OpType)opType;
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    IntersectOrExceptNode other = (IntersectOrExceptNode)node;
-    this.opType = other.opType;
-  }
+        IntersectOrExceptNode other = (IntersectOrExceptNode)node;
+        this.opType = other.opType;
+    }
 
-  public OpType getOpType() {
-    return opType;
-  }
-    
-  public String getOperatorName() {
-    return opType.operatorName;
-  }
+    public OpType getOpType() {
+        return opType;
+    }
+        
+    public String getOperatorName() {
+        return opType.operatorName;
+    }
 
 }

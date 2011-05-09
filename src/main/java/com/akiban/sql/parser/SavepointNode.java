@@ -47,65 +47,65 @@ import com.akiban.sql.StandardException;
 
 public class SavepointNode extends DDLStatementNode
 {
-  public static enum StatementType {
-    SET, ROLLBACK, RELEASE
-  }
-  private StatementType statementType;
-  private String savepointName; // Name of the savepoint.
+    public static enum StatementType {
+        SET, ROLLBACK, RELEASE
+            }
+    private StatementType statementType;
+    private String savepointName; // Name of the savepoint.
 
-  /**
-   * Initializer for a SavepointNode
-   *
-   * @param objectName The name of the savepoint
-   * @param savepointStatementType Type of savepoint statement ie rollback, release or set savepoint
-   *
-   * @exception StandardException Thrown on error
-   */
+    /**
+     * Initializer for a SavepointNode
+     *
+     * @param objectName The name of the savepoint
+     * @param savepointStatementType Type of savepoint statement ie rollback, release or set savepoint
+     *
+     * @exception StandardException Thrown on error
+     */
 
-  public void init(Object objectName,
-                   Object statementType)
-      throws StandardException {
-    initAndCheck(null);
-    this.savepointName = (String)objectName;
-    this.statementType = (StatementType)statementType;
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    SavepointNode other = (SavepointNode)node;
-    this.statementType = other.statementType;
-    this.savepointName = other.savepointName;
-  }
-
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
-
-  public String toString() {
-    String tempString = "savepointName: " + "\n" + savepointName + "\n";
-    tempString = tempString + "savepointStatementType: " + "\n" + statementType + "\n";
-    return super.toString() +  tempString;
-  }
-
-  public String statementToString() {
-    switch (statementType) {
-    case SET:
-      return "SAVEPOINT";
-    case ROLLBACK:
-      return "ROLLBACK WORK TO SAVEPOINT";
-    case RELEASE:
-      return "RELEASE TO SAVEPOINT";
-    default:
-      assert false : "Unknown savepoint statement type";
-      return "UNKNOWN";
+    public void init(Object objectName,
+                     Object statementType)
+            throws StandardException {
+        initAndCheck(null);
+        this.savepointName = (String)objectName;
+        this.statementType = (StatementType)statementType;
     }
-  }
+
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
+
+        SavepointNode other = (SavepointNode)node;
+        this.statementType = other.statementType;
+        this.savepointName = other.savepointName;
+    }
+
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+
+    public String toString() {
+        String tempString = "savepointName: " + "\n" + savepointName + "\n";
+        tempString = tempString + "savepointStatementType: " + "\n" + statementType + "\n";
+        return super.toString() +    tempString;
+    }
+
+    public String statementToString() {
+        switch (statementType) {
+        case SET:
+            return "SAVEPOINT";
+        case ROLLBACK:
+            return "ROLLBACK WORK TO SAVEPOINT";
+        case RELEASE:
+            return "RELEASE TO SAVEPOINT";
+        default:
+            assert false : "Unknown savepoint statement type";
+            return "UNKNOWN";
+        }
+    }
 
 }

@@ -50,86 +50,86 @@ import com.akiban.sql.StandardException;
 
 public abstract class ResultSetNode extends QueryTreeNode
 {
-  ResultColumnList resultColumns;
-  boolean insertSource;
+    ResultColumnList resultColumns;
+    boolean insertSource;
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    ResultSetNode other = (ResultSetNode)node;
-    this.resultColumns = (ResultColumnList)getNodeFactory().copyNode(other.resultColumns,
-                                                                     getParserContext());
-    this.insertSource = other.insertSource;
-  }
-
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
-
-  public String toString() {
-    return super.toString();
-  }
-
-  /**
-   * Remember that this node is the source result set for an INSERT.
-   */
-  public void setInsertSource() {
-    insertSource = true;
-  }
-
-  /**
-   * Set the resultColumns in this ResultSetNode
-   *
-   * @param newRCL The new ResultColumnList for this ResultSetNode
-   */
-  public void setResultColumns(ResultColumnList newRCL) {
-    resultColumns = newRCL;
-  }
-
-  /**
-   * Get the resultColumns for this ResultSetNode
-   *
-   * @return ResultColumnList for this ResultSetNode
-   */
-  public ResultColumnList getResultColumns() {
-    return resultColumns;
-  }
-
-  /**
-   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-   * how tree printing is supposed to work.
-   *
-   * @param depth The depth of this node in the tree
-   */
-
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
-
-    if (resultColumns != null) {
-      printLabel(depth, "resultColumns: ");
-      resultColumns.treePrint(depth + 1);
+        ResultSetNode other = (ResultSetNode)node;
+        this.resultColumns = (ResultColumnList)getNodeFactory().copyNode(other.resultColumns,
+                                                                         getParserContext());
+        this.insertSource = other.insertSource;
     }
-  }
 
-  /**
-   * Accept the visitor for all visitable children of this node.
-   * 
-   * @param v the visitor
-   *
-   * @exception StandardException on error
-   */
-  void acceptChildren(Visitor v) throws StandardException {
-    super.acceptChildren(v);
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
-    if (resultColumns != null) {
-      resultColumns = (ResultColumnList)resultColumns.accept(v);
+    public String toString() {
+        return super.toString();
     }
-  }
+
+    /**
+     * Remember that this node is the source result set for an INSERT.
+     */
+    public void setInsertSource() {
+        insertSource = true;
+    }
+
+    /**
+     * Set the resultColumns in this ResultSetNode
+     *
+     * @param newRCL The new ResultColumnList for this ResultSetNode
+     */
+    public void setResultColumns(ResultColumnList newRCL) {
+        resultColumns = newRCL;
+    }
+
+    /**
+     * Get the resultColumns for this ResultSetNode
+     *
+     * @return ResultColumnList for this ResultSetNode
+     */
+    public ResultColumnList getResultColumns() {
+        return resultColumns;
+    }
+
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
+
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+
+        if (resultColumns != null) {
+            printLabel(depth, "resultColumns: ");
+            resultColumns.treePrint(depth + 1);
+        }
+    }
+
+    /**
+     * Accept the visitor for all visitable children of this node.
+     * 
+     * @param v the visitor
+     *
+     * @exception StandardException on error
+     */
+    void acceptChildren(Visitor v) throws StandardException {
+        super.acceptChildren(v);
+
+        if (resultColumns != null) {
+            resultColumns = (ResultColumnList)resultColumns.accept(v);
+        }
+    }
 
 }

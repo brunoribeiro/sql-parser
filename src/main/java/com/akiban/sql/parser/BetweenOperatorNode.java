@@ -46,17 +46,17 @@ package com.akiban.sql.parser;
 
 public class BetweenOperatorNode extends BinaryListOperatorNode
 {
-  /**
-   * Initializer for a BetweenOperatorNode
-   *
-   * @param leftOperand The left operand of the node
-   * @param betweenValues The between values in list form
-   */
+    /**
+     * Initializer for a BetweenOperatorNode
+     *
+     * @param leftOperand The left operand of the node
+     * @param betweenValues The between values in list form
+     */
 
-  public void init(Object leftOperand, Object betweenValues) {
-    ValueNodeList betweenVals = (ValueNodeList)betweenValues;
-    assert betweenVals.size() == 2;
-    super.init(leftOperand, betweenValues, "BETWEEN", null);
-  }
+    public void init(Object leftOperand, Object betweenValues) {
+        ValueNodeList betweenVals = (ValueNodeList)betweenValues;
+        assert betweenVals.size() == 2;
+        super.init(leftOperand, betweenValues, "BETWEEN", null);
+    }
 
 }

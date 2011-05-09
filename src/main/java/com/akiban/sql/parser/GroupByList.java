@@ -46,41 +46,41 @@ package com.akiban.sql.parser;
 
 public class GroupByList extends OrderedColumnList<GroupByColumn>
 {
-  boolean rollup = false;
+    boolean rollup = false;
 
-  /**
-   * Add a column to the list
-   *
-   * @param column The column to add to the list
-  */
-  public void addGroupByColumn(GroupByColumn column) {
-    add(column);
-  }
+    /**
+     * Add a column to the list
+     *
+     * @param column The column to add to the list
+     */
+    public void addGroupByColumn(GroupByColumn column) {
+        add(column);
+    }
 
-  /**
-   * Get a column from the list
-   * 
-   * @param position The column to get from the list
-  */
-  public GroupByColumn getGroupByColumn(int position) {
-    return get(position);
-  }
+    /**
+     * Get a column from the list
+     * 
+     * @param position The column to get from the list
+     */
+    public GroupByColumn getGroupByColumn(int position) {
+        return get(position);
+    }
 
-  public void setRollup() {
-    rollup = true;
-  }
-  public boolean isRollup() {
-    return rollup;
-  }
+    public void setRollup() {
+        rollup = true;
+    }
+    public boolean isRollup() {
+        return rollup;
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
-  public String toString() {
-    return super.toString();
-  }
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+    public String toString() {
+        return super.toString();
+    }
 
 }

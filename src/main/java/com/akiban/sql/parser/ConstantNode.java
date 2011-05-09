@@ -60,87 +60,87 @@ import com.akiban.sql.types.TypeId;
  */
 public abstract class ConstantNode extends ValueNode
 {
-  Object value;
+    Object value;
 
-  /**
-   * Initializer for non-numeric types
-   *
-   * @param typeId The Type ID of the datatype
-   * @param nullable True means the constant is nullable
-   * @param maximumWidth The maximum number of bytes in the data value
-   *
-   * @exception StandardException
-   */
-  public void init(Object typeId,
-                   Object nullable,
-                   Object maximumWidth) 
-      throws StandardException {
-    setType((TypeId)typeId,
-            ((Boolean)nullable).booleanValue(),
-            ((Integer)maximumWidth).intValue());
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    ConstantNode other = (ConstantNode)node;
-    this.value = other.value;   // Assumed to be immutable.
-  }
-
-  /**
-   * Get the value in this ConstantNode
-   */
-  public Object getValue() {
-    return value;
-  }
-
-  /**
-   * Set the value in this ConstantNode.
-   */
-  public void setValue(Object value) {
-    this.value = value;
-  }
-
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
-
-  public String toString() {
-    return "value: " + value + "\n" +
-      super.toString();
-  }
-
-  /**
-   * Return whether or not this expression tree represents a constant expression.
-   *
-   * @return Whether or not this expression tree represents a constant expression.
-   */
-  public boolean isConstantExpression() {
-    return true;
-  }
-
-  /**
-   * Return whether or not this node represents a typed null constant.
-   *
-   */
-  boolean isNull() {
-    return (value == null);
-  }
-        
-  protected boolean isEquivalent(ValueNode o) throws StandardException {
-    if (isSameNodeType(o)) {
-      ConstantNode other = (ConstantNode)o;
-
-      // value can be null which represents a SQL NULL value.
-      return ((other.getValue() == null && getValue() == null) || 
-              (other.getValue() != null && other.getValue().equals(getValue())));
+    /**
+     * Initializer for non-numeric types
+     *
+     * @param typeId The Type ID of the datatype
+     * @param nullable True means the constant is nullable
+     * @param maximumWidth The maximum number of bytes in the data value
+     *
+     * @exception StandardException
+     */
+    public void init(Object typeId,
+                     Object nullable,
+                     Object maximumWidth) 
+            throws StandardException {
+        setType((TypeId)typeId,
+                ((Boolean)nullable).booleanValue(),
+                ((Integer)maximumWidth).intValue());
     }
-    return false;
-  }
+
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
+
+        ConstantNode other = (ConstantNode)node;
+        this.value = other.value;       // Assumed to be immutable.
+    }
+
+    /**
+     * Get the value in this ConstantNode
+     */
+    public Object getValue() {
+        return value;
+    }
+
+    /**
+     * Set the value in this ConstantNode.
+     */
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+
+    public String toString() {
+        return "value: " + value + "\n" +
+            super.toString();
+    }
+
+    /**
+     * Return whether or not this expression tree represents a constant expression.
+     *
+     * @return Whether or not this expression tree represents a constant expression.
+     */
+    public boolean isConstantExpression() {
+        return true;
+    }
+
+    /**
+     * Return whether or not this node represents a typed null constant.
+     *
+     */
+    boolean isNull() {
+        return (value == null);
+    }
+                
+    protected boolean isEquivalent(ValueNode o) throws StandardException {
+        if (isSameNodeType(o)) {
+            ConstantNode other = (ConstantNode)o;
+
+            // value can be null which represents a SQL NULL value.
+            return ((other.getValue() == null && getValue() == null) || 
+                    (other.getValue() != null && other.getValue().equals(getValue())));
+        }
+        return false;
+    }
 }

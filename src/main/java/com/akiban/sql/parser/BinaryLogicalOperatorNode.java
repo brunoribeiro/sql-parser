@@ -43,33 +43,33 @@ import com.akiban.sql.types.ValueClassName;
 
 public abstract class BinaryLogicalOperatorNode extends BinaryOperatorNode
 {
-  protected boolean shortCircuitValue;
+    protected boolean shortCircuitValue;
 
-  /**
-   * Initializer for a BinaryLogicalOperatorNode
-   *
-   * @param leftOperand The left operand of the comparison
-   * @param rightOperand The right operand of the comparison
-   * @param methodName The name of the method to call in the generated
-   *        class.  In this case, it's actually an operator name.
-   */
+    /**
+     * Initializer for a BinaryLogicalOperatorNode
+     *
+     * @param leftOperand The left operand of the comparison
+     * @param rightOperand The right operand of the comparison
+     * @param methodName The name of the method to call in the generated
+     *              class.  In this case, it's actually an operator name.
+     */
 
-  public void init(Object leftOperand,
-                   Object rightOperand,
-                   Object methodName) {
-    /* For logical operators, the operator and method names are the same */
-    super.init(leftOperand, rightOperand, methodName, methodName,
-               ValueClassName.BooleanDataValue, ValueClassName.BooleanDataValue);
-  }
+    public void init(Object leftOperand,
+                     Object rightOperand,
+                     Object methodName) {
+        /* For logical operators, the operator and method names are the same */
+        super.init(leftOperand, rightOperand, methodName, methodName,
+                   ValueClassName.BooleanDataValue, ValueClassName.BooleanDataValue);
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    BinaryLogicalOperatorNode other = (BinaryLogicalOperatorNode)node;
-    this.shortCircuitValue = other.shortCircuitValue;
-  }
+        BinaryLogicalOperatorNode other = (BinaryLogicalOperatorNode)node;
+        this.shortCircuitValue = other.shortCircuitValue;
+    }
 
 }

@@ -48,78 +48,78 @@ import com.akiban.sql.StandardException;
 
 public class BinaryRelationalOperatorNode extends BinaryComparisonOperatorNode 
 {
-  // TODO: Is there any point to this?
+    // TODO: Is there any point to this?
 
-  public final int EQUALS_RELOP = 1;
-  public final int NOT_EQUALS_RELOP = 2;
-  public final int GREATER_THAN_RELOP = 3;
-  public final int GREATER_EQUALS_RELOP = 4;
-  public final int LESS_THAN_RELOP = 5;
-  public final int LESS_EQUALS_RELOP = 6;
-  public final int IS_NULL_RELOP = 7;
-  public final int IS_NOT_NULL_RELOP = 8;
+    public final int EQUALS_RELOP = 1;
+    public final int NOT_EQUALS_RELOP = 2;
+    public final int GREATER_THAN_RELOP = 3;
+    public final int GREATER_EQUALS_RELOP = 4;
+    public final int LESS_THAN_RELOP = 5;
+    public final int LESS_EQUALS_RELOP = 6;
+    public final int IS_NULL_RELOP = 7;
+    public final int IS_NOT_NULL_RELOP = 8;
 
-  private int operatorType;
+    private int operatorType;
 
-  public void init(Object leftOperand, Object rightOperand) {
-    String methodName = "";
-    String operatorName = "";
+    public void init(Object leftOperand, Object rightOperand) {
+        String methodName = "";
+        String operatorName = "";
 
-    switch (getNodeType()) {
-    case NodeTypes.BINARY_EQUALS_OPERATOR_NODE:
-      methodName = "equals";
-      operatorName = "=";
-      operatorType = EQUALS_RELOP;
-      break;
+        switch (getNodeType()) {
+        case NodeTypes.BINARY_EQUALS_OPERATOR_NODE:
+            methodName = "equals";
+            operatorName = "=";
+            operatorType = EQUALS_RELOP;
+            break;
 
-    case NodeTypes.BINARY_GREATER_EQUALS_OPERATOR_NODE:
-      methodName = "greaterOrEquals";
-      operatorName = ">=";
-      operatorType = GREATER_EQUALS_RELOP;
-      break;
+        case NodeTypes.BINARY_GREATER_EQUALS_OPERATOR_NODE:
+            methodName = "greaterOrEquals";
+            operatorName = ">=";
+            operatorType = GREATER_EQUALS_RELOP;
+            break;
 
-    case NodeTypes.BINARY_GREATER_THAN_OPERATOR_NODE:
-      methodName = "greaterThan";
-      operatorName = ">";
-      operatorType = GREATER_THAN_RELOP;
-      break;
+        case NodeTypes.BINARY_GREATER_THAN_OPERATOR_NODE:
+            methodName = "greaterThan";
+            operatorName = ">";
+            operatorType = GREATER_THAN_RELOP;
+            break;
 
-    case NodeTypes.BINARY_LESS_EQUALS_OPERATOR_NODE:
-      methodName = "lessOrEquals";
-      operatorName = "<=";
-      operatorType =  LESS_EQUALS_RELOP;
-      break;
+        case NodeTypes.BINARY_LESS_EQUALS_OPERATOR_NODE:
+            methodName = "lessOrEquals";
+            operatorName = "<=";
+            operatorType =  LESS_EQUALS_RELOP;
+            break;
 
-    case NodeTypes.BINARY_LESS_THAN_OPERATOR_NODE:
-      methodName = "lessThan";
-      operatorName = "<";
-      operatorType = LESS_THAN_RELOP;
-      break;
-    case NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE:
-      methodName = "notEquals";
-      operatorName = "<>";
-      operatorType = NOT_EQUALS_RELOP;
-      break;
+        case NodeTypes.BINARY_LESS_THAN_OPERATOR_NODE:
+            methodName = "lessThan";
+            operatorName = "<";
+            operatorType = LESS_THAN_RELOP;
+            break;
+        case NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE:
+            methodName = "notEquals";
+            operatorName = "<>";
+            operatorType = NOT_EQUALS_RELOP;
+            break;
 
-    default:
-      assert false : "init for BinaryRelationalOperator called with wrong nodeType = " + getNodeType();
-      break;
+        default:
+            assert false : "init for BinaryRelationalOperator called with wrong nodeType = " + getNodeType();
+            break;
+        }
+        super.init(leftOperand, rightOperand, operatorName, methodName);
     }
-    super.init(leftOperand, rightOperand, operatorName, methodName);
-  }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    BinaryRelationalOperatorNode other = (BinaryRelationalOperatorNode)node;
-    this.operatorType = other.operatorType;
-  }
+        BinaryRelationalOperatorNode other = (BinaryRelationalOperatorNode)node;
+        this.operatorType = other.operatorType;
+    }
 
-  public int getOperatorType() {
-    return operatorType;
-  }
+    public int getOperatorType() {
+        return operatorType;
+    }
 
 }

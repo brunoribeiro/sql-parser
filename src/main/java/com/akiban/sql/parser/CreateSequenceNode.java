@@ -49,107 +49,107 @@ import com.akiban.sql.types.TypeId;
 
 public class CreateSequenceNode extends DDLStatementNode
 {
-  private TableName sequenceName;
-  private DataTypeDescriptor dataType;
-  private long initialValue;
-  private long stepValue;
-  private long maxValue;
-  private long minValue;
-  private boolean cycle;
+    private TableName sequenceName;
+    private DataTypeDescriptor dataType;
+    private long initialValue;
+    private long stepValue;
+    private long maxValue;
+    private long minValue;
+    private boolean cycle;
 
-  /**
-   * Initializer for a CreateSequenceNode
-   *
-   * @param sequenceName The name of the new sequence
-   * @param dataType Exact numeric type of the new sequence
-   * @param initialValue Starting value
-   * @param stepValue Increment amount
-   * @param maxValue Largest value returned by the sequence generator
-   * @param minValue Smallest value returned by the sequence generator
-   * @param cycle True if the generator should wrap around, false otherwise
-   *
-   * @throws StandardException on error
-   */
-  public void init (Object sequenceName,
-                    Object dataType,
-                    Object initialValue,
-                    Object stepValue,
-                    Object maxValue,
-                    Object minValue,
-                    Object cycle) 
-      throws StandardException {
+    /**
+     * Initializer for a CreateSequenceNode
+     *
+     * @param sequenceName The name of the new sequence
+     * @param dataType Exact numeric type of the new sequence
+     * @param initialValue Starting value
+     * @param stepValue Increment amount
+     * @param maxValue Largest value returned by the sequence generator
+     * @param minValue Smallest value returned by the sequence generator
+     * @param cycle True if the generator should wrap around, false otherwise
+     *
+     * @throws StandardException on error
+     */
+    public void init (Object sequenceName,
+                      Object dataType,
+                      Object initialValue,
+                      Object stepValue,
+                      Object maxValue,
+                      Object minValue,
+                      Object cycle) 
+            throws StandardException {
 
-    this.sequenceName = (TableName)sequenceName;
-    initAndCheck(this.sequenceName);
+        this.sequenceName = (TableName)sequenceName;
+        initAndCheck(this.sequenceName);
 
-    if (dataType != null) {
-      this.dataType = (DataTypeDescriptor)dataType;
-    } 
-    else {
-      this.dataType = DataTypeDescriptor.INTEGER;
+        if (dataType != null) {
+            this.dataType = (DataTypeDescriptor)dataType;
+        } 
+        else {
+            this.dataType = DataTypeDescriptor.INTEGER;
+        }
+
+        this.stepValue = stepValue != null ? ((Long)stepValue).longValue() : 1;
+
+        if (this.dataType.getTypeId().equals(TypeId.SMALLINT_ID)) {
+            this.minValue = minValue != null ? ((Long)minValue).longValue() : Short.MIN_VALUE;
+            this.maxValue = maxValue != null ? ((Long)maxValue).longValue() : Short.MAX_VALUE;
+        } 
+        else if (this.dataType.getTypeId().equals(TypeId.INTEGER_ID)) {
+            this.minValue = minValue != null ? ((Long)minValue).longValue() : Integer.MIN_VALUE;
+            this.maxValue = maxValue != null ? ((Long)maxValue).longValue() : Integer.MAX_VALUE;
+        }
+        else {
+            this.minValue = minValue != null ? ((Long)minValue).longValue() : Long.MIN_VALUE;
+            this.maxValue = maxValue != null ? ((Long)maxValue).longValue() : Long.MAX_VALUE;
+        }
+
+        if (initialValue != null) {
+            this.initialValue = ((Long)initialValue).longValue();
+        } 
+        else {
+            if (this.stepValue > 0) {
+                this.initialValue = this.minValue;
+            } 
+            else {
+                this.initialValue = this.maxValue;
+            }
+        }
+        this.cycle = cycle != null ? ((Boolean)cycle).booleanValue() : Boolean.FALSE;
+
     }
 
-    this.stepValue = stepValue != null ? ((Long)stepValue).longValue() : 1;
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    if (this.dataType.getTypeId().equals(TypeId.SMALLINT_ID)) {
-      this.minValue = minValue != null ? ((Long)minValue).longValue() : Short.MIN_VALUE;
-      this.maxValue = maxValue != null ? ((Long)maxValue).longValue() : Short.MAX_VALUE;
-    } 
-    else if (this.dataType.getTypeId().equals(TypeId.INTEGER_ID)) {
-      this.minValue = minValue != null ? ((Long)minValue).longValue() : Integer.MIN_VALUE;
-      this.maxValue = maxValue != null ? ((Long)maxValue).longValue() : Integer.MAX_VALUE;
+        CreateSequenceNode other = (CreateSequenceNode)node;
+        this.sequenceName = (TableName)getNodeFactory().copyNode(other.sequenceName,
+                                                                 getParserContext());
+        this.dataType = other.dataType;
+        this.initialValue = other.initialValue;
+        this.stepValue = other.stepValue;
+        this.maxValue = other.maxValue;
+        this.minValue = other.minValue;
+        this.cycle = other.cycle;
     }
-    else {
-      this.minValue = minValue != null ? ((Long)minValue).longValue() : Long.MIN_VALUE;
-      this.maxValue = maxValue != null ? ((Long)maxValue).longValue() : Long.MAX_VALUE;
+
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+
+    public String toString() {
+        return super.toString() +
+            "sequenceName: " + "\n" + sequenceName + "\n";
     }
 
-    if (initialValue != null) {
-      this.initialValue = ((Long)initialValue).longValue();
-    } 
-    else {
-      if (this.stepValue > 0) {
-        this.initialValue = this.minValue;
-      } 
-      else {
-        this.initialValue = this.maxValue;
-      }
+    public String statementToString() {
+        return "CREATE SEQUENCE";
     }
-    this.cycle = cycle != null ? ((Boolean)cycle).booleanValue() : Boolean.FALSE;
-
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    CreateSequenceNode other = (CreateSequenceNode)node;
-    this.sequenceName = (TableName)getNodeFactory().copyNode(other.sequenceName,
-                                                             getParserContext());
-    this.dataType = other.dataType;
-    this.initialValue = other.initialValue;
-    this.stepValue = other.stepValue;
-    this.maxValue = other.maxValue;
-    this.minValue = other.minValue;
-    this.cycle = other.cycle;
-  }
-
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
-
-  public String toString() {
-    return super.toString() +
-      "sequenceName: " + "\n" + sequenceName + "\n";
-  }
-
-  public String statementToString() {
-    return "CREATE SEQUENCE";
-  }
 
 }

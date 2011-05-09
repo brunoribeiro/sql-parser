@@ -42,21 +42,21 @@ import com.akiban.sql.StandardException;
 
 /**
  * A SubqueryList represents a list of subquerys within a specific clause 
- * (select, where or having) in a DML statement.  It extends QueryTreeNodeList.
+ * (select, where or having) in a DML statement.    It extends QueryTreeNodeList.
  *
  */
 
 public class SubqueryList extends QueryTreeNodeList<SubqueryNode>
 {
-  /**
-   * Add a subquery to the list.
-   *
-   * @param subqueryNode A SubqueryNode to add to the list
-   *
-   */
+    /**
+     * Add a subquery to the list.
+     *
+     * @param subqueryNode A SubqueryNode to add to the list
+     *
+     */
 
-  public void addSubqueryNode(SubqueryNode subqueryNode) throws StandardException {
-    add(subqueryNode);
-  }
+    public void addSubqueryNode(SubqueryNode subqueryNode) throws StandardException {
+        add(subqueryNode);
+    }
 
 }

@@ -49,63 +49,63 @@ import com.akiban.sql.StandardException;
 
 public class HalfOuterJoinNode extends JoinNode
 {
-  private boolean rightOuterJoin;
+    private boolean rightOuterJoin;
 
-  /**
-   * Initializer for a HalfOuterJoinNode.
-   *
-   * @param leftResult The ResultSetNode on the left side of this join
-   * @param rightResult The ResultSetNode on the right side of this join
-   * @param onClause The ON clause
-   * @param usingClause The USING clause
-   * @param rightOuterJoin Whether or not this node represents a user
-   *                       specified right outer join
-   * @param tableProperties Properties list associated with the table
-   *
-   * @exception StandardException Thrown on error
-   */
+    /**
+     * Initializer for a HalfOuterJoinNode.
+     *
+     * @param leftResult The ResultSetNode on the left side of this join
+     * @param rightResult The ResultSetNode on the right side of this join
+     * @param onClause The ON clause
+     * @param usingClause The USING clause
+     * @param rightOuterJoin Whether or not this node represents a user
+     *                                           specified right outer join
+     * @param tableProperties Properties list associated with the table
+     *
+     * @exception StandardException Thrown on error
+     */
 
-  public void init(Object leftResult,
-                   Object rightResult,
-                   Object onClause,
-                   Object usingClause,
-                   Object rightOuterJoin,
-                   Object tableProperties)
-      throws StandardException {
-    super.init(leftResult,
-               rightResult,
-               onClause,
-               usingClause,
-               null,
-               tableProperties,
-               null);
-    this.rightOuterJoin = ((Boolean)rightOuterJoin).booleanValue();
-  }
+    public void init(Object leftResult,
+                     Object rightResult,
+                     Object onClause,
+                     Object usingClause,
+                     Object rightOuterJoin,
+                     Object tableProperties)
+            throws StandardException {
+        super.init(leftResult,
+                   rightResult,
+                   onClause,
+                   usingClause,
+                   null,
+                   tableProperties,
+                   null);
+        this.rightOuterJoin = ((Boolean)rightOuterJoin).booleanValue();
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    HalfOuterJoinNode other = (HalfOuterJoinNode)node;
-    this.rightOuterJoin = other.rightOuterJoin;
-  }
+        HalfOuterJoinNode other = (HalfOuterJoinNode)node;
+        this.rightOuterJoin = other.rightOuterJoin;
+    }
 
-  public boolean isRightOuterJoin() {
-    return rightOuterJoin;
-  }
+    public boolean isRightOuterJoin() {
+        return rightOuterJoin;
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
-  public String toString() {
-    return "rightOuterJoin: " + rightOuterJoin + "\n" +
-      super.toString();
-  }
+    public String toString() {
+        return "rightOuterJoin: " + rightOuterJoin + "\n" +
+            super.toString();
+    }
 
 }

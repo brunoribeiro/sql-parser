@@ -39,7 +39,7 @@
 package com.akiban.sql.parser;
 
 /**
- * A StatementNode represents a single statement in the language.  It is
+ * A StatementNode represents a single statement in the language.    It is
  * the top node for any statement.
  * <p>
  * StatementNode controls the class generation for query tree nodes.
@@ -49,18 +49,18 @@ package com.akiban.sql.parser;
 public abstract class StatementNode extends QueryTreeNode
 {
 
-  /**
-   * Convert this object to a String. See comments in QueryTreeNode.java for
-   * how this should be done for tree printing.
-   * 
-   * @return This object as a String
-   */
+    /**
+     * Convert this object to a String. See comments in QueryTreeNode.java for
+     * how this should be done for tree printing.
+     * 
+     * @return This object as a String
+     */
 
-  public String toString() {
-    return "statementType: " + statementToString() + "\n" +
-      super.toString();
-  }
+    public String toString() {
+        return "statementType: " + statementToString() + "\n" +
+            super.toString();
+    }
 
-  public abstract String statementToString();
+    public abstract String statementToString();
 
 }

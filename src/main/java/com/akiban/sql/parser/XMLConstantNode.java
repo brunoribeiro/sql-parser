@@ -42,32 +42,32 @@ import com.akiban.sql.StandardException;
 
 public final class XMLConstantNode extends ConstantNode
 {
-  /**
-   * Initializer for an XMLConstantNode.
-   *
-   * @param arg1 The TypeId for the type of the node
-   *
-   * @exception StandardException
-   */
-  public void init(Object arg1) throws StandardException {
-    super.init(arg1,
-               Boolean.TRUE,
-               0);
-  }
+    /**
+     * Initializer for an XMLConstantNode.
+     *
+     * @param arg1 The TypeId for the type of the node
+     *
+     * @exception StandardException
+     */
+    public void init(Object arg1) throws StandardException {
+        super.init(arg1,
+                   Boolean.TRUE,
+                   0);
+    }
 
-  /**
-   * Return an Object representing the bind time value of this
-   * expression tree.  If the expression tree does not evaluate to
-   * a constant at bind time then we return null.
-   *
-   * @return An Object representing the bind time value of this
-   *         expression tree (null if not a bind time constant).
-   *
-   * @exception StandardException Thrown on error
-   */
-  Object getConstantValueAsObject() throws StandardException 
-  {
-    return value;
-  }
+    /**
+     * Return an Object representing the bind time value of this
+     * expression tree.  If the expression tree does not evaluate to
+     * a constant at bind time then we return null.
+     *
+     * @return An Object representing the bind time value of this
+     *               expression tree (null if not a bind time constant).
+     *
+     * @exception StandardException Thrown on error
+     */
+    Object getConstantValueAsObject() throws StandardException 
+    {
+        return value;
+    }
 
 }

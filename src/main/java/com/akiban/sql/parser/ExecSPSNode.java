@@ -43,9 +43,9 @@ import com.akiban.sql.StandardException;
 /**
  * A ExecSPSNode is the root of a QueryTree 
  * that represents an EXECUTE STATEMENT
- * statement.  It is a tad abnormal.  Duringa
+ * statement.    It is a tad abnormal.  Duringa
  * bind, it locates and retrieves the SPSDescriptor
- * for the particular statement.  At generate time,
+ * for the particular statement.    At generate time,
  * it generates the prepared statement for the 
  * stored prepared statement and returns it (i.e.
  * it effectively replaces itself with the appropriate
@@ -55,42 +55,42 @@ import com.akiban.sql.StandardException;
 
 public class ExecSPSNode extends StatementNode 
 {
-  private TableName name;
+    private TableName name;
 
-  /**
-   * Initializer for a ExecSPSNode
-   *
-   * @param newObjectName The name of the table to be created
-   *
-   */
+    /**
+     * Initializer for a ExecSPSNode
+     *
+     * @param newObjectName The name of the table to be created
+     *
+     */
 
-  public void init(Object newObjectName) {
-    this.name = (TableName)newObjectName;
-  }
+    public void init(Object newObjectName) {
+        this.name = (TableName)newObjectName;
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    ExecSPSNode other = (ExecSPSNode)node;
-    this.name = (TableName)getNodeFactory().copyNode(other.name,
-                                                     getParserContext());
-  }
+        ExecSPSNode other = (ExecSPSNode)node;
+        this.name = (TableName)getNodeFactory().copyNode(other.name,
+                                                         getParserContext());
+    }
 
-  /** @see StatementNode#executeStatementName */
-  public String executeStatementName() {
-    return name.getTableName();
-  }
+    /** @see StatementNode#executeStatementName */
+    public String executeStatementName() {
+        return name.getTableName();
+    }
 
-  /** @see StatementNode#executeSchemaName */
-  public String executeSchemaName() {
-    return name.getSchemaName();
-  }
+    /** @see StatementNode#executeSchemaName */
+    public String executeSchemaName() {
+        return name.getSchemaName();
+    }
 
-  public String statementToString() {
-    return "EXECUTE STATEMENT";
-  }
+    public String statementToString() {
+        return "EXECUTE STATEMENT";
+    }
 
 }

@@ -47,83 +47,83 @@ import com.akiban.sql.StandardException;
 
 public class ParameterNode extends ValueNode
 {
-  /*
-  ** The parameter number for this parameter.  The numbers start at 0.
-  */
-  private int parameterNumber;
+    /*
+    ** The parameter number for this parameter.  The numbers start at 0.
+    */
+    private int parameterNumber;
 
-  /**
-   * By default, we assume we are just a normal, harmless
-   * little ole parameter.  But sometimes we may be a return
-   * parameter (e.g. ? = CALL myMethod()).  
-   */
-  private ValueNode returnOutputParameter;
+    /**
+     * By default, we assume we are just a normal, harmless
+     * little ole parameter.    But sometimes we may be a return
+     * parameter (e.g. ? = CALL myMethod()).    
+     */
+    private ValueNode returnOutputParameter;
 
-  /**
-   * Initializer for a ParameterNode.
-   *
-   * @param parameterNumber The number of this parameter,
-   *                        (unique per query starting at 0)
-   * @param defaultValue The default value for this parameter
-   *
-   */
+    /**
+     * Initializer for a ParameterNode.
+     *
+     * @param parameterNumber The number of this parameter,
+     *                                              (unique per query starting at 0)
+     * @param defaultValue The default value for this parameter
+     *
+     */
 
-  public void init(Object parameterNumber, Object defaultValue) {
-    this.parameterNumber = ((Integer)parameterNumber).intValue();
-  }
+    public void init(Object parameterNumber, Object defaultValue) {
+        this.parameterNumber = ((Integer)parameterNumber).intValue();
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    ParameterNode other = (ParameterNode)node;
-    this.parameterNumber = other.parameterNumber;
-    this.returnOutputParameter = (ValueNode)
-      getNodeFactory().copyNode(other.returnOutputParameter, getParserContext());
-  }
+        ParameterNode other = (ParameterNode)node;
+        this.parameterNumber = other.parameterNumber;
+        this.returnOutputParameter = (ValueNode)
+            getNodeFactory().copyNode(other.returnOutputParameter, getParserContext());
+    }
 
-  /**
-   * Get the parameter number
-   *
-   * @return The parameter number
-   */
+    /**
+     * Get the parameter number
+     *
+     * @return The parameter number
+     */
 
-  public int getParameterNumber() {
-    return parameterNumber;
-  }
+    public int getParameterNumber() {
+        return parameterNumber;
+    }
 
-  /**
-   * Mark this as a return output parameter (e.g.
-   * ? = CALL myMethod())
-   */
-  public void setReturnOutputParam(ValueNode valueNode) {
-    returnOutputParameter = valueNode;
-  }
+    /**
+     * Mark this as a return output parameter (e.g.
+     * ? = CALL myMethod())
+     */
+    public void setReturnOutputParam(ValueNode valueNode) {
+        returnOutputParameter = valueNode;
+    }
 
-  /**
-   * Is this as a return output parameter (e.g.
-   * ? = CALL myMethod())
-   *
-   * @return true if it is a return param
-   */
-  public boolean isReturnOutputParam() {
-    return returnOutputParameter != null;
-  }
+    /**
+     * Is this as a return output parameter (e.g.
+     * ? = CALL myMethod())
+     *
+     * @return true if it is a return param
+     */
+    public boolean isReturnOutputParam() {
+        return returnOutputParameter != null;
+    }
 
-  /**
-   * @see ValueNode#isParameterNode
-   */
-  public boolean isParameterNode() {
-    return true;
-  }
+    /**
+     * @see ValueNode#isParameterNode
+     */
+    public boolean isParameterNode() {
+        return true;
+    }
 
-  /**
-   * @inheritDoc
-   */
-  protected boolean isEquivalent(ValueNode o) {
-    return false;
-  }
+    /**
+     * @inheritDoc
+     */
+    protected boolean isEquivalent(ValueNode o) {
+        return false;
+    }
 
 }

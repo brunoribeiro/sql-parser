@@ -49,51 +49,51 @@ import java.sql.Types;
  */
 public class CurrentDatetimeOperatorNode extends ValueNode 
 {
-  public static final int CURRENT_DATE = 0;
-  public static final int CURRENT_TIME = 1;
-  public static final int CURRENT_TIMESTAMP = 2;
+    public static final int CURRENT_DATE = 0;
+    public static final int CURRENT_TIME = 1;
+    public static final int CURRENT_TIMESTAMP = 2;
 
-  static private final int jdbcTypeId[] = { 
-    Types.DATE, 
-    Types.TIME,
-    Types.TIMESTAMP
-  };
-  static private final String methodName[] = { // used in toString only
-    "CURRENT DATE",
-    "CURRENT TIME",
-    "CURRENT TIMSTAMP"
-  };
+    static private final int jdbcTypeId[] = { 
+        Types.DATE, 
+        Types.TIME,
+        Types.TIMESTAMP
+    };
+    static private final String methodName[] = { // used in toString only
+        "CURRENT DATE",
+        "CURRENT TIME",
+        "CURRENT TIMSTAMP"
+    };
 
-  private int whichType;
+    private int whichType;
 
-  public void init(Object whichType) {
-    this.whichType = ((Integer)whichType).intValue();
-    assert (this.whichType >= 0 && this.whichType <= 2);
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    CurrentDatetimeOperatorNode other = (CurrentDatetimeOperatorNode)node;
-    this.whichType = other.whichType;
-  }
-
-  public String toString() {
-    return "methodName: " + methodName[whichType] + "\n" +
-      super.toString();
-  }
-        
-  /**
-   * {@inheritDoc}
-   */
-  protected boolean isEquivalent(ValueNode o) {
-    if (isSameNodeType(o)) {
-      CurrentDatetimeOperatorNode other = (CurrentDatetimeOperatorNode)o;
-      return other.whichType == whichType;
+    public void init(Object whichType) {
+        this.whichType = ((Integer)whichType).intValue();
+        assert (this.whichType >= 0 && this.whichType <= 2);
     }
-    return false;
-  }
+
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
+
+        CurrentDatetimeOperatorNode other = (CurrentDatetimeOperatorNode)node;
+        this.whichType = other.whichType;
+    }
+
+    public String toString() {
+        return "methodName: " + methodName[whichType] + "\n" +
+            super.toString();
+    }
+                
+    /**
+     * {@inheritDoc}
+     */
+    protected boolean isEquivalent(ValueNode o) {
+        if (isSameNodeType(o)) {
+            CurrentDatetimeOperatorNode other = (CurrentDatetimeOperatorNode)o;
+            return other.whichType == whichType;
+        }
+        return false;
+    }
 }

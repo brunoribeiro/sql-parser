@@ -53,179 +53,179 @@ import java.util.List;
 
 public class CursorNode extends DMLStatementNode
 {
-  public static enum UpdateMode {
-    UNSPECIFIED, READ_ONLY, UPDATE
-  }
+    public static enum UpdateMode {
+        UNSPECIFIED, READ_ONLY, UPDATE
+            }
 
-  private String name;
-  private OrderByList orderByList;
-  private ValueNode offset;     // <result offset clause> value
-  private ValueNode fetchFirst; // <fetch first clause> value
-  private String statementType;
-  private UpdateMode updateMode;
-  private IsolationLevel scanIsolationLevel = IsolationLevel.UNSPECIFIED_ISOLATION_LEVEL;
+    private String name;
+    private OrderByList orderByList;
+    private ValueNode offset;           // <result offset clause> value
+    private ValueNode fetchFirst; // <fetch first clause> value
+    private String statementType;
+    private UpdateMode updateMode;
+    private IsolationLevel scanIsolationLevel = IsolationLevel.UNSPECIFIED_ISOLATION_LEVEL;
 
-  /**
-   ** There can only be a list of updatable columns when FOR UPDATE
-   ** is specified as part of the cursor specification.
-   */
-  private List<String> updatableColumns;
+    /**
+     ** There can only be a list of updatable columns when FOR UPDATE
+     ** is specified as part of the cursor specification.
+     */
+    private List<String> updatableColumns;
 
-  /**
-   * Initializer for a CursorNode
-   *
-   * @param statementType Type of statement (SELECT, UPDATE, INSERT)
-   * @param resultSet A ResultSetNode specifying the result set for
-   *                  the cursor
-   * @param name The name of the cursor, null if no name
-   * @param orderByList The order by list for the cursor, null if no
-   *                    order by list
-   * @param offset The value of a <result offset clause> if present
-   * @param fetchFirst The value of a <fetch first clause> if present
-   * @param updateMode The user-specified update mode for the cursor,
-   *                   for example, CursorNode.READ_ONLY
-   * @param updatableColumns The list of updatable columns specified by
-   *                         the user in the FOR UPDATE clause, null if no
-   *                         updatable columns specified.  May only be
-   *                         provided if the updateMode parameter is
-   *                         CursorNode.UPDATE.
-   */
+    /**
+     * Initializer for a CursorNode
+     *
+     * @param statementType Type of statement (SELECT, UPDATE, INSERT)
+     * @param resultSet A ResultSetNode specifying the result set for
+     *                                  the cursor
+     * @param name The name of the cursor, null if no name
+     * @param orderByList The order by list for the cursor, null if no
+     *                                      order by list
+     * @param offset The value of a <result offset clause> if present
+     * @param fetchFirst The value of a <fetch first clause> if present
+     * @param updateMode The user-specified update mode for the cursor,
+     *                                   for example, CursorNode.READ_ONLY
+     * @param updatableColumns The list of updatable columns specified by
+     *                         the user in the FOR UPDATE clause, null if no
+     *                         updatable columns specified.    May only be
+     *                         provided if the updateMode parameter is
+     *                         CursorNode.UPDATE.
+     */
 
-  public void init(Object statementType,
-                   Object resultSet,
-                   Object name,
-                   Object orderByList,
-                   Object offset,
-                   Object fetchFirst,
-                   Object updateMode,
-                   Object updatableColumns) {
-    init(resultSet);
-    this.name = (String)name;
-    this.statementType = (String)statementType;
-    this.orderByList = (OrderByList)orderByList;
-    this.offset = (ValueNode)offset;
-    this.fetchFirst = (ValueNode)fetchFirst;
-    this.updateMode = (UpdateMode)updateMode;
-    this.updatableColumns = (List<String>)updatableColumns;
-  }
+    public void init(Object statementType,
+                     Object resultSet,
+                     Object name,
+                     Object orderByList,
+                     Object offset,
+                     Object fetchFirst,
+                     Object updateMode,
+                     Object updatableColumns) {
+        init(resultSet);
+        this.name = (String)name;
+        this.statementType = (String)statementType;
+        this.orderByList = (OrderByList)orderByList;
+        this.offset = (ValueNode)offset;
+        this.fetchFirst = (ValueNode)fetchFirst;
+        this.updateMode = (UpdateMode)updateMode;
+        this.updatableColumns = (List<String>)updatableColumns;
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    CursorNode other = (CursorNode)node;
-    this.name = other.name;
-    this.orderByList = (OrderByList)getNodeFactory().copyNode(other.orderByList,
-                                                              getParserContext());
-    this.offset = (ValueNode)getNodeFactory().copyNode(other.offset,
-                                                       getParserContext());
-    this.fetchFirst = (ValueNode)getNodeFactory().copyNode(other.fetchFirst,
+        CursorNode other = (CursorNode)node;
+        this.name = other.name;
+        this.orderByList = (OrderByList)getNodeFactory().copyNode(other.orderByList,
+                                                                  getParserContext());
+        this.offset = (ValueNode)getNodeFactory().copyNode(other.offset,
                                                            getParserContext());
-    this.statementType = other.statementType;
-    this.updateMode = other.updateMode;
-    this.scanIsolationLevel = other.scanIsolationLevel;
-    this.updatableColumns = other.updatableColumns;
-  }
-
-  public void setScanIsolationLevel(IsolationLevel isolationLevel) {
-    this.scanIsolationLevel = isolationLevel;
-  }
-
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
-
-  public String toString() {
-    return "name: " + name + "\n" +
-      "updateMode: " + updateMode + "\n" +
-      super.toString();
-  }
-
-  public String statementToString() {
-    return statementType;
-  }
-
-  /**
-   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-   * how tree printing is supposed to work.
-   *
-   * @param depth The depth of this node in the tree
-   */
-
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
-
-    if (orderByList != null) {
-      printLabel(depth, "orderByList: ");
-      orderByList.treePrint(depth + 1);
+        this.fetchFirst = (ValueNode)getNodeFactory().copyNode(other.fetchFirst,
+                                                               getParserContext());
+        this.statementType = other.statementType;
+        this.updateMode = other.updateMode;
+        this.scanIsolationLevel = other.scanIsolationLevel;
+        this.updatableColumns = other.updatableColumns;
     }
-    if (offset != null) {
-      printLabel(depth, "offset: ");
-      offset.treePrint(depth + 1);
+
+    public void setScanIsolationLevel(IsolationLevel isolationLevel) {
+        this.scanIsolationLevel = isolationLevel;
     }
-    if (fetchFirst != null) {
-      printLabel(depth, "fetchFirst: ");
-      fetchFirst.treePrint(depth + 1);
+
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+
+    public String toString() {
+        return "name: " + name + "\n" +
+            "updateMode: " + updateMode + "\n" +
+            super.toString();
     }
-  }
 
-  /**
-   * Accept the visitor for all visitable children of this node.
-   * 
-   * @param v the visitor
-   *
-   * @exception StandardException on error
-   */
-  void acceptChildren(Visitor v) throws StandardException {
-    super.acceptChildren(v);
-
-    if (orderByList != null) {
-      orderByList = (OrderByList)orderByList.accept(v);
+    public String statementToString() {
+        return statementType;
     }
-    if (offset != null) {
-      offset = (ValueNode)offset.accept(v);
+
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
+
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+
+        if (orderByList != null) {
+            printLabel(depth, "orderByList: ");
+            orderByList.treePrint(depth + 1);
+        }
+        if (offset != null) {
+            printLabel(depth, "offset: ");
+            offset.treePrint(depth + 1);
+        }
+        if (fetchFirst != null) {
+            printLabel(depth, "fetchFirst: ");
+            fetchFirst.treePrint(depth + 1);
+        }
     }
-    if (fetchFirst != null) {
-      fetchFirst = (ValueNode)fetchFirst.accept(v);
+
+    /**
+     * Accept the visitor for all visitable children of this node.
+     * 
+     * @param v the visitor
+     *
+     * @exception StandardException on error
+     */
+    void acceptChildren(Visitor v) throws StandardException {
+        super.acceptChildren(v);
+
+        if (orderByList != null) {
+            orderByList = (OrderByList)orderByList.accept(v);
+        }
+        if (offset != null) {
+            offset = (ValueNode)offset.accept(v);
+        }
+        if (fetchFirst != null) {
+            fetchFirst = (ValueNode)fetchFirst.accept(v);
+        }
     }
-  }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public OrderByList getOrderByList() {
-    return orderByList;
-  }
+    public OrderByList getOrderByList() {
+        return orderByList;
+    }
 
-  public ValueNode getOffsetClause() {
-    return offset;
-  }
+    public ValueNode getOffsetClause() {
+        return offset;
+    }
 
-  public ValueNode getFetchFirstClause() {
-    return fetchFirst;
-  }
+    public ValueNode getFetchFirstClause() {
+        return fetchFirst;
+    }
 
-  public UpdateMode getUpdateMode() {
-    return updateMode;
-  }
+    public UpdateMode getUpdateMode() {
+        return updateMode;
+    }
 
-  public IsolationLevel getScanIsolationLevel() {
-    return scanIsolationLevel;
-  }
+    public IsolationLevel getScanIsolationLevel() {
+        return scanIsolationLevel;
+    }
 
-  /**
-   * Return collection of names from the FOR UPDATE OF List
-   *
-   * @return List<String> of names from the FOR UPDATE OF list.
-   */
-  public List<String> getUpdatableColumns() {
-    return updatableColumns;
-  }
+    /**
+     * Return collection of names from the FOR UPDATE OF List
+     *
+     * @return List<String> of names from the FOR UPDATE OF list.
+     */
+    public List<String> getUpdatableColumns() {
+        return updatableColumns;
+    }
 
 }

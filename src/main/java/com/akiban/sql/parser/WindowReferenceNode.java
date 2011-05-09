@@ -45,20 +45,20 @@ import com.akiban.sql.StandardException;
  */
 public final class WindowReferenceNode extends WindowNode
 {
-  /**
-   * Initializer
-   *
-   * @param arg1 The window name referenced
-   *
-   * @exception StandardException
-   */
-  public void init(Object arg1) throws StandardException {
-    super.init(arg1);
-  }
+    /**
+     * Initializer
+     *
+     * @param arg1 The window name referenced
+     *
+     * @exception StandardException
+     */
+    public void init(Object arg1) throws StandardException {
+        super.init(arg1);
+    }
 
-  public String toString() {
-    return "referenced window: " + getName() + "\n" +
-      super.toString();
-  }
+    public String toString() {
+        return "referenced window: " + getName() + "\n" +
+            super.toString();
+    }
 
 }

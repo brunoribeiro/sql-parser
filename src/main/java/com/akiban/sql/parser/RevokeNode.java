@@ -48,53 +48,53 @@ import java.util.Iterator;
  */
 public class RevokeNode extends DDLStatementNode
 {
-  private PrivilegeNode privileges;
-  private List<String> grantees;
+    private PrivilegeNode privileges;
+    private List<String> grantees;
 
-  /**
-   * Initialize a RevokeNode.
-   *
-   * @param privileges PrivilegesNode
-   * @param grantees List
-   */
-  public void init(Object privileges, Object grantees) {
-    this.privileges = (PrivilegeNode)privileges;
-    this.grantees = (List<String>)grantees;
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    RevokeNode other = (RevokeNode)node;
-    this.privileges = (PrivilegeNode)getNodeFactory().copyNode(other.privileges,
-                                                               getParserContext());
-    this.grantees = other.grantees; // TODO: Clone?
-  }
-
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
-
-  public String toString() {
-    StringBuffer sb = new StringBuffer();
-    for (Iterator<String> it = grantees.iterator(); it.hasNext();) {
-      if (sb.length() > 0)
-        sb.append(",");
-      sb.append(it.next());
+    /**
+     * Initialize a RevokeNode.
+     *
+     * @param privileges PrivilegesNode
+     * @param grantees List
+     */
+    public void init(Object privileges, Object grantees) {
+        this.privileges = (PrivilegeNode)privileges;
+        this.grantees = (List<String>)grantees;
     }
-    return super.toString() +
-      privileges.toString() +
-      "TO: \n" + sb.toString() + "\n";
-  }
 
-  public String statementToString() {
-    return "REVOKE";
-  }
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
+
+        RevokeNode other = (RevokeNode)node;
+        this.privileges = (PrivilegeNode)getNodeFactory().copyNode(other.privileges,
+                                                                   getParserContext());
+        this.grantees = other.grantees; // TODO: Clone?
+    }
+
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        for (Iterator<String> it = grantees.iterator(); it.hasNext();) {
+            if (sb.length() > 0)
+                sb.append(",");
+            sb.append(it.next());
+        }
+        return super.toString() +
+            privileges.toString() +
+            "TO: \n" + sb.toString() + "\n";
+    }
+
+    public String statementToString() {
+        return "REVOKE";
+    }
 
 }

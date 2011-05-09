@@ -48,58 +48,58 @@ import com.akiban.sql.types.AliasInfo;
 
 public class DropAliasNode extends DDLStatementNode
 {
-  private char aliasType;
+    private char aliasType;
 
-  /**
-   * Initializer for a DropAliasNode
-   *
-   * @param dropAliasName The name of the method alias being dropped
-   * @param aliasType Alias type
-   *
-   * @exception StandardException
-   */
-  public void init(Object dropAliasName, Object aliasType) throws StandardException {
-    TableName dropItem = (TableName)dropAliasName;
-    initAndCheck(dropItem);
-    this.aliasType = ((Character)aliasType).charValue();
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    DropAliasNode other = (DropAliasNode)node;
-    this.aliasType = other.aliasType;
-  }
-
-  public char getAliasType() { 
-    return aliasType; 
-  }
-
-  public String statementToString() {
-    return "DROP ".concat(aliasTypeName(aliasType));
-  }
-
-  /* returns the alias type name given the alias char type */
-  private static String aliasTypeName(char actualType) {
-    String typeName = null;
-    switch (actualType) {
-    case AliasInfo.ALIAS_TYPE_PROCEDURE_AS_CHAR:
-      typeName = "PROCEDURE";
-      break;
-    case AliasInfo.ALIAS_TYPE_FUNCTION_AS_CHAR:
-      typeName = "FUNCTION";
-      break;
-    case AliasInfo.ALIAS_TYPE_SYNONYM_AS_CHAR:
-      typeName = "SYNONYM";
-      break;
-    case AliasInfo.ALIAS_TYPE_UDT_AS_CHAR:
-      typeName = "TYPE";
-      break;
+    /**
+     * Initializer for a DropAliasNode
+     *
+     * @param dropAliasName The name of the method alias being dropped
+     * @param aliasType Alias type
+     *
+     * @exception StandardException
+     */
+    public void init(Object dropAliasName, Object aliasType) throws StandardException {
+        TableName dropItem = (TableName)dropAliasName;
+        initAndCheck(dropItem);
+        this.aliasType = ((Character)aliasType).charValue();
     }
-    return typeName;
-  }
+
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
+
+        DropAliasNode other = (DropAliasNode)node;
+        this.aliasType = other.aliasType;
+    }
+
+    public char getAliasType() { 
+        return aliasType; 
+    }
+
+    public String statementToString() {
+        return "DROP ".concat(aliasTypeName(aliasType));
+    }
+
+    /* returns the alias type name given the alias char type */
+    private static String aliasTypeName(char actualType) {
+        String typeName = null;
+        switch (actualType) {
+        case AliasInfo.ALIAS_TYPE_PROCEDURE_AS_CHAR:
+            typeName = "PROCEDURE";
+            break;
+        case AliasInfo.ALIAS_TYPE_FUNCTION_AS_CHAR:
+            typeName = "FUNCTION";
+            break;
+        case AliasInfo.ALIAS_TYPE_SYNONYM_AS_CHAR:
+            typeName = "SYNONYM";
+            break;
+        case AliasInfo.ALIAS_TYPE_UDT_AS_CHAR:
+            typeName = "TYPE";
+            break;
+        }
+        return typeName;
+    }
 
 }

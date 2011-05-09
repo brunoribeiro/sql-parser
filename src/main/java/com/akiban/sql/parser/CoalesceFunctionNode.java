@@ -50,89 +50,89 @@ import com.akiban.sql.StandardException;
 
 public class CoalesceFunctionNode extends ValueNode
 {
-  private String functionName; //Are we here because of COALESCE function or VALUE function
-  private ValueNodeList argumentsList; //this is the list of arguments to the function. We are interested in the first not-null argument
+    private String functionName; //Are we here because of COALESCE function or VALUE function
+    private ValueNodeList argumentsList; //this is the list of arguments to the function. We are interested in the first not-null argument
 
-  /**
-   * Initializer for a CalesceFunctionNode
-   *
-   * @param functionName Tells if the function was called with name COALESCE or with name VALUE
-   * @param argumentsList The list of arguments to the coalesce/value function
-   */
-  public void init(Object functionName, Object argumentsList) {
-    this.functionName = (String)functionName;
-    this.argumentsList = (ValueNodeList)argumentsList;
-  }
-
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
-
-    CoalesceFunctionNode other = (CoalesceFunctionNode)node;
-    this.functionName = other.functionName;
-    this.argumentsList = (ValueNodeList)
-      getNodeFactory().copyNode(other.argumentsList, getParserContext());
-  }
-
-  public String getFunctionName() {
-    return functionName;
-  }
-
-  public ValueNodeList getArgumentsList() {
-    return argumentsList;
-  }
-
-  /*
-   * print the non-node subfields
-   */
-  public String toString() {
-    return "functionName: " + functionName + "\n" +
-      super.toString();
-  }
-        
-  /**
-   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-   * how tree printing is supposed to work.
-   *
-   * @param depth The depth of this node in the tree
-   */
-
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
-
-    printLabel(depth, "argumentsList: ");
-    argumentsList.treePrint(depth + 1);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  protected boolean isEquivalent(ValueNode o) throws StandardException {
-    if (!isSameNodeType(o)) {
-      return false;
+    /**
+     * Initializer for a CalesceFunctionNode
+     *
+     * @param functionName Tells if the function was called with name COALESCE or with name VALUE
+     * @param argumentsList The list of arguments to the coalesce/value function
+     */
+    public void init(Object functionName, Object argumentsList) {
+        this.functionName = (String)functionName;
+        this.argumentsList = (ValueNodeList)argumentsList;
     }
 
-    CoalesceFunctionNode other = (CoalesceFunctionNode)o;
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    if (!argumentsList.isEquivalent(other.argumentsList)) {
-      return false;
+        CoalesceFunctionNode other = (CoalesceFunctionNode)node;
+        this.functionName = other.functionName;
+        this.argumentsList = (ValueNodeList)
+            getNodeFactory().copyNode(other.argumentsList, getParserContext());
     }
 
-    return true;
-  }
+    public String getFunctionName() {
+        return functionName;
+    }
 
-  /**
-   * Accept the visitor for all visitable children of this node.
-   *
-   * @param v the visitor
-   * @throws StandardException on error in the visitor
-   */
-  void acceptChildren(Visitor v) throws StandardException {
-    super.acceptChildren(v);
+    public ValueNodeList getArgumentsList() {
+        return argumentsList;
+    }
 
-    argumentsList = (ValueNodeList)argumentsList.accept(v);
-  }
+    /*
+     * print the non-node subfields
+     */
+    public String toString() {
+        return "functionName: " + functionName + "\n" +
+            super.toString();
+    }
+                
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
+
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+
+        printLabel(depth, "argumentsList: ");
+        argumentsList.treePrint(depth + 1);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected boolean isEquivalent(ValueNode o) throws StandardException {
+        if (!isSameNodeType(o)) {
+            return false;
+        }
+
+        CoalesceFunctionNode other = (CoalesceFunctionNode)o;
+
+        if (!argumentsList.isEquivalent(other.argumentsList)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Accept the visitor for all visitable children of this node.
+     *
+     * @param v the visitor
+     * @throws StandardException on error in the visitor
+     */
+    void acceptChildren(Visitor v) throws StandardException {
+        super.acceptChildren(v);
+
+        argumentsList = (ValueNodeList)argumentsList.accept(v);
+    }
 
 }

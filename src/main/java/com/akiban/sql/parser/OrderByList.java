@@ -49,42 +49,42 @@ import java.util.Properties;
  */
 public class OrderByList extends OrderedColumnList<OrderByColumn>
 {
-  private boolean allAscending = true;
+    private boolean allAscending = true;
 
-  /**
-     Add a column to the list
+    /**
+       Add a column to the list
 
-     @param column The column to add to the list
-  */
-  public void addOrderByColumn(OrderByColumn column) {
-    add(column);
+       @param column The column to add to the list
+    */
+    public void addOrderByColumn(OrderByColumn column) {
+        add(column);
 
-    if (!column.isAscending())
-      allAscending = false;
-  }
+        if (!column.isAscending())
+            allAscending = false;
+    }
 
-  /**
-   * Are all columns in the list ascending.
-   *
-   * @return Whether or not all columns in the list ascending.
-   */
-  boolean allAscending() {
-    return allAscending;
-  }
+    /**
+     * Are all columns in the list ascending.
+     *
+     * @return Whether or not all columns in the list ascending.
+     */
+    boolean allAscending() {
+        return allAscending;
+    }
 
-  /**
-     Get a column from the list
+    /**
+       Get a column from the list
 
-     @param position The column to get from the list
-  */
-  public OrderByColumn getOrderByColumn(int position) {
-    return get(position);
-  }
+       @param position The column to get from the list
+    */
+    public OrderByColumn getOrderByColumn(int position) {
+        return get(position);
+    }
 
-  public String toString() {
-    return
-      "allAscending: " + allAscending + "\n" +
-      super.toString();
-  }
+    public String toString() {
+        return
+            "allAscending: " + allAscending + "\n" +
+            super.toString();
+    }
 
 }

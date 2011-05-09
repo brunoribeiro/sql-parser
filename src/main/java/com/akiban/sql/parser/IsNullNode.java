@@ -47,27 +47,27 @@ package com.akiban.sql.parser;
 public final class IsNullNode extends UnaryComparisonOperatorNode
 {
 
-  public void setNodeType(int nodeType)
-  {
-    String operator;
-    String methodName;
+    public void setNodeType(int nodeType)
+    {
+        String operator;
+        String methodName;
 
-    if (nodeType == NodeTypes.IS_NULL_NODE) {
-      /* By convention, the method name for the is null operator is "isNull" */
-      operator = "is null";
-      methodName = "isNullOp";
+        if (nodeType == NodeTypes.IS_NULL_NODE) {
+            /* By convention, the method name for the is null operator is "isNull" */
+            operator = "is null";
+            methodName = "isNullOp";
+        }
+        else {
+            assert (nodeType == NodeTypes.IS_NOT_NULL_NODE);
+            /* By convention, the method name for the is not null operator is 
+             * "isNotNull" 
+             */
+            operator = "is not null";
+            methodName = "isNotNull";
+        }
+        setOperator(operator);
+        setMethodName(methodName);
+        super.setNodeType(nodeType);
     }
-    else {
-      assert (nodeType == NodeTypes.IS_NOT_NULL_NODE);
-      /* By convention, the method name for the is not null operator is 
-       * "isNotNull" 
-       */
-      operator = "is not null";
-      methodName = "isNotNull";
-    }
-    setOperator(operator);
-    setMethodName(methodName);
-    super.setNodeType(nodeType);
-  }
 
 }

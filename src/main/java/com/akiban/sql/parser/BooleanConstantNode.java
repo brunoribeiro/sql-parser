@@ -45,112 +45,112 @@ import java.sql.Types;
 
 public class BooleanConstantNode extends ConstantNode
 {
-  private boolean booleanValue;
-  private boolean unknownValue;
+    private boolean booleanValue;
+    private boolean unknownValue;
 
-  /**
-   * Initializer for a BooleanConstantNode.
-   *
-   * @param arg1 A boolean containing the value of the constant OR The TypeId for the type of the node
-   *
-   * @exception StandardException
-   */
-  public void init(Object arg1) throws StandardException {
-    /*
-    ** RESOLVE: The length is fixed at 1, even for nulls.
-    ** Is that OK?
-    */
+    /**
+     * Initializer for a BooleanConstantNode.
+     *
+     * @param arg1 A boolean containing the value of the constant OR The TypeId for the type of the node
+     *
+     * @exception StandardException
+     */
+    public void init(Object arg1) throws StandardException {
+        /*
+        ** RESOLVE: The length is fixed at 1, even for nulls.
+        ** Is that OK?
+        */
 
-    if (arg1 == null) {
-      /* Fill in the type information in the parent ValueNode */
-      super.init(TypeId.BOOLEAN_ID,
-                 Boolean.TRUE,
-                 1);
+        if (arg1 == null) {
+            /* Fill in the type information in the parent ValueNode */
+            super.init(TypeId.BOOLEAN_ID,
+                       Boolean.TRUE,
+                       1);
 
-      setValue(null);
+            setValue(null);
+        }
+        else if (arg1 instanceof Boolean) {
+            /* Fill in the type information in the parent ValueNode */
+            super.init(TypeId.BOOLEAN_ID,
+                       Boolean.FALSE,
+                       1);
+
+            booleanValue = ((Boolean)arg1).booleanValue();
+            super.setValue(arg1);
+        }
+        else {
+            super.init(arg1,
+                       Boolean.TRUE,
+                       0);
+            unknownValue = true;
+        }
     }
-    else if (arg1 instanceof Boolean) {
-      /* Fill in the type information in the parent ValueNode */
-      super.init(TypeId.BOOLEAN_ID,
-                 Boolean.FALSE,
-                 1);
 
-      booleanValue = ((Boolean)arg1).booleanValue();
-      super.setValue(arg1);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
+
+        BooleanConstantNode other = (BooleanConstantNode)node;
+        this.booleanValue = other.booleanValue;
+        this.unknownValue = other.unknownValue;
     }
-    else {
-      super.init(arg1,
-                 Boolean.TRUE,
-                 0);
-      unknownValue = true;
+
+    public boolean getBooleanValue() {
+        return booleanValue;
     }
-  }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    public void setBooleanValue(boolean booleanValue) {
+        this.booleanValue = booleanValue;
+    }
 
-    BooleanConstantNode other = (BooleanConstantNode)node;
-    this.booleanValue = other.booleanValue;
-    this.unknownValue = other.unknownValue;
-  }
+    /**
+     * Return an Object representing the bind time value of this
+     * expression tree.  If the expression tree does not evaluate to
+     * a constant at bind time then we return null.
+     * This is useful for bind time resolution of VTIs.
+     * RESOLVE: What do we do for primitives?
+     *
+     * @return An Object representing the bind time value of this expression tree.
+     *               (null if not a bind time constant.)
+     *
+     */
+    Object getConstantValueAsObject() {
+        return booleanValue ? Boolean.TRUE : Boolean.FALSE;
+    }
 
-  public boolean getBooleanValue() {
-    return booleanValue;
-  }
+    /**
+     * Return the value as a string.
+     *
+     * @return The value as a string.
+     *
+     */
+    String getValueAsString() {
+        if (booleanValue) {
+            return "true";
+        }
+        else {
+            return "false";
+        }
+    }
 
-  public void setBooleanValue(boolean booleanValue) {
-    this.booleanValue = booleanValue;
-  }
+    /**
+     * Does this represent a true constant.
+     *
+     * @return Whether or not this node represents a true constant.
+     */
+    public boolean isBooleanTrue() {
+        return (booleanValue && !unknownValue);
+    }
 
-  /**
-   * Return an Object representing the bind time value of this
-   * expression tree.  If the expression tree does not evaluate to
-   * a constant at bind time then we return null.
-   * This is useful for bind time resolution of VTIs.
-   * RESOLVE: What do we do for primitives?
-   *
-   * @return An Object representing the bind time value of this expression tree.
-   *         (null if not a bind time constant.)
-   *
-   */
-  Object getConstantValueAsObject() {
-    return booleanValue ? Boolean.TRUE : Boolean.FALSE;
-  }
-
-  /**
-   * Return the value as a string.
-   *
-   * @return The value as a string.
-   *
-   */
-  String getValueAsString() {
-    if (booleanValue) {
-        return "true";
-      }
-    else {
-        return "false";
-      }
-  }
-
-  /**
-   * Does this represent a true constant.
-   *
-   * @return Whether or not this node represents a true constant.
-   */
-  public boolean isBooleanTrue() {
-    return (booleanValue && !unknownValue);
-  }
-
-  /**
-   * Does this represent a false constant.
-   *
-   * @return Whether or not this node represents a false constant.
-   */
-  public boolean isBooleanFalse() {
-    return (!booleanValue && !unknownValue);
-  }
+    /**
+     * Does this represent a false constant.
+     *
+     * @return Whether or not this node represents a false constant.
+     */
+    public boolean isBooleanFalse() {
+        return (!booleanValue && !unknownValue);
+    }
 
 }

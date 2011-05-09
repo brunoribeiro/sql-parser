@@ -43,6 +43,6 @@ package com.akiban.sql.parser;
  *
  */
 public abstract class OrderedColumnList<N extends OrderedColumn> 
-  extends QueryTreeNodeList<N>
+    extends QueryTreeNodeList<N>
 {
 }

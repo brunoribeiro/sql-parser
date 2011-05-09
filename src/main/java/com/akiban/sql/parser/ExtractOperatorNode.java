@@ -47,50 +47,50 @@ import com.akiban.sql.StandardException;
  */
 public class ExtractOperatorNode extends UnaryOperatorNode 
 {
-  public static enum Field {
-    YEAR("YEAR", "getYear"),
-    MONTH("MONTH", "getMonth"),
-    DAY("DAY", "getDate"),
-    HOUR("HOUR", "getHours"),
-    MINUTE("MINUTE", "getMinutes"),
-    SECOND("SECOND", "getSeconds");
+    public static enum Field {
+        YEAR("YEAR", "getYear"),
+            MONTH("MONTH", "getMonth"),
+            DAY("DAY", "getDate"),
+            HOUR("HOUR", "getHours"),
+            MINUTE("MINUTE", "getMinutes"),
+            SECOND("SECOND", "getSeconds");
 
-    String fieldName, fieldMethod;
+        String fieldName, fieldMethod;
 
-    Field(String fieldName, String fieldMethod) {
-      this.fieldName = fieldName;
-      this.fieldMethod = fieldMethod;
+        Field(String fieldName, String fieldMethod) {
+            this.fieldName = fieldName;
+            this.fieldMethod = fieldMethod;
+        }
     }
-  }
 
-  private Field extractField;
+    private Field extractField;
 
-  /**
-   * Initializer for a ExtractOperatorNode
-   *
-   * @param field		The field to extract
-   * @param operand	The operand
-   */
-  public void init(Object field, Object operand) throws StandardException {
-    extractField = (Field)field;
-    super.init(operand,
-               "EXTRACT "+ extractField.fieldName,
-               extractField.fieldMethod);
-  }
+    /**
+     * Initializer for a ExtractOperatorNode
+     *
+     * @param field     The field to extract
+     * @param operand The operand
+     */
+    public void init(Object field, Object operand) throws StandardException {
+        extractField = (Field)field;
+        super.init(operand,
+                   "EXTRACT "+ extractField.fieldName,
+                   extractField.fieldMethod);
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    ExtractOperatorNode other = (ExtractOperatorNode)node;
-    this.extractField = other.extractField;
-  }
+        ExtractOperatorNode other = (ExtractOperatorNode)node;
+        this.extractField = other.extractField;
+    }
 
-  public String toString() {
-    return "fieldName: " + extractField.fieldName + "\n" +
-      super.toString();
-  }
+    public String toString() {
+        return "fieldName: " + extractField.fieldName + "\n" +
+            super.toString();
+    }
 
 }

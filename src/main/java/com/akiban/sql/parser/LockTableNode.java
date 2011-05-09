@@ -42,53 +42,53 @@ import com.akiban.sql.StandardException;
 
 /**
  * A LockTableNode is the root of a QueryTree that represents a LOCK TABLE command:
- *	LOCK TABLE <TableName> IN SHARE/EXCLUSIVE MODE
+ *  LOCK TABLE <TableName> IN SHARE/EXCLUSIVE MODE
  *
  */
 
 public class LockTableNode extends MiscellaneousStatementNode
 {
-  private TableName tableName;
-  private boolean exclusiveMode;
+    private TableName tableName;
+    private boolean exclusiveMode;
 
-  /**
-   * Initializer for LockTableNode
-   *
-   * @param tableName The table to lock
-   * @param exclusiveMode boolean, whether or not to get an exclusive lock.
-   */
-  public void init(Object tableName, Object exclusiveMode) {
-    this.tableName = (TableName)tableName;
-    this.exclusiveMode = ((Boolean)exclusiveMode).booleanValue();
-  }
+    /**
+     * Initializer for LockTableNode
+     *
+     * @param tableName The table to lock
+     * @param exclusiveMode boolean, whether or not to get an exclusive lock.
+     */
+    public void init(Object tableName, Object exclusiveMode) {
+        this.tableName = (TableName)tableName;
+        this.exclusiveMode = ((Boolean)exclusiveMode).booleanValue();
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    LockTableNode other = (LockTableNode)node;
-    this.tableName = (TableName)getNodeFactory().copyNode(other.tableName,
-                                                          getParserContext());
-    this.exclusiveMode = other.exclusiveMode;
-  }
+        LockTableNode other = (LockTableNode)node;
+        this.tableName = (TableName)getNodeFactory().copyNode(other.tableName,
+                                                              getParserContext());
+        this.exclusiveMode = other.exclusiveMode;
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
-  public String toString() {
-    return "tableName: " + tableName + "\n" +
-      "exclusiveMode: " + exclusiveMode + "\n" +
-      super.toString();
-  }
+    public String toString() {
+        return "tableName: " + tableName + "\n" +
+            "exclusiveMode: " + exclusiveMode + "\n" +
+            super.toString();
+    }
 
-  public String statementToString() {
-    return "LOCK TABLE";
-  }
+    public String statementToString() {
+        return "LOCK TABLE";
+    }
 
 }

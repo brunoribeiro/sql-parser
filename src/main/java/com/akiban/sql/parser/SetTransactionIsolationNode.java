@@ -48,41 +48,41 @@ import com.akiban.sql.StandardException;
 
 public class SetTransactionIsolationNode extends TransactionStatementNode
 {
-  private IsolationLevel isolationLevel;
+    private IsolationLevel isolationLevel;
 
-  /**
-   * Initializer for SetTransactionIsolationNode
-   *
-   * @param isolationLevel The new isolation level
-   */
-  public void init(Object isolationLevel) {
-    this.isolationLevel = (IsolationLevel)isolationLevel;
-  }
+    /**
+     * Initializer for SetTransactionIsolationNode
+     *
+     * @param isolationLevel The new isolation level
+     */
+    public void init(Object isolationLevel) {
+        this.isolationLevel = (IsolationLevel)isolationLevel;
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    SetTransactionIsolationNode other = (SetTransactionIsolationNode)node;
-    this.isolationLevel = other.isolationLevel;
-  }
+        SetTransactionIsolationNode other = (SetTransactionIsolationNode)node;
+        this.isolationLevel = other.isolationLevel;
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
-  public String toString() {
-    return "isolationLevel: " + isolationLevel + "\n" +
-      super.toString();
-  }
+    public String toString() {
+        return "isolationLevel: " + isolationLevel + "\n" +
+            super.toString();
+    }
 
-  public String statementToString() {
-    return "SET TRANSACTION ISOLATION";
-  }
+    public String statementToString() {
+        return "SET TRANSACTION ISOLATION";
+    }
 
 }

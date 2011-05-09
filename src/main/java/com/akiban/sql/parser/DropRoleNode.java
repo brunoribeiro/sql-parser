@@ -48,43 +48,43 @@ import com.akiban.sql.StandardException;
 
 public class DropRoleNode extends DDLStatementNode
 {
-  private String roleName;
+    private String roleName;
 
-  /**
-   * Initializer for a DropRoleNode
-   *
-   * @param roleName      The name of the object being dropped
-   *
-   */
-  public void init(Object roleName) throws StandardException {
-    initAndCheck(null);
-    this.roleName = (String)roleName;
-  }
+    /**
+     * Initializer for a DropRoleNode
+     *
+     * @param roleName          The name of the object being dropped
+     *
+     */
+    public void init(Object roleName) throws StandardException {
+        initAndCheck(null);
+        this.roleName = (String)roleName;
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    DropRoleNode other = (DropRoleNode)node;
-    this.roleName = other.roleName;
-  }
+        DropRoleNode other = (DropRoleNode)node;
+        this.roleName = other.roleName;
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return  This object as a String
-   */
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return  This object as a String
+     */
 
-  public String toString() {
-    return super.toString() +
-      "roleName: " +  roleName + "\n";
-  }
+    public String toString() {
+        return super.toString() +
+            "roleName: " +  roleName + "\n";
+    }
 
-  public String statementToString() {
-    return "DROP ROLE";
-  }
+    public String statementToString() {
+        return "DROP ROLE";
+    }
 
 }

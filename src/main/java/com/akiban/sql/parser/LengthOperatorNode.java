@@ -49,25 +49,25 @@ import java.sql.Types;
 
 public final class LengthOperatorNode extends UnaryOperatorNode
 {
-  private int parameterType;
-  private int parameterWidth;
+    private int parameterType;
+    private int parameterWidth;
 
-  public void setNodeType(int nodeType) {
-    String operator = null;
-    String methodName = null;
+    public void setNodeType(int nodeType) {
+        String operator = null;
+        String methodName = null;
 
-    if (nodeType == NodeTypes.CHAR_LENGTH_OPERATOR_NODE) {
-      operator = "char_length";
-      methodName = "charLength";
-      parameterType = Types.VARCHAR;
-      parameterWidth = TypeId.VARCHAR_MAXWIDTH;
+        if (nodeType == NodeTypes.CHAR_LENGTH_OPERATOR_NODE) {
+            operator = "char_length";
+            methodName = "charLength";
+            parameterType = Types.VARCHAR;
+            parameterWidth = TypeId.VARCHAR_MAXWIDTH;
+        }
+        else {
+            assert false : "Unexpected nodeType = " + nodeType;
+        }
+        setOperator(operator);
+        setMethodName(methodName);
+        super.setNodeType(nodeType);
     }
-    else {
-      assert false : "Unexpected nodeType = " + nodeType;
-    }
-    setOperator(operator);
-    setMethodName(methodName);
-    super.setNodeType(nodeType);
-  }
 
 }

@@ -47,15 +47,15 @@ import com.akiban.sql.StandardException;
 
 public class SimpleStringOperatorNode extends UnaryOperatorNode
 {
-  /**
-   * Initializer for a SimpleOperatorNode
-   *
-   * @param operand The operand
-   * @param methodName The method name
-   */
+    /**
+     * Initializer for a SimpleOperatorNode
+     *
+     * @param operand The operand
+     * @param methodName The method name
+     */
 
-  public void init(Object operand, Object methodName) throws StandardException {
-    super.init(operand, methodName, methodName);
-  }
+    public void init(Object operand, Object methodName) throws StandardException {
+        super.init(operand, methodName, methodName);
+    }
 
 }

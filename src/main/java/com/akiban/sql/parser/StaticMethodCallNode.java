@@ -44,94 +44,94 @@ import com.akiban.sql.StandardException;
  * A StaticMethodCallNode represents a static method call from a Class
  * (as opposed to from an Object).
 
-   For a procedure the call requires that the arguments be ? parameters.
-   The parameter is *logically* passed into the method call a number of different ways.
+     For a procedure the call requires that the arguments be ? parameters.
+     The parameter is *logically* passed into the method call a number of different ways.
 
-   <P>
-   For a application call like CALL MYPROC(?) the logically Java method call is
-   (in psuedo Java/SQL code) (examples with CHAR(10) parameter)
-   <BR>
-   Fixed length IN parameters - com.acme.MyProcedureMethod(?)
-   <BR>
-   Variable length IN parameters - com.acme.MyProcedureMethod(CAST (? AS CHAR(10))
-   <BR>
-   Fixed length INOUT parameter -
-		String[] holder = new String[] {?}; com.acme.MyProcedureMethod(holder); ? = holder[0]
-   <BR>
-   Variable length INOUT parameter -
-		String[] holder = new String[] {CAST (? AS CHAR(10)}; com.acme.MyProcedureMethod(holder); ? = CAST (holder[0] AS CHAR(10))
+     <P>
+     For a application call like CALL MYPROC(?) the logically Java method call is
+     (in psuedo Java/SQL code) (examples with CHAR(10) parameter)
+     <BR>
+     Fixed length IN parameters - com.acme.MyProcedureMethod(?)
+     <BR>
+     Variable length IN parameters - com.acme.MyProcedureMethod(CAST (? AS CHAR(10))
+     <BR>
+     Fixed length INOUT parameter -
+        String[] holder = new String[] {?}; com.acme.MyProcedureMethod(holder); ? = holder[0]
+     <BR>
+     Variable length INOUT parameter -
+        String[] holder = new String[] {CAST (? AS CHAR(10)}; com.acme.MyProcedureMethod(holder); ? = CAST (holder[0] AS CHAR(10))
 
-   <BR>
-   Fixed length OUT parameter -
-		String[] holder = new String[1]; com.acme.MyProcedureMethod(holder); ? = holder[0]
+     <BR>
+     Fixed length OUT parameter -
+        String[] holder = new String[1]; com.acme.MyProcedureMethod(holder); ? = holder[0]
 
-   <BR>
-   Variable length INOUT parameter -
-		String[] holder = new String[1]; com.acme.MyProcedureMethod(holder); ? = CAST (holder[0] AS CHAR(10))
+     <BR>
+     Variable length INOUT parameter -
+        String[] holder = new String[1]; com.acme.MyProcedureMethod(holder); ? = CAST (holder[0] AS CHAR(10))
 
 
-    <P>
-	For static method calls there is no pre-definition of an IN or INOUT parameter, so a call to CallableStatement.registerOutParameter()
-	makes the parameter an INOUT parameter, provided:
-		- the parameter is passed directly to the method call (no casts or expressions).
-		- the method's parameter type is a Java array type.
+        <P>
+    For static method calls there is no pre-definition of an IN or INOUT parameter, so a call to CallableStatement.registerOutParameter()
+    makes the parameter an INOUT parameter, provided:
+        - the parameter is passed directly to the method call (no casts or expressions).
+        - the method's parameter type is a Java array type.
 
-    Since this is a dynmaic decision we compile in code to take both paths, based upon a boolean isINOUT which is dervied from the
-	ParameterValueSet. Code is logically (only single parameter String[] shown here). Note, no casts can exist here.
+        Since this is a dynmaic decision we compile in code to take both paths, based upon a boolean isINOUT which is dervied from the
+    ParameterValueSet. Code is logically (only single parameter String[] shown here). Note, no casts can exist here.
 
-	boolean isINOUT = getParameterValueSet().getParameterMode(0) == PARAMETER_IN_OUT;
-	if (isINOUT) {
-		String[] holder = new String[] {?}; com.acme.MyProcedureMethod(holder); ? = holder[0]
-	   
-	} else {
-		com.acme.MyProcedureMethod(?)
-	}
+    boolean isINOUT = getParameterValueSet().getParameterMode(0) == PARAMETER_IN_OUT;
+    if (isINOUT) {
+        String[] holder = new String[] {?}; com.acme.MyProcedureMethod(holder); ? = holder[0]
+         
+    } else {
+        com.acme.MyProcedureMethod(?)
+    }
 
  *
  */
 public class StaticMethodCallNode extends MethodCallNode
 {
-  private TableName procedureName;
+    private TableName procedureName;
 
-  /**
-   * Intializer for a NonStaticMethodCallNode
-   *
-   * @param methodName The name of the method to call
-   * @param javaClassName The name of the java class that the static method belongs to.
-   */
-  public void init(Object methodName, Object javaClassName) {
-    if (methodName instanceof String)
-      init(methodName);
-    else {
-      procedureName = (TableName)methodName;
-      init(procedureName.getTableName());
+    /**
+     * Intializer for a NonStaticMethodCallNode
+     *
+     * @param methodName The name of the method to call
+     * @param javaClassName The name of the java class that the static method belongs to.
+     */
+    public void init(Object methodName, Object javaClassName) {
+        if (methodName instanceof String)
+            init(methodName);
+        else {
+            procedureName = (TableName)methodName;
+            init(procedureName.getTableName());
+        }
+
+        this.javaClassName = (String)javaClassName;
     }
 
-    this.javaClassName = (String)javaClassName;
-  }
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+        StaticMethodCallNode other = (StaticMethodCallNode)node;
+        this.procedureName = (TableName)getNodeFactory().copyNode(other.procedureName,
+                                                                  getParserContext());
+    }
 
-    StaticMethodCallNode other = (StaticMethodCallNode)node;
-    this.procedureName = (TableName)getNodeFactory().copyNode(other.procedureName,
-                                                              getParserContext());
-  }
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
-
-  public String toString() {
-    return "javaClassName: " +
-      (javaClassName != null ? javaClassName : "null") + "\n" +
-      super.toString();
-  }
+    public String toString() {
+        return "javaClassName: " +
+            (javaClassName != null ? javaClassName : "null") + "\n" +
+            super.toString();
+    }
 
 }

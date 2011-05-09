@@ -47,7 +47,7 @@ package com.akiban.sql.parser;
 
 public class CurrentRowLocationNode extends ValueNode
 {
-  protected boolean isEquivalent(ValueNode o) {
-    return false;
-  }
+    protected boolean isEquivalent(ValueNode o) {
+        return false;
+    }
 }

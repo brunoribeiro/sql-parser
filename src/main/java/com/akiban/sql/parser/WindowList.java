@@ -47,10 +47,10 @@ package com.akiban.sql.parser;
 
 public class WindowList extends QueryTreeNodeList<WindowDefinitionNode>
 {
-  /**
-   * @param window the window definition to add to the list
-   */
-  public void addWindow(WindowDefinitionNode window) {
-    add(window);
-  }
+    /**
+     * @param window the window definition to add to the list
+     */
+    public void addWindow(WindowDefinitionNode window) {
+        add(window);
+    }
 }

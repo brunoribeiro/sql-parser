@@ -47,13 +47,13 @@ import com.akiban.sql.StandardException;
  */
 public interface Visitable
 {
-  /**
-   * Accept a visitor, and call v.visit()
-   * on child nodes as necessary.  
-   * 
-   * @param v the visitor
-   *
-   * @exception StandardException on error
-   */
-  abstract Visitable accept(Visitor v) throws StandardException;
+    /**
+     * Accept a visitor, and call v.visit()
+     * on child nodes as necessary.  
+     * 
+     * @param v the visitor
+     *
+     * @exception StandardException on error
+     */
+    abstract Visitable accept(Visitor v) throws StandardException;
 }

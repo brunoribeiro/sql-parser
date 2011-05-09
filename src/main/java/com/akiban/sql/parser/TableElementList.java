@@ -46,14 +46,14 @@ package com.akiban.sql.parser;
 
 public class TableElementList extends QueryTreeNodeList<TableElementNode>
 {
-  /**
-   * Add a TableElementNode to this TableElementList
-   *
-   * @param tableElement The TableElementNode to add to this list
-   */
+    /**
+     * Add a TableElementNode to this TableElementList
+     *
+     * @param tableElement The TableElementNode to add to this list
+     */
 
-  public void addTableElement(TableElementNode tableElement) {
-    add(tableElement);
-  } 
+    public void addTableElement(TableElementNode tableElement) {
+        add(tableElement);
+    } 
 
 }

@@ -44,40 +44,40 @@ import com.akiban.sql.StandardException;
 
 public class IsNode extends BinaryLogicalOperatorNode
 {
-  private boolean notMe; // set to true if we're to negate the sense of this node
+    private boolean notMe; // set to true if we're to negate the sense of this node
 
-  /**
-   * Initializer for an IsNode
-   *
-   * @param leftOperand The left operand of the IS
-   * @param rightOperand The right operand of the IS
-   * @param notMe Whether to reverse the sense of this node.
-   */
+    /**
+     * Initializer for an IsNode
+     *
+     * @param leftOperand The left operand of the IS
+     * @param rightOperand The right operand of the IS
+     * @param notMe Whether to reverse the sense of this node.
+     */
 
-  public void init(Object leftOperand,
-                   Object rightOperand,
-                   Object notMe) {
-    // the false for shortCir
-    super.init(leftOperand, rightOperand, "is");
-    this.notMe = ((Boolean)notMe).booleanValue();
-  }
+    public void init(Object leftOperand,
+                     Object rightOperand,
+                     Object notMe) {
+        // the false for shortCir
+        super.init(leftOperand, rightOperand, "is");
+        this.notMe = ((Boolean)notMe).booleanValue();
+    }
 
-  /**
-   * Fill this node with a deep copy of the given node.
-   */
-  public void copyFrom(QueryTreeNode node) throws StandardException {
-    super.copyFrom(node);
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
 
-    IsNode other = (IsNode)node;
-    this.notMe = other.notMe;
-  }
+        IsNode other = (IsNode)node;
+        this.notMe = other.notMe;
+    }
 
-  public boolean isNegated() {
-    return notMe;
-  }
+    public boolean isNegated() {
+        return notMe;
+    }
 
-  public void toggleNegated() {
-    notMe = !notMe;
-  }
+    public void toggleNegated() {
+        notMe = !notMe;
+    }
 
 }

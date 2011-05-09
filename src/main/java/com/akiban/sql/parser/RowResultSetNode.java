@@ -46,43 +46,43 @@ package com.akiban.sql.parser;
 public class RowResultSetNode extends FromTable
 {
 
-  /**
-   * Initializer for a RowResultSetNode.
-   *
-   * @param valuesClause The result column list for the VALUES clause.
-   * @param tableProperties Properties list associated with the table
-   */
-  public void init(Object valuesClause, Object tableProperties) {
-    super.init(null, tableProperties);
-    resultColumns = (ResultColumnList)valuesClause;
-    if (resultColumns != null)
-      resultColumns.markInitialSize();
-  }
+    /**
+     * Initializer for a RowResultSetNode.
+     *
+     * @param valuesClause The result column list for the VALUES clause.
+     * @param tableProperties Properties list associated with the table
+     */
+    public void init(Object valuesClause, Object tableProperties) {
+        super.init(null, tableProperties);
+        resultColumns = (ResultColumnList)valuesClause;
+        if (resultColumns != null)
+            resultColumns.markInitialSize();
+    }
 
-  /**
-   * Convert this object to a String.  See comments in QueryTreeNode.java
-   * for how this should be done for tree printing.
-   *
-   * @return This object as a String
-   */
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
-  public String toString() {
-    return super.toString();
-  }
+    public String toString() {
+        return super.toString();
+    }
 
-  public String statementToString() {
-    return "VALUES";
-  }
+    public String statementToString() {
+        return "VALUES";
+    }
 
-  /**
-   * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-   * how tree printing is supposed to work.
-   *
-   * @param depth The depth of this node in the tree
-   */
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
 
-  public void printSubNodes(int depth) {
-    super.printSubNodes(depth);
-  }
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+    }
 
 }

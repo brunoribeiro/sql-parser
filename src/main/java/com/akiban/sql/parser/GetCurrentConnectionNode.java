@@ -44,16 +44,16 @@ package com.akiban.sql.parser;
 
 public final class GetCurrentConnectionNode extends JavaValueNode
 {
-  /**
-   * Constructor for a GetCurrentConnectionNode
-   *
-   */
-  public GetCurrentConnectionNode() {
-    /*
-    ** The result type of getCurrentConnection is
-    ** java.sql.Connection
-    */
-    setJavaTypeName("java.sql.Connection");
-  }
+    /**
+     * Constructor for a GetCurrentConnectionNode
+     *
+     */
+    public GetCurrentConnectionNode() {
+        /*
+        ** The result type of getCurrentConnection is
+        ** java.sql.Connection
+        */
+        setJavaTypeName("java.sql.Connection");
+    }
 
 }
