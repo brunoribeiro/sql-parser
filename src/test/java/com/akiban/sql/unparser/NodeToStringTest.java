@@ -58,7 +58,7 @@ public class NodeToStringTest extends TestBase
     @Test
     public void testUnparser() throws Exception {
         StatementNode stmt = parser.parseStatement(sql);
-        assertEquals(expected, unparser.toString(stmt));
+        assertEquals(caseName, expected, unparser.toString(stmt));
     }
 
 }

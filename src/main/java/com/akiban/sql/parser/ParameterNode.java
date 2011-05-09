@@ -126,4 +126,16 @@ public class ParameterNode extends ValueNode
         return false;
     }
 
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+
+    public String toString() {
+        return "number: " + parameterNumber + "\n" +
+            super.toString();
+    }
+
 }
