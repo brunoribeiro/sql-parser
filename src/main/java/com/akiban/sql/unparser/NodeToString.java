@@ -589,7 +589,7 @@ public class NodeToString
     }
 
     protected String parameterNode(ParameterNode node) throws StandardException {
-        return "?";
+        return "$" + (node.getParameterNumber() + 1);
     }
 
     protected String castNode(CastNode node) throws StandardException {
