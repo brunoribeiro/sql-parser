@@ -31,27 +31,27 @@ import java.io.StringWriter;
 @Ignore
 public class ASTTransformTestBase extends TestBase
 {
-  protected ASTTransformTestBase(String caseName, String sql, String expected) {
-    super(caseName, sql, expected);
-  }
+    protected ASTTransformTestBase(String caseName, String sql, String expected) {
+        super(caseName, sql, expected);
+    }
 
-  public static final File RESOURCE_DIR = 
-    new File("src/test/resources/"
-             + ASTTransformTestBase.class.getPackage().getName().replace('.', '/'));
+    public static final File RESOURCE_DIR = 
+        new File("src/test/resources/"
+                 + ASTTransformTestBase.class.getPackage().getName().replace('.', '/'));
 
-  protected SQLParser parser;
-  protected NodeToString unparser;
+    protected SQLParser parser;
+    protected NodeToString unparser;
 
-  @Before
-  public void makeTransformers() throws Exception {
-    parser = new SQLParser();
-    unparser = new NodeToString();
-  }
+    @Before
+    public void makeTransformers() throws Exception {
+        parser = new SQLParser();
+        unparser = new NodeToString();
+    }
 
-  protected String getTree(StatementNode stmt) throws IOException {
-    StringWriter str = new StringWriter();
-    stmt.treePrint(str);
-    return str.toString().trim();
-  }
+    protected String getTree(StatementNode stmt) throws IOException {
+        StringWriter str = new StringWriter();
+        stmt.treePrint(str);
+        return str.toString().trim();
+    }
 
 }

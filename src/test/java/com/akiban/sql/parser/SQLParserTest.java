@@ -35,35 +35,35 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class SQLParserTest extends TestBase
 {
-  public static final File RESOURCE_DIR = 
-    new File("src/test/resources/"
-             + SQLParserTest.class.getPackage().getName().replace('.', '/'));
+    public static final File RESOURCE_DIR = 
+        new File("src/test/resources/"
+                 + SQLParserTest.class.getPackage().getName().replace('.', '/'));
 
-  protected SQLParser parser;
+    protected SQLParser parser;
 
-  @Before
-  public void before() throws Exception {
-    parser = new SQLParser();
-  }
+    @Before
+    public void before() throws Exception {
+        parser = new SQLParser();
+    }
 
-  protected String getTree(StatementNode stmt) throws IOException {
-    StringWriter str = new StringWriter();
-    stmt.treePrint(str);
-    return str.toString().trim();
-  }
+    protected String getTree(StatementNode stmt) throws IOException {
+        StringWriter str = new StringWriter();
+        stmt.treePrint(str);
+        return str.toString().trim();
+    }
 
-  @Parameters
-  public static Collection<Object[]> queries() throws Exception {
-    return sqlAndExpected(RESOURCE_DIR);
-  }
+    @Parameters
+    public static Collection<Object[]> queries() throws Exception {
+        return sqlAndExpected(RESOURCE_DIR);
+    }
 
-  public SQLParserTest(String caseName, String sql, String expected) {
-    super(caseName, sql, expected);
-  }
+    public SQLParserTest(String caseName, String sql, String expected) {
+        super(caseName, sql, expected);
+    }
 
-  @Test
-  public void testParser() throws Exception {
-    StatementNode stmt = parser.parseStatement(sql);
-    assertEqualsWithoutHashes(caseName, expected, getTree(stmt));
-  }
+    @Test
+    public void testParser() throws Exception {
+        StatementNode stmt = parser.parseStatement(sql);
+        assertEqualsWithoutHashes(caseName, expected, getTree(stmt));
+    }
 }

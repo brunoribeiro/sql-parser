@@ -29,23 +29,23 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class CloneTest extends ASTTransformTestBase
 {
-  public static final File RESOURCE_DIR = 
-    new File(ASTTransformTestBase.RESOURCE_DIR, "clone");
+    public static final File RESOURCE_DIR = 
+        new File(ASTTransformTestBase.RESOURCE_DIR, "clone");
 
-  @Parameters
-  public static Collection<Object[]> statements() throws Exception {
-    return sqlAndExpected(RESOURCE_DIR);
-  }
+    @Parameters
+    public static Collection<Object[]> statements() throws Exception {
+        return sqlAndExpected(RESOURCE_DIR);
+    }
 
-  public CloneTest(String caseName, String sql, String expected) {
-    super(caseName, sql, expected);
-  }
+    public CloneTest(String caseName, String sql, String expected) {
+        super(caseName, sql, expected);
+    }
 
-  @Test
-  public void testClone() throws Exception {
-    StatementNode stmt = parser.parseStatement(sql);
-    stmt = (StatementNode)parser.getNodeFactory().copyNode(stmt, parser);
-    assertEquals(expected, unparser.toString(stmt));
-  }
+    @Test
+    public void testClone() throws Exception {
+        StatementNode stmt = parser.parseStatement(sql);
+        stmt = (StatementNode)parser.getNodeFactory().copyNode(stmt, parser);
+        assertEquals(expected, unparser.toString(stmt));
+    }
 
 }

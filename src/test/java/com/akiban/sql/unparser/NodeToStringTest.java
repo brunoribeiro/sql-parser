@@ -33,32 +33,32 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class NodeToStringTest extends TestBase
 {
-  public static final File RESOURCE_DIR = 
-    new File("src/test/resources/"
-             + NodeToStringTest.class.getPackage().getName().replace('.', '/'));
+    public static final File RESOURCE_DIR = 
+        new File("src/test/resources/"
+                 + NodeToStringTest.class.getPackage().getName().replace('.', '/'));
 
-  protected SQLParser parser;
-  protected NodeToString unparser;
+    protected SQLParser parser;
+    protected NodeToString unparser;
 
-  @Before
-  public void before() throws Exception {
-    parser = new SQLParser();
-    unparser = new NodeToString();
-  }
+    @Before
+    public void before() throws Exception {
+        parser = new SQLParser();
+        unparser = new NodeToString();
+    }
 
-  @Parameters
-  public static Collection<Object[]> statements() throws Exception {
-    return sqlAndExpected(RESOURCE_DIR);
-  }
+    @Parameters
+    public static Collection<Object[]> statements() throws Exception {
+        return sqlAndExpected(RESOURCE_DIR);
+    }
 
-  public NodeToStringTest(String caseName, String sql, String expected) {
-    super(caseName, sql, expected);
-  }
+    public NodeToStringTest(String caseName, String sql, String expected) {
+        super(caseName, sql, expected);
+    }
 
-  @Test
-  public void testUnparser() throws Exception {
-    StatementNode stmt = parser.parseStatement(sql);
-    assertEquals(expected, unparser.toString(stmt));
-  }
+    @Test
+    public void testUnparser() throws Exception {
+        StatementNode stmt = parser.parseStatement(sql);
+        assertEquals(expected, unparser.toString(stmt));
+    }
 
 }

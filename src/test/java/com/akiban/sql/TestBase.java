@@ -31,84 +31,84 @@ import java.util.Comparator;
 @Ignore
 public class TestBase
 {
-  protected TestBase() {
-  }
-
-  protected String caseName, sql, expected;
-
-  protected TestBase(String caseName, String sql, String expected) {
-    this.caseName = caseName;
-    this.sql = sql;
-    this.expected = expected;
-  }
-
-  public static File[] listSQLFiles(File dir) {
-    File[] result = dir.listFiles(new RegexFilenameFilter(".*\\.sql"));
-    Arrays.sort(result, new Comparator<File>() {
-                  public int compare(File f1, File f2) {
-                    return f1.getName().compareTo(f2.getName());
-                  }
-                });
-    return result;
-  }
-
-  public static File expectedFile(File sqlFile) {
-    return new File(sqlFile.getParentFile(),
-                    sqlFile.getName().replace(".sql", ".expected"));
-  }
-
-  public static String fileContents(File file) throws IOException {
-    FileReader reader = null;
-    try {
-      reader = new FileReader(file);
-      StringBuilder str = new StringBuilder();
-      char[] buf = new char[128];
-      while (true) {
-        int nc = reader.read(buf);
-        if (nc < 0) break;
-        str.append(buf, 0, nc);
-      }
-      return str.toString();
+    protected TestBase() {
     }
-    finally {
-      if (reader != null) {
+
+    protected String caseName, sql, expected;
+
+    protected TestBase(String caseName, String sql, String expected) {
+        this.caseName = caseName;
+        this.sql = sql;
+        this.expected = expected;
+    }
+
+    public static File[] listSQLFiles(File dir) {
+        File[] result = dir.listFiles(new RegexFilenameFilter(".*\\.sql"));
+        Arrays.sort(result, new Comparator<File>() {
+                        public int compare(File f1, File f2) {
+                            return f1.getName().compareTo(f2.getName());
+                        }
+                    });
+        return result;
+    }
+
+    public static File expectedFile(File sqlFile) {
+        return new File(sqlFile.getParentFile(),
+                        sqlFile.getName().replace(".sql", ".expected"));
+    }
+
+    public static String fileContents(File file) throws IOException {
+        FileReader reader = null;
         try {
-          reader.close();
+            reader = new FileReader(file);
+            StringBuilder str = new StringBuilder();
+            char[] buf = new char[128];
+            while (true) {
+                int nc = reader.read(buf);
+                if (nc < 0) break;
+                str.append(buf, 0, nc);
+            }
+            return str.toString();
         }
-        catch (IOException ex) {
+        finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                }
+                catch (IOException ex) {
+                }
+            }
         }
-      }
     }
-  }
 
-  public static Collection<Object[]> sqlAndExpected(File dir) throws IOException {
-    Collection<Object[]> result = new ArrayList<Object[]>();
-    for (File sqlFile : listSQLFiles(dir)) {
-      result.add(new Object[] {
-                   sqlFile.getName().replace(".sql", ""),
-                   fileContents(sqlFile),
-                   fileContents(expectedFile(sqlFile))
-                 });
+    public static Collection<Object[]> sqlAndExpected(File dir) throws IOException {
+        Collection<Object[]> result = new ArrayList<Object[]>();
+        for (File sqlFile : listSQLFiles(dir)) {
+            result.add(new Object[] {
+                           sqlFile.getName().replace(".sql", ""),
+                           fileContents(sqlFile),
+                           fileContents(expectedFile(sqlFile))
+                       });
+        }
+        return result;
     }
-    return result;
-  }
 
-  protected static void assertEqualsWithoutHashes(String caseName,
-                                                  String expected, String actual) 
-      throws IOException {
-    assertEqualsWithoutPattern(caseName, 
-                               expected, actual, 
-                               CompareWithoutHashes.HASH_REGEX);
-  }
+    protected static void assertEqualsWithoutHashes(String caseName,
+                                                    String expected, String actual) 
+            throws IOException {
+        assertEqualsWithoutPattern(caseName, 
+                                   expected, actual, 
+                                   CompareWithoutHashes.HASH_REGEX);
+    }
 
-  protected static void assertEqualsWithoutPattern(String caseName,
-                                                   String expected, String actual, 
-                                                   String regex) 
-      throws IOException {
-    if (!new CompareWithoutHashes(regex).match(new StringReader(expected), 
-                                               new StringReader(actual)))
-      fail("Difference in " + caseName + 
-           ": expected='" + expected + "' actual='" + actual + "'");
-  }
+    protected static void assertEqualsWithoutPattern(String caseName,
+                                                     String expected, String actual, 
+                                                     String regex) 
+            throws IOException {
+        if (!new CompareWithoutHashes(regex).match(new StringReader(expected), 
+                                                   new StringReader(actual)))
+            fail("Difference in " + caseName + 
+                 ": expected='" + expected + "' actual='" + actual + "'");
+    }
 
 }

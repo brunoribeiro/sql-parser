@@ -30,30 +30,30 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class BooleanNormalizerTest extends ASTTransformTestBase
 {
-  public static final File RESOURCE_DIR = 
-    new File(ASTTransformTestBase.RESOURCE_DIR, "normalize");
+    public static final File RESOURCE_DIR = 
+        new File(ASTTransformTestBase.RESOURCE_DIR, "normalize");
 
-  protected BooleanNormalizer booleanNormalizer;
+    protected BooleanNormalizer booleanNormalizer;
 
-  @Before
-  public void makeNormalizer() throws Exception {
-    booleanNormalizer = new BooleanNormalizer(parser);
-  }
+    @Before
+    public void makeNormalizer() throws Exception {
+        booleanNormalizer = new BooleanNormalizer(parser);
+    }
 
-  @Parameters
-  public static Collection<Object[]> statements() throws Exception {
-    return sqlAndExpected(RESOURCE_DIR);
-  }
+    @Parameters
+    public static Collection<Object[]> statements() throws Exception {
+        return sqlAndExpected(RESOURCE_DIR);
+    }
 
-  public BooleanNormalizerTest(String caseName, String sql, String expected) {
-    super(caseName, sql, expected);
-  }
+    public BooleanNormalizerTest(String caseName, String sql, String expected) {
+        super(caseName, sql, expected);
+    }
 
-  @Test
-  public void testNormalizer() throws Exception {
-    StatementNode stmt = parser.parseStatement(sql);
-    stmt = booleanNormalizer.normalize(stmt);
-    assertEquals(expected, unparser.toString(stmt));
-  }
+    @Test
+    public void testNormalizer() throws Exception {
+        StatementNode stmt = parser.parseStatement(sql);
+        stmt = booleanNormalizer.normalize(stmt);
+        assertEquals(expected, unparser.toString(stmt));
+    }
 
 }
