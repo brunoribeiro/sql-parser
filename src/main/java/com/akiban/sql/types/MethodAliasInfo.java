@@ -45,30 +45,30 @@ package com.akiban.sql.types;
  */
 public class MethodAliasInfo implements AliasInfo
 {
-  private String methodName;
+    private String methodName;
 
-  /**
-   * Create a MethodAliasInfo
-   *
-   * @param methodName The name of the method for the alias.
-   */
-  public MethodAliasInfo(String methodName) {
-    this.methodName = methodName;
-  }
+    /**
+     * Create a MethodAliasInfo
+     *
+     * @param methodName The name of the method for the alias.
+     */
+    public MethodAliasInfo(String methodName) {
+        this.methodName = methodName;
+    }
 
-  /**
-     @see AliasInfo#getMethodName
-  */
-  public String getMethodName() {
-    return methodName;
-  }
+    /**
+         @see AliasInfo#getMethodName
+    */
+    public String getMethodName() {
+        return methodName;
+    }
 
-  public boolean isTableFunction() {
-    return false; 
-  }
+    public boolean isTableFunction() {
+        return false; 
+    }
 
-  public String toString() {
-    return methodName;
-  }
+    public String toString() {
+        return methodName;
+    }
 
 }

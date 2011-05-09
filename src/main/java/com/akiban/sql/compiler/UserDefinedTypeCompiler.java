@@ -46,66 +46,66 @@ import com.akiban.sql.types.TypeId;
 
 public class UserDefinedTypeCompiler extends TypeCompiler
 {
-  protected UserDefinedTypeCompiler(TypeId typeId) {
-    super(typeId);
-  }
-
-  /**
-   * Right now, casting is not allowed from one user defined type
-   * to another.
-   *
-   * @param otherType 
-   * @param forDataTypeFunction
-   * @return true if otherType is convertible to this type, else false.
-   * 
-   *@see TypeCompiler#convertible
-   */
-  public boolean convertible(TypeId otherType, boolean forDataTypeFunction) {
-    if (getTypeId().isAnsiUDT()) {
-      if (!otherType.isAnsiUDT() ) { 
-        return false; 
-      }
-      return getTypeId().getSQLTypeName().equals(otherType.getSQLTypeName());
+    protected UserDefinedTypeCompiler(TypeId typeId) {
+        super(typeId);
     }
-        
-    /*
-    ** We are a non-ANSI user defined type, we are
-    ** going to have to let the client find out
-    ** the hard way.
-    */
-    return true;
-  }
 
-  /** @see TypeCompiler#compatible */
-  public boolean compatible(TypeId otherType) {
-    return convertible(otherType, false);
-  }
-			
-  /**
-   * @see TypeCompiler#getCorrespondingPrimitiveTypeName
-   */
+    /**
+     * Right now, casting is not allowed from one user defined type
+     * to another.
+     *
+     * @param otherType 
+     * @param forDataTypeFunction
+     * @return true if otherType is convertible to this type, else false.
+     * 
+     *@see TypeCompiler#convertible
+     */
+    public boolean convertible(TypeId otherType, boolean forDataTypeFunction) {
+        if (getTypeId().isAnsiUDT()) {
+            if (!otherType.isAnsiUDT() ) { 
+                return false; 
+            }
+            return getTypeId().getSQLTypeName().equals(otherType.getSQLTypeName());
+        }
+                
+        /*
+        ** We are a non-ANSI user defined type, we are
+        ** going to have to let the client find out
+        ** the hard way.
+        */
+        return true;
+    }
 
-  public String getCorrespondingPrimitiveTypeName() {
-    return getTypeId().getCorrespondingJavaTypeName();
-  }
+    /** @see TypeCompiler#compatible */
+    public boolean compatible(TypeId otherType) {
+        return convertible(otherType, false);
+    }
+            
+    /**
+     * @see TypeCompiler#getCorrespondingPrimitiveTypeName
+     */
 
-  /**
-   * Get the method name for getting out the corresponding primitive
-   * Java type.
-   *
-   * @return String The method call name for getting the
-   *                corresponding primitive Java type.
-   */
-  public String getPrimitiveMethodName() {
-    return "getObject";
-  }
+    public String getCorrespondingPrimitiveTypeName() {
+        return getTypeId().getCorrespondingJavaTypeName();
+    }
 
-  /**
-   * @see TypeCompiler#getCastToCharWidth
-   */
-  public int getCastToCharWidth(DataTypeDescriptor dts) {
-    // This is the maximum maximum width for user types
-    return -1;
-  }
+    /**
+     * Get the method name for getting out the corresponding primitive
+     * Java type.
+     *
+     * @return String The method call name for getting the
+     *                              corresponding primitive Java type.
+     */
+    public String getPrimitiveMethodName() {
+        return "getObject";
+    }
+
+    /**
+     * @see TypeCompiler#getCastToCharWidth
+     */
+    public int getCastToCharWidth(DataTypeDescriptor dts) {
+        // This is the maximum maximum width for user types
+        return -1;
+    }
 
 }

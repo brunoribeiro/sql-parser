@@ -51,53 +51,53 @@ import com.akiban.sql.types.TypeId;
 
 public class BooleanTypeCompiler extends TypeCompiler
 {
-  protected BooleanTypeCompiler(TypeId typeId) {
-    super(typeId);
-  }
+    protected BooleanTypeCompiler(TypeId typeId) {
+        super(typeId);
+    }
 
-  /**
-   * Tell whether this type (boolean) can be converted to the given type.
-   *
-   * @see TypeCompiler#convertible
-   */
-  public boolean convertible(TypeId otherType, boolean forDataTypeFunction)
-  {
-    return (otherType.isStringTypeId() || otherType.isBooleanTypeId());
-  }
+    /**
+     * Tell whether this type (boolean) can be converted to the given type.
+     *
+     * @see TypeCompiler#convertible
+     */
+    public boolean convertible(TypeId otherType, boolean forDataTypeFunction)
+    {
+        return (otherType.isStringTypeId() || otherType.isBooleanTypeId());
+    }
 
-  /**
-   * Tell whether this type (boolean) is compatible with the given type.
-   *
-   * @param otherType     The TypeId of the other type.
-   */
-  public boolean compatible(TypeId otherType) {
-    return convertible(otherType,false);
-  }
+    /**
+     * Tell whether this type (boolean) is compatible with the given type.
+     *
+     * @param otherType         The TypeId of the other type.
+     */
+    public boolean compatible(TypeId otherType) {
+        return convertible(otherType,false);
+    }
 
-  /**
-   * @see TypeCompiler#getCorrespondingPrimitiveTypeName
-   */
-  public String getCorrespondingPrimitiveTypeName() {
-    /* Only numerics and booleans get mapped to Java primitives */
-    return "boolean";
-  }
+    /**
+     * @see TypeCompiler#getCorrespondingPrimitiveTypeName
+     */
+    public String getCorrespondingPrimitiveTypeName() {
+        /* Only numerics and booleans get mapped to Java primitives */
+        return "boolean";
+    }
 
-  /**
-   * Get the method name for getting out the corresponding primitive
-   * Java type.
-   *
-   * @return String The method call name for getting the
-   *                corresponding primitive Java type.
-   */
-  public String getPrimitiveMethodName() {
-    return "getBoolean";
-  }
+    /**
+     * Get the method name for getting out the corresponding primitive
+     * Java type.
+     *
+     * @return String The method call name for getting the
+     *                              corresponding primitive Java type.
+     */
+    public String getPrimitiveMethodName() {
+        return "getBoolean";
+    }
 
-  /**
-   * @see TypeCompiler#getCastToCharWidth
-   */
-  public int getCastToCharWidth(DataTypeDescriptor dts) {
-    return TypeCompiler.BOOLEAN_MAXWIDTH_AS_CHAR;
-  }
+    /**
+     * @see TypeCompiler#getCastToCharWidth
+     */
+    public int getCastToCharWidth(DataTypeDescriptor dts) {
+        return TypeCompiler.BOOLEAN_MAXWIDTH_AS_CHAR;
+    }
 
 }

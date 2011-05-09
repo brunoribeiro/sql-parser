@@ -51,58 +51,58 @@ import com.akiban.sql.types.TypeId;
 
 public class BitTypeCompiler extends TypeCompiler
 {
-  protected BitTypeCompiler(TypeId typeId) {
-    super(typeId);
-  }
-
-  /**
-   * Tell whether this type (bit) can be converted to the given type.
-   *
-   * @see TypeCompiler#convertible
-   */
-  public boolean convertible(TypeId otherType, boolean forDataTypeFunction) {
-    if (otherType.isAnsiUDT()) { 
-      return false; 
+    protected BitTypeCompiler(TypeId typeId) {
+        super(typeId);
     }
-    return (otherType.isBitTypeId() ||
-            otherType.isBlobTypeId() ||
-            otherType.userType());
-  }
 
-  /**
-   * Tell whether this type (bit) is compatible with the given type.
-   *
-   * @param otherType The TypeId of the other type.
-   */
-  public boolean compatible(TypeId otherType) {
-    if (otherType.isBlobTypeId())
-      return false;
-    return (otherType.isBitTypeId());
-  }
+    /**
+     * Tell whether this type (bit) can be converted to the given type.
+     *
+     * @see TypeCompiler#convertible
+     */
+    public boolean convertible(TypeId otherType, boolean forDataTypeFunction) {
+        if (otherType.isAnsiUDT()) { 
+            return false; 
+        }
+        return (otherType.isBitTypeId() ||
+                otherType.isBlobTypeId() ||
+                otherType.userType());
+    }
 
-  /**
-   * @see TypeCompiler#getCorrespondingPrimitiveTypeName
-   */
-  public String getCorrespondingPrimitiveTypeName() {
-    return "byte[]";
-  }
+    /**
+     * Tell whether this type (bit) is compatible with the given type.
+     *
+     * @param otherType The TypeId of the other type.
+     */
+    public boolean compatible(TypeId otherType) {
+        if (otherType.isBlobTypeId())
+            return false;
+        return (otherType.isBitTypeId());
+    }
 
-  /**
-   * Get the method name for getting out the corresponding primitive
-   * Java type.
-   *
-   * @return String The method call name for getting the
-   *                corresponding primitive Java type.
-   */
-  public String getPrimitiveMethodName() {
-    return "getBytes";
-  }
+    /**
+     * @see TypeCompiler#getCorrespondingPrimitiveTypeName
+     */
+    public String getCorrespondingPrimitiveTypeName() {
+        return "byte[]";
+    }
 
-  /**
-   * @see TypeCompiler#getCastToCharWidth
-   */
-  public int getCastToCharWidth(DataTypeDescriptor dts) {
-    return dts.getMaximumWidth();
-  }
+    /**
+     * Get the method name for getting out the corresponding primitive
+     * Java type.
+     *
+     * @return String The method call name for getting the
+     *                              corresponding primitive Java type.
+     */
+    public String getPrimitiveMethodName() {
+        return "getBytes";
+    }
+
+    /**
+     * @see TypeCompiler#getCastToCharWidth
+     */
+    public int getCastToCharWidth(DataTypeDescriptor dts) {
+        return dts.getMaximumWidth();
+    }
 
 }

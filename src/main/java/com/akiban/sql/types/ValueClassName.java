@@ -52,14 +52,14 @@ package com.akiban.sql.types;
 
 public interface ValueClassName
 {
-  String BitDataValue = "BitDataValue";
-  String BooleanDataValue = "BooleanDataValue";
-  String ConcatableDataValue  = "ConcatableDataValue";
-  String DataValueDescriptor = "DataValueDescriptor";
-  String DateTimeDataValue = "DateTimeDataValue";
-  String NumberDataValue = "NumberDataValue";
-  String RefDataValue = "RefDataValue";
-  String StringDataValue = "StringDataValue";
-  String UserDataValue = "UserDataValue";
-  String XMLDataValue  = "XMLDataValue";
+    String BitDataValue = "BitDataValue";
+    String BooleanDataValue = "BooleanDataValue";
+    String ConcatableDataValue  = "ConcatableDataValue";
+    String DataValueDescriptor = "DataValueDescriptor";
+    String DateTimeDataValue = "DateTimeDataValue";
+    String NumberDataValue = "NumberDataValue";
+    String RefDataValue = "RefDataValue";
+    String StringDataValue = "StringDataValue";
+    String UserDataValue = "UserDataValue";
+    String XMLDataValue  = "XMLDataValue";
 }

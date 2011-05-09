@@ -50,69 +50,69 @@ import com.akiban.sql.types.TypeId;
 
 public class XMLTypeCompiler extends TypeCompiler
 {
-  protected XMLTypeCompiler(TypeId typeId) {
-    super(typeId);
-  }
+    protected XMLTypeCompiler(TypeId typeId) {
+        super(typeId);
+    }
 
-  /**
-   * Tell whether this type (XML) can be converted to the given type.
-   *
-   * An XML value can't be converted to any other type, per
-   * SQL/XML[2003] 6.3 <cast specification>
-   *
-   * @see TypeCompiler#convertible
-   */
-  public boolean convertible(TypeId otherType, boolean forDataTypeFunction) {
-    // An XML value cannot be converted to any non-XML type.  If
-    // user wants to convert an XML value to a string, then
-    // s/he must use the provided SQL/XML serialization operator
-    // (namely, XMLSERIALIZE).
-    return otherType.isXMLTypeId();
-  }
+    /**
+     * Tell whether this type (XML) can be converted to the given type.
+     *
+     * An XML value can't be converted to any other type, per
+     * SQL/XML[2003] 6.3 <cast specification>
+     *
+     * @see TypeCompiler#convertible
+     */
+    public boolean convertible(TypeId otherType, boolean forDataTypeFunction) {
+        // An XML value cannot be converted to any non-XML type.    If
+        // user wants to convert an XML value to a string, then
+        // s/he must use the provided SQL/XML serialization operator
+        // (namely, XMLSERIALIZE).
+        return otherType.isXMLTypeId();
+    }
 
-  /**
-   * Tell whether this type (XML) is compatible with the given type.
-   *
-   * @param otherType The TypeId of the other type.
-   */
-  public boolean compatible(TypeId otherType) {
-    // An XML value is not compatible (i.e. cannot be "coalesced")
-    // into any non-XML type.
-    return otherType.isXMLTypeId();
-  }
+    /**
+     * Tell whether this type (XML) is compatible with the given type.
+     *
+     * @param otherType The TypeId of the other type.
+     */
+    public boolean compatible(TypeId otherType) {
+        // An XML value is not compatible (i.e. cannot be "coalesced")
+        // into any non-XML type.
+        return otherType.isXMLTypeId();
+    }
 
-  /**
-   * @see TypeCompiler#getCorrespondingPrimitiveTypeName
-   */
-  public String getCorrespondingPrimitiveTypeName() {
-    int formatId = getStoredFormatIdFromTypeId();
-    if (formatId == TypeId.FormatIds.XML_TYPE_ID)
-      return "org.apache.derby.iapi.types.XML"; // TODO: What is really used?
+    /**
+     * @see TypeCompiler#getCorrespondingPrimitiveTypeName
+     */
+    public String getCorrespondingPrimitiveTypeName() {
+        int formatId = getStoredFormatIdFromTypeId();
+        if (formatId == TypeId.FormatIds.XML_TYPE_ID)
+            return "org.apache.derby.iapi.types.XML"; // TODO: What is really used?
 
-    assert false : "unexpected formatId in getCorrespondingPrimitiveTypeName(): " + formatId;
-    return null;
-  }
+        assert false : "unexpected formatId in getCorrespondingPrimitiveTypeName(): " + formatId;
+        return null;
+    }
 
-  /**
-   * Get the method name for getting out the corresponding primitive
-   * Java type.
-   *
-   * @return String The method call name for getting the
-   *                corresponding primitive Java type.
-   */
-  public String getPrimitiveMethodName() {
-    return "getXML";            // TODO: How does this really work?
-  }
+    /**
+     * Get the method name for getting out the corresponding primitive
+     * Java type.
+     *
+     * @return String The method call name for getting the
+     *                              corresponding primitive Java type.
+     */
+    public String getPrimitiveMethodName() {
+        return "getXML";                        // TODO: How does this really work?
+    }
 
-  /**
-   * @see TypeCompiler#getCastToCharWidth
-   *
-   * While it is true XML values can't be cast to char, this method
-   * can get called before we finish type checking--so we return a dummy
-   * value here and let the type check throw the appropriate error.
-   */
-  public int getCastToCharWidth(DataTypeDescriptor dts) {
-    return -1;
-  }
+    /**
+     * @see TypeCompiler#getCastToCharWidth
+     *
+     * While it is true XML values can't be cast to char, this method
+     * can get called before we finish type checking--so we return a dummy
+     * value here and let the type check throw the appropriate error.
+     */
+    public int getCastToCharWidth(DataTypeDescriptor dts) {
+        return -1;
+    }
 
 }

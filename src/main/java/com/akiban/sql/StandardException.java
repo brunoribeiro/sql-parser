@@ -39,13 +39,13 @@
 package com.akiban.sql;
 
 public class StandardException extends Exception {
-  public StandardException(String msg) {
-    super(msg);
-  }
-  public StandardException(Throwable cause) {
-    super(cause);
-  }
-  public StandardException(String msg, Throwable cause) {
-    super(msg, cause);
-  }
+    public StandardException(String msg) {
+        super(msg);
+    }
+    public StandardException(Throwable cause) {
+        super(cause);
+    }
+    public StandardException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

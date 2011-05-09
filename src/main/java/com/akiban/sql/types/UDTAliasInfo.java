@@ -48,19 +48,19 @@ package com.akiban.sql.types;
  */
 public class UDTAliasInfo implements AliasInfo
 {
-  public UDTAliasInfo() {
-  }
+    public UDTAliasInfo() {
+    }
 
-  public boolean isTableFunction() {
-    return false; 
-  }
+    public boolean isTableFunction() {
+        return false; 
+    }
 
-  public String toString() {
-    return "LANGUAGE JAVA";
-  }
+    public String toString() {
+        return "LANGUAGE JAVA";
+    }
 
-  public String getMethodName()
-  {
-    return null;
-  }
+    public String getMethodName()
+    {
+        return null;
+    }
 }

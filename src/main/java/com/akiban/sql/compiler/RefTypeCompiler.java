@@ -51,46 +51,46 @@ import com.akiban.sql.types.TypeId;
 
 public class RefTypeCompiler extends TypeCompiler
 {
-  protected RefTypeCompiler(TypeId typeId) {
-    super(typeId);
-  }
+    protected RefTypeCompiler(TypeId typeId) {
+        super(typeId);
+    }
 
-  /** @see TypeCompiler#getCorrespondingPrimitiveTypeName */
-  public String getCorrespondingPrimitiveTypeName() {
-    assert false : "getCorrespondingPrimitiveTypeName not implemented for SQLRef";
-    return null;
-  }
+    /** @see TypeCompiler#getCorrespondingPrimitiveTypeName */
+    public String getCorrespondingPrimitiveTypeName() {
+        assert false : "getCorrespondingPrimitiveTypeName not implemented for SQLRef";
+        return null;
+    }
 
-  /**
-   * Get the method name for getting out the corresponding primitive
-   * Java type.
-   *
-   * @return String The method call name for getting the
-   *                corresponding primitive Java type.
-   */
-  public String getPrimitiveMethodName() {
-    return "getObject";
-  }
+    /**
+     * Get the method name for getting out the corresponding primitive
+     * Java type.
+     *
+     * @return String The method call name for getting the
+     *                              corresponding primitive Java type.
+     */
+    public String getPrimitiveMethodName() {
+        return "getObject";
+    }
 
-  /**
-   * @see TypeCompiler#getCastToCharWidth
-   */
-  public int getCastToCharWidth(DataTypeDescriptor dts) {
-    assert false : "getCastToCharWidth not implemented for SQLRef";
-    return 0;
-  }
+    /**
+     * @see TypeCompiler#getCastToCharWidth
+     */
+    public int getCastToCharWidth(DataTypeDescriptor dts) {
+        assert false : "getCastToCharWidth not implemented for SQLRef";
+        return 0;
+    }
 
-  /** @see TypeCompiler#convertible */
-  public boolean convertible(TypeId otherType, boolean forDataTypeFunction) {
-    return false;
-  }
+    /** @see TypeCompiler#convertible */
+    public boolean convertible(TypeId otherType, boolean forDataTypeFunction) {
+        return false;
+    }
 
-  /**
-   * Tell whether this type is compatible with the given type.
-   *
-   * @see TypeCompiler#compatible */
-  public boolean compatible(TypeId otherType) {
-    return convertible(otherType, false);
-  }
+    /**
+     * Tell whether this type is compatible with the given type.
+     *
+     * @see TypeCompiler#compatible */
+    public boolean compatible(TypeId otherType) {
+        return convertible(otherType, false);
+    }
 
 }

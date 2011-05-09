@@ -48,59 +48,59 @@ import java.sql.Types;
 
 public class DateTypeCompiler extends TypeCompiler
 {
-  protected DateTypeCompiler(TypeId typeId) {
-    super(typeId);
-  }
-
-  /**
-   * User types are convertible to other user types only if
-   * (for now) they are the same type and are being used to
-   * implement some JDBC type.  This is sufficient for
-   * date/time types; it may be generalized later for e.g.
-   * comparison of any user type with one of its subtypes.
-   *
-   * @see TypeCompiler#convertible
-   */
-  public boolean convertible(TypeId otherType, boolean forDataTypeFunction) {
-    if (otherType.isStringTypeId() && !otherType.isLongConcatableTypeId()) {
-      return true;
+    protected DateTypeCompiler(TypeId typeId) {
+        super(typeId);
     }
-    return (getStoredFormatIdFromTypeId() == otherType.getTypeFormatId());
-  }
 
-  /**
-   * Tell whether this type (date) is compatible with the given type.
-   *
-   * @param otherType     The TypeId of the other type.
-   */
-  public boolean compatible(TypeId otherType) {
-    return convertible(otherType,false);
-  }
-			
-  /**
-   * @see TypeCompiler#getCorrespondingPrimitiveTypeName
-   */
+    /**
+     * User types are convertible to other user types only if
+     * (for now) they are the same type and are being used to
+     * implement some JDBC type.    This is sufficient for
+     * date/time types; it may be generalized later for e.g.
+     * comparison of any user type with one of its subtypes.
+     *
+     * @see TypeCompiler#convertible
+     */
+    public boolean convertible(TypeId otherType, boolean forDataTypeFunction) {
+        if (otherType.isStringTypeId() && !otherType.isLongConcatableTypeId()) {
+            return true;
+        }
+        return (getStoredFormatIdFromTypeId() == otherType.getTypeFormatId());
+    }
 
-  public String getCorrespondingPrimitiveTypeName() {
-    return "java.sql.Date";
-  }
+    /**
+     * Tell whether this type (date) is compatible with the given type.
+     *
+     * @param otherType         The TypeId of the other type.
+     */
+    public boolean compatible(TypeId otherType) {
+        return convertible(otherType,false);
+    }
+            
+    /**
+     * @see TypeCompiler#getCorrespondingPrimitiveTypeName
+     */
 
-  /**
-   * Get the method name for getting out the corresponding primitive
-   * Java type.
-   *
-   * @return String The method call name for getting the
-   *                corresponding primitive Java type.
-   */
-  public String getPrimitiveMethodName() {
-    return "getDate";
-  }
+    public String getCorrespondingPrimitiveTypeName() {
+        return "java.sql.Date";
+    }
 
-  /**
-   * @see TypeCompiler#getCastToCharWidth
-   */
-  public int getCastToCharWidth(DataTypeDescriptor dts) {
-    return TypeId.DATE_MAXWIDTH;
-  }
+    /**
+     * Get the method name for getting out the corresponding primitive
+     * Java type.
+     *
+     * @return String The method call name for getting the
+     *                              corresponding primitive Java type.
+     */
+    public String getPrimitiveMethodName() {
+        return "getDate";
+    }
+
+    /**
+     * @see TypeCompiler#getCastToCharWidth
+     */
+    public int getCastToCharWidth(DataTypeDescriptor dts) {
+        return TypeId.DATE_MAXWIDTH;
+    }
 
 }

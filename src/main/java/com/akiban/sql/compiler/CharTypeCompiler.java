@@ -51,76 +51,76 @@ import com.akiban.sql.types.TypeId;
 
 public final class CharTypeCompiler extends TypeCompiler
 {
-  protected CharTypeCompiler(TypeId typeId) {
-    super(typeId);
-  }
-
-  /**
-   * Tell whether this type (char) can be converted to the given type.
-   *
-   * @see TypeCompiler#convertible
-   */
-  public boolean convertible(TypeId otherType, boolean forDataTypeFunction) {
-    if (otherType.isAnsiUDT()) { 
-      return false; 
-    }
-            
-    // LONGVARCHAR can only be converted from  character types
-    // or CLOB or boolean.
-    if (getTypeId().isLongVarcharTypeId()) {
-      return (otherType.isStringTypeId() || otherType.isBooleanTypeId());
+    protected CharTypeCompiler(TypeId typeId) {
+        super(typeId);
     }
 
-    // The double function can convert CHAR and VARCHAR
-    if (forDataTypeFunction && otherType.isDoubleTypeId())
-      return (getTypeId().isStringTypeId());
+    /**
+     * Tell whether this type (char) can be converted to the given type.
+     *
+     * @see TypeCompiler#convertible
+     */
+    public boolean convertible(TypeId otherType, boolean forDataTypeFunction) {
+        if (otherType.isAnsiUDT()) { 
+            return false; 
+        }
+                        
+        // LONGVARCHAR can only be converted from    character types
+        // or CLOB or boolean.
+        if (getTypeId().isLongVarcharTypeId()) {
+            return (otherType.isStringTypeId() || otherType.isBooleanTypeId());
+        }
 
-    // can't CAST to CHAR and VARCHAR from REAL or DOUBLE
-    // or binary types or XML
-    // all other types are ok.
-    if (otherType.isFloatingPointTypeId() || otherType.isBitTypeId() ||
-        otherType.isBlobTypeId() || otherType.isXMLTypeId())
-      return false;
+        // The double function can convert CHAR and VARCHAR
+        if (forDataTypeFunction && otherType.isDoubleTypeId())
+            return (getTypeId().isStringTypeId());
 
-    return true;
-  }
+        // can't CAST to CHAR and VARCHAR from REAL or DOUBLE
+        // or binary types or XML
+        // all other types are ok.
+        if (otherType.isFloatingPointTypeId() || otherType.isBitTypeId() ||
+            otherType.isBlobTypeId() || otherType.isXMLTypeId())
+            return false;
 
-  /**
-   * Tell whether this type (char) is compatible with the given type.
-   *
-   * @param otherType The TypeId of the other type.
-   */
-  public boolean compatible(TypeId otherType) {
-    return (otherType.isStringTypeId() || 
-            (otherType.isDateTimeTimeStampTypeId() && 
-             !getTypeId().isLongVarcharTypeId()));
-  }
+        return true;
+    }
 
-  /**
-   * @see TypeCompiler#getCorrespondingPrimitiveTypeName
-   */
+    /**
+     * Tell whether this type (char) is compatible with the given type.
+     *
+     * @param otherType The TypeId of the other type.
+     */
+    public boolean compatible(TypeId otherType) {
+        return (otherType.isStringTypeId() || 
+                (otherType.isDateTimeTimeStampTypeId() && 
+                 !getTypeId().isLongVarcharTypeId()));
+    }
 
-  public String getCorrespondingPrimitiveTypeName() {
-    /* Only numerics and booleans get mapped to Java primitives */
-    return "java.lang.String";
-  }
+    /**
+     * @see TypeCompiler#getCorrespondingPrimitiveTypeName
+     */
 
-  /**
-   * Get the method name for getting out the corresponding primitive
-   * Java type.
-   *
-   * @return String The method call name for getting the
-   *                corresponding primitive Java type.
-   */
-  public String getPrimitiveMethodName() {
-    return "getString";
-  }
+    public String getCorrespondingPrimitiveTypeName() {
+        /* Only numerics and booleans get mapped to Java primitives */
+        return "java.lang.String";
+    }
 
-  /**
-   * @see TypeCompiler#getCastToCharWidth
-   */
-  public int getCastToCharWidth(DataTypeDescriptor dts) {
-    return dts.getMaximumWidth();
-  }
+    /**
+     * Get the method name for getting out the corresponding primitive
+     * Java type.
+     *
+     * @return String The method call name for getting the
+     *                              corresponding primitive Java type.
+     */
+    public String getPrimitiveMethodName() {
+        return "getString";
+    }
+
+    /**
+     * @see TypeCompiler#getCastToCharWidth
+     */
+    public int getCastToCharWidth(DataTypeDescriptor dts) {
+        return dts.getMaximumWidth();
+    }
 
 }

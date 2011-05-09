@@ -45,36 +45,36 @@ package com.akiban.sql.types;
  */
 public class SynonymAliasInfo implements AliasInfo
 {
-  private String schemaName;
-  private String tableName;
+    private String schemaName;
+    private String tableName;
 
-  /**
-     Create a SynonymAliasInfo for synonym.
-  */
-  public SynonymAliasInfo(String schemaName, String tableName)
-  {
-    this.schemaName = schemaName;
-    this.tableName = tableName;
-  }
+    /**
+         Create a SynonymAliasInfo for synonym.
+    */
+    public SynonymAliasInfo(String schemaName, String tableName)
+    {
+        this.schemaName = schemaName;
+        this.tableName = tableName;
+    }
 
-  public String getSynonymTable() {
-    return tableName;
-  }
+    public String getSynonymTable() {
+        return tableName;
+    }
 
-  public String getSynonymSchema() {
-    return schemaName;
-  }
+    public String getSynonymSchema() {
+        return schemaName;
+    }
 
-  public boolean isTableFunction() {
-    return false; 
-  }
+    public boolean isTableFunction() {
+        return false; 
+    }
 
-  public String toString() {
-    return "\"" + schemaName + "\".\"" + tableName + "\"";
-  }
+    public String toString() {
+        return "\"" + schemaName + "\".\"" + tableName + "\"";
+    }
 
-  public String getMethodName()
-  {
-    return null;
-  }
+    public String getMethodName()
+    {
+        return null;
+    }
 }

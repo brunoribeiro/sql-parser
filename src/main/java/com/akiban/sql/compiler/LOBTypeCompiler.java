@@ -51,60 +51,60 @@ import com.akiban.sql.types.TypeId;
 
 public class LOBTypeCompiler extends TypeCompiler
 {
-  protected LOBTypeCompiler(TypeId typeId) {
-    super(typeId);
-  }
-
-  /**
-   * Tell whether this type (LOB) can be converted to the given type.
-   *
-   * @see TypeCompiler#convertible
-   */
-  public boolean convertible(TypeId otherType, 
-                             boolean forDataTypeFunction) {
-    return  (otherType.isBlobTypeId());
-  }
-
-  /**
-   * Tell whether this type (LOB) is compatible with the given type.
-   *
-   * @param otherType     The TypeId of the other type.
-   */
-  public boolean compatible(TypeId otherType) {
-    return convertible(otherType,false);
-  }
-
-  /**
-   * @see TypeCompiler#getCorrespondingPrimitiveTypeName
-   */
-
-  public String getCorrespondingPrimitiveTypeName() {
-    int formatId = getStoredFormatIdFromTypeId();
-    switch (formatId) {
-    case TypeId.FormatIds.BLOB_TYPE_ID:  
-      return "java.sql.Blob";
-    default:
-      assert false : "unexpected formatId in getCorrespondingPrimitiveTypeName() - " + formatId;
-      return null;
+    protected LOBTypeCompiler(TypeId typeId) {
+        super(typeId);
     }
-  }
 
-  /**
-   * Get the method name for getting out the corresponding primitive
-   * Java type.
-   *
-   * @return String The method call name for getting the
-   *                corresponding primitive Java type.
-   */
-  public String getPrimitiveMethodName() {
-    return "getBlob";
-  }
+    /**
+     * Tell whether this type (LOB) can be converted to the given type.
+     *
+     * @see TypeCompiler#convertible
+     */
+    public boolean convertible(TypeId otherType, 
+                               boolean forDataTypeFunction) {
+        return (otherType.isBlobTypeId());
+    }
 
-  /**
-   * @see TypeCompiler#getCastToCharWidth
-   */
-  public int getCastToCharWidth(DataTypeDescriptor dts) {
-    return dts.getMaximumWidth();
-  }
+    /**
+     * Tell whether this type (LOB) is compatible with the given type.
+     *
+     * @param otherType         The TypeId of the other type.
+     */
+    public boolean compatible(TypeId otherType) {
+        return convertible(otherType,false);
+    }
+
+    /**
+     * @see TypeCompiler#getCorrespondingPrimitiveTypeName
+     */
+
+    public String getCorrespondingPrimitiveTypeName() {
+        int formatId = getStoredFormatIdFromTypeId();
+        switch (formatId) {
+        case TypeId.FormatIds.BLOB_TYPE_ID:  
+            return "java.sql.Blob";
+        default:
+            assert false : "unexpected formatId in getCorrespondingPrimitiveTypeName() - " + formatId;
+            return null;
+        }
+    }
+
+    /**
+     * Get the method name for getting out the corresponding primitive
+     * Java type.
+     *
+     * @return String The method call name for getting the
+     *                              corresponding primitive Java type.
+     */
+    public String getPrimitiveMethodName() {
+        return "getBlob";
+    }
+
+    /**
+     * @see TypeCompiler#getCastToCharWidth
+     */
+    public int getCastToCharWidth(DataTypeDescriptor dts) {
+        return dts.getMaximumWidth();
+    }
 
 }

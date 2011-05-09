@@ -48,84 +48,84 @@ import java.sql.Types;
 
 public class TimestampTypeCompiler extends TypeCompiler
 {
-  protected TimestampTypeCompiler(TypeId typeId) {
-    super(typeId);
-  }
-
-  /**
-   * User types are convertible to other user types only if
-   * (for now) they are the same type and are being used to
-   * implement some JDBC type.  This is sufficient for
-   * date/time types; it may be generalized later for e.g.
-   * comparison of any user type with one of its subtypes.
-   *
-   * @see TypeCompiler#convertible 
-   *
-   */
-  public boolean convertible(TypeId otherType, boolean forDataTypeFunction) {
-    if (otherType.isStringTypeId()&& 
-        (!otherType.isLongConcatableTypeId())) {
-      return true;
+    protected TimestampTypeCompiler(TypeId typeId) {
+        super(typeId);
     }
 
-    int otherJDBCTypeId = otherType.getJDBCTypeId();
+    /**
+     * User types are convertible to other user types only if
+     * (for now) they are the same type and are being used to
+     * implement some JDBC type.    This is sufficient for
+     * date/time types; it may be generalized later for e.g.
+     * comparison of any user type with one of its subtypes.
+     *
+     * @see TypeCompiler#convertible 
+     *
+     */
+    public boolean convertible(TypeId otherType, boolean forDataTypeFunction) {
+        if (otherType.isStringTypeId() &&
+            (!otherType.isLongConcatableTypeId())) {
+            return true;
+        }
 
-    /*
-    ** At this point, we have only date/time.  If
-    ** same type, convert always ok.
-    */
-    if (otherJDBCTypeId == Types.TIMESTAMP) {
-      return true;
+        int otherJDBCTypeId = otherType.getJDBCTypeId();
+
+        /*
+        ** At this point, we have only date/time.    If
+        ** same type, convert always ok.
+        */
+        if (otherJDBCTypeId == Types.TIMESTAMP) {
+            return true;
+        }
+
+        /*
+        ** Otherwise, we can convert timestamp to
+        ** date or time only.
+        */
+        return ((otherJDBCTypeId == Types.DATE) ||
+                (otherJDBCTypeId == Types.TIME));
     }
 
-    /*
-    ** Otherwise, we can convert timestamp to
-    ** date or time only.
-    */
-    return ((otherJDBCTypeId == Types.DATE) ||
-            (otherJDBCTypeId == Types.TIME));
-  }
-
-  /**
-   * Tell whether this type (timestamp) is compatible with the given type.
-   *
-   * @param otherType The TypeId of the other type.
-   */
-  public boolean compatible(TypeId otherType) {
-    if (otherType.isStringTypeId() &&
-        (!otherType.isLongConcatableTypeId())) {
-      return true;
+    /**
+     * Tell whether this type (timestamp) is compatible with the given type.
+     *
+     * @param otherType The TypeId of the other type.
+     */
+    public boolean compatible(TypeId otherType) {
+        if (otherType.isStringTypeId() &&
+            (!otherType.isLongConcatableTypeId())) {
+            return true;
+        }
+        /*
+        ** Both are timestamp datatypes and hence compatible.
+        */
+        return (getStoredFormatIdFromTypeId() == otherType.getTypeFormatId());
     }
-    /*
-    ** Both are timestamp datatypes and hence compatible.
-    */
-    return (getStoredFormatIdFromTypeId() == otherType.getTypeFormatId());
-  }
-			
-  /**
-   * @see TypeCompiler#getCorrespondingPrimitiveTypeName
-   */
+            
+    /**
+     * @see TypeCompiler#getCorrespondingPrimitiveTypeName
+     */
 
-  public String getCorrespondingPrimitiveTypeName() {
-    return "java.sql.Timestamp";
-  }
+    public String getCorrespondingPrimitiveTypeName() {
+        return "java.sql.Timestamp";
+    }
 
-  /**
-   * Get the method name for getting out the corresponding primitive
-   * Java type.
-   *
-   * @return String The method call name for getting the
-   *                corresponding primitive Java type.
-   */
-  public String getPrimitiveMethodName() {
-    return "getTimestamp";
-  }
+    /**
+     * Get the method name for getting out the corresponding primitive
+     * Java type.
+     *
+     * @return String The method call name for getting the
+     *                              corresponding primitive Java type.
+     */
+    public String getPrimitiveMethodName() {
+        return "getTimestamp";
+    }
 
-  /**
-   * @see TypeCompiler#getCastToCharWidth
-   */
-  public int getCastToCharWidth(DataTypeDescriptor dts) {
-    return 26; // DATE TIME.milliseconds (extra few for good measure)
-  }
+    /**
+     * @see TypeCompiler#getCastToCharWidth
+     */
+    public int getCastToCharWidth(DataTypeDescriptor dts) {
+        return 26; // DATE TIME.milliseconds (extra few for good measure)
+    }
 
 }
