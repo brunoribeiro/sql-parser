@@ -1053,14 +1053,13 @@ class SQLGrammar
      *
      * @exception StandardException
      */
-    private ParameterNode makeParameterNode() throws StandardException {
+    private ParameterNode makeParameterNode(int number) throws StandardException {
         ParameterNode parm = (ParameterNode)
             nodeFactory.getNode(NodeTypes.PARAMETER_NODE,
-                                parameterNumber,
+                                number,
                                 null,
                                 parserContext);
 
-        parameterNumber++;
         parameterList.add(parm);
         return parm;
     }
@@ -2161,6 +2160,11 @@ TOKEN :
 TOKEN :
 { /* Identifiers */
  <IDENTIFIER: ( <LETTER> ) (<LETTER> | "_" | <DIGIT>)* >
+}
+
+TOKEN :
+{ /* Postgres-style parameters */
+ <DOLLAR_N: ( "$" (<DIGIT>)+ ) >
 }
 
 // TODO: These are not used. Are they necessary to bare use work?
@@ -8408,11 +8412,19 @@ castOperand() throws StandardException :
 
 ParameterNode
 dynamicParameterSpecification() throws StandardException :
-{}
+{
+    Token tok;
+}
 {
     <QUESTION_MARK>
     {
-        return makeParameterNode();
+        return makeParameterNode(parameterNumber++);
+    }
+|
+    tok = <DOLLAR_N>
+    {
+        int n = Integer.parseInt(tok.image.substring(1));
+        return makeParameterNode(n-1);
     }
 }
 
