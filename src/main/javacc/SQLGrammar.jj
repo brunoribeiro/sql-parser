@@ -1447,6 +1447,14 @@ class SQLGrammar
         return Statement();
     }
 
+    List<StatementNode> parseStatements(String statementSQLText)
+            throws ParseException, StandardException {
+        List<StatementNode> result = new ArrayList<StatementNode>();
+        this.statementSQLText = statementSQLText;
+        StatementList(result);
+        return result;
+    }
+
 }
 
 PARSER_END(SQLGrammar)
@@ -2466,12 +2474,34 @@ TOKEN :
 StatementNode
 Statement() throws StandardException :
 {
-    StatementNode   statementNode;
+    StatementNode statementNode;
 }
 {
     statementNode = StatementPart(null) <EOF>
     {
         return statementNode;
+    }
+}
+
+void
+StatementList(List<StatementNode> list) throws StandardException :
+{
+}
+{
+    statementListElement(list)
+    ( <SEMICOLON> [ statementListElement(list) ] )*
+    <EOF>
+}
+
+void
+statementListElement(List<StatementNode> list) throws StandardException :
+{
+    StatementNode statementNode;
+}
+{
+    statementNode = StatementPart(null)
+    {
+        list.add(statementNode);
     }
 }
 
