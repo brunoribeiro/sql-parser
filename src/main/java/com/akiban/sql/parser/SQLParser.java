@@ -104,8 +104,38 @@ public class SQLParser implements SQLParserContext {
     }
 
     /** Normal external parser entry. */
-    public StatementNode parseStatement(String sqlText) 
-            throws StandardException {
+    public StatementNode parseStatement(String sqlText) throws StandardException {
+        reinit(sqlText);
+        try {
+            return parser.parseStatement(sqlText, parameterList);
+        }
+        catch (ParseException ex) {
+            throw new StandardException(ex);
+        }
+        catch (TokenMgrError ex) {
+            // Throw away the cached parser.
+            parser = null;
+            throw new StandardException(ex);
+        }
+    }
+
+    /** Parse multiple statements delimited by semicolons. */
+    public List<StatementNode> parseStatements(String sqlText) throws StandardException {
+        reinit(sqlText);
+        try {
+            return parser.parseStatements(sqlText);
+        }
+        catch (ParseException ex) {
+            throw new StandardException(ex);
+        }
+        catch (TokenMgrError ex) {
+            // Throw away the cached parser.
+            parser = null;
+            throw new StandardException(ex);
+        }
+    }
+
+    protected void reinit(String sqlText) throws StandardException {
         this.sqlText = sqlText;
         Reader reader = new StringReader(sqlText);
         if (charStream == null) {
@@ -131,17 +161,6 @@ public class SQLParser implements SQLParserContext {
         returnParameterFlag = false;
         printedObjectsMap = null;
         generatedColumnNameIndex = 1;
-        try {
-            return parser.parseStatement(sqlText, parameterList);
-        }
-        catch (ParseException ex) {
-            throw new StandardException(ex);
-        }
-        catch (TokenMgrError ex) {
-            // Throw away the cached parser.
-            parser = null;
-            throw new StandardException(ex);
-        }
     }
 
     /** Get maximum length of a string literal. */
