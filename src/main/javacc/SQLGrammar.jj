@@ -2574,7 +2574,7 @@ StatementPart(Token[] tokenHolder) throws StandardException :
 |
     statementNode = spsSetStatement()
 |
-    statementNode = truncateTableStatement()
+    statementNode = truncateStatement()
 |
     statementNode = grantStatement()
 |
@@ -2621,6 +2621,9 @@ createStatements() throws StandardException :
     statementNode = udtDefinition()
 |
     statementNode = indexDefinition()
+|
+    LOOKAHEAD ( { hasFeature(SQLParserFeature.GROUPING) } )
+    statementNode = groupDefinition()
 )
     {
         return statementNode;
@@ -2650,6 +2653,9 @@ dropStatements() throws StandardException :
     statementNode = dropRoleStatement() 
 |
     statementNode = dropSequenceStatement()
+|
+    LOOKAHEAD ( { hasFeature(SQLParserFeature.GROUPING) } )
+    statementNode = dropGroupStatement()
 )
     {
         return statementNode;
@@ -11730,12 +11736,30 @@ dropTriggerStatement() throws StandardException :
 }
 
 StatementNode
+truncateStatement() throws StandardException :
+{
+    StatementNode statementNode;
+}
+{
+    <TRUNCATE>
+(
+    statementNode = truncateTableStatement()
+|
+    LOOKAHEAD ( { hasFeature(SQLParserFeature.GROUPING) } )
+    statementNode = truncateGroupStatement()
+)
+    {
+        return statementNode;
+    }
+}
+
+StatementNode
 truncateTableStatement() throws StandardException :
 {
     TableName tableName;
 }
 {
-    <TRUNCATE> <TABLE> tableName = qualifiedName() 
+    <TABLE> tableName = qualifiedName() 
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_TABLE_NODE,
                                                   tableName,
@@ -12757,5 +12781,56 @@ caseSensitiveIdentifier() :
     str = nonReservedKeyword()
     {
         return str;
+    }
+}
+
+StatementNode
+groupDefinition() throws StandardException :
+{
+    TableName groupName;
+}
+{
+    /*
+     * CREATE GROUP
+     */
+    <GROUP> groupName = qualifiedName()
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_GROUP_NODE,
+                                                  groupName,
+                                                  parserContext);
+    }
+}
+
+StatementNode
+dropGroupStatement() throws StandardException :
+{
+    TableName groupName;
+}
+{
+    /*
+     * DROP GROUP
+     */
+    <GROUP> groupName = qualifiedName()
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_GROUP_NODE,
+                                                  groupName,
+                                                  parserContext);
+    }
+}
+
+StatementNode
+truncateGroupStatement() throws StandardException :
+{
+    TableName groupName;
+}
+{
+    /*
+     * TRUNCATE GROUP
+     */
+    <GROUP> groupName = qualifiedName() 
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.TRUNCATE_GROUP_NODE,
+                                                  groupName,
+                                                  parserContext);
     }
 }

@@ -57,6 +57,9 @@ public interface NodeNames
     // The names are in alphabetic order.
 
     static final String AGGREGATE_NODE_NAME = "com.akiban.sql.parser.AggregateNode";
+
+    static final String AGGREGATE_WINDOW_FUNCTION_NAME = "com.akiban.sql.parser.AggregateWindowFunctionNode";
+
     static final String ALL_RESULT_COLUMN_NAME = "com.akiban.sql.parser.AllResultColumn";
 
     static final String ALTER_TABLE_NODE_NAME = "com.akiban.sql.parser.AlterTableNode";
@@ -97,10 +100,11 @@ public interface NodeNames
 
     static final String CREATE_ALIAS_NODE_NAME = "com.akiban.sql.parser.CreateAliasNode";
 
-    static final String CREATE_ROLE_NODE_NAME =
-        "com.akiban.sql.parser.CreateRoleNode";
+    static final String CREATE_GROUP_NODE_NAME = "com.akiban.sql.parser.CreateGroupNode";
 
     static final String CREATE_INDEX_NODE_NAME = "com.akiban.sql.parser.CreateIndexNode";
+
+    static final String CREATE_ROLE_NODE_NAME = "com.akiban.sql.parser.CreateRoleNode";
 
     static final String CREATE_SCHEMA_NODE_NAME = "com.akiban.sql.parser.CreateSchemaNode";
 
@@ -118,13 +122,9 @@ public interface NodeNames
 
     static final String CURRENT_ROW_LOCATION_NODE_NAME = "com.akiban.sql.parser.CurrentRowLocationNode";
 
-    static final String SPECIAL_FUNCTION_NODE_NAME = "com.akiban.sql.parser.SpecialFunctionNode";
-
     static final String CURSOR_NODE_NAME = "com.akiban.sql.parser.CursorNode";
 
     static final String DB2_LENGTH_OPERATOR_NODE_NAME = "com.akiban.sql.parser.DB2LengthOperatorNode";
-
-    static final String DML_MOD_STATEMENT_NODE_NAME = "com.akiban.sql.parser.DMLModStatementNode";
 
     static final String DEFAULT_NODE_NAME = "com.akiban.sql.parser.DefaultNode";
 
@@ -132,12 +132,15 @@ public interface NodeNames
 
     static final String DISTINCT_NODE_NAME = "com.akiban.sql.parser.DistinctNode";
 
+    static final String DML_MOD_STATEMENT_NODE_NAME = "com.akiban.sql.parser.DMLModStatementNode";
+
     static final String DROP_ALIAS_NODE_NAME = "com.akiban.sql.parser.DropAliasNode";
+
+    static final String DROP_GROUP_NODE_NAME = "com.akiban.sql.parser.DropGroupNode";
 
     static final String DROP_INDEX_NODE_NAME = "com.akiban.sql.parser.DropIndexNode";
 
-    static final String DROP_ROLE_NODE_NAME =
-        "com.akiban.sql.parser.DropRoleNode";
+    static final String DROP_ROLE_NODE_NAME = "com.akiban.sql.parser.DropRoleNode";
 
     static final String DROP_SCHEMA_NODE_NAME = "com.akiban.sql.parser.DropSchemaNode";
 
@@ -169,9 +172,8 @@ public interface NodeNames
 
     static final String GRANT_NODE_NAME = "com.akiban.sql.parser.GrantNode";
 
-    static final String GRANT_ROLE_NODE_NAME =
-        "com.akiban.sql.parser.GrantRoleNode";
-        
+    static final String GRANT_ROLE_NODE_NAME = "com.akiban.sql.parser.GrantRoleNode";
+
     static final String GROUP_BY_COLUMN_NAME = "com.akiban.sql.parser.GroupByColumn";
 
     static final String GROUP_BY_LIST_NAME = "com.akiban.sql.parser.GroupByList";
@@ -182,11 +184,13 @@ public interface NodeNames
 
     static final String HASH_TABLE_NODE_NAME = "com.akiban.sql.parser.HashTableNode";
 
-    static final String IN_LIST_OPERATOR_NODE_NAME = "com.akiban.sql.parser.InListOperatorNode";
-
     static final String INDEX_TO_BASE_ROW_NODE_NAME = "com.akiban.sql.parser.IndexToBaseRowNode";
 
     static final String INSERT_NODE_NAME = "com.akiban.sql.parser.InsertNode";
+
+    static final String INTERSECT_OR_EXCEPT_NODE_NAME = "com.akiban.sql.parser.IntersectOrExceptNode";
+
+    static final String IN_LIST_OPERATOR_NODE_NAME = "com.akiban.sql.parser.InListOperatorNode";
 
     static final String IS_NODE_NAME = "com.akiban.sql.parser.IsNode";
 
@@ -206,13 +210,13 @@ public interface NodeNames
 
     static final String MODIFY_COLUMN_NODE_NAME = "com.akiban.sql.parser.ModifyColumnNode";
 
-    static final String NOP_STATEMENT_NODE_NAME = "com.akiban.sql.parser.NOPStatementNode";
-
     static final String NEW_INVOCATION_NODE_NAME = "com.akiban.sql.parser.NewInvocationNode";
 
     static final String NEXT_SEQUENCE_NODE_NAME = "com.akiban.sql.parser.NextSequenceNode";
 
     static final String NON_STATIC_METHOD_CALL_NODE_NAME = "com.akiban.sql.parser.NonStaticMethodCallNode";
+
+    static final String NOP_STATEMENT_NODE_NAME = "com.akiban.sql.parser.NOPStatementNode";
 
     static final String NORMALIZE_RESULT_SET_NODE_NAME = "com.akiban.sql.parser.NormalizeResultSetNode";
 
@@ -230,9 +234,9 @@ public interface NodeNames
 
     static final String PARAMETER_NODE_NAME = "com.akiban.sql.parser.ParameterNode";
 
-    static final String PREDICATE_NAME = "com.akiban.sql.parser.Predicate";
-
     static final String PREDICATE_LIST_NAME = "com.akiban.sql.parser.PredicateList";
+
+    static final String PREDICATE_NAME = "com.akiban.sql.parser.Predicate";
 
     static final String PRIVILEGE_NAME = "com.akiban.sql.parser.PrivilegeNode";
 
@@ -240,33 +244,39 @@ public interface NodeNames
 
     static final String RENAME_NODE_NAME = "com.akiban.sql.parser.RenameNode";
 
-    static final String RESULT_COLUMN_NAME = "com.akiban.sql.parser.ResultColumn";
-
     static final String RESULT_COLUMN_LIST_NAME = "com.akiban.sql.parser.ResultColumnList";
+
+    static final String RESULT_COLUMN_NAME = "com.akiban.sql.parser.ResultColumn";
 
     static final String REVOKE_NODE_NAME = "com.akiban.sql.parser.RevokeNode";
 
-    static final String REVOKE_ROLE_NODE_NAME =
-        "com.akiban.sql.parser.RevokeRoleNode";
+    static final String REVOKE_ROLE_NODE_NAME = "com.akiban.sql.parser.RevokeRoleNode";
+
+    static final String ROW_COUNT_NODE_NAME = "com.akiban.sql.parser.RowCountNode";
+
+    static final String ROW_NUMBER_FUNCTION_NAME = "com.akiban.sql.parser.RowNumberFunctionNode";
 
     static final String ROW_RESULT_SET_NODE_NAME = "com.akiban.sql.parser.RowResultSetNode";
 
-    static final String SQL_BOOLEAN_CONSTANT_NODE_NAME = "com.akiban.sql.parser.SQLBooleanConstantNode";
-
-    static final String SQL_TO_JAVA_VALUE_NODE_NAME = "com.akiban.sql.parser.SQLToJavaValueNode";
+    static final String SAVEPOINT_NODE_NAME = "com.akiban.sql.parser.SavepointNode";
 
     static final String SCROLL_INSENSITIVE_RESULT_SET_NODE_NAME = "com.akiban.sql.parser.ScrollInsensitiveResultSetNode";
 
     static final String SELECT_NODE_NAME = "com.akiban.sql.parser.SelectNode";
 
-    static final String SET_ROLE_NODE_NAME =
-        "com.akiban.sql.parser.SetRoleNode";
+    static final String SET_ROLE_NODE_NAME = "com.akiban.sql.parser.SetRoleNode";
 
     static final String SET_SCHEMA_NODE_NAME = "com.akiban.sql.parser.SetSchemaNode";
 
     static final String SET_TRANSACTION_ISOLATION_NODE_NAME = "com.akiban.sql.parser.SetTransactionIsolationNode";
 
     static final String SIMPLE_STRING_OPERATOR_NODE_NAME = "com.akiban.sql.parser.SimpleStringOperatorNode";
+
+    static final String SPECIAL_FUNCTION_NODE_NAME = "com.akiban.sql.parser.SpecialFunctionNode";
+
+    static final String SQL_BOOLEAN_CONSTANT_NODE_NAME = "com.akiban.sql.parser.SQLBooleanConstantNode";
+
+    static final String SQL_TO_JAVA_VALUE_NODE_NAME = "com.akiban.sql.parser.SQLToJavaValueNode";
 
     static final String STATIC_CLASS_FIELD_REFERENCE_NODE_NAME = "com.akiban.sql.parser.StaticClassFieldReferenceNode";
 
@@ -290,16 +300,15 @@ public interface NodeNames
 
     static final String TIMESTAMP_OPERATOR_NODE_NAME = "com.akiban.sql.parser.TimestampOperatorNode";
 
+    static final String TRUNCATE_GROUP_NODE_NAME = "com.akiban.sql.parser.TruncateGroupNode";
+
     static final String UNARY_ARITHMETIC_OPERATOR_NODE_NAME = "com.akiban.sql.parser.UnaryArithmeticOperatorNode";
 
-    static final String UNARY_DATE_TIMESTAMP_OPERATOR_NODE_NAME
-        = "com.akiban.sql.parser.UnaryDateTimestampOperatorNode";
+    static final String UNARY_DATE_TIMESTAMP_OPERATOR_NODE_NAME = "com.akiban.sql.parser.UnaryDateTimestampOperatorNode";
 
     static final String UNARY_OPERATOR_NODE_NAME = "com.akiban.sql.parser.UnaryOperatorNode";
 
     static final String UNION_NODE_NAME = "com.akiban.sql.parser.UnionNode";
-
-    static final String INTERSECT_OR_EXCEPT_NODE_NAME = "com.akiban.sql.parser.IntersectOrExceptNode";
 
     static final String UNTYPED_NULL_CONSTANT_NODE_NAME = "com.akiban.sql.parser.UntypedNullConstantNode";
 
@@ -313,20 +322,17 @@ public interface NodeNames
 
     static final String VIRTUAL_COLUMN_NODE_NAME = "com.akiban.sql.parser.VirtualColumnNode";
 
-    static final String SAVEPOINT_NODE_NAME = "com.akiban.sql.parser.SavepointNode";
+    static final String WINDOW_DEFINITION_NAME = "com.akiban.sql.parser.WindowDefinitionNode";
+
+    static final String WINDOW_REFERENCE_NAME = "com.akiban.sql.parser.WindowReferenceNode";
+
+    static final String WINDOW_RESULTSET_NODE_NAME = "com.akiban.sql.parser.WindowResultSetNode";
 
     static final String XML_BINARY_OPERATOR_NODE_NAME = "com.akiban.sql.parser.XMLBinaryOperatorNode";
 
     static final String XML_CONSTANT_NODE_NAME = "com.akiban.sql.parser.XMLConstantNode";
+
     static final String XML_UNARY_OPERATOR_NODE_NAME = "com.akiban.sql.parser.XMLUnaryOperatorNode";
-
-    static final String AGGREGATE_WINDOW_FUNCTION_NAME = "com.akiban.sql.parser.AggregateWindowFunctionNode";
-    static final String ROW_NUMBER_FUNCTION_NAME = "com.akiban.sql.parser.RowNumberFunctionNode";
-    static final String WINDOW_DEFINITION_NAME = "com.akiban.sql.parser.WindowDefinitionNode";
-    static final String WINDOW_REFERENCE_NAME = "com.akiban.sql.parser.WindowReferenceNode";
-    static final String WINDOW_RESULTSET_NODE_NAME = "com.akiban.sql.parser.WindowResultSetNode";
-
-    static final String ROW_COUNT_NODE_NAME = "com.akiban.sql.parser.RowCountNode";
 
     // The names are in alphabetic order.
 

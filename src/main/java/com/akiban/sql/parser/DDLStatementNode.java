@@ -46,7 +46,7 @@ import com.akiban.sql.StandardException;
  *
  */
 
-abstract class DDLStatementNode extends StatementNode
+public abstract class DDLStatementNode extends StatementNode
 {
     public static final int UNKNOWN_TYPE = 0;
     public static final int ADD_TYPE = 1;
