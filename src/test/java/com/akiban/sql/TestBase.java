@@ -18,6 +18,7 @@ package com.akiban.sql;
 import org.junit.Ignore;
 import static junit.framework.Assert.fail;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 
 @Ignore
 public class TestBase
@@ -81,14 +83,68 @@ public class TestBase
         }
     }
 
-    public static Collection<Object[]> sqlAndExpected(File dir) throws IOException {
+    public static File paramsFile(File sqlFile) {
+        return new File(sqlFile.getParentFile(),
+                        sqlFile.getName().replace(".sql", ".params"));
+    }
+
+    public static String[] fileContentsArray(File file) throws IOException {
+        FileReader reader = null;
+        List<String> result = new ArrayList<String>();
+        try {
+            reader = new FileReader(file);
+            BufferedReader buffered = new BufferedReader(reader);
+            while (true) {
+                String line = buffered.readLine();
+                if (line == null) break;
+                result.add(line);
+            }
+        }
+        finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                }
+                catch (IOException ex) {
+                }
+            }
+        }
+        return result.toArray(new String[result.size()]);
+    }
+
+    public static Collection<Object[]> sqlAndExpected(File dir) 
+            throws IOException {
+        return sqlAndExpected(dir, false);
+    }
+
+    public static Collection<Object[]> sqlAndExpectedAndParams(File dir) 
+            throws IOException {
+        return sqlAndExpected(dir, true);
+    }
+    
+    public static Collection<Object[]> sqlAndExpected(File dir, 
+                                                      boolean andParams)
+            throws IOException {
         Collection<Object[]> result = new ArrayList<Object[]>();
         for (File sqlFile : listSQLFiles(dir)) {
-            result.add(new Object[] {
-                           sqlFile.getName().replace(".sql", ""),
-                           fileContents(sqlFile),
-                           fileContents(expectedFile(sqlFile))
-                       });
+            String caseName = sqlFile.getName().replace(".sql", "");
+            String sql = fileContents(sqlFile);
+            String expected = fileContents(expectedFile(sqlFile));
+            if (andParams) {
+                String[] params = null;
+                File paramsFile = paramsFile(sqlFile);
+                if (paramsFile.exists()) {
+                    params = fileContentsArray(paramsFile);
+                }
+                result.add(new Object[] {
+                               caseName, sql, expected, params
+                           });
+            }
+            else {
+                result.add(new Object[] {
+                               caseName, sql, expected
+                           });
+            }
         }
         return result;
     }
