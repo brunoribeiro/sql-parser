@@ -54,9 +54,9 @@ public class TestBase
         return result;
     }
 
-    public static File expectedFile(File sqlFile) {
+    public static File changeSuffix(File sqlFile, String suffix) {
         return new File(sqlFile.getParentFile(),
-                        sqlFile.getName().replace(".sql", ".expected"));
+                        sqlFile.getName().replace(".sql", suffix));
     }
 
     public static String fileContents(File file) throws IOException {
@@ -81,11 +81,6 @@ public class TestBase
                 }
             }
         }
-    }
-
-    public static File paramsFile(File sqlFile) {
-        return new File(sqlFile.getParentFile(),
-                        sqlFile.getName().replace(".sql", ".params"));
     }
 
     public static String[] fileContentsArray(File file) throws IOException {
@@ -122,17 +117,21 @@ public class TestBase
         return sqlAndExpected(dir, true);
     }
     
+    static final boolean RUN_FAILING_TESTS = Boolean.getBoolean("akiban.sql.test.runFailing");
+
     public static Collection<Object[]> sqlAndExpected(File dir, 
                                                       boolean andParams)
             throws IOException {
         Collection<Object[]> result = new ArrayList<Object[]>();
         for (File sqlFile : listSQLFiles(dir)) {
             String caseName = sqlFile.getName().replace(".sql", "");
+            if (changeSuffix(sqlFile, ".fail").exists() && !RUN_FAILING_TESTS)
+                continue;
             String sql = fileContents(sqlFile);
-            String expected = fileContents(expectedFile(sqlFile));
+            String expected = fileContents(changeSuffix(sqlFile, ".expected"));
             if (andParams) {
                 String[] params = null;
-                File paramsFile = paramsFile(sqlFile);
+                File paramsFile = changeSuffix(sqlFile, ".params");
                 if (paramsFile.exists()) {
                     params = fileContentsArray(paramsFile);
                 }
