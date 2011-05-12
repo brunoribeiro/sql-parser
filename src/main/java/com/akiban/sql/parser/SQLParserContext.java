@@ -43,4 +43,7 @@ public interface SQLParserContext
      * @return the map
      */
     public Map getPrintedObjectsMap();
+
+    /** Is the given feature enabled for this parser? */
+    public boolean hasFeature(SQLParserFeature feature);
 }

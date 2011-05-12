@@ -234,4 +234,12 @@ public class SQLParser implements SQLParserContext {
         return "_SQL_COL_" + generatedColumnNameIndex++;
     }
 
+    public boolean hasFeature(SQLParserFeature feature) {
+        switch (feature) {
+        case GROUPING:
+            return true;
+        default:
+            return false;
+        }
+    }
 }

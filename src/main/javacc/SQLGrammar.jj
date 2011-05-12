@@ -287,6 +287,11 @@ class SQLGrammar
         return s.toUpperCase(Locale.ENGLISH);
     }
 
+    /** Is the given feature enabled for this parser? */
+    public boolean hasFeature(SQLParserFeature feature) {
+        return parserContext.hasFeature(feature);
+    }
+
     /**
      * Is this token a date / time function name?
      */
