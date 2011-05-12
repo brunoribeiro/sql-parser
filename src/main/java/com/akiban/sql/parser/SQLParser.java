@@ -221,7 +221,7 @@ public class SQLParser implements SQLParserContext {
     /**
      * Return a map of AST nodes that have already been printed during a
      * compiler phase, so as to be able to avoid printing a node more than once.
-     * @see org.apache.derby.impl.sql.compile.QueryTreeNode#treePrint(int)
+     * @see QueryTreeNode#treePrint(int)
      * @return the map
      */
     public Map getPrintedObjectsMap() {
