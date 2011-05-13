@@ -167,6 +167,10 @@ public class NodeToString
             if (!node.isWithData()) str.append("NO ");
             str.append("DATA");
         }
+        if (node.getGroupName() != null) {
+            str.append(" GROUP ");
+            str.append(toString(node.getGroupName()));
+        }
         return str.toString();
     }
 

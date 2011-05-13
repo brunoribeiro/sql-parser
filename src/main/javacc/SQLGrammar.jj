@@ -3207,6 +3207,7 @@ globalTemporaryTableDeclaration() throws StandardException :
         return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_TABLE_NODE,
                                                   tableName,
                                                   tableElementList,
+                                                  (TableName)null,
                                                   (Properties)null,
                                                   (Boolean)declareTableClauses[1],
                                                   (Boolean)declareTableClauses[2],
@@ -8821,10 +8822,11 @@ dropSequenceStatement() throws StandardException :
 StatementNode
 tableDefinition() throws StandardException :
 {
-    char lockGranularity = CreateTableNode.DEFAULT_LOCK_GRANULARITY;
-    Properties properties = null;
     TableName tableName;
     TableElementList tableElementList;
+    TableName groupName = null;
+    Properties properties = null;
+    char lockGranularity = CreateTableNode.DEFAULT_LOCK_GRANULARITY;
     ResultColumnList resultColumns = null;
     ResultSetNode queryExpression;
     boolean withData = true;
@@ -8835,13 +8837,17 @@ tableDefinition() throws StandardException :
     // tableColumnList.
     (        
         LOOKAHEAD( { getToken(1).kind == LEFT_PAREN && 
-                                     getToken(3).kind != COMMA && getToken(3).kind != RIGHT_PAREN } )
+                     getToken(3).kind != COMMA && getToken(3).kind != RIGHT_PAREN } )
         tableElementList = tableElementList()
+        [ LOOKAHEAD ( { getToken(1).kind == GROUP &&
+                        hasFeature(SQLParserFeature.GROUPING) } )
+          <GROUP> groupName = qualifiedName() ]
         [ properties = propertyList(false)<CHECK_PROPERTIES>]
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_TABLE_NODE,
                                                   tableName,
                                                   tableElementList,
+                                                  groupName,
                                                   properties,
                                                   new Character(lockGranularity),
                                                   parserContext);
