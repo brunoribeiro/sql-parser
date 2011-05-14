@@ -55,7 +55,7 @@ public class CursorNode extends DMLStatementNode
 {
     public static enum UpdateMode {
         UNSPECIFIED, READ_ONLY, UPDATE
-            }
+    }
 
     private String name;
     private OrderByList orderByList;

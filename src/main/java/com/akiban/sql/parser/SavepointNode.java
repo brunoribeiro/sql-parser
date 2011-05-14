@@ -49,7 +49,7 @@ public class SavepointNode extends DDLStatementNode
 {
     public static enum StatementType {
         SET, ROLLBACK, RELEASE
-            }
+    }
     private StatementType statementType;
     private String savepointName; // Name of the savepoint.
 

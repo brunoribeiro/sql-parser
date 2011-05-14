@@ -109,8 +109,8 @@ public class SubqueryNode extends ValueNode
      */
     public static enum SubqueryType {
         FROM, IN, NOT_IN, EQ_ANY, EQ_ALL, NE_ANY, NE_ALL, GT_ANY, GT_ALL, GE_ANY, GE_ALL,
-            LT_ANY, LT_ALL, LE_ANY, LE_ALL, EXISTS, NOT_EXISTS, EXPRESSION
-            }
+        LT_ANY, LT_ALL, LE_ANY, LE_ALL, EXISTS, NOT_EXISTS, EXPRESSION
+    }
 
     /**
      * Initializer.

@@ -74,7 +74,7 @@ public class FromBaseTable extends FromTable
 {
     public static enum UpdateOrDelete {
         UPDATE, DELETE
-            }
+    }
 
     private TableName tableName;
     private UpdateOrDelete updateOrDelete;
