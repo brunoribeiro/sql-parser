@@ -1439,6 +1439,11 @@ class SQLGrammar
         return additiveExpression(null, null);
     }
 
+    boolean groupConstructFollows(int tokenKind) {
+        return hasFeature(SQLParserFeature.GROUPING) &&
+            getToken(1).kind == tokenKind;
+    }
+
     void setParserContext(SQLParserContext parserContext) {
         this.parserContext = parserContext;
         this.nodeFactory = parserContext.getNodeFactory();
@@ -2622,7 +2627,7 @@ createStatements() throws StandardException :
 |
     statementNode = indexDefinition()
 |
-    LOOKAHEAD ( { hasFeature(SQLParserFeature.GROUPING) } )
+    LOOKAHEAD ( { groupConstructFollows(GROUP) } )
     statementNode = groupDefinition()
 )
     {
@@ -2654,7 +2659,7 @@ dropStatements() throws StandardException :
 |
     statementNode = dropSequenceStatement()
 |
-    LOOKAHEAD ( { hasFeature(SQLParserFeature.GROUPING) } )
+    LOOKAHEAD ( { groupConstructFollows(GROUP) } )
     statementNode = dropGroupStatement()
 )
     {
@@ -8839,8 +8844,7 @@ tableDefinition() throws StandardException :
         LOOKAHEAD( { getToken(1).kind == LEFT_PAREN && 
                      getToken(3).kind != COMMA && getToken(3).kind != RIGHT_PAREN } )
         tableElementList = tableElementList()
-        [ LOOKAHEAD ( { getToken(1).kind == GROUP &&
-                        hasFeature(SQLParserFeature.GROUPING) } )
+        [ LOOKAHEAD ( { groupConstructFollows(GROUP) } )
           <GROUP> groupName = qualifiedName() ]
         [ properties = propertyList(false)<CHECK_PROPERTIES>]
     {
@@ -11751,7 +11755,7 @@ truncateStatement() throws StandardException :
 (
     statementNode = truncateTableStatement()
 |
-    LOOKAHEAD ( { hasFeature(SQLParserFeature.GROUPING) } )
+    LOOKAHEAD ( { groupConstructFollows(GROUP) } )
     statementNode = truncateGroupStatement()
 )
     {
