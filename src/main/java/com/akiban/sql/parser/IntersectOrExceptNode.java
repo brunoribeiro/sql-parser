@@ -49,7 +49,7 @@ public class IntersectOrExceptNode extends SetOperatorNode
 {
     public static enum OpType { 
         INTERSECT("INTERSECT"), 
-            EXCEPT("EXCEPT");
+        EXCEPT("EXCEPT");
 
         String operatorName;
         OpType(String operatorName) {

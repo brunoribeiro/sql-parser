@@ -63,7 +63,7 @@ public class RenameNode extends DDLStatementNode
 
     public static enum RenameType {
         TABLE, COLUMN, INDEX
-            }
+    }
     protected RenameType renamingWhat;
 
     /**

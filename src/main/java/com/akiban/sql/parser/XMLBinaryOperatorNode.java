@@ -64,9 +64,9 @@ public class XMLBinaryOperatorNode extends BinaryOperatorNode
         EXISTS("xmlexists", "XMLExists",
                ValueClassName.BooleanDataValue,
                new String[] { ValueClassName.StringDataValue, ValueClassName.XMLDataValue }),
-            QUERY("xmlquery", "XMLQuery", 
-                  ValueClassName.XMLDataValue,
-                  new String [] { ValueClassName.StringDataValue, ValueClassName.XMLDataValue });
+        QUERY("xmlquery", "XMLQuery", 
+              ValueClassName.XMLDataValue,
+              new String [] { ValueClassName.StringDataValue, ValueClassName.XMLDataValue });
 
         String operator, methodName;
         String resultType;
@@ -82,13 +82,13 @@ public class XMLBinaryOperatorNode extends BinaryOperatorNode
 
     public static enum PassByType {
         REF, VALUE
-            }
+    }
     public static enum ReturnType {
         SEQUENCE, CONTENT
-            }
+    }
     public static enum OnEmpty {
         EMPTY, NULL
-            }
+    }
 
     /**
      * Initializer for a BinaryOperatorNode

@@ -47,7 +47,7 @@ public class PrivilegeNode extends QueryTreeNode
 {
     public static enum ObjectType {
         TABLE_PRIVILEGES, ROUTINE_PRIVILEGES, SEQUENCE_PRIVILEGES, UDT_PRIVILEGES
-            }
+    }
 
     public static final String USAGE_PRIV = "USAGE";
 

@@ -55,9 +55,9 @@ public class XMLUnaryOperatorNode extends UnaryOperatorNode
         PARSE("xmlparse", "XMLParse",
               ValueClassName.XMLDataValue,
               ValueClassName.StringDataValue),
-            SERIALIZE("xmlserialize", "XMLSerialize",
-                      ValueClassName.StringDataValue,
-                      ValueClassName.XMLDataValue);
+        SERIALIZE("xmlserialize", "XMLSerialize",
+                  ValueClassName.StringDataValue,
+                  ValueClassName.XMLDataValue);
         
         String operator, methodName;
         String resultType, argType;

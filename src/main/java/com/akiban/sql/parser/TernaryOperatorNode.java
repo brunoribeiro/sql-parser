@@ -57,33 +57,33 @@ public class TernaryOperatorNode extends ValueNode
              new String[] { ValueClassName.StringDataValue, 
                             ValueClassName.StringDataValue, 
                             "java.lang.Integer" }),
-            LOCATE("LOCATE", "locate",
-                   ValueClassName.NumberDataValue,
-                   new String[] { ValueClassName.StringDataValue, 
-                                  ValueClassName.StringDataValue, 
-                                  ValueClassName.NumberDataValue }),
-            SUBSTRING("substring" , "substring",
-                      ValueClassName.ConcatableDataValue,
-                      new String[] { ValueClassName.ConcatableDataValue, 
-                                     ValueClassName.NumberDataValue, 
-                                     ValueClassName.NumberDataValue }),
-            LIKE("like", "like",
-                 ValueClassName.BooleanDataValue,
-                 new String[] { ValueClassName.DataValueDescriptor, 
-                                ValueClassName.DataValueDescriptor, 
-                                ValueClassName.DataValueDescriptor }),
-            TIMESTAMPADD("TIMESTAMPADD", "timestampAdd",
-                         ValueClassName.DateTimeDataValue, 
-                         // time.timestampadd(interval, count)
-                         new String[] { ValueClassName.DateTimeDataValue, 
-                                        "java.lang.Integer", 
-                                        ValueClassName.NumberDataValue }),
-            TIMESTAMPDIFF("TIMESTAMPDIFF", "timestampDiff",
-                          ValueClassName.NumberDataValue,
-                          // time2.timestampDiff(interval, time1)
-                          new String[] { ValueClassName.DateTimeDataValue, 
-                                         "java.lang.Integer", 
-                                         ValueClassName.DateTimeDataValue });
+        LOCATE("LOCATE", "locate",
+               ValueClassName.NumberDataValue,
+               new String[] { ValueClassName.StringDataValue, 
+                              ValueClassName.StringDataValue, 
+                              ValueClassName.NumberDataValue }),
+        SUBSTRING("substring" , "substring",
+                  ValueClassName.ConcatableDataValue,
+                  new String[] { ValueClassName.ConcatableDataValue, 
+                                 ValueClassName.NumberDataValue, 
+                                 ValueClassName.NumberDataValue }),
+        LIKE("like", "like",
+             ValueClassName.BooleanDataValue,
+             new String[] { ValueClassName.DataValueDescriptor, 
+                            ValueClassName.DataValueDescriptor, 
+                            ValueClassName.DataValueDescriptor }),
+        TIMESTAMPADD("TIMESTAMPADD", "timestampAdd",
+                     ValueClassName.DateTimeDataValue, 
+                     // time.timestampadd(interval, count)
+                     new String[] { ValueClassName.DateTimeDataValue, 
+                                    "java.lang.Integer", 
+                                    ValueClassName.NumberDataValue }),
+        TIMESTAMPDIFF("TIMESTAMPDIFF", "timestampDiff",
+                      ValueClassName.NumberDataValue,
+                      // time2.timestampDiff(interval, time1)
+                      new String[] { ValueClassName.DateTimeDataValue, 
+                                     "java.lang.Integer", 
+                                     ValueClassName.DateTimeDataValue });
 
         String operator, methodName;
         String resultType;
@@ -112,7 +112,7 @@ public class TernaryOperatorNode extends ValueNode
 
     public static enum TrimType {
         LEADING, TRAILING, BOTH
-            }
+    }
     protected TrimType trimType;
 
     // TODO: Could be enum, but note how passed as Integer constant.

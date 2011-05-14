@@ -49,11 +49,11 @@ public class ExtractOperatorNode extends UnaryOperatorNode
 {
     public static enum Field {
         YEAR("YEAR", "getYear"),
-            MONTH("MONTH", "getMonth"),
-            DAY("DAY", "getDate"),
-            HOUR("HOUR", "getHours"),
-            MINUTE("MINUTE", "getMinutes"),
-            SECOND("SECOND", "getSeconds");
+        MONTH("MONTH", "getMonth"),
+        DAY("DAY", "getDate"),
+        HOUR("HOUR", "getHours"),
+        MINUTE("MINUTE", "getMinutes"),
+        SECOND("SECOND", "getSeconds");
 
         String fieldName, fieldMethod;
 

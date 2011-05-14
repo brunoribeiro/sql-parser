@@ -49,9 +49,9 @@ public class UnaryArithmeticOperatorNode extends UnaryOperatorNode
 {
     public static enum OperatorType {
         PLUS("+", "plus"), 
-            MINUS("-", "minus"), 
-            SQRT("SQRT", "sqrt"), 
-            ABSOLUTE("ABS/ABSVAL", "absolute");
+        MINUS("-", "minus"), 
+        SQRT("SQRT", "sqrt"), 
+        ABSOLUTE("ABS/ABSVAL", "absolute");
 
         String operator, methodName;
         OperatorType(String operator, String methodName) {
