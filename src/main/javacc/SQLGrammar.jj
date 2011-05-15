@@ -2045,6 +2045,7 @@ TOKEN [IGNORE_CASE] :
 | <CURTIME: "curtime">
 | <DATABASE: "database">
 | <GET_CURRENT_CONNECTION: "getCurrentConnection">
+| <GROUPING: "grouping">
 | <EXPLAIN: "explain">
 | <LIMIT: "limit">
 | <LONGINT: "bigint">
@@ -10954,8 +10955,11 @@ referentialConstraintDefinition(TableName constraintName) throws StandardExcepti
     TableName referencedTable;
     int[] refActions = { StatementType.RA_NOACTION,
                          StatementType.RA_NOACTION }; //default values
+    Token grouping = null;
 }
 {
+    [ LOOKAHEAD ( { groupConstructFollows(GROUPING) } )
+      grouping = <GROUPING> ]
     <FOREIGN> <KEY> <LEFT_PAREN> columnNameList(fkRcl) <RIGHT_PAREN>
     referencedTable = referencesSpecification(refRcl, refActions)
     {
@@ -10965,6 +10969,7 @@ referentialConstraintDefinition(TableName constraintName) throws StandardExcepti
                                                              fkRcl,
                                                              refRcl,
                                                              refActions,
+                                                             (grouping == null) ? Boolean.FALSE : Boolean.TRUE,
                                                              parserContext);
     }
 }
@@ -11120,6 +11125,7 @@ columnConstraint(TableName constraintName,
     TableName referencedTable;
     int[] refActions = {StatementType.RA_NOACTION,
                         StatementType.RA_NOACTION} ; //default: NO ACTION
+    Token grouping = null;
 }
 {
     <NOT> <NULL>
@@ -11156,6 +11162,8 @@ columnConstraint(TableName constraintName,
                                                              parserContext);
     }
 |    
+    [ LOOKAHEAD ( { groupConstructFollows(GROUPING) } )
+      grouping = <GROUPING> ]
     referencedTable = referencesSpecification(refRcl, refActions)
     [ properties = propertyList(false)<CHECK_PROPERTIES>] 
     {
@@ -11172,6 +11180,7 @@ columnConstraint(TableName constraintName,
                                                              fkRcl,
                                                              refRcl,
                                                              refActions,
+                                                             (grouping == null) ? Boolean.FALSE : Boolean.TRUE,
                                                              parserContext);
         if (properties != null) {
             tcdn.setProperties(properties);
@@ -12539,6 +12548,7 @@ reservedKeyword() :
 | tok = <CALL>
 | tok = <CURRENT_ROLE>
 | tok = <EXPLAIN>
+| tok = <GROUPING>
 | tok = <LONGINT>
 | tok = <LTRIM>
 | tok = <RTRIM>

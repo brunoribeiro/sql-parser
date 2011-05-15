@@ -45,6 +45,8 @@ public class NodeToString
             return columnDefinitionNode((ColumnDefinitionNode)node);
         case NodeTypes.CONSTRAINT_DEFINITION_NODE:
             return constraintDefinitionNode((ConstraintDefinitionNode)node);
+        case NodeTypes.FK_CONSTRAINT_DEFINITION_NODE:
+            return fkConstraintDefinitionNode((FKConstraintDefinitionNode)node);
         case NodeTypes.RENAME_NODE:
             return renameNode((RenameNode)node);
         case NodeTypes.CURSOR_NODE:
@@ -209,6 +211,21 @@ public class NodeToString
         default:
             return "**UNKNOWN(" + node.getConstraintType() + ")";
         }
+    }
+
+    protected String fkConstraintDefinitionNode(FKConstraintDefinitionNode node)
+            throws StandardException {
+        StringBuilder str = new StringBuilder();
+        if (node.isGrouping())
+            str.append("GROUPING ");
+        str.append("FOREIGN KEY(");
+        str.append(toString(node.getColumnList()));
+        str.append(") REFERENCES ");
+        str.append(toString(node.getRefTableName()));
+        str.append("(");
+        str.append(toString(node.getColumnList()));
+        str.append(")");
+        return str.toString();
     }
 
     protected String renameNode(RenameNode node)
