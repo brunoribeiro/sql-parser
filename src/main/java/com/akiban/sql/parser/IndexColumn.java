@@ -22,6 +22,7 @@ import com.akiban.sql.StandardException;
  */
 public class IndexColumn extends QueryTreeNode
 {
+    private TableName tableName;
     private String columnName;
     private boolean ascending = true;
 
@@ -33,6 +34,22 @@ public class IndexColumn extends QueryTreeNode
      */
     public void init(Object columnName,
                      Object ascending) {
+        this.tableName = null;
+        this.columnName = (String)columnName;
+        this.ascending = ((Boolean)ascending).booleanValue();
+    }
+
+    /**
+     * Initializer.
+     *
+     * @param tableName Table holding indexed column
+     * @param columnName Name of the column
+     * @param ascending Whether index is ascending
+     */
+    public void init(Object tableName,
+                     Object columnName,
+                     Object ascending) {
+        this.tableName = (TableName)tableName;
         this.columnName = (String)columnName;
         this.ascending = ((Boolean)ascending).booleanValue();
     }
@@ -44,6 +61,8 @@ public class IndexColumn extends QueryTreeNode
         super.copyFrom(node);
 
         IndexColumn other = (IndexColumn)node;
+        this.tableName = (TableName)getNodeFactory().copyNode(other.tableName, 
+                                                              getParserContext());
         this.columnName = other.columnName;
         this.ascending = other.ascending;
     }
@@ -56,8 +75,13 @@ public class IndexColumn extends QueryTreeNode
      */
     public String toString() {
         return "columnName: " + columnName + "\n" +
+            "tableName: " + ((tableName != null) ? tableName.toString() : "null") + "\n" +
             (ascending ? "ascending" : "descending") + "\n" +
             super.toString();
+    }
+
+    public TableName getTableName() {
+        return tableName;
     }
 
     public String getColumnName() {

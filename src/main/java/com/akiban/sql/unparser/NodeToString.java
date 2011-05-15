@@ -239,11 +239,11 @@ public class NodeToString
         if (node.getUniqueness())
             str.append("UNIQUE ");
         str.append("INDEX");
-        if (node.getIndexName() != null) {
-            str.append(" ");
-            str.append(toString(node.getIndexName()));
-        }
+        str.append(" ");
+        str.append(toString(node.getIndexName()));
         str.append(" ON ");
+        if (node.isGroup())
+            str.append("GROUP ");
         str.append(node.getIndexTableName());
         str.append("(");
         str.append(toString(node.getColumnList()));
@@ -257,6 +257,10 @@ public class NodeToString
 
     protected String indexColumn(IndexColumn node) throws StandardException {
         StringBuilder str = new StringBuilder();
+        if (node.getTableName() != null) {
+            str.append(toString(node.getTableName()));
+            str.append(".");
+        }
         str.append(node.getColumnName());
         if (!node.isAscending())
             str.append(" DESC");

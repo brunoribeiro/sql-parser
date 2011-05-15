@@ -1,0 +1,1 @@
+CREATE INDEX GIDX ON GROUP g1(p.c1, c.c2)

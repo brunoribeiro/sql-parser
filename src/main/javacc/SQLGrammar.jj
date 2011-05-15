@@ -8996,13 +8996,23 @@ indexDefinition() throws StandardException :
     TableName tableName;
     IndexColumnList indexColumnList = (IndexColumnList)
         nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
+    Token groupToken = null;
 }
 {
     [ unique = unique() ] 
     <INDEX>
     indexName = qualifiedName() 
-    <ON> tableName = qualifiedName()
-    <LEFT_PAREN> indexColumnList(indexColumnList) <RIGHT_PAREN>
+    <ON> 
+    ( LOOKAHEAD ( { groupConstructFollows(GROUP) } )
+      groupToken = <GROUP>
+      tableName = qualifiedName()
+      <LEFT_PAREN> groupIndexColumnList(indexColumnList) <RIGHT_PAREN>
+    |
+      [ LOOKAHEAD ( { groupConstructFollows(TABLE) } )
+        <TABLE> ]
+      tableName = qualifiedName()
+      <LEFT_PAREN> indexColumnList(indexColumnList) <RIGHT_PAREN>
+    )
     [ properties = propertyList(false) <CHECK_PROPERTIES>]
     {
         /* User allowed to specify schema name on table and index.
@@ -9024,7 +9034,7 @@ indexDefinition() throws StandardException :
             if (! (indexName.getSchemaName().equals(
                         tableName.getSchemaName()))) {
                 throw new StandardException("Specified schemas do not match: " + 
-                                                                         indexName + ", " + tableName);
+                                            indexName + ", " + tableName);
             }
         }
         return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_INDEX_NODE,
@@ -9033,6 +9043,7 @@ indexDefinition() throws StandardException :
                                                   indexName,
                                                   tableName,
                                                   indexColumnList,
+                                                  (groupToken != null) ? Boolean.TRUE : Boolean.FALSE,
                                                   properties,
                                                   parserContext);
     }
@@ -12903,4 +12914,52 @@ alterGroupRenameGroupStatement(TableName groupName) throws StandardException :
     }
 }
 */
+
+void
+groupIndexColumnList(IndexColumnList columnList) throws StandardException :
+{}
+{
+    groupIndexColumnItem(columnList) 
+    ( <COMMA> groupIndexColumnItem(columnList) )*
+}
+
+void
+groupIndexColumnItem(IndexColumnList columnList) throws StandardException :
+{
+    String firstName, secondName;
+    String thirdName = null;
+    boolean asc = true;
+}
+{
+    firstName = identifierDeferCheckLength()
+    <PERIOD>
+    secondName = identifierDeferCheckLength()
+    [ LOOKAHEAD( { getToken(1).kind == PERIOD } )
+      thirdName = identifierDeferCheckLength() ]
+    [ <ASC> | <DESC> { asc = false; } ]
+    {
+        if (thirdName == null) {
+            thirdName = secondName;
+            secondName = firstName;
+            firstName = null;
+        }
+        if (firstName != null)
+            parserContext.checkIdentifierLengthLimit(firstName);
+        parserContext.checkIdentifierLengthLimit(secondName);
+        parserContext.checkIdentifierLengthLimit(thirdName);
+        TableName tableName = (TableName)nodeFactory.getNode(NodeTypes.TABLE_NAME,
+                                                             firstName,
+                                                             secondName,
+                                                             new Integer(nextToLastIdentifierToken.beginOffset),
+                                                             new Integer(nextToLastIdentifierToken.endOffset),
+                                                             parserContext);
+        IndexColumn indexColumn = (IndexColumn)
+            nodeFactory.getNode(NodeTypes.INDEX_COLUMN,
+                                tableName,
+                                thirdName,
+                                asc ? Boolean.TRUE : Boolean.FALSE,
+                                parserContext);
+        columnList.add(indexColumn);
+    }
+}
 
