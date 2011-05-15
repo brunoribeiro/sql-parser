@@ -31,6 +31,14 @@ public class NodeToString
             return createTableNode((CreateTableNode)node);
         case NodeTypes.CREATE_VIEW_NODE:
             return createViewNode((CreateViewNode)node);
+        case NodeTypes.CREATE_GROUP_NODE:
+        case NodeTypes.DROP_TABLE_NODE:
+        case NodeTypes.DROP_INDEX_NODE:
+        case NodeTypes.DROP_VIEW_NODE:
+        case NodeTypes.DROP_TRIGGER_NODE:
+        case NodeTypes.DROP_GROUP_NODE:
+        case NodeTypes.TRUNCATE_GROUP_NODE:
+            return qualifiedDDLNode((DDLStatementNode)node);
         case NodeTypes.TABLE_ELEMENT_LIST:
             return tableElementList((TableElementList)node);
         case NodeTypes.COLUMN_DEFINITION_NODE:
@@ -158,6 +166,10 @@ public class NodeToString
             str.append(") WITH ");
             if (!node.isWithData()) str.append("NO ");
             str.append("DATA");
+        }
+        if (node.getGroupName() != null) {
+            str.append(" GROUP ");
+            str.append(toString(node.getGroupName()));
         }
         return str.toString();
     }
@@ -595,6 +607,10 @@ public class NodeToString
     protected String castNode(CastNode node) throws StandardException {
         return "CAST(" + toString(node.getCastOperand()) + 
             " AS " + node.getType().toString() + ")";
+    }
+
+    protected String qualifiedDDLNode(DDLStatementNode node) throws StandardException {
+        return node.statementToString() + " " + node.getObjectName();
     }
 
 }

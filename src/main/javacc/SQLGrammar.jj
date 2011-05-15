@@ -287,6 +287,11 @@ class SQLGrammar
         return s.toUpperCase(Locale.ENGLISH);
     }
 
+    /** Is the given feature enabled for this parser? */
+    public boolean hasFeature(SQLParserFeature feature) {
+        return parserContext.hasFeature(feature);
+    }
+
     /**
      * Is this token a date / time function name?
      */
@@ -1434,6 +1439,11 @@ class SQLGrammar
         return additiveExpression(null, null);
     }
 
+    boolean groupConstructFollows(int tokenKind) {
+        return hasFeature(SQLParserFeature.GROUPING) &&
+            getToken(1).kind == tokenKind;
+    }
+
     void setParserContext(SQLParserContext parserContext) {
         this.parserContext = parserContext;
         this.nodeFactory = parserContext.getNodeFactory();
@@ -2569,7 +2579,7 @@ StatementPart(Token[] tokenHolder) throws StandardException :
 |
     statementNode = spsSetStatement()
 |
-    statementNode = truncateTableStatement()
+    statementNode = truncateStatement()
 |
     statementNode = grantStatement()
 |
@@ -2616,6 +2626,9 @@ createStatements() throws StandardException :
     statementNode = udtDefinition()
 |
     statementNode = indexDefinition()
+|
+    LOOKAHEAD ( { groupConstructFollows(GROUP) } )
+    statementNode = groupDefinition()
 )
     {
         return statementNode;
@@ -2645,6 +2658,9 @@ dropStatements() throws StandardException :
     statementNode = dropRoleStatement() 
 |
     statementNode = dropSequenceStatement()
+|
+    LOOKAHEAD ( { groupConstructFollows(GROUP) } )
+    statementNode = dropGroupStatement()
 )
     {
         return statementNode;
@@ -3196,6 +3212,7 @@ globalTemporaryTableDeclaration() throws StandardException :
         return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_TABLE_NODE,
                                                   tableName,
                                                   tableElementList,
+                                                  (TableName)null,
                                                   (Properties)null,
                                                   (Boolean)declareTableClauses[1],
                                                   (Boolean)declareTableClauses[2],
@@ -8810,10 +8827,11 @@ dropSequenceStatement() throws StandardException :
 StatementNode
 tableDefinition() throws StandardException :
 {
-    char lockGranularity = CreateTableNode.DEFAULT_LOCK_GRANULARITY;
-    Properties properties = null;
     TableName tableName;
     TableElementList tableElementList;
+    TableName groupName = null;
+    Properties properties = null;
+    char lockGranularity = CreateTableNode.DEFAULT_LOCK_GRANULARITY;
     ResultColumnList resultColumns = null;
     ResultSetNode queryExpression;
     boolean withData = true;
@@ -8824,13 +8842,16 @@ tableDefinition() throws StandardException :
     // tableColumnList.
     (        
         LOOKAHEAD( { getToken(1).kind == LEFT_PAREN && 
-                                     getToken(3).kind != COMMA && getToken(3).kind != RIGHT_PAREN } )
+                     getToken(3).kind != COMMA && getToken(3).kind != RIGHT_PAREN } )
         tableElementList = tableElementList()
+        [ LOOKAHEAD ( { groupConstructFollows(GROUP) } )
+          <GROUP> groupName = qualifiedName() ]
         [ properties = propertyList(false)<CHECK_PROPERTIES>]
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_TABLE_NODE,
                                                   tableName,
                                                   tableElementList,
+                                                  groupName,
                                                   properties,
                                                   new Character(lockGranularity),
                                                   parserContext);
@@ -11725,12 +11746,30 @@ dropTriggerStatement() throws StandardException :
 }
 
 StatementNode
+truncateStatement() throws StandardException :
+{
+    StatementNode statementNode;
+}
+{
+    <TRUNCATE>
+(
+    statementNode = truncateTableStatement()
+|
+    LOOKAHEAD ( { groupConstructFollows(GROUP) } )
+    statementNode = truncateGroupStatement()
+)
+    {
+        return statementNode;
+    }
+}
+
+StatementNode
 truncateTableStatement() throws StandardException :
 {
     TableName tableName;
 }
 {
-    <TRUNCATE> <TABLE> tableName = qualifiedName() 
+    <TABLE> tableName = qualifiedName() 
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_TABLE_NODE,
                                                   tableName,
@@ -12752,5 +12791,56 @@ caseSensitiveIdentifier() :
     str = nonReservedKeyword()
     {
         return str;
+    }
+}
+
+StatementNode
+groupDefinition() throws StandardException :
+{
+    TableName groupName;
+}
+{
+    /*
+     * CREATE GROUP
+     */
+    <GROUP> groupName = qualifiedName()
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_GROUP_NODE,
+                                                  groupName,
+                                                  parserContext);
+    }
+}
+
+StatementNode
+dropGroupStatement() throws StandardException :
+{
+    TableName groupName;
+}
+{
+    /*
+     * DROP GROUP
+     */
+    <GROUP> groupName = qualifiedName()
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_GROUP_NODE,
+                                                  groupName,
+                                                  parserContext);
+    }
+}
+
+StatementNode
+truncateGroupStatement() throws StandardException :
+{
+    TableName groupName;
+}
+{
+    /*
+     * TRUNCATE GROUP
+     */
+    <GROUP> groupName = qualifiedName() 
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.TRUNCATE_GROUP_NODE,
+                                                  groupName,
+                                                  parserContext);
     }
 }
