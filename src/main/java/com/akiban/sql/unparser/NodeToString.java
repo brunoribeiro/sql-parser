@@ -45,6 +45,8 @@ public class NodeToString
             return columnDefinitionNode((ColumnDefinitionNode)node);
         case NodeTypes.CONSTRAINT_DEFINITION_NODE:
             return constraintDefinitionNode((ConstraintDefinitionNode)node);
+        case NodeTypes.RENAME_NODE:
+            return renameNode((RenameNode)node);
         case NodeTypes.CURSOR_NODE:
             return cursorNode((CursorNode)node);
         case NodeTypes.SELECT_NODE:
@@ -206,6 +208,19 @@ public class NodeToString
             return "UNIQUE(" + toString(node.getColumnList()) + ")";
         default:
             return "**UNKNOWN(" + node.getConstraintType() + ")";
+        }
+    }
+
+    protected String renameNode(RenameNode node)
+        throws StandardException {
+        if (node.isAlterTable()) {
+            return "ALTER TABLE " + toString(node.getObjectName()) +
+                "RENAME COLUMN " + node.getOldObjectName() +
+                " TO " + node.getNewObjectName();
+        }
+        else {
+            return node.statementToString() + " " + toString(node.getObjectName()) +
+                " TO " + toString(node.getNewTableName());
         }
     }
 

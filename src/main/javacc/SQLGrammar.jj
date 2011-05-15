@@ -10277,6 +10277,9 @@ spsRenameStatement() throws StandardException :
         qtn = renameIndexStatement() 
     |
         qtn = renameColumnStatement()
+    |
+        LOOKAHEAD ( { groupConstructFollows(GROUP) } )
+        qtn = renameGroupStatement()
     )
     {
         return qtn;
@@ -12844,3 +12847,45 @@ truncateGroupStatement() throws StandardException :
                                                   parserContext);
     }
 }
+
+StatementNode
+renameGroupStatement() throws StandardException :
+{
+    StatementNode qtn;
+    TableName groupName;
+    String newGroupName;
+}
+{
+    <GROUP> groupName = qualifiedName() 
+    <TO> newGroupName = identifier()
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
+                                                  groupName,
+                                                  null,
+                                                  newGroupName,
+                                                  Boolean.FALSE,
+                                                  RenameNode.RenameType.GROUP,
+                                                  parserContext);
+    }
+}
+
+/*
+StatementNode
+alterGroupRenameGroupStatement(TableName groupName) throws StandardException :
+{
+    String newGroupName;
+}
+{
+    <TO> newGroupName = identifier()
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
+                                                  groupName,
+                                                  null,
+                                                  newGroupName,
+                                                  Boolean.TRUE,
+                                                  RenameNode.RenameType.GROUP,
+                                                  parserContext);
+    }
+}
+*/
+
