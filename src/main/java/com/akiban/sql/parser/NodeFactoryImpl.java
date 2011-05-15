@@ -559,6 +559,12 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.NEXT_SEQUENCE_NODE:
             return NodeNames.NEXT_SEQUENCE_NODE_NAME;
 
+        case NodeTypes.INDEX_COLUMN:
+            return NodeNames.INDEX_COLUMN_NAME;
+        
+        case NodeTypes.INDEX_COLUMN_LIST:
+            return NodeNames.INDEX_COLUMN_LIST_NAME;
+        
         case NodeTypes.CREATE_GROUP_NODE:
             return NodeNames.CREATE_GROUP_NODE_NAME;
 

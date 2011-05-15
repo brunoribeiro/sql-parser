@@ -7928,7 +7928,7 @@ columnNameItem(ResultColumnList columnList) throws StandardException :
 }
 
 void
-indexColumnList(List<String> columnList) throws StandardException :
+indexColumnList(IndexColumnList columnList) throws StandardException :
 {}
 {
     indexColumnItem(columnList) 
@@ -7936,17 +7936,21 @@ indexColumnList(List<String> columnList) throws StandardException :
 }
 
 void
-indexColumnItem(List<String> columnList) throws StandardException :
+indexColumnItem(IndexColumnList columnList) throws StandardException :
 {
     String columnName;
+    boolean asc = true;
 }
 {
-    /* identifier never ends with a space; appending a space meaning desc */
-    // TODO: O RLY? Sounds like a crock.
     columnName = identifier() 
-    [ <ASC> | <DESC> { columnName = columnName + ' '; } ]
+    [ <ASC> | <DESC> { asc = false; } ]
     {
-        columnList.add(columnName);
+        IndexColumn indexColumn = (IndexColumn)
+            nodeFactory.getNode(NodeTypes.INDEX_COLUMN,
+                                columnName,
+                                asc ? Boolean.TRUE : Boolean.FALSE,
+                                parserContext);
+        columnList.add(indexColumn);
     }
 }
 
@@ -8990,7 +8994,8 @@ indexDefinition() throws StandardException :
     Properties properties = null;
     TableName indexName;
     TableName tableName;
-    List<String> indexColumnList = new ArrayList<String>();
+    IndexColumnList indexColumnList = (IndexColumnList)
+        nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
 }
 {
     [ unique = unique() ] 

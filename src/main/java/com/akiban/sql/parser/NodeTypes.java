@@ -57,14 +57,14 @@ public interface NodeTypes
     public static final int ORDER_BY_LIST = 7;
     public static final int PREDICATE_LIST = 8;
     public static final int RESULT_COLUMN_LIST = 9;
-    // 10 available
+    public static final int INDEX_COLUMN = 10;
     public static final int SUBQUERY_LIST = 11;
     public static final int TABLE_ELEMENT_LIST = 12;
     public static final int UNTYPED_NULL_CONSTANT_NODE = 13;
     public static final int TABLE_ELEMENT_NODE = 14;
     public static final int VALUE_NODE_LIST = 15;
     public static final int ALL_RESULT_COLUMN = 16;
-    // 17 is available
+    public static final int INDEX_COLUMN_LIST = 17;
     public static final int GET_CURRENT_CONNECTION_NODE = 18;
     public static final int NOP_STATEMENT_NODE = 19;
     public static final int DB2_LENGTH_OPERATOR_NODE = 20;

@@ -47,6 +47,12 @@ public class NodeToString
             return constraintDefinitionNode((ConstraintDefinitionNode)node);
         case NodeTypes.FK_CONSTRAINT_DEFINITION_NODE:
             return fkConstraintDefinitionNode((FKConstraintDefinitionNode)node);
+        case NodeTypes.CREATE_INDEX_NODE:
+            return createIndexNode((CreateIndexNode)node);
+        case NodeTypes.INDEX_COLUMN_LIST:
+            return indexColumnList((IndexColumnList)node);
+        case NodeTypes.INDEX_COLUMN:
+            return indexColumn((IndexColumn)node);
         case NodeTypes.RENAME_NODE:
             return renameNode((RenameNode)node);
         case NodeTypes.CURSOR_NODE:
@@ -225,6 +231,35 @@ public class NodeToString
         str.append("(");
         str.append(toString(node.getColumnList()));
         str.append(")");
+        return str.toString();
+    }
+
+    protected String createIndexNode(CreateIndexNode node) throws StandardException {
+        StringBuilder str = new StringBuilder("CREATE ");
+        if (node.getUniqueness())
+            str.append("UNIQUE ");
+        str.append("INDEX");
+        if (node.getIndexName() != null) {
+            str.append(" ");
+            str.append(toString(node.getIndexName()));
+        }
+        str.append(" ON ");
+        str.append(node.getIndexTableName());
+        str.append("(");
+        str.append(toString(node.getColumnList()));
+        str.append(")");
+        return str.toString();
+    }
+
+    protected String indexColumnList(IndexColumnList node) throws StandardException {
+        return nodeList(node);
+    }
+
+    protected String indexColumn(IndexColumn node) throws StandardException {
+        StringBuilder str = new StringBuilder();
+        str.append(node.getColumnName());
+        if (!node.isAscending())
+            str.append(" DESC");
         return str.toString();
     }
 
