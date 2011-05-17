@@ -55,7 +55,8 @@ public class CreateIndexNode extends DDLStatementNode
     String indexType;
     TableName indexName;
     TableName tableName;
-    List<String> columnNameList;
+    IndexColumnList columnList;
+    boolean group;
     Properties properties;
 
     /**
@@ -65,8 +66,9 @@ public class CreateIndexNode extends DDLStatementNode
      * @param indexType The type of index
      * @param indexName The name of the index
      * @param tableName The name of the table the index will be on
-     * @param columnNameList A list of column names, in the order they
-     *              appear in the index.
+     * @param columnList A list of columns, in the order they
+     *                   appear in the index.
+     * @param group Whether this is a group index.
      * @param properties The optional properties list associated with the index.
      *
      * @exception StandardException Thrown on error
@@ -75,7 +77,8 @@ public class CreateIndexNode extends DDLStatementNode
                      Object indexType,
                      Object indexName,
                      Object tableName,
-                     Object columnNameList,
+                     Object columnList,
+                     Object group,
                      Object properties) 
             throws StandardException {
         initAndCheck(indexName);
@@ -83,7 +86,8 @@ public class CreateIndexNode extends DDLStatementNode
         this.indexType = (String)indexType;
         this.indexName = (TableName)indexName;
         this.tableName = (TableName)tableName;
-        this.columnNameList = (List<String>)columnNameList;
+        this.columnList = (IndexColumnList)columnList;
+        this.group = ((Boolean)group).booleanValue();
         this.properties = (Properties)properties;
     }
 
@@ -100,7 +104,9 @@ public class CreateIndexNode extends DDLStatementNode
             getNodeFactory().copyNode(other.indexName, getParserContext());
         this.tableName = (TableName)
             getNodeFactory().copyNode(other.tableName, getParserContext());
-        this.columnNameList = other.columnNameList; // TODO: Clone?
+        this.columnList = (IndexColumnList)
+            getNodeFactory().copyNode(other.columnList, getParserContext());
+        this.group = other.group;
         this.properties = other.properties; // TODO: Clone?
     }
 
@@ -132,6 +138,12 @@ public class CreateIndexNode extends DDLStatementNode
     }
     public TableName getIndexName() { 
         return indexName; 
+    }
+    public IndexColumnList getColumnList() {
+        return columnList;
+    }
+    public boolean isGroup() {
+        return group;
     }
     public Properties getProperties() { 
         return properties; 

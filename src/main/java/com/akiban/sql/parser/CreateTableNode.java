@@ -64,6 +64,7 @@ public class CreateTableNode extends DDLStatementNode
     private char lockGranularity;
     private boolean onCommitDeleteRows; //If true, on commit delete rows else on commit preserve rows of temporary table.
     private boolean onRollbackDeleteRows; //If true, on rollback delete rows from temp table if it was logically modified in that UOW. true is the only supported value
+    private TableName groupName;
     private Properties properties;
     private TableElementList tableElementList;
     protected int tableType; //persistent table or global temporary table
@@ -77,6 +78,7 @@ public class CreateTableNode extends DDLStatementNode
      * @param newObjectName The name of the new object being created (ie base table)
      * @param tableElementList The elements of the table: columns,
      *              constraints, etc.
+     * @param groupName The optional name of a group to add this table to.
      * @param properties The optional list of properties associated with
      *              the table.
      * @param lockGranularity The lock granularity.
@@ -86,6 +88,7 @@ public class CreateTableNode extends DDLStatementNode
 
     public void init(Object newObjectName,
                      Object tableElementList,
+                     Object groupName,
                      Object properties,
                      Object lockGranularity)
             throws StandardException {
@@ -98,6 +101,7 @@ public class CreateTableNode extends DDLStatementNode
 
         initAndCheck(newObjectName);
         this.tableElementList = (TableElementList)tableElementList;
+        this.groupName = (TableName)groupName;
         this.properties = (Properties)properties;
     }
 
@@ -117,6 +121,7 @@ public class CreateTableNode extends DDLStatementNode
 
     public void init(Object newObjectName,
                      Object tableElementList,
+                     Object groupName,
                      Object properties,
                      Object onCommitDeleteRows,
                      Object onRollbackDeleteRows)
@@ -127,6 +132,7 @@ public class CreateTableNode extends DDLStatementNode
         this.onRollbackDeleteRows = ((Boolean)onRollbackDeleteRows).booleanValue();
         initAndCheck(newObjectName);
         this.tableElementList = (TableElementList)tableElementList;
+        this.groupName = (TableName)groupName;
         this.properties = (Properties)properties;
 
         assert this.onRollbackDeleteRows;
@@ -204,6 +210,7 @@ public class CreateTableNode extends DDLStatementNode
         } 
         else
             tempString = tempString +
+                (groupName != null ? "group: " + "\n" + groupName + "\n" : "") +
                 (properties != null ? "properties: " + "\n" + properties + "\n" : "") +
                 (withData ? "withData: " + withData + "\n" : "") +
                 "lockGranularity: " + lockGranularity + "\n";
@@ -216,6 +223,10 @@ public class CreateTableNode extends DDLStatementNode
 
     public ResultSetNode getQueryExpression() {
         return queryExpression;
+    }
+
+    public TableName getGroupName() {
+        return groupName;
     }
 
     public boolean isWithData() {

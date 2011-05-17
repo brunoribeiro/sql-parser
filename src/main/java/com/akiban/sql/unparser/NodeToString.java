@@ -31,12 +31,30 @@ public class NodeToString
             return createTableNode((CreateTableNode)node);
         case NodeTypes.CREATE_VIEW_NODE:
             return createViewNode((CreateViewNode)node);
+        case NodeTypes.CREATE_GROUP_NODE:
+        case NodeTypes.DROP_TABLE_NODE:
+        case NodeTypes.DROP_INDEX_NODE:
+        case NodeTypes.DROP_VIEW_NODE:
+        case NodeTypes.DROP_TRIGGER_NODE:
+        case NodeTypes.DROP_GROUP_NODE:
+        case NodeTypes.TRUNCATE_GROUP_NODE:
+            return qualifiedDDLNode((DDLStatementNode)node);
         case NodeTypes.TABLE_ELEMENT_LIST:
             return tableElementList((TableElementList)node);
         case NodeTypes.COLUMN_DEFINITION_NODE:
             return columnDefinitionNode((ColumnDefinitionNode)node);
         case NodeTypes.CONSTRAINT_DEFINITION_NODE:
             return constraintDefinitionNode((ConstraintDefinitionNode)node);
+        case NodeTypes.FK_CONSTRAINT_DEFINITION_NODE:
+            return fkConstraintDefinitionNode((FKConstraintDefinitionNode)node);
+        case NodeTypes.CREATE_INDEX_NODE:
+            return createIndexNode((CreateIndexNode)node);
+        case NodeTypes.INDEX_COLUMN_LIST:
+            return indexColumnList((IndexColumnList)node);
+        case NodeTypes.INDEX_COLUMN:
+            return indexColumn((IndexColumn)node);
+        case NodeTypes.RENAME_NODE:
+            return renameNode((RenameNode)node);
         case NodeTypes.CURSOR_NODE:
             return cursorNode((CursorNode)node);
         case NodeTypes.SELECT_NODE:
@@ -159,6 +177,10 @@ public class NodeToString
             if (!node.isWithData()) str.append("NO ");
             str.append("DATA");
         }
+        if (node.getGroupName() != null) {
+            str.append(" GROUP ");
+            str.append(toString(node.getGroupName()));
+        }
         return str.toString();
     }
 
@@ -194,6 +216,67 @@ public class NodeToString
             return "UNIQUE(" + toString(node.getColumnList()) + ")";
         default:
             return "**UNKNOWN(" + node.getConstraintType() + ")";
+        }
+    }
+
+    protected String fkConstraintDefinitionNode(FKConstraintDefinitionNode node)
+            throws StandardException {
+        StringBuilder str = new StringBuilder();
+        if (node.isGrouping())
+            str.append("GROUPING ");
+        str.append("FOREIGN KEY(");
+        str.append(toString(node.getColumnList()));
+        str.append(") REFERENCES ");
+        str.append(toString(node.getRefTableName()));
+        str.append("(");
+        str.append(toString(node.getColumnList()));
+        str.append(")");
+        return str.toString();
+    }
+
+    protected String createIndexNode(CreateIndexNode node) throws StandardException {
+        StringBuilder str = new StringBuilder("CREATE ");
+        if (node.getUniqueness())
+            str.append("UNIQUE ");
+        str.append("INDEX");
+        str.append(" ");
+        str.append(toString(node.getIndexName()));
+        str.append(" ON ");
+        if (node.isGroup())
+            str.append("GROUP ");
+        str.append(node.getIndexTableName());
+        str.append("(");
+        str.append(toString(node.getColumnList()));
+        str.append(")");
+        return str.toString();
+    }
+
+    protected String indexColumnList(IndexColumnList node) throws StandardException {
+        return nodeList(node);
+    }
+
+    protected String indexColumn(IndexColumn node) throws StandardException {
+        StringBuilder str = new StringBuilder();
+        if (node.getTableName() != null) {
+            str.append(toString(node.getTableName()));
+            str.append(".");
+        }
+        str.append(node.getColumnName());
+        if (!node.isAscending())
+            str.append(" DESC");
+        return str.toString();
+    }
+
+    protected String renameNode(RenameNode node)
+        throws StandardException {
+        if (node.isAlterTable()) {
+            return "ALTER TABLE " + toString(node.getObjectName()) +
+                "RENAME COLUMN " + node.getOldObjectName() +
+                " TO " + node.getNewObjectName();
+        }
+        else {
+            return node.statementToString() + " " + toString(node.getObjectName()) +
+                " TO " + toString(node.getNewTableName());
         }
     }
 
@@ -595,6 +678,10 @@ public class NodeToString
     protected String castNode(CastNode node) throws StandardException {
         return "CAST(" + toString(node.getCastOperand()) + 
             " AS " + node.getType().toString() + ")";
+    }
+
+    protected String qualifiedDDLNode(DDLStatementNode node) throws StandardException {
+        return node.statementToString() + " " + node.getObjectName();
     }
 
 }

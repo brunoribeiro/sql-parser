@@ -57,14 +57,14 @@ public interface NodeTypes
     public static final int ORDER_BY_LIST = 7;
     public static final int PREDICATE_LIST = 8;
     public static final int RESULT_COLUMN_LIST = 9;
-    // 10 available
+    public static final int INDEX_COLUMN = 10;
     public static final int SUBQUERY_LIST = 11;
     public static final int TABLE_ELEMENT_LIST = 12;
     public static final int UNTYPED_NULL_CONSTANT_NODE = 13;
     public static final int TABLE_ELEMENT_NODE = 14;
     public static final int VALUE_NODE_LIST = 15;
     public static final int ALL_RESULT_COLUMN = 16;
-    // 17 is available
+    public static final int INDEX_COLUMN_LIST = 17;
     public static final int GET_CURRENT_CONNECTION_NODE = 18;
     public static final int NOP_STATEMENT_NODE = 19;
     public static final int DB2_LENGTH_OPERATOR_NODE = 20;
@@ -261,8 +261,13 @@ public interface NodeTypes
     public static final int WINDOW_REFERENCE_NODE = 229;
     public static final int WINDOW_RESULTSET_NODE = 230;
 
+    // Grouping
+    public static final int CREATE_GROUP_NODE = 232;
+    public static final int DROP_GROUP_NODE = 233;
+    public static final int TRUNCATE_GROUP_NODE = 234;
+
     // Final value in set, keep up to date!
-    public static final int FINAL_VALUE = NEXT_SEQUENCE_NODE;
+    public static final int FINAL_VALUE = TRUNCATE_GROUP_NODE;
 
     /**
      * Extensions to this interface can use nodetypes > MAX_NODE_TYPE with out fear of collision

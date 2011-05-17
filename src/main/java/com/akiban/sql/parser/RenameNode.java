@@ -62,7 +62,7 @@ public class RenameNode extends DDLStatementNode
     protected boolean usedAlterTable;
 
     public static enum RenameType {
-        TABLE, COLUMN, INDEX
+        TABLE, COLUMN, INDEX, GROUP
     }
     protected RenameType renamingWhat;
 
@@ -96,6 +96,7 @@ public class RenameNode extends DDLStatementNode
 
         switch (this.renamingWhat) {
         case TABLE:
+        case GROUP:
             initAndCheck((TableName)tableName);
             this.newTableName =
                 makeTableName(getObjectName().getSchemaName(), (String)newObjectName);
@@ -130,6 +131,26 @@ public class RenameNode extends DDLStatementNode
         }
     }
 
+    public RenameType getRenameType() {
+        return renamingWhat;
+    }
+
+    public TableName getNewTableName() {
+        return newTableName;
+    }
+
+    public boolean isAlterTable() {
+        return usedAlterTable;
+    }
+
+    public String getOldObjectName() {
+        return oldObjectName;
+    }
+
+    public String getNewObjectName() {
+        return newObjectName;
+    }
+
     /**
      * Fill this node with a deep copy of the given node.
      */
@@ -155,6 +176,7 @@ public class RenameNode extends DDLStatementNode
     public String toString() {
         switch (renamingWhat) {
         case TABLE:
+        case GROUP:
             return super.toString() +
                 "oldTableName: " + "\n" + getRelativeName() + "\n" +
                 "newTableName: " + "\n" + newTableName + "\n" ;
@@ -177,8 +199,19 @@ public class RenameNode extends DDLStatementNode
     }
 
     public String statementToString() {
-        if (usedAlterTable)
-            return "ALTER TABLE";
+        if (usedAlterTable) {
+            switch (renamingWhat) {
+            case TABLE:
+                return "ALTER TABLE";
+
+            case GROUP:
+                return "ALTER GROUP";
+
+            default:
+                assert false : "Unexpected rename action in RenameNode";
+                return "UNKNOWN";
+            }
+        }
         else {
             switch (renamingWhat) {
             case TABLE:
@@ -189,6 +222,9 @@ public class RenameNode extends DDLStatementNode
 
             case INDEX:
                 return "RENAME INDEX";
+
+            case GROUP:
+                return "RENAME GROUP";
 
             default:
                 assert false : "Unexpected rename action in RenameNode";

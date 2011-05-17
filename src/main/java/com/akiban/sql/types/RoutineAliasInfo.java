@@ -44,7 +44,7 @@ import com.akiban.sql.types.DataTypeDescriptor;
 /**
  * Describe a routine (procedure or function) alias.
  *
- * @see org.apache.derby.catalog.AliasInfo
+ * @see AliasInfo
  */
 public class RoutineAliasInfo extends MethodAliasInfo
 {
