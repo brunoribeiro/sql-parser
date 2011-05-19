@@ -154,6 +154,8 @@ public interface NodeNames
 
     static final String EXEC_SPS_NODE_NAME = "com.akiban.sql.parser.ExecSPSNode";
 
+    static final String EXPLAIN_STATEMENT_NODE_NAME = "com.akiban.sql.parser.ExplainStatementNode";
+
     static final String EXTRACT_OPERATOR_NODE_NAME = "com.akiban.sql.parser.ExtractOperatorNode";
 
     static final String FK_CONSTRAINT_DEFINITION_NODE_NAME = "com.akiban.sql.parser.FKConstraintDefinitionNode";

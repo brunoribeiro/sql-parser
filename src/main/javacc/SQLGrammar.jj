@@ -2587,6 +2587,8 @@ StatementPart(Token[] tokenHolder) throws StandardException :
     statementNode = revokeStatement()
 |
     statementNode = execStatement()
+|
+    statementNode = explainStatement()
 /*
 |
     statementNode = SQLTransactionStatement()
@@ -12266,6 +12268,21 @@ roleRevokeStatement() throws StandardException :
         return (StatementNode)nodeFactory.getNode(NodeTypes.REVOKE_ROLE_NODE,
                                                   rolesRevokeed,
                                                   grantees,
+                                                  parserContext);
+    }
+}
+
+StatementNode
+explainStatement() throws StandardException :
+{
+    StatementNode stmt;
+    Token[] tokenHolder = new Token[1];
+}
+{
+    <EXPLAIN> stmt = proceduralStatement(tokenHolder)
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.EXPLAIN_STATEMENT_NODE,
+                                                  stmt,
                                                   parserContext);
     }
 }

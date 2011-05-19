@@ -39,6 +39,8 @@ public class NodeToString
         case NodeTypes.DROP_GROUP_NODE:
         case NodeTypes.TRUNCATE_GROUP_NODE:
             return qualifiedDDLNode((DDLStatementNode)node);
+        case NodeTypes.EXPLAIN_STATEMENT_NODE:
+            return explainStatementNode((ExplainStatementNode)node);
         case NodeTypes.TABLE_ELEMENT_LIST:
             return tableElementList((TableElementList)node);
         case NodeTypes.COLUMN_DEFINITION_NODE:
@@ -682,6 +684,11 @@ public class NodeToString
 
     protected String qualifiedDDLNode(DDLStatementNode node) throws StandardException {
         return node.statementToString() + " " + node.getObjectName();
+    }
+
+    protected String explainStatementNode(ExplainStatementNode node) 
+            throws StandardException {
+        return "EXPLAIN " + toString(node.getStatement());
     }
 
 }
