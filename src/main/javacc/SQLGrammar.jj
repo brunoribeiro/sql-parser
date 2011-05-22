@@ -2629,9 +2629,6 @@ createStatements() throws StandardException :
     statementNode = udtDefinition()
 |
     statementNode = indexDefinition()
-|
-    LOOKAHEAD ( { groupConstructFollows(GROUP) } )
-    statementNode = groupDefinition()
 )
     {
         return statementNode;
@@ -2661,9 +2658,6 @@ dropStatements() throws StandardException :
     statementNode = dropRoleStatement() 
 |
     statementNode = dropSequenceStatement()
-|
-    LOOKAHEAD ( { groupConstructFollows(GROUP) } )
-    statementNode = dropGroupStatement()
 )
     {
         return statementNode;
@@ -3215,7 +3209,6 @@ globalTemporaryTableDeclaration() throws StandardException :
         return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_TABLE_NODE,
                                                   tableName,
                                                   tableElementList,
-                                                  (TableName)null,
                                                   (Properties)null,
                                                   (Boolean)declareTableClauses[1],
                                                   (Boolean)declareTableClauses[2],
@@ -8836,7 +8829,6 @@ tableDefinition() throws StandardException :
 {
     TableName tableName;
     TableElementList tableElementList;
-    TableName groupName = null;
     Properties properties = null;
     char lockGranularity = CreateTableNode.DEFAULT_LOCK_GRANULARITY;
     ResultColumnList resultColumns = null;
@@ -8851,14 +8843,11 @@ tableDefinition() throws StandardException :
         LOOKAHEAD( { getToken(1).kind == LEFT_PAREN && 
                      getToken(3).kind != COMMA && getToken(3).kind != RIGHT_PAREN } )
         tableElementList = tableElementList()
-        [ LOOKAHEAD ( { groupConstructFollows(GROUP) } )
-          <GROUP> groupName = qualifiedName() ]
         [ properties = propertyList(false)<CHECK_PROPERTIES>]
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_TABLE_NODE,
                                                   tableName,
                                                   tableElementList,
-                                                  groupName,
                                                   properties,
                                                   new Character(lockGranularity),
                                                   parserContext);
@@ -8998,23 +8987,21 @@ indexDefinition() throws StandardException :
     TableName tableName;
     IndexColumnList indexColumnList = (IndexColumnList)
         nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
-    Token groupToken = null;
+    boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
 }
 {
     [ unique = unique() ] 
     <INDEX>
     indexName = qualifiedName() 
-    <ON> 
-    ( LOOKAHEAD ( { groupConstructFollows(GROUP) } )
-      groupToken = <GROUP>
-      tableName = qualifiedName()
-      <LEFT_PAREN> groupIndexColumnList(indexColumnList) <RIGHT_PAREN>
+    <ON> tableName = qualifiedName()
+    <LEFT_PAREN>
+    ( LOOKAHEAD ( { groupFormat } )
+      groupIndexColumnList(indexColumnList)
     |
-      [ LOOKAHEAD ( { groupConstructFollows(TABLE) } )
-        <TABLE> ]
-      tableName = qualifiedName()
-      <LEFT_PAREN> indexColumnList(indexColumnList) <RIGHT_PAREN>
+      LOOKAHEAD ( { !groupFormat } )
+      indexColumnList(indexColumnList)
     )
+    <RIGHT_PAREN>
     [ properties = propertyList(false) <CHECK_PROPERTIES>]
     {
         /* User allowed to specify schema name on table and index.
@@ -9045,7 +9032,6 @@ indexDefinition() throws StandardException :
                                                   indexName,
                                                   tableName,
                                                   indexColumnList,
-                                                  (groupToken != null) ? Boolean.TRUE : Boolean.FALSE,
                                                   properties,
                                                   parserContext);
     }
@@ -10296,9 +10282,6 @@ spsRenameStatement() throws StandardException :
         qtn = renameIndexStatement() 
     |
         qtn = renameColumnStatement()
-    |
-        LOOKAHEAD ( { groupConstructFollows(GROUP) } )
-        qtn = renameGroupStatement()
     )
     {
         return qtn;
@@ -11784,9 +11767,6 @@ truncateStatement() throws StandardException :
     <TRUNCATE>
 (
     statementNode = truncateTableStatement()
-|
-    LOOKAHEAD ( { groupConstructFollows(GROUP) } )
-    statementNode = truncateGroupStatement()
 )
     {
         return statementNode;
@@ -12840,98 +12820,6 @@ caseSensitiveIdentifier() :
     }
 }
 
-StatementNode
-groupDefinition() throws StandardException :
-{
-    TableName groupName;
-}
-{
-    /*
-     * CREATE GROUP
-     */
-    <GROUP> groupName = qualifiedName()
-    {
-        return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_GROUP_NODE,
-                                                  groupName,
-                                                  parserContext);
-    }
-}
-
-StatementNode
-dropGroupStatement() throws StandardException :
-{
-    TableName groupName;
-}
-{
-    /*
-     * DROP GROUP
-     */
-    <GROUP> groupName = qualifiedName()
-    {
-        return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_GROUP_NODE,
-                                                  groupName,
-                                                  parserContext);
-    }
-}
-
-StatementNode
-truncateGroupStatement() throws StandardException :
-{
-    TableName groupName;
-}
-{
-    /*
-     * TRUNCATE GROUP
-     */
-    <GROUP> groupName = qualifiedName() 
-    {
-        return (StatementNode)nodeFactory.getNode(NodeTypes.TRUNCATE_GROUP_NODE,
-                                                  groupName,
-                                                  parserContext);
-    }
-}
-
-StatementNode
-renameGroupStatement() throws StandardException :
-{
-    StatementNode qtn;
-    TableName groupName;
-    String newGroupName;
-}
-{
-    <GROUP> groupName = qualifiedName() 
-    <TO> newGroupName = identifier()
-    {
-        return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
-                                                  groupName,
-                                                  null,
-                                                  newGroupName,
-                                                  Boolean.FALSE,
-                                                  RenameNode.RenameType.GROUP,
-                                                  parserContext);
-    }
-}
-
-/*
-StatementNode
-alterGroupRenameGroupStatement(TableName groupName) throws StandardException :
-{
-    String newGroupName;
-}
-{
-    <TO> newGroupName = identifier()
-    {
-        return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
-                                                  groupName,
-                                                  null,
-                                                  newGroupName,
-                                                  Boolean.TRUE,
-                                                  RenameNode.RenameType.GROUP,
-                                                  parserContext);
-    }
-}
-*/
-
 void
 groupIndexColumnList(IndexColumnList columnList) throws StandardException :
 {}
@@ -12943,33 +12831,43 @@ groupIndexColumnList(IndexColumnList columnList) throws StandardException :
 void
 groupIndexColumnItem(IndexColumnList columnList) throws StandardException :
 {
-    String firstName, secondName;
+    String firstName;
+    String secondName = null;
     String thirdName = null;
     boolean asc = true;
 }
 {
     firstName = identifierDeferCheckLength()
-    <PERIOD>
-    secondName = identifierDeferCheckLength()
     [ LOOKAHEAD( { getToken(1).kind == PERIOD } )
-      thirdName = identifierDeferCheckLength() ]
+      <PERIOD>
+      secondName = identifierDeferCheckLength()
+      [ LOOKAHEAD( { getToken(1).kind == PERIOD } )
+        <PERIOD>
+        thirdName = identifierDeferCheckLength() ] ]
     [ <ASC> | <DESC> { asc = false; } ]
     {
-        if (thirdName == null) {
+        if (secondName == null) {
+            thirdName = firstName;
+            firstName = null;
+        }
+        else if (thirdName == null) {
             thirdName = secondName;
             secondName = firstName;
             firstName = null;
         }
         if (firstName != null)
             parserContext.checkIdentifierLengthLimit(firstName);
-        parserContext.checkIdentifierLengthLimit(secondName);
+        if (secondName != null)
+            parserContext.checkIdentifierLengthLimit(secondName);
         parserContext.checkIdentifierLengthLimit(thirdName);
-        TableName tableName = (TableName)nodeFactory.getNode(NodeTypes.TABLE_NAME,
-                                                             firstName,
-                                                             secondName,
-                                                             new Integer(nextToLastIdentifierToken.beginOffset),
-                                                             new Integer(nextToLastIdentifierToken.endOffset),
-                                                             parserContext);
+        TableName tableName = null;
+        if (secondName != null)
+            tableName = (TableName)nodeFactory.getNode(NodeTypes.TABLE_NAME,
+                                                       firstName,
+                                                       secondName,
+                                                       new Integer(nextToLastIdentifierToken.beginOffset),
+                                                       new Integer(nextToLastIdentifierToken.endOffset),
+                                                       parserContext);
         IndexColumn indexColumn = (IndexColumn)
             nodeFactory.getNode(NodeTypes.INDEX_COLUMN,
                                 tableName,

@@ -261,13 +261,8 @@ public interface NodeTypes
     public static final int WINDOW_REFERENCE_NODE = 229;
     public static final int WINDOW_RESULTSET_NODE = 230;
 
-    // Grouping
-    public static final int CREATE_GROUP_NODE = 232;
-    public static final int DROP_GROUP_NODE = 233;
-    public static final int TRUNCATE_GROUP_NODE = 234;
-
     // Final value in set, keep up to date!
-    public static final int FINAL_VALUE = TRUNCATE_GROUP_NODE;
+    public static final int FINAL_VALUE = NEXT_SEQUENCE_NODE;
 
     /**
      * Extensions to this interface can use nodetypes > MAX_NODE_TYPE with out fear of collision

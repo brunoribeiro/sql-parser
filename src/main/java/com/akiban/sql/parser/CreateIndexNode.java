@@ -56,7 +56,6 @@ public class CreateIndexNode extends DDLStatementNode
     TableName indexName;
     TableName tableName;
     IndexColumnList columnList;
-    boolean group;
     Properties properties;
 
     /**
@@ -68,7 +67,6 @@ public class CreateIndexNode extends DDLStatementNode
      * @param tableName The name of the table the index will be on
      * @param columnList A list of columns, in the order they
      *                   appear in the index.
-     * @param group Whether this is a group index.
      * @param properties The optional properties list associated with the index.
      *
      * @exception StandardException Thrown on error
@@ -78,7 +76,6 @@ public class CreateIndexNode extends DDLStatementNode
                      Object indexName,
                      Object tableName,
                      Object columnList,
-                     Object group,
                      Object properties) 
             throws StandardException {
         initAndCheck(indexName);
@@ -87,7 +84,6 @@ public class CreateIndexNode extends DDLStatementNode
         this.indexName = (TableName)indexName;
         this.tableName = (TableName)tableName;
         this.columnList = (IndexColumnList)columnList;
-        this.group = ((Boolean)group).booleanValue();
         this.properties = (Properties)properties;
     }
 
@@ -106,7 +102,6 @@ public class CreateIndexNode extends DDLStatementNode
             getNodeFactory().copyNode(other.tableName, getParserContext());
         this.columnList = (IndexColumnList)
             getNodeFactory().copyNode(other.columnList, getParserContext());
-        this.group = other.group;
         this.properties = other.properties; // TODO: Clone?
     }
 
@@ -141,9 +136,6 @@ public class CreateIndexNode extends DDLStatementNode
     }
     public IndexColumnList getColumnList() {
         return columnList;
-    }
-    public boolean isGroup() {
-        return group;
     }
     public Properties getProperties() { 
         return properties; 

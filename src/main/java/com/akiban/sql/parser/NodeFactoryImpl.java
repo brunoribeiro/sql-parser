@@ -567,15 +567,6 @@ public final class NodeFactoryImpl extends NodeFactory
         
         case NodeTypes.INDEX_COLUMN_LIST:
             return NodeNames.INDEX_COLUMN_LIST_NAME;
-        
-        case NodeTypes.CREATE_GROUP_NODE:
-            return NodeNames.CREATE_GROUP_NODE_NAME;
-
-        case NodeTypes.DROP_GROUP_NODE:
-            return NodeNames.DROP_GROUP_NODE_NAME;
-
-        case NodeTypes.TRUNCATE_GROUP_NODE:
-            return NodeNames.TRUNCATE_GROUP_NODE_NAME;
 
         default:
             throw new StandardException("Not implemented");
