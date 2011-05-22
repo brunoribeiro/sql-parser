@@ -1,0 +1,147 @@
+com.akiban.sql.parser.InsertNode@351e1e67
+null
+statementType: INSERT
+resultSet: 	
+	com.akiban.sql.parser.UnionNode@4c5e176f
+	tableConstructor: true
+	all: true
+	nestedInParens: false
+	correlation Name: null
+	null
+	resultColumns: 		
+		com.akiban.sql.parser.ResultColumnList@35549f94
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@46b8c8e6
+		exposedName: null
+		name: null
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.NumericConstantNode@d8d9850
+			value: 1
+			type: INTEGER NOT NULL
+		[1]:		
+		com.akiban.sql.parser.ResultColumn@4b0ab323
+		exposedName: null
+		name: null
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.CharConstantNode@2b76e552
+			value: foo
+			type: CHAR(3) NOT NULL
+		[2]:		
+		com.akiban.sql.parser.ResultColumn@ac980c9
+		exposedName: null
+		name: null
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.BinaryArithmeticOperatorNode@332611a7
+			operator: *
+			methodName: times
+			type: null
+			leftOperand: 				
+				com.akiban.sql.parser.NumericConstantNode@851052d
+				value: 3
+				type: INTEGER NOT NULL
+			rightOperand: 				
+				com.akiban.sql.parser.NumericConstantNode@7f2ad19e
+				value: 10
+				type: INTEGER NOT NULL
+	leftResultSet: 		
+		com.akiban.sql.parser.RowResultSetNode@54281d4b
+		correlation Name: null
+		null
+		resultColumns: 			
+			com.akiban.sql.parser.ResultColumnList@159b5217
+
+			[0]:			
+			com.akiban.sql.parser.ResultColumn@82a6f16
+			exposedName: null
+			name: null
+			tableName: null
+			isDefaultColumn: false
+			type: null
+			expression: 				
+				com.akiban.sql.parser.NumericConstantNode@19e3118a
+				value: 1
+				type: INTEGER NOT NULL
+			[1]:			
+			com.akiban.sql.parser.ResultColumn@a94884d
+			exposedName: null
+			name: null
+			tableName: null
+			isDefaultColumn: false
+			type: null
+			expression: 				
+				com.akiban.sql.parser.CharConstantNode@1d807ca8
+				value: foo
+				type: CHAR(3) NOT NULL
+			[2]:			
+			com.akiban.sql.parser.ResultColumn@5e7808b9
+			exposedName: null
+			name: null
+			tableName: null
+			isDefaultColumn: false
+			type: null
+			expression: 				
+				com.akiban.sql.parser.BinaryArithmeticOperatorNode@1a84da23
+				operator: *
+				methodName: times
+				type: null
+				leftOperand: 					
+					com.akiban.sql.parser.NumericConstantNode@80d3d6f
+					value: 3
+					type: INTEGER NOT NULL
+				rightOperand: 					
+					com.akiban.sql.parser.NumericConstantNode@1d3c468a
+					value: 10
+					type: INTEGER NOT NULL
+	rightResultSet: 		
+		com.akiban.sql.parser.RowResultSetNode@603b1d04
+		correlation Name: null
+		null
+		resultColumns: 			
+			com.akiban.sql.parser.ResultColumnList@48ee22f7
+
+			[0]:			
+			com.akiban.sql.parser.ResultColumn@a39ab89
+			exposedName: null
+			name: null
+			tableName: null
+			isDefaultColumn: false
+			type: null
+			expression: 				
+				com.akiban.sql.parser.NumericConstantNode@502cb49d
+				value: 2
+				type: INTEGER NOT NULL
+			[1]:			
+			com.akiban.sql.parser.ResultColumn@2705d88a
+			exposedName: null
+			name: null
+			tableName: null
+			isDefaultColumn: false
+			type: null
+			expression: 				
+				com.akiban.sql.parser.CharConstantNode@70cb6009
+				value: bar
+				type: CHAR(3) NOT NULL
+			[2]:			
+			com.akiban.sql.parser.ResultColumn@380e28b9
+			exposedName: null
+			name: null
+			tableName: null
+			isDefaultColumn: false
+			type: null
+			expression: 				
+				com.akiban.sql.parser.NumericConstantNode@2993a66f
+				value: -1
+				type: INTEGER NOT NULL
+targetTableName: 	
+	com.akiban.sql.parser.TableName@a5d
+	T1

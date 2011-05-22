@@ -1,0 +1,97 @@
+com.akiban.sql.parser.InsertNode@67d225a7
+null
+statementType: INSERT
+resultSet: 	
+	com.akiban.sql.parser.SelectNode@15a62c31
+	isDistinct: false
+	resultColumns: 		
+		com.akiban.sql.parser.ResultColumnList@509f5011
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@b41b571
+		exposedName: X
+		name: X
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.ColumnReference@6ef137d
+			columnName: X
+			tableName: null
+			type: null
+		[1]:		
+		com.akiban.sql.parser.ResultColumn@39e87719
+		exposedName: Y
+		name: Y
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.ColumnReference@4ce32802
+			columnName: Y
+			tableName: null
+			type: null
+		[2]:		
+		com.akiban.sql.parser.ResultColumn@5557c2bd
+		exposedName: Z
+		name: Z
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.ColumnReference@74b23210
+			columnName: Z
+			tableName: null
+			type: null
+	fromList: 		
+		com.akiban.sql.parser.FromList@5ef4f44a
+
+		[0]:		
+		com.akiban.sql.parser.FromBaseTable@23d256fa
+		tableName: T
+		updateOrDelete: null
+		null
+		correlation Name: null
+		null
+targetTableName: 	
+	com.akiban.sql.parser.TableName@a5d
+	T1
+targetColumnList: 	
+	com.akiban.sql.parser.ResultColumnList@464c4975
+
+	[0]:	
+	com.akiban.sql.parser.ResultColumn@3a6ac461
+	exposedName: A
+	name: A
+	tableName: null
+	isDefaultColumn: false
+	type: null
+	reference: 		
+		com.akiban.sql.parser.ColumnReference@3782da3d
+		columnName: A
+		tableName: null
+		type: null
+	[1]:	
+	com.akiban.sql.parser.ResultColumn@6fc5f743
+	exposedName: B
+	name: B
+	tableName: null
+	isDefaultColumn: false
+	type: null
+	reference: 		
+		com.akiban.sql.parser.ColumnReference@2dec8909
+		columnName: B
+		tableName: null
+		type: null
+	[2]:	
+	com.akiban.sql.parser.ResultColumn@418c56d
+	exposedName: C
+	name: C
+	tableName: null
+	isDefaultColumn: false
+	type: null
+	reference: 		
+		com.akiban.sql.parser.ColumnReference@76497934
+		columnName: C
+		tableName: null
+		type: null
