@@ -80,6 +80,8 @@ public class NodeToString
         case NodeTypes.JOIN_NODE:
         case NodeTypes.HALF_OUTER_JOIN_NODE:
             return joinNode((JoinNode)node);
+        case NodeTypes.UNION_NODE:
+            return unionNode((UnionNode)node);
         case NodeTypes.GROUP_BY_LIST:
             return groupByList((GroupByList)node);
         case NodeTypes.ORDER_BY_LIST:
@@ -490,6 +492,31 @@ public class NodeToString
         return str.toString();
     }
 
+    protected String unionNode(UnionNode node) throws StandardException {
+        ResultSetNode right = node.getRightResultSet();
+        chainedValues:
+        if (right instanceof RowResultSetNode) {
+            StringBuilder str = new StringBuilder();
+            while (true) {
+                str.insert(0, ")");
+                str.insert(0, toString(((RowResultSetNode)right).getResultColumns()));
+                str.insert(0, ", (");
+                ResultSetNode left = node.getLeftResultSet();
+                if (left instanceof RowResultSetNode) {
+                    str.insert(0, toString(left));
+                    return str.toString();
+                }
+                if (!(left instanceof UnionNode))
+                    break chainedValues;
+                node = (UnionNode)left;
+                right = node.getRightResultSet();
+                if (!(right instanceof RowResultSetNode))
+                    break chainedValues;
+            }
+        }
+        return toString(node.getLeftResultSet()) + " UNION " + toString(right);
+    }
+
     protected String tableName(TableName node) throws StandardException {
         return node.getFullTableName();
     }
@@ -610,6 +637,8 @@ public class NodeToString
             return "'" + ((String)value).replace("'", "''") + "'";
         else if (value instanceof byte[])
             return hexConstant((byte[])value);
+        else if (value instanceof Double)
+            return String.format("%e", value);
         else
             return value.toString();
     }

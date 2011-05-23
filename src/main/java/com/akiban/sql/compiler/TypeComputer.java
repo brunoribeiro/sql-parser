@@ -278,7 +278,8 @@ public class TypeComputer implements Visitor
         checkBooleanClause(node.getHavingClause(), "HAVING");
 
         // Children first wasn't enough to ensure that subqueries were done first.
-        node.getResultColumns().accept(this);
+        if (node.getResultColumns() != null)
+            node.getResultColumns().accept(this);
     }
 
     private void checkBooleanClause(ValueNode clause, String which) 
