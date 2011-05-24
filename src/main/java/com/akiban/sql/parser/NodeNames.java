@@ -100,8 +100,6 @@ public interface NodeNames
 
     static final String CREATE_ALIAS_NODE_NAME = "com.akiban.sql.parser.CreateAliasNode";
 
-    static final String CREATE_GROUP_NODE_NAME = "com.akiban.sql.parser.CreateGroupNode";
-
     static final String CREATE_INDEX_NODE_NAME = "com.akiban.sql.parser.CreateIndexNode";
 
     static final String CREATE_ROLE_NODE_NAME = "com.akiban.sql.parser.CreateRoleNode";
@@ -135,8 +133,6 @@ public interface NodeNames
     static final String DML_MOD_STATEMENT_NODE_NAME = "com.akiban.sql.parser.DMLModStatementNode";
 
     static final String DROP_ALIAS_NODE_NAME = "com.akiban.sql.parser.DropAliasNode";
-
-    static final String DROP_GROUP_NODE_NAME = "com.akiban.sql.parser.DropGroupNode";
 
     static final String DROP_INDEX_NODE_NAME = "com.akiban.sql.parser.DropIndexNode";
 
@@ -305,8 +301,6 @@ public interface NodeNames
     static final String TEST_CONSTRAINT_NODE_NAME = "com.akiban.sql.parser.TestConstraintNode";
 
     static final String TIMESTAMP_OPERATOR_NODE_NAME = "com.akiban.sql.parser.TimestampOperatorNode";
-
-    static final String TRUNCATE_GROUP_NODE_NAME = "com.akiban.sql.parser.TruncateGroupNode";
 
     static final String UNARY_ARITHMETIC_OPERATOR_NODE_NAME = "com.akiban.sql.parser.UnaryArithmeticOperatorNode";
 

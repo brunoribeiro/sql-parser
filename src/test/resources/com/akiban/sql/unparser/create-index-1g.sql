@@ -1,1 +1,1 @@
-CREATE INDEX GIDX ON GROUP g1(p.c1, c.c2)
+CREATE INDEX group_index ON gct(p.c1, c.c2, c3)
