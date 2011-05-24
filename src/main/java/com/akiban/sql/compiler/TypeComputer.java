@@ -179,7 +179,7 @@ public class TypeComputer implements Visitor
         if ((leftTypeId == null) || (rightTypeId == null))
             return null;
 
-        // TODO: See whether this ends up being needed this way.
+        // TODO: Is this really needed?
 
         /*
          * If we are comparing a non-string with a string type, then we
@@ -187,33 +187,31 @@ public class TypeComputer implements Visitor
          * an index on a string column. This is because the string types
          * are all of low precedence, so the comparison rules of the non-string
          * value are used, so it may not find values in a string index because
-         * it will be in the wrong order. So, cast the string value to its
-         * own type. This is easier than casting it to the non-string type,
-         * because we would have to figure out the right length to cast it to.
+         * it will be in the wrong order.
          */
         if (!leftTypeId.isStringTypeId() && rightTypeId.isStringTypeId()) {
+            DataTypeDescriptor leftType = leftOperand.getType();
             DataTypeDescriptor rightType = rightOperand.getType();
 
             rightOperand = (ValueNode)node.getNodeFactory()
                 .getNode(NodeTypes.CAST_NODE,
                          rightOperand, 
-                         new DataTypeDescriptor(rightTypeId, true, 
-                                                rightType.getMaximumWidth()),
+                         leftType.getNullabilityType(rightType.isNullable()),
                          node.getParserContext());
             node.setRightOperand(rightOperand);
         }
         else if (!rightTypeId.isStringTypeId() && leftTypeId.isStringTypeId()) {
             DataTypeDescriptor leftType = leftOperand.getType();
+            DataTypeDescriptor rightType = rightOperand.getType();
 
             leftOperand = (ValueNode)node.getNodeFactory()
                 .getNode(NodeTypes.CAST_NODE,
                          leftOperand,
-                         new DataTypeDescriptor(leftTypeId, true, 
-                                                leftType.getMaximumWidth()),
+                         rightType.getNullabilityType(leftType.isNullable()),
                          node.getParserContext());
             node.setLeftOperand(leftOperand);
         }
-        
+
         // Bypass the comparable check if this is a rewrite from the 
         // optimizer.    We will assume Mr. Optimizer knows what he is doing.
         if (!node.isForQueryRewrite()) {
