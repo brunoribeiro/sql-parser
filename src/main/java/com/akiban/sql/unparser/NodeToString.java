@@ -568,7 +568,10 @@ public class NodeToString
     }
 
     protected String aggregateNode(AggregateNode node) throws StandardException {
-        return node.getAggregateName() + "(" + toString(node.getOperand()) + ")";
+        if (node.getOperand() == null)
+            return node.getAggregateName();
+        else
+            return node.getAggregateName() + "(" + toString(node.getOperand()) + ")";
     }
 
     protected String likeEscapeOperatorNode(LikeEscapeOperatorNode node) 
