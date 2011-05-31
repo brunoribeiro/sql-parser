@@ -1065,7 +1065,8 @@ class SQLGrammar
                                 null,
                                 parserContext);
 
-        parameterList.add(parm);
+        if (parameterList != null)
+            parameterList.add(parm);
         return parm;
     }
 
@@ -2508,6 +2509,7 @@ void
 statementListElement(List<StatementNode> list) throws StandardException :
 {
     StatementNode statementNode;
+    parameterNumber = 0;
 }
 {
     statementNode = StatementPart(null)
