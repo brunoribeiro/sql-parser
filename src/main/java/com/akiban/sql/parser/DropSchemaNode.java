@@ -84,6 +84,7 @@ public class DropSchemaNode extends DDLStatementNode
 
     public String toString() {
         return super.toString() +
+            "schemaName: " + "\n" + schemaName + "\n" +
             "dropBehavior: " + "\n" + dropBehavior + "\n";
     }
 
@@ -91,4 +92,11 @@ public class DropSchemaNode extends DDLStatementNode
         return "DROP SCHEMA";
     }
 
+    public int getDropBehavior() {
+        return this.dropBehavior;
+    }
+    
+    public String getSchemaName() {
+        return this.schemaName;
+    }
 }

@@ -99,4 +99,11 @@ public class CreateSchemaNode extends DDLStatementNode
         return "CREATE SCHEMA";
     }
 
+    public String getSchemaName() {
+        return this.name;
+    }
+    
+    public String getAuthorizationID() {
+        return this.aid;
+    }
 }
