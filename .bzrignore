@@ -1,5 +1,8 @@
 ./classes
 ./target
+./.classpath
+./.project
+build.properties.local
 ParseException.java
 SQLGrammar.java
 SQLGrammarConstants.java
