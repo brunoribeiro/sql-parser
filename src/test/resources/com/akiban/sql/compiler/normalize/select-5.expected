@@ -1,0 +1,1 @@
+SELECT * FROM T WHERE (A >= 100) AND ((A <= 200) AND true)

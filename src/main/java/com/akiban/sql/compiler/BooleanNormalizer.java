@@ -123,7 +123,8 @@ public class BooleanNormalizer implements Visitor
                 if (underNotNode) {
                     /* Convert AND to OR and vice versa. */
                     BinaryLogicalOperatorNode cnode = (BinaryLogicalOperatorNode)
-                        nodeFactory.getNode(NodeTypes.OR_NODE,
+                        nodeFactory.getNode((node.getNodeType() == NodeTypes.AND_NODE) ?
+                                            NodeTypes.OR_NODE : NodeTypes.AND_NODE,
                                             leftOperand, rightOperand,
                                             parserContext);
                     cnode.setType(bnode.getType());
