@@ -246,7 +246,7 @@ public class ColumnDefinitionNode extends TableElementNode
      *
      * @return Autoincrement start value.
      */
-    long getAutoincrementStart()
+    public long getAutoincrementStart()
     {
         return autoincrementStart;
     }
@@ -256,7 +256,7 @@ public class ColumnDefinitionNode extends TableElementNode
      *
      * @return Autoincrement increment value.
      */
-    long getAutoincrementIncrement()
+    public long getAutoincrementIncrement()
     {
         return autoincrementIncrement;
     }
@@ -271,7 +271,7 @@ public class ColumnDefinitionNode extends TableElementNode
      *   ColumnDefinitionNode.MODIFY_AUTOINCREMENT_INC_VALUE 
      *               if this definition is for alter autoincrement column to change the increment value
      */
-    long getAutoinc_create_or_modify_Start_Increment()
+    public long getAutoinc_create_or_modify_Start_Increment()
     {
         return autoinc_create_or_modify_Start_Increment;
     }
