@@ -2591,10 +2591,8 @@ StatementPart(Token[] tokenHolder) throws StandardException :
     statementNode = execStatement()
 |
     statementNode = explainStatement()
-/*
 |
-    statementNode = SQLTransactionStatement()
-*/
+    statementNode = transactionControlStatement()
 )
     {
         return statementNode;
@@ -2737,8 +2735,10 @@ preparableSQLDataStatement() throws StandardException :
     dmlStatement = preparableUpdateStatement()
 |
     dmlStatement = callStatement()
+/*
 |
     dmlStatement = savepointStatement()
+*/
 )
     {
         return dmlStatement;
@@ -3184,6 +3184,35 @@ LocksOrCursors() :
     <CURSORS>
     {
         return SAVEPOINT_RETAIN_CURSORS;
+    }
+}
+
+StatementNode
+transactionControlStatement() throws StandardException :
+{
+    TransactionControlNode.StatementType transactionStatementType;
+}
+{
+    (
+        <BEGIN>
+        {
+            transactionStatementType = TransactionControlNode.StatementType.BEGIN;
+        }
+    |
+        <COMMIT>
+        {
+            transactionStatementType = TransactionControlNode.StatementType.COMMIT;
+        }
+    |
+        <ROLLBACK>
+        {
+            transactionStatementType = TransactionControlNode.StatementType.ROLLBACK;
+        }
+    ) [ <WORK> | <TRANSACTION> ]
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.TRANSACTION_CONTROL_NODE,
+                                                  transactionStatementType,
+                                                  parserContext);
     }
 }
 
