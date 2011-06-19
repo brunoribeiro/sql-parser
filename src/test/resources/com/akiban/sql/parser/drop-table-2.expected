@@ -1,0 +1,5 @@
+com.akiban.sql.parser.DropTableNode@b23b25c
+name: TEST.T1
+statementType: DROP TABLE
+dropBehavior: 
+2
