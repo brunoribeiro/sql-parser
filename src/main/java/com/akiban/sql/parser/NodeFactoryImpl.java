@@ -492,6 +492,9 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.UNARY_MINUS_OPERATOR_NODE:
             return NodeNames.UNARY_ARITHMETIC_OPERATOR_NODE_NAME;
 
+        case NodeTypes.TRANSACTION_CONTROL_NODE:
+            return NodeNames.TRANSACTION_CONTROL_NODE_NAME;
+
         case NodeTypes.SAVEPOINT_NODE:
             return NodeNames.SAVEPOINT_NODE_NAME;
 

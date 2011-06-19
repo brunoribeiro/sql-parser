@@ -223,8 +223,9 @@ public interface NodeTypes
     // LOB
     public static final int BLOB_CONSTANT_NODE = 195;
     public static final int CLOB_CONSTANT_NODE = 196;
-    //public static final int NCLOB_CONSTANT_NODE = 197;
-    // for SAVEPOINT sql
+
+    // Transactions / savepoints
+    public static final int TRANSACTION_CONTROL_NODE = 197;
     public static final int SAVEPOINT_NODE = 198;
 
     // XML

@@ -302,6 +302,8 @@ public interface NodeNames
 
     static final String TIMESTAMP_OPERATOR_NODE_NAME = "com.akiban.sql.parser.TimestampOperatorNode";
 
+    static final String TRANSACTION_CONTROL_NODE_NAME = "com.akiban.sql.parser.TransactionControlNode";
+
     static final String UNARY_ARITHMETIC_OPERATOR_NODE_NAME = "com.akiban.sql.parser.UnaryArithmeticOperatorNode";
 
     static final String UNARY_DATE_TIMESTAMP_OPERATOR_NODE_NAME = "com.akiban.sql.parser.UnaryDateTimestampOperatorNode";
