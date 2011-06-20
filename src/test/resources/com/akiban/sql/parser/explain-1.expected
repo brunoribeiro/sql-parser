@@ -13,26 +13,26 @@ statement:
 
 			[0]:			
 			com.akiban.sql.parser.ResultColumn@210a6ae2
-			exposedName: X
-			name: X
+			exposedName: x
+			name: x
 			tableName: null
 			isDefaultColumn: false
 			type: null
 			expression: 				
 				com.akiban.sql.parser.ColumnReference@32ef2c60
-				columnName: X
+				columnName: x
 				tableName: null
 				type: null
 			[1]:			
 			com.akiban.sql.parser.ResultColumn@744a6cbf
-			exposedName: Y
-			name: Y
+			exposedName: y
+			name: y
 			tableName: null
 			isDefaultColumn: false
 			type: null
 			expression: 				
 				com.akiban.sql.parser.ColumnReference@4229ab3e
-				columnName: Y
+				columnName: y
 				tableName: null
 				type: null
 		fromList: 			
@@ -40,7 +40,7 @@ statement:
 
 			[0]:			
 			com.akiban.sql.parser.FromBaseTable@488e32e7
-			tableName: T
+			tableName: t
 			updateOrDelete: null
 			null
 			correlation Name: null

@@ -1,1 +1,1 @@
-CREATE INDEX GROUP_INDEX ON GCT(P.C1, C.C2, C3)
+CREATE INDEX group_index ON gct(p.c1, c.c2, c3)

@@ -10,26 +10,26 @@ resultSet:
 
 		[0]:		
 		com.akiban.sql.parser.ResultColumn@16b8f8eb
-		exposedName: X
-		name: X
+		exposedName: x
+		name: x
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
 			com.akiban.sql.parser.ColumnReference@49de17f4
-			columnName: X
+			columnName: x
 			tableName: null
 			type: null
 		[1]:		
 		com.akiban.sql.parser.ResultColumn@13f6ba0f
-		exposedName: Y
-		name: Y
+		exposedName: y
+		name: y
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
 			com.akiban.sql.parser.ColumnReference@2b313906
-			columnName: Y
+			columnName: y
 			tableName: null
 			type: null
 	fromList: 		
@@ -37,7 +37,7 @@ resultSet:
 
 		[0]:		
 		com.akiban.sql.parser.FromBaseTable@60f47bf5
-		tableName: T
+		tableName: t
 		updateOrDelete: null
 		null
 		correlation Name: null
@@ -54,7 +54,7 @@ resultSet:
 			type: null
 			leftOperand: 				
 				com.akiban.sql.parser.ColumnReference@37eb2c1b
-				columnName: Z
+				columnName: z
 				tableName: null
 				type: null
 			rightOperand: 				
@@ -73,6 +73,6 @@ resultSet:
 				type: null
 				operand: 					
 					com.akiban.sql.parser.ColumnReference@19632847
-					columnName: W
+					columnName: w
 					tableName: null
 					type: null

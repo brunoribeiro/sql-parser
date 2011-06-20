@@ -1,6 +1,6 @@
 com.akiban.sql.parser.DropSchemaNode@626f50a8
 statementType: DROP SCHEMA
 schemaName: 
-TJONESLO
+tjoneslo
 dropBehavior: 
 1

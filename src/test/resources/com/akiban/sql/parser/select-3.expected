@@ -21,8 +21,8 @@ resultSet:
 
 		[0]:		
 		com.akiban.sql.parser.FromSubquery@47d62270
-		correlation Name: S
-		S
+		correlation Name: s
+		s
 		subquery: 			
 			com.akiban.sql.parser.SelectNode@3b6f0be8
 			isDistinct: false
@@ -31,26 +31,26 @@ resultSet:
 
 				[0]:				
 				com.akiban.sql.parser.ResultColumn@17fe1feb
-				exposedName: Z
-				name: Z
+				exposedName: z
+				name: z
 				tableName: null
 				isDefaultColumn: false
 				type: null
 				expression: 					
 					com.akiban.sql.parser.ColumnReference@2ce1899b
-					columnName: Z
+					columnName: z
 					tableName: null
 					type: null
 				[1]:				
 				com.akiban.sql.parser.ResultColumn@b113622
-				exposedName: Y
-				name: Y
+				exposedName: y
+				name: y
 				tableName: null
 				isDefaultColumn: false
 				type: null
 				expression: 					
 					com.akiban.sql.parser.ColumnReference@16f8f7db
-					columnName: Y
+					columnName: y
 					tableName: null
 					type: null
 			fromList: 				
@@ -58,7 +58,7 @@ resultSet:
 
 				[0]:				
 				com.akiban.sql.parser.FromBaseTable@6ca084f8
-				tableName: T1
+				tableName: t1
 				updateOrDelete: null
 				null
 				correlation Name: null

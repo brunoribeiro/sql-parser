@@ -1,1 +1,1 @@
-SELECT X, (Y || Y) AS YY FROM T WHERE ((Z > 3.14) AND (NOT (W IS NULL))) OR (Y LIKE 'f%')
+SELECT x, (y || y) AS yy FROM t WHERE ((z > 3.14) AND (NOT (w IS NULL))) OR (y LIKE 'f%')

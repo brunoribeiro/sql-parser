@@ -1,1 +1,1 @@
-SELECT * FROM T WHERE (A = 1) AND true
+SELECT * FROM t WHERE (a = 1) AND true

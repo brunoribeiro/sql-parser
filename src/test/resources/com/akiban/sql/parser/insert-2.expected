@@ -9,38 +9,38 @@ resultSet:
 
 		[0]:		
 		com.akiban.sql.parser.ResultColumn@7d2452e8
-		exposedName: X
-		name: X
+		exposedName: x
+		name: x
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
 			com.akiban.sql.parser.ColumnReference@5bbf3d87
-			columnName: X
+			columnName: x
 			tableName: null
 			type: null
 		[1]:		
 		com.akiban.sql.parser.ResultColumn@6860991f
-		exposedName: Y
-		name: Y
+		exposedName: y
+		name: y
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
 			com.akiban.sql.parser.ColumnReference@1de4f7c2
-			columnName: Y
+			columnName: y
 			tableName: null
 			type: null
 		[2]:		
 		com.akiban.sql.parser.ResultColumn@2345f0e3
-		exposedName: Z
-		name: Z
+		exposedName: z
+		name: z
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
 			com.akiban.sql.parser.ColumnReference@44c9d92c
-			columnName: Z
+			columnName: z
 			tableName: null
 			type: null
 	fromList: 		
@@ -48,11 +48,11 @@ resultSet:
 
 		[0]:		
 		com.akiban.sql.parser.FromBaseTable@510dc6b5
-		tableName: T
+		tableName: t
 		updateOrDelete: null
 		null
 		correlation Name: null
 		null
 targetTableName: 	
 	com.akiban.sql.parser.TableName@a5d
-	T1
+	t1

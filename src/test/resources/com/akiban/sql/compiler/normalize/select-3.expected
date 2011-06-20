@@ -1,1 +1,1 @@
-SELECT * FROM T WHERE ((D = true) OR ((E = true) OR (((A = true) AND ((B = true) AND ((C = true) AND true))) OR false))) AND true
+SELECT * FROM t WHERE ((d = true) OR ((e = true) OR (((a = true) AND ((b = true) AND ((c = true) AND true))) OR false))) AND true

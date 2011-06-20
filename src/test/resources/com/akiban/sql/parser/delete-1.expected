@@ -8,7 +8,7 @@ resultSet:
 
 		[0]:		
 		com.akiban.sql.parser.FromBaseTable@ed42d08
-		tableName: T
+		tableName: t
 		updateOrDelete: DELETE
 		null
 		correlation Name: null
@@ -20,7 +20,7 @@ resultSet:
 		type: null
 		leftOperand: 			
 			com.akiban.sql.parser.ColumnReference@2e958bb8
-			columnName: X
+			columnName: x
 			tableName: null
 			type: null
 		rightOperandList: 			
@@ -40,4 +40,4 @@ resultSet:
 			type: INTEGER NOT NULL
 targetTableName: 	
 	com.akiban.sql.parser.TableName@54
-	T
+	t

@@ -45,7 +45,7 @@ public class CloneTest extends ASTTransformTestBase
     public void testClone() throws Exception {
         StatementNode stmt = parser.parseStatement(sql);
         stmt = (StatementNode)parser.getNodeFactory().copyNode(stmt, parser);
-        assertEquals(expected, unparser.toString(stmt));
+        assertEquals(caseName, expected, unparser.toString(stmt));
     }
 
 }

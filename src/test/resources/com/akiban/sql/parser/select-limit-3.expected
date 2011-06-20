@@ -21,7 +21,7 @@ resultSet:
 
 		[0]:		
 		com.akiban.sql.parser.FromBaseTable@57e40274
-		tableName: T1
+		tableName: t1
 		updateOrDelete: null
 		null
 		correlation Name: null

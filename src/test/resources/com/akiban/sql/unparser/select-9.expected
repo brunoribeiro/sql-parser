@@ -1,1 +1,1 @@
-SELECT (X + $2), Z FROM T1 WHERE Y <> $1
+SELECT (x + $2), z FROM t1 WHERE y <> $1

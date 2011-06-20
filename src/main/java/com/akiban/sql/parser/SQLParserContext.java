@@ -46,4 +46,9 @@ public interface SQLParserContext
 
     /** Is the given feature enabled for this parser? */
     public boolean hasFeature(SQLParserFeature feature);
+
+    enum IdentifierCase { UPPER, LOWER, PRESERVE };
+
+    /** How are unquoted identifiers standardized? **/
+    public IdentifierCase getIdentifierCase();
 }

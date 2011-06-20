@@ -1,5 +1,5 @@
 com.akiban.sql.parser.UpdateNode@7e78fc6
-T
+t
 statementType: UPDATE
 resultSet: 	
 	com.akiban.sql.parser.SelectNode@73901437
@@ -9,8 +9,8 @@ resultSet:
 
 		[0]:		
 		com.akiban.sql.parser.ResultColumn@5464ea66
-		exposedName: F
-		name: F
+		exposedName: f
+		name: f
 		tableName: null
 		isDefaultColumn: false
 		type: null
@@ -21,7 +21,7 @@ resultSet:
 			type: null
 			leftOperand: 				
 				com.akiban.sql.parser.ColumnReference@2c79a2e7
-				columnName: F
+				columnName: f
 				tableName: null
 				type: null
 			rightOperand: 				
@@ -30,13 +30,13 @@ resultSet:
 				type: INTEGER NOT NULL
 		reference: 			
 			com.akiban.sql.parser.ColumnReference@105e55ab
-			columnName: F
+			columnName: f
 			tableName: null
 			type: null
 		[1]:		
 		com.akiban.sql.parser.ResultColumn@214a55f2
-		exposedName: G
-		name: G
+		exposedName: g
+		name: g
 		tableName: null
 		isDefaultColumn: false
 		type: null
@@ -46,7 +46,7 @@ resultSet:
 			type: INTEGER NOT NULL
 		reference: 			
 			com.akiban.sql.parser.ColumnReference@2b20bf2c
-			columnName: G
+			columnName: g
 			tableName: null
 			type: null
 	fromList: 		
@@ -54,7 +54,7 @@ resultSet:
 
 		[0]:		
 		com.akiban.sql.parser.FromBaseTable@199836ed
-		tableName: T
+		tableName: t
 		updateOrDelete: UPDATE
 		null
 		correlation Name: null
@@ -66,7 +66,7 @@ resultSet:
 		type: null
 		leftOperand: 			
 			com.akiban.sql.parser.ColumnReference@5239443f
-			columnName: X
+			columnName: x
 			tableName: null
 			type: null
 		rightOperand: 			
@@ -75,4 +75,4 @@ resultSet:
 			type: INTEGER NOT NULL
 targetTableName: 	
 	com.akiban.sql.parser.TableName@54
-	T
+	t
