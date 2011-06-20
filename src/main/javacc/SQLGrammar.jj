@@ -3190,28 +3190,28 @@ LocksOrCursors() :
 StatementNode
 transactionControlStatement() throws StandardException :
 {
-    TransactionControlNode.StatementType transactionStatementType;
+    TransactionControlNode.Operation transactionOperation;
 }
 {
     (
         <BEGIN>
         {
-            transactionStatementType = TransactionControlNode.StatementType.BEGIN;
+            transactionOperation = TransactionControlNode.Operation.BEGIN;
         }
     |
         <COMMIT>
         {
-            transactionStatementType = TransactionControlNode.StatementType.COMMIT;
+            transactionOperation = TransactionControlNode.Operation.COMMIT;
         }
     |
         <ROLLBACK>
         {
-            transactionStatementType = TransactionControlNode.StatementType.ROLLBACK;
+            transactionOperation = TransactionControlNode.Operation.ROLLBACK;
         }
     ) [ <WORK> | <TRANSACTION> ]
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.TRANSACTION_CONTROL_NODE,
-                                                  transactionStatementType,
+                                                  transactionOperation,
                                                   parserContext);
     }
 }
