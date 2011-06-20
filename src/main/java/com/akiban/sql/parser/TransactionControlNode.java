@@ -23,22 +23,26 @@ import com.akiban.sql.StandardException;
  */
 public class TransactionControlNode extends TransactionStatementNode
 {
-    public static enum StatementType {
+    public static enum Operation {
         BEGIN, COMMIT, ROLLBACK
     }
-    private StatementType statementType;
+    private Operation operation;
 
     /**
      * Initializer for a TransactionControlNode
      *
-     * @param transactionStatementType Type of statement.
+     * @param transactionOperation Type of statement.
      *
      * @exception StandardException Thrown on error
      */
 
-    public void init(Object statementType)
+    public void init(Object operation)
             throws StandardException {
-        this.statementType = (StatementType)statementType;
+        this.operation = (Operation)operation;
+    }
+
+    public Operation getOperation() {
+        return operation;
     }
 
     /**
@@ -48,7 +52,7 @@ public class TransactionControlNode extends TransactionStatementNode
         super.copyFrom(node);
 
         TransactionControlNode other = (TransactionControlNode)node;
-        this.statementType = other.statementType;
+        this.operation = other.operation;
     }
 
     /**
@@ -60,11 +64,11 @@ public class TransactionControlNode extends TransactionStatementNode
 
     public String toString() {
         return super.toString() + 
-            "statementType: " + statementType + "\n";
+            "operation: " + operation + "\n";
     }
 
     public String statementToString() {
-        switch (statementType) {
+        switch (operation) {
         case BEGIN:
             return "BEGIN";
         case COMMIT:
