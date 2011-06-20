@@ -144,4 +144,4 @@ resultSet:
 				type: INTEGER NOT NULL
 targetTableName: 	
 	com.akiban.sql.parser.TableName@a5d
-	T1
+	t1

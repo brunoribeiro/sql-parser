@@ -1,5 +1,5 @@
 com.akiban.sql.parser.CreateTableNode@5ae80842
-name: T1
+name: t1
 statementType: CREATE TABLE
 lockGranularity: R
 tableElementList: 	
@@ -8,220 +8,220 @@ tableElementList:
 	[0]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@396fe0f4
 	type: INTEGER NOT NULL
-	name: COL1
+	name: col1
 	elementType: null
 	[1]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@6019d0a1
 	type: INTEGER
-	name: COL2
+	name: col2
 	elementType: null
 	[2]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@3ed02b51
 	type: SMALLINT NOT NULL
-	name: COL3
+	name: col3
 	elementType: null
 	[3]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@54cbf30e
 	type: SMALLINT
-	name: COL4
+	name: col4
 	elementType: null
 	[4]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@19c247a0
-	type: LONGINT NOT NULL
-	name: COL5
+	type: BIGINT NOT NULL
+	name: col5
 	elementType: null
 	[5]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@21ec6696
-	type: LONGINT
-	name: COL6
+	type: BIGINT
+	name: col6
 	elementType: null
 	[6]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@27431340
 	type: CHAR(1) NOT NULL
-	name: COL10
+	name: col10
 	elementType: null
 	[7]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@24a4e2e3
 	type: CHAR(1)
-	name: COL11
+	name: col11
 	elementType: null
 	[8]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@452bb7e0
 	type: VARCHAR(1) NOT NULL
-	name: COL12
+	name: col12
 	elementType: null
 	[9]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@3934f69a
 	type: VARCHAR(1)
-	name: COL13
+	name: col13
 	elementType: null
 	[10]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@442a15cd
 	type: LONG VARCHAR NOT NULL
-	name: COL14
+	name: col14
 	elementType: null
 	[11]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@26fd68b1
 	type: LONG VARCHAR
-	name: COL15
+	name: col15
 	elementType: null
 	[12]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@46e45076
 	type: DOUBLE NOT NULL
-	name: COL20
+	name: col20
 	elementType: null
 	[13]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@375e9756
 	type: DOUBLE
-	name: COL21
+	name: col21
 	elementType: null
 	[14]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@2321ab80
 	type: REAL NOT NULL
-	name: COL22
+	name: col22
 	elementType: null
 	[15]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@77827284
 	type: REAL
-	name: COL23
+	name: col23
 	elementType: null
 	[16]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@152c7568
 	type: DOUBLE NOT NULL
-	name: COL24
+	name: col24
 	elementType: null
 	[17]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@19d009b4
 	type: DOUBLE
-	name: COL25
+	name: col25
 	elementType: null
 	[18]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@292d15a9
 	type: DATE NOT NULL
-	name: COL30
+	name: col30
 	elementType: null
 	[19]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@4ee91f5d
 	type: DATE
-	name: COL31
+	name: col31
 	elementType: null
 	[20]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@2b0a3b24
 	type: TIME NOT NULL
-	name: COL32
+	name: col32
 	elementType: null
 	[21]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@2cb0ce8f
 	type: TIME
-	name: COL33
+	name: col33
 	elementType: null
 	[22]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@bc92535
 	type: TIMESTAMP NOT NULL
-	name: COL34
+	name: col34
 	elementType: null
 	[23]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@42a9c09e
 	type: TIMESTAMP
-	name: COL35
+	name: col35
 	elementType: null
 	[24]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@16a4e743
 	type: CLOB(2147483647) NOT NULL
-	name: COL40
+	name: col40
 	elementType: null
 	[25]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@244aeb52
 	type: CLOB(2147483647)
-	name: COL41
+	name: col41
 	elementType: null
 	[26]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@329f671b
 	type: BLOB(2147483647) NOT NULL
-	name: COL42
+	name: col42
 	elementType: null
 	[27]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@7f2a3793
 	type: BLOB(2147483647)
-	name: COL43
+	name: col43
 	elementType: null
 	[28]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@2ca6d51e
 	type: DECIMAL(5,0) NOT NULL
-	name: COL50
+	name: col50
 	elementType: null
 	[29]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@7cf1bb78
 	type: DECIMAL(5,0)
-	name: COL51
+	name: col51
 	elementType: null
 	[30]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@624b035d
 	type: DECIMAL(1,0) NOT NULL
-	name: COL52
+	name: col52
 	elementType: null
 	[31]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@2aca0115
 	type: DECIMAL(1,0)
-	name: COL53
+	name: col53
 	elementType: null
 	[32]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@340d1fa5
 	type: DECIMAL(10,0) NOT NULL
-	name: COL54
+	name: col54
 	elementType: null
 	[33]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@4998a455
 	type: DECIMAL(10,0)
-	name: COL55
+	name: col55
 	elementType: null
 	[34]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@444cee32
 	type: DECIMAL(1,1) NOT NULL
-	name: COL56
+	name: col56
 	elementType: null
 	[35]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@16aa37a6
 	type: DECIMAL(1,1)
-	name: COL57
+	name: col57
 	elementType: null
 	[36]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@12b7eea
 	type: DECIMAL(10,1) NOT NULL
-	name: COL58
+	name: col58
 	elementType: null
 	[37]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@4e99353f
 	type: DECIMAL(10,1)
-	name: COL59
+	name: col59
 	elementType: null
 	[38]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@2c76e369
 	type: DECIMAL(10,10) NOT NULL
-	name: COL60
+	name: col60
 	elementType: null
 	[39]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@314c194d
 	type: DECIMAL(10,10)
-	name: COL61
+	name: col61
 	elementType: null
 	[40]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@7b112783
 	type: DECIMAL(30,10) NOT NULL
-	name: COL62
+	name: col62
 	elementType: null
 	[41]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@23394894
 	type: DECIMAL(30,10)
-	name: COL63
+	name: col63
 	elementType: null
 	[42]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@5cbfe9d
 	type: NUMERIC NOT NULL
-	name: COL70
+	name: col70
 	elementType: null
 	[43]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@13b8f864
 	type: NUMERIC
-	name: COL71
+	name: col71
 	elementType: null

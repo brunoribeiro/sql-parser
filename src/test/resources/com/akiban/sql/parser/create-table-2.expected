@@ -1,5 +1,5 @@
 com.akiban.sql.parser.CreateTableNode@35c0e45a
-name: T1
+name: t1
 statementType: CREATE TABLE
 lockGranularity: R
 tableElementList: 	
@@ -17,13 +17,13 @@ tableElementList:
 
 		[0]:		
 		com.akiban.sql.parser.ResultColumn@690da5eb
-		exposedName: COL1
-		name: COL1
+		exposedName: col1
+		name: col1
 		tableName: null
 		isDefaultColumn: false
 		type: null
 	[1]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@7f081d2e
 	type: INTEGER
-	name: COL1
+	name: col1
 	elementType: null

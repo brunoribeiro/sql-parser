@@ -53,7 +53,7 @@ public class BooleanNormalizerTest extends ASTTransformTestBase
     public void testNormalizer() throws Exception {
         StatementNode stmt = parser.parseStatement(sql);
         stmt = booleanNormalizer.normalize(stmt);
-        assertEquals(expected, unparser.toString(stmt));
+        assertEquals(caseName, expected, unparser.toString(stmt));
     }
 
 }

@@ -21,7 +21,7 @@ resultSet:
 
 		[0]:		
 		com.akiban.sql.parser.FromBaseTable@7426dbec
-		tableName: T1
+		tableName: t1
 		updateOrDelete: null
 		null
 		correlation Name: null
@@ -40,14 +40,14 @@ resultSet:
 			null
 			leftResultSet: 				
 				com.akiban.sql.parser.FromBaseTable@1e2acc65
-				tableName: T2
+				tableName: t2
 				updateOrDelete: null
 				null
 				correlation Name: null
 				null
 			rightResultSet: 				
 				com.akiban.sql.parser.FromBaseTable@bd10a5c
-				tableName: T3
+				tableName: t3
 				updateOrDelete: null
 				null
 				correlation Name: null
@@ -59,17 +59,17 @@ resultSet:
 				type: null
 				leftOperand: 					
 					com.akiban.sql.parser.ColumnReference@669980d5
-					columnName: X
-					tableName: T2
+					columnName: x
+					tableName: t2
 					type: null
 				rightOperand: 					
 					com.akiban.sql.parser.ColumnReference@67d95492
-					columnName: X
-					tableName: T3
+					columnName: x
+					tableName: t3
 					type: null
 		rightResultSet: 			
 			com.akiban.sql.parser.FromBaseTable@6d3f7281
-			tableName: T4
+			tableName: t4
 			updateOrDelete: null
 			null
 			correlation Name: null
@@ -81,11 +81,11 @@ resultSet:
 			type: null
 			leftOperand: 				
 				com.akiban.sql.parser.ColumnReference@ee0cc23
-				columnName: X
-				tableName: T3
+				columnName: x
+				tableName: t3
 				type: null
 			rightOperand: 				
 				com.akiban.sql.parser.ColumnReference@487a1576
-				columnName: X
-				tableName: T4
+				columnName: x
+				tableName: t4
 				type: null

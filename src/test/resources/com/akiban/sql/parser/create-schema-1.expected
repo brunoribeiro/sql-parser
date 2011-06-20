@@ -1,6 +1,6 @@
 com.akiban.sql.parser.CreateSchemaNode@52b2a2d8
 statementType: CREATE SCHEMA
 schemaName: 
-TEST
+test
 authorizationId: 
 null

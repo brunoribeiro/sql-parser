@@ -282,9 +282,17 @@ class SQLGrammar
         return retval;
     }
  
-    private static String SQLToUpperCase(String s) {
-        // Always use the ENGLISH locale.
-        return s.toUpperCase(Locale.ENGLISH);
+    private String SQLToIdentifierCase(String s) {
+        switch (parserContext.getIdentifierCase()) {
+        case UPPER:
+            // Always use the ENGLISH locale.
+            return s.toUpperCase(Locale.ENGLISH);
+        case LOWER:
+            return s.toLowerCase(Locale.ENGLISH);
+        case PRESERVE:
+        default:
+            return s;
+        }
     }
 
     /** Is the given feature enabled for this parser? */
@@ -867,7 +875,7 @@ class SQLGrammar
          function exists.
     */  
     private String getEscapedSYSFUN(String name) {
-        name = SQLToUpperCase(name);
+        name = SQLToIdentifierCase(name);
 
         for (int i = 0; i < ESCAPED_SYSFUN_FUNCTIONS.length; i++) {
             if (ESCAPED_SYSFUN_FUNCTIONS[i].equals(name))
@@ -12307,7 +12315,7 @@ internalIdentifier() throws StandardException :
 {
     tok = <IDENTIFIER>
     {
-        str = SQLToUpperCase(tok.image);
+        str = SQLToIdentifierCase(tok.image);
  
         // Remember last identifier token and whether it was delimited.
         nextToLastTokenDelimitedIdentifier = lastTokenDelimitedIdentifier;
@@ -12324,7 +12332,7 @@ internalIdentifier() throws StandardException :
 |
     str = nonReservedKeyword()
     {
-        return SQLToUpperCase(str);
+        return SQLToIdentifierCase(str);
     }
 }
 
@@ -12821,7 +12829,7 @@ caseInsensitiveIdentifierPlusReservedWords() throws StandardException :
 |
     str = reservedKeyword()
     {
-        return SQLToUpperCase(str);
+        return SQLToIdentifierCase(str);
     }
 }
 

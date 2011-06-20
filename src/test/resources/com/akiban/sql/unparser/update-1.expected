@@ -1,1 +1,1 @@
-UPDATE T SET X = NULL, Y = (Y + 1) WHERE X <= 4
+UPDATE t SET x = NULL, y = (y + 1) WHERE x <= 4

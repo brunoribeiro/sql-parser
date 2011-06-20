@@ -242,4 +242,9 @@ public class SQLParser implements SQLParserContext {
             return false;
         }
     }
+
+    public IdentifierCase getIdentifierCase() {
+        return IdentifierCase.LOWER;
+    }
+
 }

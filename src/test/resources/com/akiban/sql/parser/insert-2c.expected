@@ -9,38 +9,38 @@ resultSet:
 
 		[0]:		
 		com.akiban.sql.parser.ResultColumn@b41b571
-		exposedName: X
-		name: X
+		exposedName: x
+		name: x
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
 			com.akiban.sql.parser.ColumnReference@6ef137d
-			columnName: X
+			columnName: x
 			tableName: null
 			type: null
 		[1]:		
 		com.akiban.sql.parser.ResultColumn@39e87719
-		exposedName: Y
-		name: Y
+		exposedName: y
+		name: y
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
 			com.akiban.sql.parser.ColumnReference@4ce32802
-			columnName: Y
+			columnName: y
 			tableName: null
 			type: null
 		[2]:		
 		com.akiban.sql.parser.ResultColumn@5557c2bd
-		exposedName: Z
-		name: Z
+		exposedName: z
+		name: z
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
 			com.akiban.sql.parser.ColumnReference@74b23210
-			columnName: Z
+			columnName: z
 			tableName: null
 			type: null
 	fromList: 		
@@ -48,50 +48,50 @@ resultSet:
 
 		[0]:		
 		com.akiban.sql.parser.FromBaseTable@23d256fa
-		tableName: T
+		tableName: t
 		updateOrDelete: null
 		null
 		correlation Name: null
 		null
 targetTableName: 	
 	com.akiban.sql.parser.TableName@a5d
-	T1
+	t1
 targetColumnList: 	
 	com.akiban.sql.parser.ResultColumnList@464c4975
 
 	[0]:	
 	com.akiban.sql.parser.ResultColumn@3a6ac461
-	exposedName: A
-	name: A
+	exposedName: a
+	name: a
 	tableName: null
 	isDefaultColumn: false
 	type: null
 	reference: 		
 		com.akiban.sql.parser.ColumnReference@3782da3d
-		columnName: A
+		columnName: a
 		tableName: null
 		type: null
 	[1]:	
 	com.akiban.sql.parser.ResultColumn@6fc5f743
-	exposedName: B
-	name: B
+	exposedName: b
+	name: b
 	tableName: null
 	isDefaultColumn: false
 	type: null
 	reference: 		
 		com.akiban.sql.parser.ColumnReference@2dec8909
-		columnName: B
+		columnName: b
 		tableName: null
 		type: null
 	[2]:	
 	com.akiban.sql.parser.ResultColumn@418c56d
-	exposedName: C
-	name: C
+	exposedName: c
+	name: c
 	tableName: null
 	isDefaultColumn: false
 	type: null
 	reference: 		
 		com.akiban.sql.parser.ColumnReference@76497934
-		columnName: C
+		columnName: c
 		tableName: null
 		type: null

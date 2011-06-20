@@ -1,1 +1,1 @@
-INSERT INTO T1(A, B, C) SELECT X, Y, Z FROM T
+INSERT INTO t1(a, b, c) SELECT x, y, z FROM t
