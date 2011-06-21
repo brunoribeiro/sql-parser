@@ -173,13 +173,25 @@ public class TypeComputer implements Visitor
             throws StandardException {
         ValueNode leftOperand = node.getLeftOperand();
         ValueNode rightOperand = node.getRightOperand();
+
+        // Infer type for parameters from other comparand.
+        if (leftOperand.isParameterNode()) {
+            DataTypeDescriptor rightType = rightOperand.getType();
+            if (rightType != null)
+                leftOperand.setType(rightType.getNullabilityType(true));
+        }
+        else if (rightOperand.isParameterNode()) {
+            DataTypeDescriptor leftType = leftOperand.getType();
+            if (leftType != null)
+                rightOperand.setType(leftType.getNullabilityType(true));
+        }
+            
+
         TypeId leftTypeId = leftOperand.getTypeId();
         TypeId rightTypeId = rightOperand.getTypeId();
 
         if ((leftTypeId == null) || (rightTypeId == null))
             return null;
-
-        // TODO: Is this really needed?
 
         /*
          * If we are comparing a non-string with a string type, then we
