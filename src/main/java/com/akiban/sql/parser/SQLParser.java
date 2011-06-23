@@ -49,7 +49,7 @@ import java.util.Map;
 
 public class SQLParser implements SQLParserContext {
     private String sqlText;
-    private List<ValueNode> parameterList;
+    private List<ParameterNode> parameterList;
     private boolean returnParameterFlag;
     private Map printedObjectsMap;
     private int generatedColumnNameIndex;
@@ -85,7 +85,7 @@ public class SQLParser implements SQLParserContext {
     }
 
     /** Return the parameters to the parsed statement. */
-    public List<ValueNode> getParameterList() {
+    public List<ParameterNode> getParameterList() {
         return parameterList;
     }
 
@@ -98,9 +98,7 @@ public class SQLParser implements SQLParserContext {
      *
      */
     public ParameterNode lookupUnnamedParameter(int paramNumber) {
-        ParameterNode unnamedParameter;
-        unnamedParameter = (ParameterNode)parameterList.get(paramNumber);
-        return unnamedParameter;
+        return parameterList.get(paramNumber);
     }
 
     /** Normal external parser entry. */
@@ -157,7 +155,7 @@ public class SQLParser implements SQLParserContext {
         else {
             parser.ReInit(tokenManager);
         }
-        parameterList = new ArrayList<ValueNode>();
+        parameterList = new ArrayList<ParameterNode>();
         returnParameterFlag = false;
         printedObjectsMap = null;
         generatedColumnNameIndex = 1;

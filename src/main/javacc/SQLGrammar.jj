@@ -202,7 +202,7 @@ class SQLGrammar
     private int parameterNumber;
 
     /* The list of ? parameters */
-    private List<ValueNode> parameterList;
+    private List<ParameterNode> parameterList;
 
     /* Remember if the last identifier or keyword was a delimited identifier.
          This is used for Java references. */
@@ -1458,7 +1458,8 @@ class SQLGrammar
         this.nodeFactory = parserContext.getNodeFactory();
     }
 
-    StatementNode parseStatement(String statementSQLText, List<ValueNode> parameterList)
+    StatementNode parseStatement(String statementSQLText, 
+                                 List<ParameterNode> parameterList)
             throws ParseException, StandardException {
         this.statementSQLText = statementSQLText;
         this.parameterList = parameterList;
@@ -10633,7 +10634,7 @@ setRoleStatement() throws StandardException :
             // Can also be prepared with ? argument, cf. SET SCHEMA.
             // set the type of parameter node, it should be a varchar
             // max Limits.MAX_IDENTIFIER_LENGTH - non nullable
-            ParameterNode p = (ParameterNode)parameterList.get(0);
+            ParameterNode p = parameterList.get(0);
             p.setType(new DataTypeDescriptor(TypeId.getBuiltInTypeId(Types.VARCHAR), false,
                                              128));
         }
@@ -10690,7 +10691,7 @@ setSchemaStatement() throws StandardException :
     {
         if (parameterList != null && parameterList.size() > 0) {
             // Set the type of parameter node, it should be a VARCHAR.
-            ParameterNode p = (ParameterNode)parameterList.get(0);
+            ParameterNode p = parameterList.get(0);
             p.setType(new DataTypeDescriptor(TypeId.getBuiltInTypeId(Types.VARCHAR), false,
                                              128));
         }
