@@ -10,6 +10,7 @@
     <properties>
         <BZR_REVISION></BZR_REVISION>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
     <distributionManagement>
         <snapshotRepository>
@@ -131,6 +132,7 @@
             <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
+                <version>1.9.0</version>
                 <configuration>
                     <header>src/etc/header.txt</header>
                     <failIfMissing>true</failIfMissing>
