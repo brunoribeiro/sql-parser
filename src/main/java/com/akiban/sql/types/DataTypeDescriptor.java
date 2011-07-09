@@ -764,12 +764,13 @@ public final class DataTypeDescriptor
             else
                 return false;
 
-        // Right now, user defined types are not comparable.
+        // Right now, user defined types are only comparable to the
+        // identical type.
         // This removes old logic which we might want
         // to revive when we support comparable UDTs. See
         // DERBY-4470.
         if (typeId.isUserDefinedTypeId() || typeId.getJDBCTypeId() == Types.OTHER) { 
-            return false; 
+            return typeId.equals(compareWithTypeID); 
         }
 
         return false;
