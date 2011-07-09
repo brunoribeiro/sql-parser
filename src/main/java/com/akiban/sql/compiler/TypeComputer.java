@@ -62,6 +62,8 @@ public class TypeComputer implements Visitor
             return conditionalNode((ConditionalNode)node);
         case NodeTypes.COALESCE_FUNCTION_NODE:
             return coalesceFunctionNode((CoalesceFunctionNode)node);
+        case NodeTypes.AGGREGATE_NODE:
+            return aggregateNode((AggregateNode)node);
         default:
             // assert false;
             return null;
@@ -292,6 +294,19 @@ public class TypeComputer implements Visitor
     protected DataTypeDescriptor coalesceFunctionNode(CoalesceFunctionNode node)
             throws StandardException {
         return dominantType(node.getArgumentsList());
+    }
+
+    protected DataTypeDescriptor aggregateNode(AggregateNode node) 
+            throws StandardException {
+        if (node.getAggregateName().equals("COUNT") ||
+            node.getAggregateName().equals("COUNT(*)"))
+            return new DataTypeDescriptor(TypeId.INTEGER_ID, false);
+
+        ValueNode operand = node.getOperand();
+        if ((operand == null) ||
+            (operand.getType() == null))
+            return null;
+        return operand.getType().getNullabilityType(true);
     }
 
     protected DataTypeDescriptor dominantType(ValueNodeList nodeList) 
