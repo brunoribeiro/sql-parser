@@ -227,7 +227,7 @@ public class AlterTableNode extends DDLStatementNode
     public String toString() {
         return super.toString() +
             "objectName: " + getObjectName() + "\n" +
-            "lockGranularity: " + lockGranularity + "\n" +
+            //"lockGranularity: " + lockGranularity + "\n" +
             "compressTable: " + compressTable + "\n" +
             "sequential: " + sequential + "\n" +
             "truncateTable: " + truncateTable + "\n" +

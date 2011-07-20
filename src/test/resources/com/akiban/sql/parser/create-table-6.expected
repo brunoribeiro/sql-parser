@@ -1,0 +1,156 @@
+com.akiban.sql.parser.CreateTableNode@603b1d04
+name: t1
+statementType: CREATE TABLE
+lockGranularity: R
+tableElementList: 	
+	com.akiban.sql.parser.TableElementList@48ee22f7
+
+	[0]:	
+	com.akiban.sql.parser.ConstraintDefinitionNode@a39ab89
+	constraintName: null
+	constraintType: PRIMARY_KEY
+	properties: null
+	name: null
+	elementType: AT_DROP_CONSTRAINT
+	columnList: 		
+		com.akiban.sql.parser.ResultColumnList@502cb49d
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@2705d88a
+		exposedName: c1
+		name: c1
+		tableName: null
+		isDefaultColumn: false
+		type: null
+	[1]:	
+	com.akiban.sql.parser.ColumnDefinitionNode@70cb6009
+	type: INTEGER
+	name: c1
+	elementType: null
+	[2]:	
+	com.akiban.sql.parser.ColumnDefinitionNode@380e28b9
+	type: INTEGER NOT NULL
+	name: c2
+	elementType: null
+	[3]:	
+	com.akiban.sql.parser.ColumnDefinitionNode@2993a66f
+	type: INTEGER NOT NULL
+	name: c3
+	elementType: null
+	[4]:	
+	com.akiban.sql.parser.ColumnDefinitionNode@1c93d6bc
+	type: INTEGER NOT NULL
+	name: c4
+	elementType: null
+	[5]:	
+	com.akiban.sql.parser.ColumnDefinitionNode@2df6df4c
+	type: INTEGER NOT NULL
+	name: c5
+	elementType: null
+	[6]:	
+	com.akiban.sql.parser.ColumnDefinitionNode@2abe0e27
+	type: INTEGER NOT NULL
+	name: c6
+	elementType: null
+	[7]:	
+	com.akiban.sql.parser.ConstraintDefinitionNode@2393385d
+	constraintName: null
+	constraintType: UNIQUE
+	properties: null
+	name: null
+	elementType: AT_DROP_CONSTRAINT
+	columnList: 		
+		com.akiban.sql.parser.ResultColumnList@165973ea
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@4ac9131c
+		exposedName: c2
+		name: c2
+		tableName: null
+		isDefaultColumn: false
+		type: null
+	[8]:	
+	com.akiban.sql.parser.ConstraintDefinitionNode@5705b99f
+	constraintName: key_c3
+	constraintType: UNIQUE
+	properties: null
+	name: key_c3
+	elementType: AT_DROP_CONSTRAINT
+	columnList: 		
+		com.akiban.sql.parser.ResultColumnList@38dda25b
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@5ece2187
+		exposedName: c3
+		name: c3
+		tableName: null
+		isDefaultColumn: false
+		type: null
+	[9]:	
+	com.akiban.sql.parser.FKConstraintDefinitionNode@2efb56b1
+	constraintName: null
+	constraintType: FOREIGN_KEY
+	properties: null
+	name: null
+	elementType: AT_DROP_CONSTRAINT
+	columnList: 		
+		com.akiban.sql.parser.ResultColumnList@76f8968f
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@3a64c34e
+		exposedName: c4
+		name: c4
+		tableName: null
+		isDefaultColumn: false
+		type: null
+	[10]:	
+	com.akiban.sql.parser.FKConstraintDefinitionNode@2d5253d5
+	constraintName: null
+	constraintType: FOREIGN_KEY
+	properties: null
+	name: null
+	elementType: AT_DROP_CONSTRAINT
+	columnList: 		
+		com.akiban.sql.parser.ResultColumnList@77fddc31
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@3b835282
+		exposedName: c2
+		name: c2
+		tableName: null
+		isDefaultColumn: false
+		type: null
+	[11]:	
+	com.akiban.sql.parser.FKConstraintDefinitionNode@2a9df354
+	constraintName: fk_c5
+	constraintType: FOREIGN_KEY
+	properties: null
+	name: fk_c5
+	elementType: AT_DROP_CONSTRAINT
+	columnList: 		
+		com.akiban.sql.parser.ResultColumnList@67d225a7
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@15a62c31
+		exposedName: c5
+		name: c5
+		tableName: null
+		isDefaultColumn: false
+		type: null
+	[12]:	
+	com.akiban.sql.parser.FKConstraintDefinitionNode@509f5011
+	constraintName: fk_c6
+	constraintType: FOREIGN_KEY
+	properties: null
+	name: fk_c6
+	elementType: AT_DROP_CONSTRAINT
+	columnList: 		
+		com.akiban.sql.parser.ResultColumnList@b41b571
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@6ef137d
+		exposedName: c6
+		name: c6
+		tableName: null
+		isDefaultColumn: false
+		type: null
