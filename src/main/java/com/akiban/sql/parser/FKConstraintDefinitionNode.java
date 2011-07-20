@@ -100,5 +100,12 @@ public class FKConstraintDefinitionNode extends ConstraintDefinitionNode
     public boolean isGrouping() {
         return grouping;
     }
+    
+    public String toString() {
+        return "refTable name : " + refTableName + "\n" +
+            "grouping: " + grouping + "\n" + 
+            super.toString();
+    }
+    
 
 }
