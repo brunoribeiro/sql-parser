@@ -152,6 +152,7 @@ public class TypeId
     public static final String TINYINT_NAME = "TINYINT";
     public static final String SMALLINT_NAME = "SMALLINT";
     public static final String INTEGER_NAME = "INTEGER";
+    public static final String INT_NAME = "INT";
     public static final String LONGINT_NAME = "BIGINT";
     public static final String FLOAT_NAME = "FLOAT";
     public static final String REAL_NAME = "REAL";
@@ -178,6 +179,7 @@ public class TypeId
     public static final String TINYINT_UNSIGNED_NAME = "TINYINT UNSIGNED";
     public static final String SMALLINT_UNSIGNED_NAME = "SMALLINT UNSIGNED";
     public static final String INTEGER_UNSIGNED_NAME = "INTEGER UNSIGNED";
+    public static final String INT_UNSIGNED_NAME = "INT UNSIGNED";
     public static final String LONGINT_UNSIGNED_NAME = "BIGINT UNSIGNED";
     public static final String FLOAT_UNSIGNED_NAME = "FLOAT UNSIGNED";
     public static final String REAL_UNSIGNED_NAME = "REAL UNSIGNED";
@@ -561,7 +563,8 @@ public class TypeId
         if (SQLTypeName.equals(FLOAT_NAME)) {
             return DOUBLE_ID;
         }
-        if (SQLTypeName.equals(INTEGER_NAME)) {
+        if (SQLTypeName.equals(INTEGER_NAME) ||
+            SQLTypeName.equals(INT_NAME)) {
             return INTEGER_ID;
         }
         if (SQLTypeName.equals(LONGINT_NAME)) {
@@ -618,7 +621,8 @@ public class TypeId
         if (SQLTypeName.equals(SMALLINT_UNSIGNED_NAME)) {
             return SMALLINT_UNSIGNED_ID;
         }
-        if (SQLTypeName.equals(INTEGER_UNSIGNED_NAME)) {
+        if (SQLTypeName.equals(INTEGER_UNSIGNED_NAME) ||
+            SQLTypeName.equals(INT_UNSIGNED_NAME)) {
             return INTEGER_UNSIGNED_ID;
         }
         if (SQLTypeName.equals(LONGINT_UNSIGNED_NAME)) {
