@@ -1040,4 +1040,28 @@ public final class DataTypeDescriptor
         return (scale == 0) ? (precision + 1) : ((scale == precision) ? (precision + 3) : (precision + 2));
     }
 
+    public DataTypeDescriptor getUnsigned() throws StandardException {
+        TypeId unsignedTypeId;
+        if (typeId == TypeId.SMALLINT_ID)
+            unsignedTypeId = TypeId.SMALLINT_UNSIGNED_ID;
+        else if (typeId == TypeId.INTEGER_ID)
+            unsignedTypeId = TypeId.INTEGER_UNSIGNED_ID;
+        else if (typeId == TypeId.TINYINT_ID)
+            unsignedTypeId = TypeId.TINYINT_UNSIGNED_ID;
+        else if (typeId == TypeId.BIGINT_ID)
+            unsignedTypeId = TypeId.BIGINT_UNSIGNED_ID;
+        else if (typeId == TypeId.REAL_ID)
+            unsignedTypeId = TypeId.REAL_UNSIGNED_ID;
+        else if (typeId == TypeId.DOUBLE_ID)
+            unsignedTypeId = TypeId.DOUBLE_UNSIGNED_ID;
+        else if (typeId == TypeId.DECIMAL_ID)
+            unsignedTypeId = TypeId.DECIMAL_UNSIGNED_ID;
+        else if (typeId == TypeId.NUMERIC_ID)
+            unsignedTypeId = TypeId.NUMERIC_UNSIGNED_ID;
+        else
+            throw new StandardException("Not a numeric type: " + this);            
+        return new DataTypeDescriptor(unsignedTypeId, precision, scale,
+                                      isNullable, maximumWidth);
+    }
+
 }

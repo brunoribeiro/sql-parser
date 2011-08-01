@@ -1453,6 +1453,11 @@ class SQLGrammar
             getToken(1).kind == tokenKind;
     }
 
+    boolean unsignedFollows() {
+        return hasFeature(SQLParserFeature.UNSIGNED) &&
+            getToken(1).kind == UNSIGNED;
+    }
+
     void setParserContext(SQLParserContext parserContext) {
         this.parserContext = parserContext;
         this.nodeFactory = parserContext.getNodeFactory();
@@ -2147,6 +2152,7 @@ TOKEN [IGNORE_CASE] :
 | <TRIGGER: "trigger">
 | <TRUNCATE_END: "truncate_end">
 | <UCASE: "ucase">
+| <UNSIGNED: "unsigned">
 | <UR: "ur">
 | <WHITESPACE: "whitespace">
 }
@@ -3661,16 +3667,21 @@ DataTypeDescriptor
 numericType() throws StandardException :
 {
     DataTypeDescriptor typeDescriptor;
+    Token unsignedToken = null;
 }
 {
+(
     typeDescriptor = exactNumericType()
-    {
-        return typeDescriptor;
-    }
 |
     typeDescriptor = approximateNumericType()
+)
+    [ LOOKAHEAD( { unsignedFollows() })
+      unsignedToken = <UNSIGNED> ]
     {
-        return typeDescriptor;
+        if (unsignedToken != null)
+            return typeDescriptor.getUnsigned();
+        else
+            return typeDescriptor;
     }
 }
 
@@ -12781,6 +12792,7 @@ nonReservedKeyword() :
 | tok = <TYPE>
 | tok = <UCASE>
 | tok = <UNCOMMITTED>
+| tok = <UNSIGNED>
 | tok = <UR>
 | tok = <USAGE>
 // SQL92 says VALUE is reserved, but we want it to be nonreserved.

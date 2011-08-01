@@ -152,6 +152,7 @@ public class TypeId
     public static final String TINYINT_NAME = "TINYINT";
     public static final String SMALLINT_NAME = "SMALLINT";
     public static final String INTEGER_NAME = "INTEGER";
+    public static final String INT_NAME = "INT";
     public static final String LONGINT_NAME = "BIGINT";
     public static final String FLOAT_NAME = "FLOAT";
     public static final String REAL_NAME = "REAL";
@@ -175,6 +176,16 @@ public class TypeId
     public static final String BLOB_NAME = "BLOB";
     public static final String CLOB_NAME = "CLOB";
     public static final String NCLOB_NAME = "NCLOB";
+    public static final String TINYINT_UNSIGNED_NAME = "TINYINT UNSIGNED";
+    public static final String SMALLINT_UNSIGNED_NAME = "SMALLINT UNSIGNED";
+    public static final String INTEGER_UNSIGNED_NAME = "INTEGER UNSIGNED";
+    public static final String INT_UNSIGNED_NAME = "INT UNSIGNED";
+    public static final String LONGINT_UNSIGNED_NAME = "BIGINT UNSIGNED";
+    public static final String FLOAT_UNSIGNED_NAME = "FLOAT UNSIGNED";
+    public static final String REAL_UNSIGNED_NAME = "REAL UNSIGNED";
+    public static final String DOUBLE_UNSIGNED_NAME = "DOUBLE UNSIGNED";
+    public static final String NUMERIC_UNSIGNED_NAME = "NUMERIC UNSIGNED";
+    public static final String DECIMAL_UNSIGNED_NAME = "DECIMAL UNSIGNED";
 
     // Following use of "XML" is per SQL/XML (2003) spec,
     // section "10.2 Type name determination".
@@ -254,12 +265,12 @@ public class TypeId
     public static final TypeId SMALLINT_ID = new TypeId(FormatIds.SMALLINT_TYPE_ID);
     public static final TypeId INTEGER_ID = new TypeId(FormatIds.INT_TYPE_ID);
     public static final TypeId CHAR_ID = new TypeId(FormatIds.CHAR_TYPE_ID);
-    private static final TypeId TINYINT_ID = new TypeId(FormatIds.TINYINT_TYPE_ID);
-    private static final TypeId BIGINT_ID = new TypeId(FormatIds.LONGINT_TYPE_ID);
-    private static final TypeId REAL_ID = new TypeId(FormatIds.REAL_TYPE_ID);
-    private static final TypeId DOUBLE_ID = new TypeId(FormatIds.DOUBLE_TYPE_ID);
-    private static final TypeId DECIMAL_ID =    new TypeId(FormatIds.DECIMAL_TYPE_ID);
-    private static final TypeId NUMERIC_ID =    new TypeId(FormatIds.NUMERIC_TYPE_ID);
+    public static final TypeId TINYINT_ID = new TypeId(FormatIds.TINYINT_TYPE_ID);
+    public static final TypeId BIGINT_ID = new TypeId(FormatIds.LONGINT_TYPE_ID);
+    public static final TypeId REAL_ID = new TypeId(FormatIds.REAL_TYPE_ID);
+    public static final TypeId DOUBLE_ID = new TypeId(FormatIds.DOUBLE_TYPE_ID);
+    public static final TypeId DECIMAL_ID =    new TypeId(FormatIds.DECIMAL_TYPE_ID);
+    public static final TypeId NUMERIC_ID =    new TypeId(FormatIds.NUMERIC_TYPE_ID);
     private static final TypeId VARCHAR_ID = new TypeId(FormatIds.VARCHAR_TYPE_ID);
     private static final TypeId DATE_ID = new TypeId(FormatIds.DATE_TYPE_ID);
     private static final TypeId TIME_ID = new TypeId(FormatIds.TIME_TYPE_ID);
@@ -272,6 +283,15 @@ public class TypeId
     private static final TypeId BLOB_ID = new TypeId(FormatIds.BLOB_TYPE_ID);
     private static final TypeId CLOB_ID = new TypeId(FormatIds.CLOB_TYPE_ID);
     private static final TypeId XML_ID = new TypeId(FormatIds.XML_TYPE_ID);
+
+    public static final TypeId SMALLINT_UNSIGNED_ID = new TypeId(FormatIds.SMALLINT_TYPE_ID, true);
+    public static final TypeId INTEGER_UNSIGNED_ID = new TypeId(FormatIds.INT_TYPE_ID, true);
+    public static final TypeId TINYINT_UNSIGNED_ID = new TypeId(FormatIds.TINYINT_TYPE_ID, true);
+    public static final TypeId BIGINT_UNSIGNED_ID = new TypeId(FormatIds.LONGINT_TYPE_ID, true);
+    public static final TypeId REAL_UNSIGNED_ID = new TypeId(FormatIds.REAL_TYPE_ID, true);
+    public static final TypeId DOUBLE_UNSIGNED_ID = new TypeId(FormatIds.DOUBLE_TYPE_ID, true);
+    public static final TypeId DECIMAL_UNSIGNED_ID =    new TypeId(FormatIds.DECIMAL_TYPE_ID, true);
+    public static final TypeId NUMERIC_UNSIGNED_ID =    new TypeId(FormatIds.NUMERIC_TYPE_ID, true);
 
     private static final TypeId[] ALL_BUILTIN_TYPE_IDS = {
         BOOLEAN_ID,
@@ -296,6 +316,14 @@ public class TypeId
         BLOB_ID,
         CLOB_ID,
         XML_ID,
+        SMALLINT_UNSIGNED_ID,
+        INTEGER_UNSIGNED_ID,
+        TINYINT_UNSIGNED_ID,
+        BIGINT_UNSIGNED_ID,
+        REAL_UNSIGNED_ID,
+        DOUBLE_UNSIGNED_ID,
+        DECIMAL_UNSIGNED_ID,
+        NUMERIC_UNSIGNED_ID,
     };
 
     /*
@@ -535,7 +563,8 @@ public class TypeId
         if (SQLTypeName.equals(FLOAT_NAME)) {
             return DOUBLE_ID;
         }
-        if (SQLTypeName.equals(INTEGER_NAME)) {
+        if (SQLTypeName.equals(INTEGER_NAME) ||
+            SQLTypeName.equals(INT_NAME)) {
             return INTEGER_ID;
         }
         if (SQLTypeName.equals(LONGINT_NAME)) {
@@ -585,6 +614,34 @@ public class TypeId
         }
         if (SQLTypeName.equals(XML_NAME)) {
             return XML_ID;
+        }
+        if (SQLTypeName.equals(TINYINT_UNSIGNED_NAME)) {
+            return TINYINT_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(SMALLINT_UNSIGNED_NAME)) {
+            return SMALLINT_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(INTEGER_UNSIGNED_NAME) ||
+            SQLTypeName.equals(INT_UNSIGNED_NAME)) {
+            return INTEGER_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(LONGINT_UNSIGNED_NAME)) {
+            return BIGINT_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(FLOAT_UNSIGNED_NAME)) {
+            return DOUBLE_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(REAL_UNSIGNED_NAME)) {
+            return REAL_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(DOUBLE_UNSIGNED_NAME)) {
+            return DOUBLE_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(NUMERIC_UNSIGNED_NAME)) {
+            return NUMERIC_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(DECIMAL_UNSIGNED_NAME)) {
+            return DECIMAL_UNSIGNED_ID;
         }
 
         // Types defined below here are SQL types and non-JDBC types that are
@@ -920,6 +977,42 @@ public class TypeId
         return formatId;
     }
 
+    private boolean unsigned;
+    private TypeId(int formatId, boolean unsigned) {
+        this(formatId);
+        if (unsigned) {
+            this.unsigned = true;
+            switch (formatId) {
+            case FormatIds.DECIMAL_TYPE_ID:
+                unqualifiedName = TypeId.DECIMAL_UNSIGNED_NAME;
+                break;
+            case FormatIds.NUMERIC_TYPE_ID:
+                unqualifiedName = TypeId.NUMERIC_UNSIGNED_NAME;
+                break;
+            case FormatIds.DOUBLE_TYPE_ID:
+                unqualifiedName = TypeId.DOUBLE_UNSIGNED_NAME;
+                break;
+            case FormatIds.INT_TYPE_ID:
+                unqualifiedName = TypeId.INTEGER_UNSIGNED_NAME;
+                break;
+            case FormatIds.LONGINT_TYPE_ID:
+                unqualifiedName = TypeId.LONGINT_UNSIGNED_NAME;
+                break;
+            case FormatIds.REAL_TYPE_ID:
+                unqualifiedName = TypeId.REAL_UNSIGNED_NAME;
+                break;
+            case FormatIds.SMALLINT_TYPE_ID:
+                unqualifiedName = TypeId.SMALLINT_UNSIGNED_NAME;
+                break;
+            case FormatIds.TINYINT_TYPE_ID:
+                unqualifiedName = TypeId.TINYINT_UNSIGNED_NAME;
+                break;
+            default:
+                assert false;
+            }
+        }
+    }
+
     /**
      * Constructor for a TypeId for user defined types
      *
@@ -1253,7 +1346,13 @@ public class TypeId
             break;
 
         case FormatIds.DECIMAL_TYPE_ID:
-            retval += "(" + dts.getPrecision() + "," + dts.getScale() + ")";
+            if (unsigned) {
+                retval = retval.substring(0, retval.length() - 9) +
+                    "(" + dts.getPrecision() + "," + dts.getScale() + ")" +
+                    retval.substring(retval.length() - 9);
+            }
+            else
+                retval += "(" + dts.getPrecision() + "," + dts.getScale() + ")";
             break;
         }
 
@@ -1456,6 +1555,11 @@ public class TypeId
 
     public boolean isRowMultiSet() {
         return false;
+    }
+
+    /** Is this one of the unsigned numeric types? */
+    public boolean isUnsigned() {
+        return unsigned;
     }
 
 }
