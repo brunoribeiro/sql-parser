@@ -8,5 +8,5 @@ unique (c2),
 constraint key_c3 unique (c3),
 foreign key (c4) references t3,
 grouping foreign key (c2) references t2 (c1),
-constraint fk_c5 foreign key (c5) references t5,
+constraint fk_c5 foreign key (c5) references other.t5,
 constraint fk_c6 grouping foreign key (c6) references t6)

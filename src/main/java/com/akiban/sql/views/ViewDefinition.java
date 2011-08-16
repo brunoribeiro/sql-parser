@@ -18,7 +18,6 @@ package com.akiban.sql.views;
 import com.akiban.sql.parser.*;
 
 import com.akiban.sql.StandardException;
-import com.akiban.sql.types.DataTypeDescriptor;
 
 public class ViewDefinition
 {
@@ -47,7 +46,7 @@ public class ViewDefinition
     /** 
      * Get the name of the view.
      */
-    public TableName getName() throws StandardException {
+    public TableName getName() {
         return definition.getObjectName();
     }
 

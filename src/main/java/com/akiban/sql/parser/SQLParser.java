@@ -235,6 +235,7 @@ public class SQLParser implements SQLParserContext {
     public boolean hasFeature(SQLParserFeature feature) {
         switch (feature) {
         case GROUPING:
+        case UNSIGNED:
             return true;
         default:
             return false;
