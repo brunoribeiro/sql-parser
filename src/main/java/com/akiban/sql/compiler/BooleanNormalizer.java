@@ -323,6 +323,68 @@ public class BooleanNormalizer implements Visitor
                 return result;
             }
             break;
+        case NodeTypes.SUBQUERY_NODE:
+            if (underNotNode) {
+                SubqueryNode snode = (SubqueryNode)node;
+                SubqueryNode.SubqueryType subqueryType = snode.getSubqueryType();
+                switch (subqueryType) {
+                case IN:
+                    subqueryType = SubqueryNode.SubqueryType.NOT_IN;
+                    break;
+                case NOT_IN:
+                    subqueryType = SubqueryNode.SubqueryType.IN;
+                    break;
+                case EQ_ANY:
+                    subqueryType = SubqueryNode.SubqueryType.NE_ALL;
+                    break;
+                case EQ_ALL:
+                    subqueryType = SubqueryNode.SubqueryType.NE_ANY;
+                    break;
+                case NE_ANY:
+                    subqueryType = SubqueryNode.SubqueryType.EQ_ALL;
+                    break;
+                case NE_ALL:
+                    subqueryType = SubqueryNode.SubqueryType.EQ_ANY;
+                    break;
+                case GT_ANY:
+                    subqueryType = SubqueryNode.SubqueryType.LE_ALL;
+                    break;
+                case GT_ALL:
+                    subqueryType = SubqueryNode.SubqueryType.LE_ANY;
+                    break;
+                case GE_ANY:
+                    subqueryType = SubqueryNode.SubqueryType.LT_ALL;
+                    break;
+                case GE_ALL:
+                    subqueryType = SubqueryNode.SubqueryType.LT_ANY;
+                    break;
+                case LT_ANY:
+                    subqueryType = SubqueryNode.SubqueryType.GE_ALL;
+                    break;
+                case LT_ALL:
+                    subqueryType = SubqueryNode.SubqueryType.GE_ANY;
+                    break;
+                case LE_ANY:
+                    subqueryType = SubqueryNode.SubqueryType.GT_ALL;
+                    break;
+                case LE_ALL:
+                    subqueryType = SubqueryNode.SubqueryType.GT_ANY;
+                    break;
+                case EXISTS:
+                    subqueryType = SubqueryNode.SubqueryType.NOT_EXISTS;
+                    break;
+                case NOT_EXISTS:
+                    subqueryType = SubqueryNode.SubqueryType.EXISTS;
+                    break;
+                case EXPRESSION:
+                    return equalsBooleanConstant(node, Boolean.FALSE);
+                default:
+                    assert false : "NOT is not supported for this time of subquery";
+                    return equalsBooleanConstant(node, Boolean.FALSE);
+                }
+                snode.setSubqueryType(subqueryType);
+            }
+            break;
         case NodeTypes.BOOLEAN_CONSTANT_NODE:
             if (underNotNode) {
                 BooleanConstantNode bnode = (BooleanConstantNode)node;
@@ -336,47 +398,37 @@ public class BooleanNormalizer implements Visitor
             }
             break;
         case NodeTypes.COLUMN_REFERENCE:
-            if (!underNotNode) {
-                /* X -> (X = TRUE) */
-                // NOTE: This happened in a different place in the original
-                // Derby, but that ended up only doing those along the
-                // right-hand branch, which does not seem consistent.
-                BooleanConstantNode trueNode = (BooleanConstantNode)
-                    nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
-                                        Boolean.TRUE,
-                                        parserContext);
-                BinaryComparisonOperatorNode equalsNode = (BinaryComparisonOperatorNode)
-                    nodeFactory.getNode(NodeTypes.BINARY_EQUALS_OPERATOR_NODE,
-                                        node, trueNode,
-                                        parserContext);
-                if (node.getType() != null) {
-                    boolean nullableResult = node.getType().isNullable();
-                    equalsNode.setType(new DataTypeDescriptor(TypeId.BOOLEAN_ID,
-                                                              nullableResult));
-                }
-                return equalsNode;
-            }
-            /* else falls through */
+            /* X -> (X = TRUE / FALSE) */
+            // NOTE: This happened in a different place in the original
+            // Derby, but that ended up only doing those along the
+            // right-hand branch, which does not seem consistent.
+            return equalsBooleanConstant(node, 
+                                         underNotNode ? Boolean.FALSE : Boolean.TRUE);
         default:
             if (underNotNode) {
-                BooleanConstantNode falseNode = (BooleanConstantNode) 
-                    nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
-                                        Boolean.FALSE,
-                                        parserContext);
-                BinaryRelationalOperatorNode equalsNode = (BinaryRelationalOperatorNode)
-                    nodeFactory.getNode(NodeTypes.BINARY_EQUALS_OPERATOR_NODE,
-                                        node, falseNode,
-                                        parserContext);
-                if (node.getType() != null) {
-                    boolean nullableResult = node.getType().isNullable();
-                    equalsNode.setType(new DataTypeDescriptor(TypeId.BOOLEAN_ID,
-                                                              nullableResult));
-                }
-                return equalsNode;
+                return equalsBooleanConstant(node, Boolean.FALSE);
             }
             break;
         }
         return node;
+    }
+
+    protected ValueNode equalsBooleanConstant(ValueNode node, Boolean constant) 
+            throws StandardException {
+        BooleanConstantNode trueNode = (BooleanConstantNode)
+            nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE,
+                                constant,
+                                parserContext);
+        BinaryComparisonOperatorNode equalsNode = (BinaryComparisonOperatorNode)
+            nodeFactory.getNode(NodeTypes.BINARY_EQUALS_OPERATOR_NODE,
+                                node, trueNode,
+                                parserContext);
+        if (node.getType() != null) {
+            boolean nullableResult = node.getType().isNullable();
+            equalsNode.setType(new DataTypeDescriptor(TypeId.BOOLEAN_ID,
+                                                      nullableResult));
+        }
+        return equalsNode;
     }
 
     /**
