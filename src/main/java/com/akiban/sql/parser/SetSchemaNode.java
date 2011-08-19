@@ -95,5 +95,12 @@ public class SetSchemaNode extends MiscellaneousStatementNode
     public String statementToString() {
         return "SET SCHEMA";
     }
-
+    
+    public String getSchemaName() {
+        return name;
+    }
+    
+    public int statementType() {
+        return type;
+    }
 }
