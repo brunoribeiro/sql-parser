@@ -192,7 +192,7 @@ public class JoinNode extends TableOperatorNode
      * (For RIGHT OUTER JOIN, the left is the right
      * and the right is the left and the JOIN is the NIOJ).
      */
-    ResultSetNode getLogicalLeftResultSet() {
+    public ResultSetNode getLogicalLeftResultSet() {
         return leftResultSet;
     }
 
@@ -202,7 +202,7 @@ public class JoinNode extends TableOperatorNode
      * (For RIGHT OUTER JOIN, the left is the right
      * and the right is the left and the JOIN is the NIOJ).
      */
-    ResultSetNode getLogicalRightResultSet() {
+    public ResultSetNode getLogicalRightResultSet() {
         return rightResultSet;
     }
 

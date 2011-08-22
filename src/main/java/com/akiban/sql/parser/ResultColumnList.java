@@ -227,7 +227,7 @@ public class ResultColumnList extends QueryTreeNodeList<ResultColumn>
      * 
      * @param joinColumns The list of join columns
      */
-    void removeJoinColumns(ResultColumnList joinColumns) {
+    public void removeJoinColumns(ResultColumnList joinColumns) {
         for (ResultColumn joinRC : joinColumns) {
             String columnName = joinRC.getName();
             ResultColumn rightRC = getResultColumn(columnName);
@@ -247,7 +247,7 @@ public class ResultColumnList extends QueryTreeNodeList<ResultColumn>
      *
      * @return A list of the join columns from this list
      */
-    ResultColumnList getJoinColumns(ResultColumnList joinColumns)
+    public ResultColumnList getJoinColumns(ResultColumnList joinColumns)
             throws StandardException {
         ResultColumnList newRCL = new ResultColumnList();
 
