@@ -1,0 +1,34 @@
+com.akiban.sql.parser.CreateTableNode@36b8bef7
+name: t7
+statementType: CREATE TABLE
+lockGranularity: R
+tableElementList: 	
+	com.akiban.sql.parser.TableElementList@1b016632
+
+	[0]:	
+	com.akiban.sql.parser.ConstraintDefinitionNode@78dc6a77
+	constraintName: null
+	constraintType: PRIMARY_KEY
+	properties: null
+	name: null
+	elementType: AT_DROP_CONSTRAINT
+	columnList: 		
+		com.akiban.sql.parser.ResultColumnList@4ed1e89e
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@36ff057f
+		exposedName: c1
+		name: c1
+		tableName: null
+		isDefaultColumn: false
+		type: null
+	[1]:	
+	com.akiban.sql.parser.ColumnDefinitionNode@20c1f10e
+	type: INTEGER NOT NULL
+	name: c1
+	elementType: null
+	default: 		
+		com.akiban.sql.parser.DefaultNode@1cb8deef
+		columnName: null
+		defaultText: null
+		type: null

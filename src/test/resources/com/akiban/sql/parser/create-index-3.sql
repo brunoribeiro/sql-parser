@@ -1,0 +1,1 @@
+CREATE INDEX G1 ON group_table (t1.c1, t2.c2)
