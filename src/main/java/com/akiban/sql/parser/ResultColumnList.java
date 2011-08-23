@@ -220,6 +220,52 @@ public class ResultColumnList extends QueryTreeNodeList<ResultColumn>
         return strings;
     }
 
+    /**
+     * Remove the columns which are join columns (in the
+     * joinColumns RCL) from this list.  This is useful
+     * for a JOIN with a USING clause.
+     * 
+     * @param joinColumns The list of join columns
+     */
+    public void removeJoinColumns(ResultColumnList joinColumns) {
+        for (ResultColumn joinRC : joinColumns) {
+            String columnName = joinRC.getName();
+            ResultColumn rightRC = getResultColumn(columnName);
+            // Remove the RC from this list.
+            if (rightRC != null) {
+                remove(rightRC);
+            }
+        }
+    }
+
+    /**
+     * Get the join columns from this list.
+     * This is useful for a join with a USING clause.  
+     * (ANSI specifies that the join columns appear 1st.) 
+     *
+     * @param joinColumns A list of the join columns.
+     *
+     * @return A list of the join columns from this list
+     */
+    public ResultColumnList getJoinColumns(ResultColumnList joinColumns)
+            throws StandardException {
+        ResultColumnList newRCL = new ResultColumnList();
+
+        /* Find all of the join columns and put them on the new RCL. */
+        for (ResultColumn joinRC : joinColumns) {
+            String columnName = joinRC.getName();
+            ResultColumn xferRC = getResultColumn(columnName);
+
+            if (xferRC == null) {
+                throw new StandardException("Column not found: " + columnName);
+            }
+
+            // Add the RC to the new list.
+            newRCL.add(xferRC);
+        }
+        return newRCL;
+    }
+
     /* ****
      * Take note of the size of this RCL _before_ we start
      * processing/binding it.    This is so that, at bind time,
