@@ -87,7 +87,7 @@ public class RenameNode extends DDLStatementNode
      */
     public void init(Object tableName,
                      Object oldObjectName,
-                     Object newObjectName,
+                     Object newName,
                      Object usedAlterTable,
                      Object renamingWhat)
             throws StandardException {
@@ -96,9 +96,9 @@ public class RenameNode extends DDLStatementNode
 
         switch (this.renamingWhat) {
         case TABLE:
+        case INDEX:
             initAndCheck((TableName)tableName);
-            this.newTableName =
-                makeTableName(getObjectName().getSchemaName(), (String)newObjectName);
+            this.newTableName = (TableName)newName;
             this.oldObjectName = null;
             this.newObjectName = this.newTableName.getTableName();
             break;
@@ -115,14 +115,8 @@ public class RenameNode extends DDLStatementNode
                 actingObjectName = makeTableName(null, (String)tableName);
             initAndCheck(actingObjectName);
 
-
             this.oldObjectName = (String)oldObjectName;
-            this.newObjectName = (String)newObjectName;
-            break;
-
-        case INDEX:
-            this.oldObjectName = (String)oldObjectName;
-            this.newObjectName = (String)newObjectName;
+            this.newObjectName = (String)newName;
             break;
 
         default:
@@ -187,8 +181,8 @@ public class RenameNode extends DDLStatementNode
 
         case INDEX:
             return super.toString() +
-                "oldIndexName:" + "\n" + oldObjectName + "\n" +
-                "newIndexName: " + "\n" + newObjectName + "\n" ;
+                "oldIndexName:" + "\n" + getRelativeName() + "\n" +
+                "newIndexName: " + "\n" + newTableName + "\n" ;
 
         default:
             assert false : "Unexpected rename action in RenameNode";

@@ -10342,13 +10342,11 @@ spsRenameStatement() throws StandardException :
 StatementNode
 renameTableStatement() throws StandardException :
 {
-    StatementNode qtn;
-    TableName tableName;
-    String newTableName;
+    TableName tableName, newTableName;
 }
 {
     <TABLE> tableName = qualifiedName() 
-    <TO> newTableName = identifier()
+    <TO> newTableName = qualifiedName()
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
                                                   tableName,
@@ -10362,26 +10360,23 @@ renameTableStatement() throws StandardException :
 
 StatementNode
 renameIndexStatement() throws StandardException :
-{
-    String oldIndexName;
-    String newIndexName;
+{ 
+    TableName indexName, newIndexName;
 }
 {
-    <INDEX> oldIndexName = identifier() 
-        <TO> newIndexName = identifier()
+    <INDEX> indexName = qualifiedName() 
+    <TO> newIndexName = qualifiedName()
     {
-        StatementNode qtn = (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
-                                                               null,
-                                                               oldIndexName,
-                                                               newIndexName,
-                                                               Boolean.FALSE,
-                                                               RenameNode.RenameType.INDEX,
-                                                               parserContext);
-
-        return qtn;
-
+        return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
+                                                  indexName,
+                                                  null,
+                                                  newIndexName,
+                                                  Boolean.FALSE,
+                                                  RenameNode.RenameType.INDEX,
+                                                  parserContext);
     }
 }
+
 StatementNode
 renameColumnStatement() throws StandardException :
 {
