@@ -10342,7 +10342,6 @@ spsRenameStatement() throws StandardException :
 StatementNode
 renameTableStatement() throws StandardException :
 {
-    StatementNode qtn;
     TableName tableName;
     String newTableName;
 }
@@ -10362,24 +10361,21 @@ renameTableStatement() throws StandardException :
 
 StatementNode
 renameIndexStatement() throws StandardException :
-{
-    String oldIndexName;
+{ 
+    TableName indexName;
     String newIndexName;
 }
 {
-    <INDEX> oldIndexName = identifier() 
-        <TO> newIndexName = identifier()
+    <INDEX> indexName = qualifiedName() 
+    <TO> newIndexName = identifier()
     {
-        StatementNode qtn = (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
-                                                               null,
-                                                               oldIndexName,
-                                                               newIndexName,
-                                                               Boolean.FALSE,
-                                                               RenameNode.RenameType.INDEX,
-                                                               parserContext);
-
-        return qtn;
-
+        return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
+                                                  indexName,
+                                                  null,
+                                                  newIndexName,
+                                                  Boolean.FALSE,
+                                                  RenameNode.RenameType.INDEX,
+                                                  parserContext);
     }
 }
 StatementNode
