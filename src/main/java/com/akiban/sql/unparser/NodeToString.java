@@ -273,7 +273,7 @@ public class NodeToString
         }
         else {
             return node.statementToString() + " " + toString(node.getObjectName()) +
-                " TO " + node.getNewObjectName();
+                " TO " + toString(node.getNewTableName());
         }
     }
 

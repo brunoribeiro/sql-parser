@@ -4,4 +4,4 @@ statementType: RENAME TABLE
 oldTableName: 
 told
 newTableName: 
-x.tnew
+tnew

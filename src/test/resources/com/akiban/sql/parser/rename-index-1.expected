@@ -4,4 +4,4 @@ statementType: RENAME INDEX
 oldIndexName:
 iold
 newIndexName: 
-x.inew
+inew

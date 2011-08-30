@@ -10342,12 +10342,11 @@ spsRenameStatement() throws StandardException :
 StatementNode
 renameTableStatement() throws StandardException :
 {
-    TableName tableName;
-    String newTableName;
+    TableName tableName, newTableName;
 }
 {
     <TABLE> tableName = qualifiedName() 
-    <TO> newTableName = identifier()
+    <TO> newTableName = qualifiedName()
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
                                                   tableName,
@@ -10362,12 +10361,11 @@ renameTableStatement() throws StandardException :
 StatementNode
 renameIndexStatement() throws StandardException :
 { 
-    TableName indexName;
-    String newIndexName;
+    TableName indexName, newIndexName;
 }
 {
     <INDEX> indexName = qualifiedName() 
-    <TO> newIndexName = identifier()
+    <TO> newIndexName = qualifiedName()
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
                                                   indexName,
@@ -10378,6 +10376,7 @@ renameIndexStatement() throws StandardException :
                                                   parserContext);
     }
 }
+
 StatementNode
 renameColumnStatement() throws StandardException :
 {
