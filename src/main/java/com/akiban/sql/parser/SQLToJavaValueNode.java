@@ -99,7 +99,7 @@ public class SQLToJavaValueNode extends JavaValueNode
      *
      * @return The underlying SQL ValueNode
      */
-    ValueNode getSQLValueNode() {
+    public ValueNode getSQLValueNode() {
         return value;
     }
 
