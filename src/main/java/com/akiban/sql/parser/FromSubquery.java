@@ -157,6 +157,14 @@ public class FromSubquery extends FromTable
         return orderByList;
     }
 
+    public ValueNode getOffset() {
+        return offset;
+    }
+
+    public ValueNode getFetchFirst() {
+        return fetchFirst;
+    }
+
     /**
      * Accept the visitor for all visitable children of this node.
      * 
