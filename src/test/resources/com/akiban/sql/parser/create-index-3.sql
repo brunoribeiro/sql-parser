@@ -1,1 +1,1 @@
-CREATE INDEX G1 ON group_table (t1.c1, t2.c2)
+CREATE INDEX G1 ON group_table (schema1.t1.c1, t2.c2, c3)

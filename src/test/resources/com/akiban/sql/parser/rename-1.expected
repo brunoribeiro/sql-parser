@@ -1,0 +1,7 @@
+com.akiban.sql.parser.RenameNode@45db05b2
+name: schema1.t1
+statementType: RENAME TABLE
+oldTableName: 
+t1
+newTableName: 
+schema1.t2
