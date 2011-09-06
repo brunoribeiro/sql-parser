@@ -36,12 +36,13 @@ public class TestBase
     protected TestBase() {
     }
 
-    protected String caseName, sql, expected;
+    protected String caseName, sql, expected, error;
 
-    protected TestBase(String caseName, String sql, String expected) {
+    protected TestBase(String caseName, String sql, String expected, String error) {
         this.caseName = caseName;
         this.sql = sql;
         this.expected = expected;
+        this.error = error;
     }
 
     public static File[] listSQLFiles(File dir) {
@@ -128,7 +129,17 @@ public class TestBase
             if (changeSuffix(sqlFile, ".fail").exists() && !RUN_FAILING_TESTS)
                 continue;
             String sql = fileContents(sqlFile);
-            String expected = fileContents(changeSuffix(sqlFile, ".expected"));
+            String expected, error;
+            File expectedFile = changeSuffix(sqlFile, ".expected");
+            if (expectedFile.exists())
+                expected = fileContents(expectedFile);
+            else
+                expected = null;
+            File errorFile = changeSuffix(sqlFile, ".error");
+            if (errorFile.exists())
+                error = fileContents(errorFile);
+            else
+                error = null;
             if (andParams) {
                 String[] params = null;
                 File paramsFile = changeSuffix(sqlFile, ".params");
@@ -136,12 +147,12 @@ public class TestBase
                     params = fileContentsArray(paramsFile);
                 }
                 result.add(new Object[] {
-                               caseName, sql, expected, params
+                               caseName, sql, expected, error, params
                            });
             }
             else {
                 result.add(new Object[] {
-                               caseName, sql, expected
+                               caseName, sql, expected, error
                            });
             }
         }

@@ -51,21 +51,41 @@ public class ParseMultipleTest extends TestBase
         return sqlAndExpected(RESOURCE_DIR);
     }
 
-    public ParseMultipleTest(String caseName, String sql, String expected) {
-        super(caseName, sql, expected);
+    public ParseMultipleTest(String caseName, String sql, 
+                             String expected, String error) {
+        super(caseName, sql, expected, error);
     }
 
     @Test
     public void testParseMultiple() throws Exception {
-        List<StatementNode> stmts = parser.parseStatements(sql);
-        StringBuilder str = new StringBuilder();
-        for (int i = 0; i < stmts.size(); i++) {
-            if (i > 0) str.append("\n");
-            str.append("[" + i + "]: ");
-            str.append(unparser.toString(stmts.get(i)));
-            str.append(";");
+        String result = null;
+        Exception errorResult = null;
+        try {
+            List<StatementNode> stmts = parser.parseStatements(sql);
+            StringBuilder str = new StringBuilder();
+            for (int i = 0; i < stmts.size(); i++) {
+                if (i > 0) str.append("\n");
+                str.append("[" + i + "]: ");
+                str.append(unparser.toString(stmts.get(i)));
+                str.append(";");
+            }
+            result = str.toString();
         }
-        assertEquals(caseName, expected, str.toString());
+        catch (Exception ex) {
+            errorResult = ex;
+        }
+        if (error != null) {
+            if (errorResult == null)
+                fail(caseName + ": error expected but none thrown");
+            else
+                assertEquals(caseName, error, errorResult.toString());
+        }
+        else if (errorResult != null) {
+            throw errorResult;
+        }
+        else {
+            assertEquals(caseName, expected, result);
+        }
     }
 
 }

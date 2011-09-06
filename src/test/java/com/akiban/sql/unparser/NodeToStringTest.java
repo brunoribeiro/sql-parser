@@ -51,14 +51,34 @@ public class NodeToStringTest extends TestBase
         return sqlAndExpected(RESOURCE_DIR);
     }
 
-    public NodeToStringTest(String caseName, String sql, String expected) {
-        super(caseName, sql, expected);
+    public NodeToStringTest(String caseName, String sql, 
+                            String expected, String error) {
+        super(caseName, sql, expected, error);
     }
 
     @Test
     public void testUnparser() throws Exception {
-        StatementNode stmt = parser.parseStatement(sql);
-        assertEquals(caseName, expected, unparser.toString(stmt));
+        String result = null;
+        Exception errorResult = null;
+        try {
+            StatementNode stmt = parser.parseStatement(sql);
+            result = unparser.toString(stmt);
+        }
+        catch (Exception ex) {
+            errorResult = ex;
+        }
+        if (error != null) {
+            if (errorResult == null)
+                fail(caseName + ": error expected but none thrown");
+            else
+                assertEquals(caseName, error, errorResult.toString());
+        }
+        else if (errorResult != null) {
+            throw errorResult;
+        }
+        else {
+            assertEquals(caseName, expected, result);
+        }
     }
 
 }

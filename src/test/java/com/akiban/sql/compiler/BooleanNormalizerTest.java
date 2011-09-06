@@ -45,15 +45,35 @@ public class BooleanNormalizerTest extends ASTTransformTestBase
         return sqlAndExpected(RESOURCE_DIR);
     }
 
-    public BooleanNormalizerTest(String caseName, String sql, String expected) {
-        super(caseName, sql, expected);
+    public BooleanNormalizerTest(String caseName, String sql, 
+                                 String expected, String error) {
+        super(caseName, sql, expected, error);
     }
 
     @Test
     public void testNormalizer() throws Exception {
-        StatementNode stmt = parser.parseStatement(sql);
-        stmt = booleanNormalizer.normalize(stmt);
-        assertEquals(caseName, expected, unparser.toString(stmt));
+        String result = null;
+        Exception errorResult = null;
+        try {
+            StatementNode stmt = parser.parseStatement(sql);
+            stmt = booleanNormalizer.normalize(stmt);
+            result = unparser.toString(stmt);
+        }
+        catch (Exception ex) {
+            errorResult = ex;
+        }
+        if (error != null) {
+            if (errorResult == null)
+                fail(caseName + ": error expected but none thrown");
+            else
+                assertEquals(caseName, error, errorResult.toString());
+        }
+        else if (errorResult != null) {
+            throw errorResult;
+        }
+        else {
+            assertEquals(caseName, expected, result);
+        }
     }
 
 }
