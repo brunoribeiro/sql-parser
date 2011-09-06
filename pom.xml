@@ -138,8 +138,9 @@
                     <failIfMissing>true</failIfMissing>
                     <excludes>
                         <!-- General files that can't have or don't need header -->
-                        <exclude>**/*.expected</exclude>
                         <exclude>**/*.sql</exclude>
+                        <exclude>**/*.expected</exclude>
+                        <exclude>**/*.error</exclude>
                         <exclude>**/*.jj</exclude>
                         <exclude>.bzrignore</exclude>
                     </excludes>
