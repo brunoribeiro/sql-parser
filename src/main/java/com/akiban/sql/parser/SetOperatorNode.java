@@ -134,6 +134,10 @@ public abstract class SetOperatorNode extends TableOperatorNode
         }
     }
 
+    public boolean isAll() {
+        return all;
+    }
+
     /**
      * @return the operator name: "UNION", "INTERSECT", or "EXCEPT"
      */
