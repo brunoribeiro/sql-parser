@@ -5249,7 +5249,7 @@ escapedValueFunction() throws StandardException :
     <CURDATE> <LEFT_PAREN> <RIGHT_PAREN>
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_DATETIME_OPERATOR_NODE,
-                                              CurrentDatetimeOperatorNode.CURRENT_DATE,
+                                              CurrentDatetimeOperatorNode.Field.DATE,
                                               parserContext);
     }
 |
@@ -5257,7 +5257,7 @@ escapedValueFunction() throws StandardException :
     <CURTIME> <LEFT_PAREN> <RIGHT_PAREN>
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_DATETIME_OPERATOR_NODE,
-                                              CurrentDatetimeOperatorNode.CURRENT_TIME,
+                                              CurrentDatetimeOperatorNode.Field.TIME,
                                               parserContext);
     }
 |
@@ -8228,14 +8228,14 @@ datetimeValueFunction() throws StandardException :
     <CURRENT> <DATE> 
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_DATETIME_OPERATOR_NODE,
-                                              CurrentDatetimeOperatorNode.CURRENT_DATE,
+                                              CurrentDatetimeOperatorNode.Field.DATE,
                                               parserContext);
     }
 | 
     <CURRENT_DATE>
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_DATETIME_OPERATOR_NODE,
-                                              CurrentDatetimeOperatorNode.CURRENT_DATE,
+                                              CurrentDatetimeOperatorNode.Field.DATE,
                                               parserContext);
     }
 |
@@ -8243,14 +8243,14 @@ datetimeValueFunction() throws StandardException :
     <CURRENT> <TIME> 
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_DATETIME_OPERATOR_NODE,
-                                              CurrentDatetimeOperatorNode.CURRENT_TIME,
+                                              CurrentDatetimeOperatorNode.Field.TIME,
                                               parserContext);
     }
 | 
     <CURRENT_TIME> 
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_DATETIME_OPERATOR_NODE,
-                                              CurrentDatetimeOperatorNode.CURRENT_TIME,
+                                              CurrentDatetimeOperatorNode.Field.TIME,
                                               parserContext);
     }
 |
@@ -8258,14 +8258,14 @@ datetimeValueFunction() throws StandardException :
     <CURRENT> <TIMESTAMP> 
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_DATETIME_OPERATOR_NODE,
-                                              CurrentDatetimeOperatorNode.CURRENT_TIMESTAMP,
+                                              CurrentDatetimeOperatorNode.Field.TIMESTAMP,
                                               parserContext);
     }
     | 
     <CURRENT_TIMESTAMP> 
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_DATETIME_OPERATOR_NODE,
-                                              CurrentDatetimeOperatorNode.CURRENT_TIMESTAMP,
+                                              CurrentDatetimeOperatorNode.Field.TIMESTAMP,
                                               parserContext);
     }
 }
