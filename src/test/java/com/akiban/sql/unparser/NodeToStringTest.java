@@ -61,11 +61,13 @@ public class NodeToStringTest extends TestBase implements TestBase.GenerateAndCh
         generateAndCheckResult();
     }
 
+    @Override
     public String generateResult() throws Exception {
         StatementNode stmt = parser.parseStatement(sql);
         return unparser.toString(stmt);
     }
 
+    @Override
     public void checkResult(String result) {
         assertEquals(caseName, expected, result);
     }

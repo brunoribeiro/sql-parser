@@ -66,11 +66,13 @@ public class SQLParserTest extends TestBase implements TestBase.GenerateAndCheck
         generateAndCheckResult();
     }
 
+    @Override
     public String generateResult() throws Exception {
         StatementNode stmt = parser.parseStatement(sql);
         return getTree(stmt);
     }
 
+    @Override
     public void checkResult(String result) throws IOException {
         assertEqualsWithoutHashes(caseName, expected, result);
     }

@@ -57,12 +57,14 @@ public class BooleanNormalizerTest extends ASTTransformTestBase implements TestB
         generateAndCheckResult();
     }
 
+    @Override
     public String generateResult() throws Exception {
         StatementNode stmt = parser.parseStatement(sql);
         stmt = booleanNormalizer.normalize(stmt);
         return unparser.toString(stmt);
     }
 
+    @Override
     public void checkResult(String result) {
         assertEquals(caseName, expected, result);
     }

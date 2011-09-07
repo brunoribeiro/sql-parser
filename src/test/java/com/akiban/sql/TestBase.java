@@ -159,6 +159,7 @@ public class TestBase
         return result;
     }
 
+    /** A class implementing this can call {@link #generateAndCheckResult(). */
     public interface GenerateAndCheckResult {
         public String generateResult() throws Exception;
         public void checkResult(String result) throws IOException;
@@ -196,6 +197,7 @@ public class TestBase
         }
     }
 
+    /** @see GenerateAndCheckResult */
     protected void generateAndCheckResult() throws Exception {
         generateAndCheckResult((GenerateAndCheckResult)this, caseName, expected, error);
     }

@@ -61,6 +61,7 @@ public class ParseMultipleTest extends TestBase implements TestBase.GenerateAndC
         generateAndCheckResult();
     }
 
+    @Override
     public String generateResult() throws Exception {
         List<StatementNode> stmts = parser.parseStatements(sql);
         StringBuilder str = new StringBuilder();
@@ -73,6 +74,7 @@ public class ParseMultipleTest extends TestBase implements TestBase.GenerateAndC
         return str.toString();
     }
 
+    @Override
     public void checkResult(String result) {
         assertEquals(caseName, expected, result);
     }

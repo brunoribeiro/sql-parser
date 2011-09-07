@@ -48,12 +48,14 @@ public class CloneTest extends ASTTransformTestBase implements TestBase.Generate
         generateAndCheckResult();
     }
 
+    @Override
     public String generateResult() throws Exception {
         StatementNode stmt = parser.parseStatement(sql);
         stmt = (StatementNode)parser.getNodeFactory().copyNode(stmt, parser);
         return unparser.toString(stmt);
     }
 
+    @Override
     public void checkResult(String result) {
         assertEquals(caseName, expected, result);
     }
