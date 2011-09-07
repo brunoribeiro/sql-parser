@@ -31,7 +31,7 @@ import java.io.File;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class NodeToStringTest extends TestBase
+public class NodeToStringTest extends TestBase implements TestBase.GenerateAndCheckResult
 {
     public static final File RESOURCE_DIR = 
         new File("src/test/resources/"
@@ -58,27 +58,16 @@ public class NodeToStringTest extends TestBase
 
     @Test
     public void testUnparser() throws Exception {
-        String result = null;
-        Exception errorResult = null;
-        try {
-            StatementNode stmt = parser.parseStatement(sql);
-            result = unparser.toString(stmt);
-        }
-        catch (Exception ex) {
-            errorResult = ex;
-        }
-        if (error != null) {
-            if (errorResult == null)
-                fail(caseName + ": error expected but none thrown");
-            else
-                assertEquals(caseName, error, errorResult.toString());
-        }
-        else if (errorResult != null) {
-            throw errorResult;
-        }
-        else {
-            assertEquals(caseName, expected, result);
-        }
+        generateAndCheckResult();
+    }
+
+    public String generateResult() throws Exception {
+        StatementNode stmt = parser.parseStatement(sql);
+        return unparser.toString(stmt);
+    }
+
+    public void checkResult(String result) {
+        assertEquals(caseName, expected, result);
     }
 
 }

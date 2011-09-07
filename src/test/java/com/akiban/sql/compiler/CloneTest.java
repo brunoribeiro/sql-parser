@@ -15,6 +15,8 @@
 
 package com.akiban.sql.compiler;
 
+import com.akiban.sql.TestBase;
+
 import com.akiban.sql.parser.StatementNode;
 
 import org.junit.Test;
@@ -27,7 +29,7 @@ import java.io.File;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class CloneTest extends ASTTransformTestBase
+public class CloneTest extends ASTTransformTestBase implements TestBase.GenerateAndCheckResult
 {
     public static final File RESOURCE_DIR = 
         new File(ASTTransformTestBase.RESOURCE_DIR, "clone");
@@ -43,28 +45,17 @@ public class CloneTest extends ASTTransformTestBase
 
     @Test
     public void testClone() throws Exception {
-        String result = null;
-        Exception errorResult = null;
-        try {
-            StatementNode stmt = parser.parseStatement(sql);
-            stmt = (StatementNode)parser.getNodeFactory().copyNode(stmt, parser);
-            result = unparser.toString(stmt);
-        }
-        catch (Exception ex) {
-            errorResult = ex;
-        }
-        if (error != null) {
-            if (errorResult == null)
-                fail(caseName + ": error expected but none thrown");
-            else
-                assertEquals(caseName, error, errorResult.toString());
-        }
-        else if (errorResult != null) {
-            throw errorResult;
-        }
-        else {
-            assertEquals(caseName, expected, result);
-        }
+        generateAndCheckResult();
+    }
+
+    public String generateResult() throws Exception {
+        StatementNode stmt = parser.parseStatement(sql);
+        stmt = (StatementNode)parser.getNodeFactory().copyNode(stmt, parser);
+        return unparser.toString(stmt);
+    }
+
+    public void checkResult(String result) {
+        assertEquals(caseName, expected, result);
     }
 
 }

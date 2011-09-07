@@ -16,7 +16,7 @@
 package com.akiban.sql;
 
 import org.junit.Ignore;
-import static junit.framework.Assert.fail;
+import static junit.framework.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -159,17 +159,58 @@ public class TestBase
         return result;
     }
 
-    protected static void assertEqualsWithoutHashes(String caseName,
-                                                    String expected, String actual) 
+    public interface GenerateAndCheckResult {
+        public String generateResult() throws Exception;
+        public void checkResult(String result) throws IOException;
+    }
+
+    public static void generateAndCheckResult(GenerateAndCheckResult handler,
+                                              String caseName, 
+                                              String expected, String error) 
+            throws Exception {
+        if ((expected != null) && (error != null)) {
+            fail(caseName + ": both expected result and expected error specified.");
+        }
+        String result = null;
+        Exception errorResult = null;
+        try {
+            result = handler.generateResult();
+        }
+        catch (Exception ex) {
+            errorResult = ex;
+        }
+        if (error != null) {
+            if (errorResult == null)
+                fail(caseName + ": error expected but none thrown");
+            else
+                assertEquals(caseName, error, errorResult.toString());
+        }
+        else if (errorResult != null) {
+            throw errorResult;
+        }
+        else if (expected == null) {
+            fail(caseName + " no expected result given. actual='" + result + "'");
+        }
+        else {
+            handler.checkResult(result);
+        }
+    }
+
+    protected void generateAndCheckResult() throws Exception {
+        generateAndCheckResult((GenerateAndCheckResult)this, caseName, expected, error);
+    }
+
+    public static void assertEqualsWithoutHashes(String caseName,
+                                                 String expected, String actual) 
             throws IOException {
         assertEqualsWithoutPattern(caseName, 
                                    expected, actual, 
                                    CompareWithoutHashes.HASH_REGEX);
     }
 
-    protected static void assertEqualsWithoutPattern(String caseName,
-                                                     String expected, String actual, 
-                                                     String regex) 
+    public static void assertEqualsWithoutPattern(String caseName,
+                                                  String expected, String actual, 
+                                                  String regex) 
             throws IOException {
         if (!new CompareWithoutHashes(regex).match(new StringReader(expected), 
                                                    new StringReader(actual)))

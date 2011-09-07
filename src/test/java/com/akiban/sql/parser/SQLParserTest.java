@@ -33,7 +33,7 @@ import java.io.StringWriter;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class SQLParserTest extends TestBase
+public class SQLParserTest extends TestBase implements TestBase.GenerateAndCheckResult
 {
     public static final File RESOURCE_DIR = 
         new File("src/test/resources/"
@@ -63,26 +63,16 @@ public class SQLParserTest extends TestBase
 
     @Test
     public void testParser() throws Exception {
-        String result = null;
-        Exception errorResult = null;
-        try {
-            StatementNode stmt = parser.parseStatement(sql);
-            result = getTree(stmt);
-        }
-        catch (Exception ex) {
-            errorResult = ex;
-        }
-        if (error != null) {
-            if (errorResult == null)
-                fail(caseName + ": error expected but none thrown");
-            else
-                assertEquals(caseName, error, errorResult.toString());
-        }
-        else if (errorResult != null) {
-            throw errorResult;
-        }
-        else {
-            assertEqualsWithoutHashes(caseName, expected, result);
-        }
+        generateAndCheckResult();
     }
+
+    public String generateResult() throws Exception {
+        StatementNode stmt = parser.parseStatement(sql);
+        return getTree(stmt);
+    }
+
+    public void checkResult(String result) throws IOException {
+        assertEqualsWithoutHashes(caseName, expected, result);
+    }
+
 }

@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.List;
 
 @RunWith(Parameterized.class)
-public class ParseMultipleTest extends TestBase
+public class ParseMultipleTest extends TestBase implements TestBase.GenerateAndCheckResult
 {
     public static final File RESOURCE_DIR = 
         new File(NodeToStringTest.RESOURCE_DIR, "multiple");
@@ -58,34 +58,23 @@ public class ParseMultipleTest extends TestBase
 
     @Test
     public void testParseMultiple() throws Exception {
-        String result = null;
-        Exception errorResult = null;
-        try {
-            List<StatementNode> stmts = parser.parseStatements(sql);
-            StringBuilder str = new StringBuilder();
-            for (int i = 0; i < stmts.size(); i++) {
-                if (i > 0) str.append("\n");
-                str.append("[" + i + "]: ");
-                str.append(unparser.toString(stmts.get(i)));
-                str.append(";");
-            }
-            result = str.toString();
+        generateAndCheckResult();
+    }
+
+    public String generateResult() throws Exception {
+        List<StatementNode> stmts = parser.parseStatements(sql);
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < stmts.size(); i++) {
+            if (i > 0) str.append("\n");
+            str.append("[" + i + "]: ");
+            str.append(unparser.toString(stmts.get(i)));
+            str.append(";");
         }
-        catch (Exception ex) {
-            errorResult = ex;
-        }
-        if (error != null) {
-            if (errorResult == null)
-                fail(caseName + ": error expected but none thrown");
-            else
-                assertEquals(caseName, error, errorResult.toString());
-        }
-        else if (errorResult != null) {
-            throw errorResult;
-        }
-        else {
-            assertEquals(caseName, expected, result);
-        }
+        return str.toString();
+    }
+
+    public void checkResult(String result) {
+        assertEquals(caseName, expected, result);
     }
 
 }
