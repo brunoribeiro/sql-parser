@@ -15,6 +15,8 @@
 
 package com.akiban.sql.compiler;
 
+import com.akiban.sql.TestBase;
+
 import com.akiban.sql.parser.StatementNode;
 
 import org.junit.Test;
@@ -27,7 +29,7 @@ import java.io.File;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class CloneTest extends ASTTransformTestBase
+public class CloneTest extends ASTTransformTestBase implements TestBase.GenerateAndCheckResult
 {
     public static final File RESOURCE_DIR = 
         new File(ASTTransformTestBase.RESOURCE_DIR, "clone");
@@ -37,15 +39,25 @@ public class CloneTest extends ASTTransformTestBase
         return sqlAndExpected(RESOURCE_DIR);
     }
 
-    public CloneTest(String caseName, String sql, String expected) {
-        super(caseName, sql, expected);
+    public CloneTest(String caseName, String sql, String expected, String error) {
+        super(caseName, sql, expected, error);
     }
 
     @Test
     public void testClone() throws Exception {
+        generateAndCheckResult();
+    }
+
+    @Override
+    public String generateResult() throws Exception {
         StatementNode stmt = parser.parseStatement(sql);
         stmt = (StatementNode)parser.getNodeFactory().copyNode(stmt, parser);
-        assertEquals(caseName, expected, unparser.toString(stmt));
+        return unparser.toString(stmt);
+    }
+
+    @Override
+    public void checkResult(String result) {
+        assertEquals(caseName, expected, result);
     }
 
 }

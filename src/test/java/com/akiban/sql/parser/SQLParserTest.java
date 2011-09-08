@@ -33,7 +33,7 @@ import java.io.StringWriter;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class SQLParserTest extends TestBase
+public class SQLParserTest extends TestBase implements TestBase.GenerateAndCheckResult
 {
     public static final File RESOURCE_DIR = 
         new File("src/test/resources/"
@@ -57,13 +57,24 @@ public class SQLParserTest extends TestBase
         return sqlAndExpected(RESOURCE_DIR);
     }
 
-    public SQLParserTest(String caseName, String sql, String expected) {
-        super(caseName, sql, expected);
+    public SQLParserTest(String caseName, String sql, String expected, String error) {
+        super(caseName, sql, expected, error);
     }
 
     @Test
     public void testParser() throws Exception {
-        StatementNode stmt = parser.parseStatement(sql);
-        assertEqualsWithoutHashes(caseName, expected, getTree(stmt));
+        generateAndCheckResult();
     }
+
+    @Override
+    public String generateResult() throws Exception {
+        StatementNode stmt = parser.parseStatement(sql);
+        return getTree(stmt);
+    }
+
+    @Override
+    public void checkResult(String result) throws IOException {
+        assertEqualsWithoutHashes(caseName, expected, result);
+    }
+
 }

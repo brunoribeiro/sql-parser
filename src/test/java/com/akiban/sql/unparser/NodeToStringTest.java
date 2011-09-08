@@ -31,7 +31,7 @@ import java.io.File;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
-public class NodeToStringTest extends TestBase
+public class NodeToStringTest extends TestBase implements TestBase.GenerateAndCheckResult
 {
     public static final File RESOURCE_DIR = 
         new File("src/test/resources/"
@@ -51,14 +51,25 @@ public class NodeToStringTest extends TestBase
         return sqlAndExpected(RESOURCE_DIR);
     }
 
-    public NodeToStringTest(String caseName, String sql, String expected) {
-        super(caseName, sql, expected);
+    public NodeToStringTest(String caseName, String sql, 
+                            String expected, String error) {
+        super(caseName, sql, expected, error);
     }
 
     @Test
     public void testUnparser() throws Exception {
+        generateAndCheckResult();
+    }
+
+    @Override
+    public String generateResult() throws Exception {
         StatementNode stmt = parser.parseStatement(sql);
-        assertEquals(caseName, expected, unparser.toString(stmt));
+        return unparser.toString(stmt);
+    }
+
+    @Override
+    public void checkResult(String result) {
+        assertEquals(caseName, expected, result);
     }
 
 }

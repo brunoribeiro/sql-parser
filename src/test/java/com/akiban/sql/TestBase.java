@@ -16,7 +16,7 @@
 package com.akiban.sql;
 
 import org.junit.Ignore;
-import static junit.framework.Assert.fail;
+import static junit.framework.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,12 +36,13 @@ public class TestBase
     protected TestBase() {
     }
 
-    protected String caseName, sql, expected;
+    protected String caseName, sql, expected, error;
 
-    protected TestBase(String caseName, String sql, String expected) {
+    protected TestBase(String caseName, String sql, String expected, String error) {
         this.caseName = caseName;
         this.sql = sql;
         this.expected = expected;
+        this.error = error;
     }
 
     public static File[] listSQLFiles(File dir) {
@@ -128,7 +129,17 @@ public class TestBase
             if (changeSuffix(sqlFile, ".fail").exists() && !RUN_FAILING_TESTS)
                 continue;
             String sql = fileContents(sqlFile);
-            String expected = fileContents(changeSuffix(sqlFile, ".expected"));
+            String expected, error;
+            File expectedFile = changeSuffix(sqlFile, ".expected");
+            if (expectedFile.exists())
+                expected = fileContents(expectedFile);
+            else
+                expected = null;
+            File errorFile = changeSuffix(sqlFile, ".error");
+            if (errorFile.exists())
+                error = fileContents(errorFile);
+            else
+                error = null;
             if (andParams) {
                 String[] params = null;
                 File paramsFile = changeSuffix(sqlFile, ".params");
@@ -136,29 +147,72 @@ public class TestBase
                     params = fileContentsArray(paramsFile);
                 }
                 result.add(new Object[] {
-                               caseName, sql, expected, params
+                               caseName, sql, expected, error, params
                            });
             }
             else {
                 result.add(new Object[] {
-                               caseName, sql, expected
+                               caseName, sql, expected, error
                            });
             }
         }
         return result;
     }
 
-    protected static void assertEqualsWithoutHashes(String caseName,
-                                                    String expected, String actual) 
+    /** A class implementing this can call {@link #generateAndCheckResult(). */
+    public interface GenerateAndCheckResult {
+        public String generateResult() throws Exception;
+        public void checkResult(String result) throws IOException;
+    }
+
+    public static void generateAndCheckResult(GenerateAndCheckResult handler,
+                                              String caseName, 
+                                              String expected, String error) 
+            throws Exception {
+        if ((expected != null) && (error != null)) {
+            fail(caseName + ": both expected result and expected error specified.");
+        }
+        String result = null;
+        Exception errorResult = null;
+        try {
+            result = handler.generateResult();
+        }
+        catch (Exception ex) {
+            errorResult = ex;
+        }
+        if (error != null) {
+            if (errorResult == null)
+                fail(caseName + ": error expected but none thrown");
+            else
+                assertEquals(caseName, error, errorResult.toString());
+        }
+        else if (errorResult != null) {
+            throw errorResult;
+        }
+        else if (expected == null) {
+            fail(caseName + " no expected result given. actual='" + result + "'");
+        }
+        else {
+            handler.checkResult(result);
+        }
+    }
+
+    /** @see GenerateAndCheckResult */
+    protected void generateAndCheckResult() throws Exception {
+        generateAndCheckResult((GenerateAndCheckResult)this, caseName, expected, error);
+    }
+
+    public static void assertEqualsWithoutHashes(String caseName,
+                                                 String expected, String actual) 
             throws IOException {
         assertEqualsWithoutPattern(caseName, 
                                    expected, actual, 
                                    CompareWithoutHashes.HASH_REGEX);
     }
 
-    protected static void assertEqualsWithoutPattern(String caseName,
-                                                     String expected, String actual, 
-                                                     String regex) 
+    public static void assertEqualsWithoutPattern(String caseName,
+                                                  String expected, String actual, 
+                                                  String regex) 
             throws IOException {
         if (!new CompareWithoutHashes(regex).match(new StringReader(expected), 
                                                    new StringReader(actual)))

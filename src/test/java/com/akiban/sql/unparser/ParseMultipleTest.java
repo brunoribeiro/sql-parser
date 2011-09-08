@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.List;
 
 @RunWith(Parameterized.class)
-public class ParseMultipleTest extends TestBase
+public class ParseMultipleTest extends TestBase implements TestBase.GenerateAndCheckResult
 {
     public static final File RESOURCE_DIR = 
         new File(NodeToStringTest.RESOURCE_DIR, "multiple");
@@ -51,12 +51,18 @@ public class ParseMultipleTest extends TestBase
         return sqlAndExpected(RESOURCE_DIR);
     }
 
-    public ParseMultipleTest(String caseName, String sql, String expected) {
-        super(caseName, sql, expected);
+    public ParseMultipleTest(String caseName, String sql, 
+                             String expected, String error) {
+        super(caseName, sql, expected, error);
     }
 
     @Test
     public void testParseMultiple() throws Exception {
+        generateAndCheckResult();
+    }
+
+    @Override
+    public String generateResult() throws Exception {
         List<StatementNode> stmts = parser.parseStatements(sql);
         StringBuilder str = new StringBuilder();
         for (int i = 0; i < stmts.size(); i++) {
@@ -65,7 +71,12 @@ public class ParseMultipleTest extends TestBase
             str.append(unparser.toString(stmts.get(i)));
             str.append(";");
         }
-        assertEquals(caseName, expected, str.toString());
+        return str.toString();
+    }
+
+    @Override
+    public void checkResult(String result) {
+        assertEquals(caseName, expected, result);
     }
 
 }
