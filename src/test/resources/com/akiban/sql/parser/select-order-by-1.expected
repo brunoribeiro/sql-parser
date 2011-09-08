@@ -1,0 +1,67 @@
+com.akiban.sql.parser.CursorNode@d576e70
+name: null
+updateMode: UNSPECIFIED
+statementType: SELECT
+resultSet: 	
+	com.akiban.sql.parser.SelectNode@671381e7
+	isDistinct: false
+	resultColumns: 		
+		com.akiban.sql.parser.ResultColumnList@31b5998f
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@97494c8
+		exposedName: x
+		name: x
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.ColumnReference@44d3db51
+			columnName: x
+			tableName: null
+			type: null
+		[1]:		
+		com.akiban.sql.parser.ResultColumn@30e3c624
+		exposedName: y
+		name: y
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.ColumnReference@39e57e8f
+			columnName: y
+			tableName: null
+			type: null
+		[2]:		
+		com.akiban.sql.parser.ResultColumn@9d7fbfb
+		exposedName: z
+		name: z
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.ColumnReference@42e020c9
+			columnName: z
+			tableName: null
+			type: null
+	fromList: 		
+		com.akiban.sql.parser.FromList@8888e6c
+
+		[0]:		
+		com.akiban.sql.parser.FromBaseTable@3d3e58d4
+		tableName: t
+		updateOrDelete: null
+		null
+		correlation Name: null
+		null
+orderByList: 	
+	com.akiban.sql.parser.OrderByList@4839e5b5
+	allAscending: true
+	[0]:	
+	com.akiban.sql.parser.OrderByColumn@5117f31e
+	columnPosition: -1
+	expression: 		
+		com.akiban.sql.parser.ColumnReference@7b5a6029
+		columnName: x
+		tableName: null
+		type: null

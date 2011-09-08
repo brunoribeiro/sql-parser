@@ -1,0 +1,16 @@
+com.akiban.sql.parser.CreateIndexNode@68e6ff0d
+name: idx1
+statementType: CREATE INDEX
+unique: false
+indexType: null
+indexName: idx1
+tableName: table1
+properties: null
+	
+	com.akiban.sql.parser.IndexColumnList@1572e449
+
+	[0]:	
+	com.akiban.sql.parser.IndexColumn@29e97f9f
+	columnName: c1
+	tableName: null
+	ascending

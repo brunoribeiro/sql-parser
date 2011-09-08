@@ -40,7 +40,6 @@ package com.akiban.sql.parser;
 
 import com.akiban.sql.StandardException;
 
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -121,6 +120,11 @@ public class CreateIndexNode extends DDLStatementNode
             "properties: " + properties + "\n";
     }
 
+    public void printSubNodes(int depth) {
+        if (columnList != null) {
+            columnList.treePrint(depth+1);
+        }
+    }
     public String statementToString() {
         return "CREATE INDEX";
     }

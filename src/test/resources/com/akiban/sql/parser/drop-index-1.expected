@@ -1,0 +1,3 @@
+com.akiban.sql.parser.DropIndexNode@4ac9131c
+name: schema1.bad_index
+statementType: DROP INDEX
