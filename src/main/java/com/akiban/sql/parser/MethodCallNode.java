@@ -105,6 +105,10 @@ public abstract class MethodCallNode extends JavaValueNode
         return javaClassName;
     }
 
+    public JavaValueNode[] getMethodParameters() {
+        return methodParms;
+    }
+
     /**
      * Add the parameter list
      *

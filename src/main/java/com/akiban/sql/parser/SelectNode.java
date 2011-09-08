@@ -80,9 +80,6 @@ public class SelectNode extends ResultSetNode
      */
     private WindowList windows;
 
-    /** List of columns in ORDER BY list */
-    private OrderByList orderByList;
-
     private boolean isDistinct;
 
     private ValueNode havingClause;
@@ -132,8 +129,6 @@ public class SelectNode extends ResultSetNode
                                                                   getParserContext());
         this.windows = (WindowList)getNodeFactory().copyNode(other.windows,
                                                              getParserContext());
-        this.orderByList = (OrderByList)getNodeFactory().copyNode(other.orderByList,
-                                                                  getParserContext());
         this.isDistinct = other.isDistinct;
         this.havingClause = (ValueNode)getNodeFactory().copyNode(other.havingClause,
                                                                  getParserContext());
@@ -198,11 +193,6 @@ public class SelectNode extends ResultSetNode
             havingClause.treePrint(depth + 1);
         }
 
-        if (orderByList != null) {
-            printLabel(depth, "orderByList:");
-            orderByList.treePrint(depth + 1);
-        }
-
         if (windows != null) {
             printLabel(depth, "windows: ");
             windows.treePrint(depth + 1);
@@ -261,9 +251,18 @@ public class SelectNode extends ResultSetNode
             whereClause = (ValueNode)whereClause.accept(v);
         }
 
+        if (groupByList != null) {
+            groupByList = (GroupByList)groupByList.accept(v);
+        }
+
         if (havingClause != null) {
             havingClause = (ValueNode)havingClause.accept(v);
         }
+
+        if (windows != null) {
+            windows = (WindowList)windows.accept(v);
+        }
+
     }
 
     /**

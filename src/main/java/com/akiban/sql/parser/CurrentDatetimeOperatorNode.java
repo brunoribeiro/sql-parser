@@ -49,26 +49,28 @@ import java.sql.Types;
  */
 public class CurrentDatetimeOperatorNode extends ValueNode 
 {
-    public static final int CURRENT_DATE = 0;
-    public static final int CURRENT_TIME = 1;
-    public static final int CURRENT_TIMESTAMP = 2;
+    public static enum Field {
+        DATE("CURRENT DATE", Types.DATE),
+        TIME("CURRENT TIME", Types.TIME),
+        TIMESTAMP("CURRENT TIMESTAMP", Types.TIMESTAMP);
 
-    static private final int jdbcTypeId[] = { 
-        Types.DATE, 
-        Types.TIME,
-        Types.TIMESTAMP
-    };
-    static private final String methodName[] = { // used in toString only
-        "CURRENT DATE",
-        "CURRENT TIME",
-        "CURRENT TIMSTAMP"
-    };
+        String methodName;
+        int jdbcTypeId;
 
-    private int whichType;
+        Field(String methodName, int jdbcTypeId) {
+            this.methodName = methodName;
+            this.jdbcTypeId = jdbcTypeId;
+        }
+    }
 
-    public void init(Object whichType) {
-        this.whichType = ((Integer)whichType).intValue();
-        assert (this.whichType >= 0 && this.whichType <= 2);
+    private Field field;
+
+    public void init(Object field) {
+        this.field = (Field)field;
+    }
+
+    public Field getField() {
+        return field;
     }
 
     /**
@@ -78,21 +80,21 @@ public class CurrentDatetimeOperatorNode extends ValueNode
         super.copyFrom(node);
 
         CurrentDatetimeOperatorNode other = (CurrentDatetimeOperatorNode)node;
-        this.whichType = other.whichType;
+        this.field = other.field;
     }
 
     public String toString() {
-        return "methodName: " + methodName[whichType] + "\n" +
+        return "methodName: " + field.methodName + "\n" +
             super.toString();
     }
-                
+
     /**
      * {@inheritDoc}
      */
     protected boolean isEquivalent(ValueNode o) {
         if (isSameNodeType(o)) {
             CurrentDatetimeOperatorNode other = (CurrentDatetimeOperatorNode)o;
-            return other.whichType == whichType;
+            return other.field == field;
         }
         return false;
     }

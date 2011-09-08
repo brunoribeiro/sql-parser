@@ -95,6 +95,8 @@ public class NodeToString
             return tableName((TableName)node);
         case NodeTypes.COLUMN_REFERENCE:
             return columnReference((ColumnReference)node);
+        case NodeTypes.VIRTUAL_COLUMN_NODE:
+            return virtualColumnNode((VirtualColumnNode)node);
         case NodeTypes.ROW_RESULT_SET_NODE:
             return rowResultSetNode((RowResultSetNode)node);
         case NodeTypes.GROUP_BY_COLUMN:
@@ -516,6 +518,10 @@ public class NodeToString
 
     protected String columnReference(ColumnReference node) throws StandardException {
         return node.getSQLColumnName();
+    }
+
+    protected String virtualColumnNode(VirtualColumnNode node) throws StandardException {
+        return node.getSourceColumn().getName();
     }
 
     protected String groupByList(GroupByList node) throws StandardException {
