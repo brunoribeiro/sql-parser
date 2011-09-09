@@ -54,6 +54,8 @@ public class TypeComputer implements Visitor
         case NodeTypes.BINARY_LESS_THAN_OPERATOR_NODE:
         case NodeTypes.BINARY_LESS_EQUALS_OPERATOR_NODE:
             return binaryComparisonOperatorNode((BinaryComparisonOperatorNode)node);
+        case NodeTypes.BETWEEN_OPERATOR_NODE:
+            return betweenOperatorNode((BetweenOperatorNode)node);
         case NodeTypes.IN_LIST_OPERATOR_NODE:
             return inListOperatorNode((InListOperatorNode)node);
         case NodeTypes.SUBQUERY_NODE:
@@ -250,6 +252,52 @@ public class TypeComputer implements Visitor
         */
         boolean nullableResult = leftOperand.getType().isNullable() ||
                                  rightOperand.getType().isNullable();
+        return new DataTypeDescriptor(TypeId.BOOLEAN_ID, nullableResult);
+    }
+
+    protected DataTypeDescriptor betweenOperatorNode(BetweenOperatorNode node) throws StandardException {
+        ValueNode leftOperand = node.getLeftOperand();
+        DataTypeDescriptor leftType = leftOperand.getType();
+        if (leftType == null)
+            return null;
+
+        ValueNodeList rightOperands = node.getRightOperandList();
+        ValueNode lowOperand = rightOperands.get(0);
+        ValueNode highOperand = rightOperands.get(1);
+        if (lowOperand.isParameterNode()) {
+            lowOperand.setType(leftType.getNullabilityType(true));
+        }
+        if (highOperand.isParameterNode()) {
+            highOperand.setType(leftType.getNullabilityType(true));
+        }
+
+        TypeId leftTypeId = leftOperand.getTypeId();
+        DataTypeDescriptor lowType = lowOperand.getType();
+        DataTypeDescriptor highType = highOperand.getType();
+        if (!leftTypeId.isStringTypeId()) {
+            if ((lowType != null) && lowType.getTypeId().isStringTypeId()) {
+                lowOperand = (ValueNode)node.getNodeFactory()
+                    .getNode(NodeTypes.CAST_NODE,
+                             lowOperand,
+                             leftType.getNullabilityType(lowType.isNullable()),
+                             node.getParserContext());
+                rightOperands.set(0, lowOperand);
+            }
+            if ((highType != null) && highType.getTypeId().isStringTypeId()) {
+                highOperand = (ValueNode)node.getNodeFactory()
+                    .getNode(NodeTypes.CAST_NODE,
+                             highOperand,
+                             leftType.getNullabilityType(highType.isNullable()),
+                             node.getParserContext());
+                rightOperands.set(1, highOperand);
+            }
+        }
+
+        if ((lowType == null) || (highType == null))
+            return null;
+        boolean nullableResult = leftType.isNullable() ||
+                                 lowType.isNullable() ||
+                                 highType.isNullable();
         return new DataTypeDescriptor(TypeId.BOOLEAN_ID, nullableResult);
     }
 
