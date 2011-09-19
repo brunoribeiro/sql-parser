@@ -11164,6 +11164,7 @@ columnConstraint(TableName constraintName,
                  DataTypeDescriptor[] dataTypeDescriptor,
                  String columnName) throws StandardException :
 {
+    Token notNull = null;
     ConstraintDefinitionNode.ConstraintType constraintType;
     Properties properties = null;
     ConstraintDefinitionNode tcdn;
@@ -11175,12 +11176,12 @@ columnConstraint(TableName constraintName,
     Token grouping = null;
 }
 {
-    <NOT> <NULL>
+    [ notNull = <NOT> ] <NULL>
     {
         if ( dataTypeDescriptor[0] == null ) { 
-            throw new StandardException("NOT NULL requires a data type");
+            throw new StandardException("[NOT] NULL requires a data type");
         }
-        dataTypeDescriptor[0] = dataTypeDescriptor[0].getNullabilityType(false);
+        dataTypeDescriptor[0] = dataTypeDescriptor[0].getNullabilityType(notNull == null);
         return null;
     }
 |
