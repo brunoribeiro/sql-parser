@@ -1,5 +1,5 @@
-com.akiban.sql.parser.RenameNode@7f70888e
-name: x
+com.akiban.sql.parser.RenameNode@151ca803
+name: s.x
 statementType: RENAME INDEX
 oldIndexName:
 iold

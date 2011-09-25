@@ -1,1 +1,1 @@
-RENAME INDEX index1 to index2
+RENAME INDEX table1 TO index2

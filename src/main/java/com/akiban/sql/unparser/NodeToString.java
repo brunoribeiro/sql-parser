@@ -32,10 +32,11 @@ public class NodeToString
         case NodeTypes.CREATE_VIEW_NODE:
             return createViewNode((CreateViewNode)node);
         case NodeTypes.DROP_TABLE_NODE:
-        case NodeTypes.DROP_INDEX_NODE:
         case NodeTypes.DROP_VIEW_NODE:
         case NodeTypes.DROP_TRIGGER_NODE:
             return qualifiedDDLNode((DDLStatementNode)node);
+        case NodeTypes.DROP_INDEX_NODE:
+            return dropIndexNode((DropIndexNode)node);
         case NodeTypes.EXPLAIN_STATEMENT_NODE:
             return explainStatementNode((ExplainStatementNode)node);
         case NodeTypes.TRANSACTION_CONTROL_NODE:
@@ -273,10 +274,24 @@ public class NodeToString
                 "RENAME COLUMN " + node.getOldObjectName() +
                 " TO " + node.getNewObjectName();
         }
+        else if (node.getNewTableName() == null) {
+            return node.statementToString() + " " + toString(node.getObjectName()) +
+                ((node.getOldObjectName() == null) ? "" :
+                 "." + node.getOldObjectName()) +
+                " TO " + node.getNewObjectName();
+        }
         else {
             return node.statementToString() + " " + toString(node.getObjectName()) +
                 " TO " + toString(node.getNewTableName());
         }
+    }
+
+    protected String dropIndexNode(DropIndexNode node) {
+        if (node.getIndexName() == null)
+            return node.statementToString() + " " + node.getObjectName();
+        else
+            return node.statementToString() + " " + node.getObjectName() + 
+                "." + node.getIndexName();
     }
 
     protected String cursorNode(CursorNode node) throws StandardException {

@@ -96,13 +96,18 @@ public class RenameNode extends DDLStatementNode
 
         switch (this.renamingWhat) {
         case TABLE:
-        case INDEX:
             initAndCheck((TableName)tableName);
             this.newTableName = (TableName)newName;
             this.oldObjectName = null;
             this.newObjectName = this.newTableName.getTableName();
             break;
 
+        case INDEX:
+            initAndCheck((TableName)tableName);
+            this.oldObjectName = (String)oldObjectName;
+            this.newObjectName = (String)newName;
+            break;
+            
         case COLUMN:
             /* coming from ALTER TABLE path, tableName will
              * be TableName object. Coming from RENAME COLUMN
@@ -181,8 +186,8 @@ public class RenameNode extends DDLStatementNode
 
         case INDEX:
             return super.toString() +
-                "oldIndexName:" + "\n" + getRelativeName() + "\n" +
-                "newIndexName: " + "\n" + newTableName + "\n" ;
+                "oldIndexName:" + "\n" + oldObjectName + "\n" +
+                "newIndexName: " + "\n" + newObjectName + "\n" ;
 
         default:
             assert false : "Unexpected rename action in RenameNode";

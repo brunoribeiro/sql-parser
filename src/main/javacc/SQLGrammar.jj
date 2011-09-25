@@ -10320,6 +10320,63 @@ checkConstraintDefinition(TableName constraintName, String columnName)
     }
 }
 
+TableName
+indexName(String[] retIndexName) throws StandardException :
+{
+    String firstName;
+    String secondName = null;
+    String thirdName = null;
+}
+{
+    firstName = identifierDeferCheckLength()
+    [
+        <PERIOD> secondName = identifierDeferCheckLength()
+        [
+            <PERIOD> thirdName = identifierDeferCheckLength()
+        ]
+    ]
+    {
+        String schemaName = null;
+        String tableName = null;
+        String indexName = null;
+
+        if (thirdName != null) {
+            // Three names: schema.table.index
+            schemaName = firstName;
+            tableName = secondName;
+            indexName = thirdName;
+        }
+        else if (secondName != null) {
+            // Two names: table.index
+            tableName = firstName;
+            indexName = secondName;
+        }
+        else {
+            // Only one name, table.
+            tableName = firstName;
+        }
+
+        if (indexName != null) {
+            parserContext.checkIdentifierLengthLimit(indexName);
+            retIndexName[0] = indexName;
+        }
+
+        if (schemaName != null)
+            parserContext.checkIdentifierLengthLimit(schemaName);
+        parserContext.checkIdentifierLengthLimit(tableName);
+        return (TableName)nodeFactory.getNode(NodeTypes.TABLE_NAME,
+                                              schemaName,
+                                              tableName,
+                                              new Integer((indexName != null) ?
+                                                          nextToLastIdentifierToken.beginOffset :
+                                                          lastIdentifierToken.beginOffset),
+                                              new Integer((indexName != null) ?
+                                                          nextToLastIdentifierToken.endOffset :
+                                                          lastIdentifierToken.endOffset),
+                                              parserContext);
+    }
+}
+
 StatementNode
 spsRenameStatement() throws StandardException :
 {
@@ -10361,15 +10418,17 @@ renameTableStatement() throws StandardException :
 StatementNode
 renameIndexStatement() throws StandardException :
 { 
-    TableName indexName, newIndexName;
+    TableName tableName;
+    String[] indexName = new String[1];
+    String newIndexName;
 }
 {
-    <INDEX> indexName = qualifiedName() 
-    <TO> newIndexName = qualifiedName()
+    <INDEX> tableName = indexName(indexName) 
+    <TO> newIndexName = identifier()
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
-                                                  indexName,
-                                                  null,
+                                                  tableName,
+                                                  indexName[0],
                                                   newIndexName,
                                                   Boolean.FALSE,
                                                   RenameNode.RenameType.INDEX,
@@ -11738,13 +11797,15 @@ dropTableStatement() throws StandardException :
 StatementNode
 dropIndexStatement() throws StandardException :
 {
-    TableName indexName;
+    TableName tableName;
+    String[] indexName = new String[1];
 }
 {
-    <INDEX> indexName = qualifiedName()
+    <INDEX> tableName = indexName(indexName)
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_INDEX_NODE,
-                                                  indexName,
+                                                  tableName,
+                                                  indexName[0],
                                                   parserContext);
     }
 }

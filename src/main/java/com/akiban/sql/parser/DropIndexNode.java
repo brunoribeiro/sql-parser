@@ -38,6 +38,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * A DropIndexNode is the root of a QueryTree that represents a DROP INDEX
  * statement.
@@ -46,6 +48,39 @@ package com.akiban.sql.parser;
 
 public class DropIndexNode extends DDLStatementNode
 {
+    protected String indexName;
+
+    public void init(Object tableName,
+                     Object indexName)
+            throws StandardException {
+        initAndCheck((TableName)tableName);
+        this.indexName = (String)indexName;
+    }
+
+    public String getIndexName() {
+        return indexName;
+    }
+
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
+
+        DropIndexNode other = (DropIndexNode)node;
+        this.indexName = other.indexName;
+    }
+
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+    public String toString() {
+        return super.toString() + "indexName: " + indexName;
+    }
+
     public String statementToString() {
         return "DROP INDEX";
     }
