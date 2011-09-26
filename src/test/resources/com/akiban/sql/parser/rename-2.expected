@@ -1,7 +1,6 @@
 com.akiban.sql.parser.RenameNode@162200d5
-name: table1
 statementType: RENAME INDEX
 oldIndexName:
-null
+index1
 newIndexName: 
 index2
