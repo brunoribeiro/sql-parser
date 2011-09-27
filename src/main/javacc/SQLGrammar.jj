@@ -10320,6 +10320,61 @@ checkConstraintDefinition(TableName constraintName, String columnName)
     }
 }
 
+// Index names are like column names: unqualified searches tables for
+// match with possible ambiguous exception.
+String
+indexName(TableName[] retTableName) throws StandardException :
+{
+    String firstName;
+    String secondName = null;
+    String thirdName = null;
+}
+{
+    firstName = identifierDeferCheckLength()
+    [
+        <PERIOD> secondName = identifierDeferCheckLength()
+        [
+            <PERIOD> thirdName = identifierDeferCheckLength()
+        ]
+    ]
+    {
+        String schemaName = null;
+        String tableName = null;
+        String indexName = null;
+
+        if (thirdName != null) {
+            // Three names: schema.table.index
+            schemaName = firstName;
+            tableName = secondName;
+            indexName = thirdName;
+        }
+        else if (secondName != null) {
+            // Two names: table.index
+            tableName = firstName;
+            indexName = secondName;
+        }
+        else {
+            // Only one name, index.
+            indexName = firstName;
+        }
+
+        if (tableName != null) {
+            if (schemaName != null)
+                parserContext.checkIdentifierLengthLimit(schemaName);
+            parserContext.checkIdentifierLengthLimit(tableName);
+            retTableName[0] = (TableName)nodeFactory.getNode(NodeTypes.TABLE_NAME,
+                                                             schemaName,
+                                                             tableName,
+                                                             new Integer(nextToLastIdentifierToken.beginOffset),
+                                                             new Integer(nextToLastIdentifierToken.endOffset),
+                                                             parserContext);
+        }
+
+        parserContext.checkIdentifierLengthLimit(indexName);
+        return indexName;
+    }
+}
+
 StatementNode
 spsRenameStatement() throws StandardException :
 {
@@ -10361,15 +10416,16 @@ renameTableStatement() throws StandardException :
 StatementNode
 renameIndexStatement() throws StandardException :
 { 
-    TableName indexName, newIndexName;
+    String indexName, newIndexName;
+    TableName tableName[] = new TableName[1];
 }
 {
-    <INDEX> indexName = qualifiedName() 
-    <TO> newIndexName = qualifiedName()
+    <INDEX> indexName = indexName(tableName) 
+    <TO> newIndexName = identifier()
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
+                                                  tableName[0],
                                                   indexName,
-                                                  null,
                                                   newIndexName,
                                                   Boolean.FALSE,
                                                   RenameNode.RenameType.INDEX,
@@ -11738,12 +11794,14 @@ dropTableStatement() throws StandardException :
 StatementNode
 dropIndexStatement() throws StandardException :
 {
-    TableName indexName;
+    String indexName;
+    TableName tableName[] = new TableName[1];
 }
 {
-    <INDEX> indexName = qualifiedName()
+    <INDEX> indexName = indexName(tableName)
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_INDEX_NODE,
+                                                  tableName[0],
                                                   indexName,
                                                   parserContext);
     }

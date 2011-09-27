@@ -32,10 +32,11 @@ public class NodeToString
         case NodeTypes.CREATE_VIEW_NODE:
             return createViewNode((CreateViewNode)node);
         case NodeTypes.DROP_TABLE_NODE:
-        case NodeTypes.DROP_INDEX_NODE:
         case NodeTypes.DROP_VIEW_NODE:
         case NodeTypes.DROP_TRIGGER_NODE:
             return qualifiedDDLNode((DDLStatementNode)node);
+        case NodeTypes.DROP_INDEX_NODE:
+            return dropIndexNode((DropIndexNode)node);
         case NodeTypes.EXPLAIN_STATEMENT_NODE:
             return explainStatementNode((ExplainStatementNode)node);
         case NodeTypes.TRANSACTION_CONTROL_NODE:
@@ -266,17 +267,38 @@ public class NodeToString
         return str.toString();
     }
 
-    protected String renameNode(RenameNode node)
-        throws StandardException {
+    protected String renameNode(RenameNode node) throws StandardException {
         if (node.isAlterTable()) {
             return "ALTER TABLE " + toString(node.getObjectName()) +
                 "RENAME COLUMN " + node.getOldObjectName() +
                 " TO " + node.getNewObjectName();
         }
+        else if (node.getRenameType() == RenameNode.RenameType.INDEX) {
+            if (node.getObjectName() == null) {
+                return node.statementToString() + " " + node.getOldObjectName() +
+                    " TO " + node.getNewObjectName();
+            }
+            else {
+                return node.statementToString() + " " + toString(node.getObjectName()) +
+                    "." + node.getOldObjectName() +
+                    " TO " + node.getNewObjectName();
+            }
+        }
         else {
             return node.statementToString() + " " + toString(node.getObjectName()) +
                 " TO " + toString(node.getNewTableName());
         }
+    }
+
+    protected String dropIndexNode(DropIndexNode node) throws StandardException {
+        StringBuilder str = new StringBuilder(node.statementToString());
+        str.append(" ");
+        if (node.getObjectName() != null) {
+            str.append(toString(node.getObjectName()));
+            str.append(".");
+        }
+        str.append(node.getIndexName());
+        return str.toString();
     }
 
     protected String cursorNode(CursorNode node) throws StandardException {
