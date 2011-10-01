@@ -393,6 +393,9 @@ public class ResultColumn extends ValueNode
         if (expression != null) {
             setExpression((ValueNode)expression.accept(v));
         }
+        if (reference != null) {
+            reference = (ColumnReference)reference.accept(v);
+        }
     }
 
     public TableName getTableNameObject() {

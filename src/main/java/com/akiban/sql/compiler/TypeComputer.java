@@ -74,9 +74,15 @@ public class TypeComputer implements Visitor
 
     protected DataTypeDescriptor resultColumn(ResultColumn node)
             throws StandardException {
-        if (node.getExpression() == null)
+        ValueNode expr = node.getExpression();
+        if (expr == null)
             return null;
-        return node.getExpression().getType();
+        if (expr.isParameterNode() && (expr.getType() == null)) {
+            ColumnReference column = node.getReference();
+            if (column != null)
+                expr.setType(column.getType());
+        }
+        return expr.getType();
     }
 
     protected DataTypeDescriptor binaryLogicalOperatorNode(BinaryLogicalOperatorNode node)
