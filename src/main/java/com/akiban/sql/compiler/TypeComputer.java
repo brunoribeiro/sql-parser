@@ -66,6 +66,8 @@ public class TypeComputer implements Visitor
             return coalesceFunctionNode((CoalesceFunctionNode)node);
         case NodeTypes.AGGREGATE_NODE:
             return aggregateNode((AggregateNode)node);
+        case NodeTypes.CONCATENATION_OPERATOR_NODE:
+            return concatenationOperatorNode((ConcatenationOperatorNode)node);
         default:
             // assert false;
             return null;
@@ -91,16 +93,31 @@ public class TypeComputer implements Visitor
         ValueNode rightOperand = node.getRightOperand();
         DataTypeDescriptor leftType = leftOperand.getType();
         DataTypeDescriptor rightType = rightOperand.getType();
+        if ((leftType != null) &&
+            !leftType.getTypeId().isBooleanTypeId()) {
+            leftType = new DataTypeDescriptor(TypeId.BOOLEAN_ID, leftType.isNullable());
+            leftOperand = (ValueNode)node.getNodeFactory()
+                .getNode(NodeTypes.CAST_NODE, 
+                         leftOperand, leftType, 
+                         node.getParserContext());
+            node.setLeftOperand(leftOperand);
+        }
+        if ((rightType != null) &&
+            !rightType.getTypeId().isBooleanTypeId()) {
+            rightType = new DataTypeDescriptor(TypeId.BOOLEAN_ID, rightType.isNullable());
+            rightOperand = (ValueNode)node.getNodeFactory()
+                .getNode(NodeTypes.CAST_NODE, 
+                         rightOperand, rightType, 
+                         node.getParserContext());
+            node.setRightOperand(rightOperand);
+        }
         if (leftType == null) 
             return rightType;
-        // TODO: rightType == null?
-        if (!leftType.getTypeId().isBooleanTypeId())
-            throw new StandardException("Boolean operation on non-boolean: " + 
-                                        leftType.getTypeName());
-        if (!rightType.getTypeId().isBooleanTypeId())
-            throw new StandardException("Boolean operation on non-boolean: " + 
-                                        rightType.getTypeName());
-        return leftType.getNullabilityType(leftType.isNullable() || rightType.isNullable());
+        else if (rightType == null)
+            return leftType;
+        else
+            return leftType.getNullabilityType(leftType.isNullable() || 
+                                               rightType.isNullable());
     }
 
     protected DataTypeDescriptor binaryArithmeticOperatorNode(BinaryArithmeticOperatorNode node)
@@ -361,6 +378,41 @@ public class TypeComputer implements Visitor
             (operand.getType() == null))
             return null;
         return operand.getType().getNullabilityType(true);
+    }
+
+    protected DataTypeDescriptor concatenationOperatorNode(ConcatenationOperatorNode node)
+            throws StandardException {
+        ValueNode leftOperand = node.getLeftOperand();
+        ValueNode rightOperand = node.getRightOperand();
+        DataTypeDescriptor leftType = leftOperand.getType();
+        DataTypeDescriptor rightType = rightOperand.getType();
+        if ((leftType != null) &&
+            !leftType.getTypeId().isStringTypeId()) {
+            leftType = new DataTypeDescriptor(TypeId.VARCHAR_ID,
+                                              leftType.isNullable(),
+                                              leftType.getMaximumWidth());
+            leftOperand = (ValueNode)node.getNodeFactory()
+                .getNode(NodeTypes.CAST_NODE, 
+                         leftOperand, leftType, 
+                         node.getParserContext());
+            node.setLeftOperand(leftOperand);
+        }
+        if ((rightType != null) &&
+            !rightType.getTypeId().isStringTypeId()) {
+            rightType = new DataTypeDescriptor(TypeId.VARCHAR_ID,
+                                              rightType.isNullable(),
+                                              rightType.getMaximumWidth());
+            rightOperand = (ValueNode)node.getNodeFactory()
+                .getNode(NodeTypes.CAST_NODE, 
+                         rightOperand, rightType, 
+                         node.getParserContext());
+            node.setRightOperand(rightOperand);
+        }
+        if ((leftType == null) || (rightType == null))
+            return null;
+        return new DataTypeDescriptor(TypeId.VARCHAR_ID,
+                                      leftType.isNullable() || rightType.isNullable(),
+                                      leftType.getMaximumWidth() + rightType.getMaximumWidth());
     }
 
     protected DataTypeDescriptor dominantType(ValueNodeList nodeList) 
