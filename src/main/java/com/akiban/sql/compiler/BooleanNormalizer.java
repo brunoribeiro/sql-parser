@@ -263,9 +263,9 @@ public class BooleanNormalizer implements Visitor
 
                 /* Create and return the OR */
                 OrNode newOr = (OrNode)nodeFactory.getNode(NodeTypes.OR_NODE,
-                                                                                                     leftBCO,
-                                                                                                     rightBCO,
-                                                                                                     parserContext);
+                                                           leftBCO,
+                                                           rightBCO,
+                                                           parserContext);
                 /* Work out types (only nullability). */
                 DataTypeDescriptor leftType = leftOperand.getType();
                 DataTypeDescriptor right0Type = rightOperandList.get(0).getType();
@@ -402,15 +402,29 @@ public class BooleanNormalizer implements Visitor
             // NOTE: This happened in a different place in the original
             // Derby, but that ended up only doing those along the
             // right-hand branch, which does not seem consistent.
-            return equalsBooleanConstant(node, 
+            return equalsBooleanConstant(castToBoolean(node), 
                                          underNotNode ? Boolean.FALSE : Boolean.TRUE);
         default:
             if (underNotNode) {
-                return equalsBooleanConstant(node, Boolean.FALSE);
+                return equalsBooleanConstant(castToBoolean(node), Boolean.FALSE);
             }
-            break;
+            else {
+                return castToBoolean(node);
+            }
         }
         return node;
+    }
+
+    protected ValueNode castToBoolean(ValueNode node) throws StandardException {
+        if ((node.getType() == null) ||
+            (node.getType().getTypeId().isBooleanTypeId()))
+            return node;
+        return (ValueNode)
+            nodeFactory.getNode(NodeTypes.CAST_NODE,
+                                node,
+                                new DataTypeDescriptor(TypeId.BOOLEAN_ID, 
+                                                       node.getType().isNullable()),
+                                parserContext);
     }
 
     protected ValueNode equalsBooleanConstant(ValueNode node, Boolean constant) 
