@@ -153,21 +153,16 @@ public class BooleanNormalizer implements Visitor
                 conditionalNode.setElseNode(elseNode);
             }
             break;
-        /* // Not sure about this
         case NodeTypes.IS_NODE:
             {
                 IsNode isNode = (IsNode)node;
                 ValueNode leftOperand = isNode.getLeftOperand();
-                ValueNode rightOperand = isNode.getRightOperand();
                 leftOperand = eliminateNots(leftOperand, underNotNode);
-                rightOperand = eliminateNots(rightOperand, underNotNode);
                 isNode.setLeftOperand(leftOperand);
-                isNode.setRightOperand(rightOperand);
                 if (underNotNode)
                     isNode.toggleNegated();
             }
             break;
-        */
         case NodeTypes.IS_NULL_NODE:
         case NodeTypes.IS_NOT_NULL_NODE:
             if (underNotNode) {
@@ -486,19 +481,6 @@ public class BooleanNormalizer implements Visitor
                 andNode.setRightOperand(putAndsOnTop(andNode.getRightOperand()));
                 return andNode;
             }
-        /* // Not sure at all about this
-        case NodeTypes.IS_NODE:
-             {
-                 IsNode isNode = (IsNode)node;
-                 ValueNode leftOperand = isNode.getLeftOperand();
-                 ValueNode rightOperand = isNode.getRightOperand();
-                 leftOperand = putAndsOnTop(leftOperand);
-                 rightOperand = putAndsOnTop(rightOperand);
-                 isNode.setLeftOperand(leftOperand);
-                 isNode.setRightOperand(rightOperand);
-             }
-             break;
-        */
         default:
             {
                 /* expr -> expr AND TRUE */

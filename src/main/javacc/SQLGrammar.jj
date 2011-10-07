@@ -4576,17 +4576,22 @@ isSearchCondition() throws StandardException :
     ValueNode booleanPrimary;
     Token isToken = null;
     Token notToken = null;
-    Token truthValue = null;
+    Boolean truthValue = null;
 }
 {
     booleanPrimary = booleanPrimary()
-    [ isToken = <IS> [ notToken = <NOT> ] <NULL> ]
+    [ isToken = <IS> [ notToken = <NOT> ] truthValue = truthValue() ]
     {
         if (isToken != null) {
-            result = (ValueNode)nodeFactory.getNode(NodeTypes.IS_NULL_NODE,
-                                                    booleanPrimary,
-                                                    parserContext);
-        
+            if (truthValue == null)
+                result = (ValueNode)nodeFactory.getNode(NodeTypes.IS_NULL_NODE,
+                                                        booleanPrimary,
+                                                        parserContext);
+            else
+                result = (ValueNode)nodeFactory.getNode(NodeTypes.IS_NODE,
+                                                        booleanPrimary,
+                                                        truthValue,
+                                                        parserContext);
             /* Put any NOT on top of the tree */
             if (notToken != null) {
                 result = (ValueNode)nodeFactory.getNode(NodeTypes.NOT_NODE,
@@ -4598,6 +4603,23 @@ isSearchCondition() throws StandardException :
             result = booleanPrimary; 
         }
         return result;
+    }
+}
+
+Boolean truthValue() throws StandardException :
+{
+    Boolean value;
+}
+{
+(
+    <NULL> { value = null; }
+|
+    <TRUE> { value = Boolean.TRUE; }
+|
+    <FALSE> { value = Boolean.FALSE; }
+)
+    {
+        return value;
     }
 }
 
