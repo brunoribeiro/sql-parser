@@ -4576,7 +4576,7 @@ isSearchCondition() throws StandardException :
     ValueNode booleanPrimary;
     Token isToken = null;
     Token notToken = null;
-    Boolean truthValue = null;
+    ValueNode truthValue = null;
 }
 {
     booleanPrimary = booleanPrimary()
@@ -4606,7 +4606,7 @@ isSearchCondition() throws StandardException :
     }
 }
 
-Boolean truthValue() throws StandardException :
+ValueNode truthValue() throws StandardException :
 {
     Boolean value;
 }
@@ -4619,7 +4619,13 @@ Boolean truthValue() throws StandardException :
     <FALSE> { value = Boolean.FALSE; }
 )
     {
-        return value;
+        if (value == null)
+            return null;
+        else
+            return (ValueNode)
+                nodeFactory.getNode(NodeTypes.BOOLEAN_CONSTANT_NODE, 
+                                    value, 
+                                    parserContext);
     }
 }
 
