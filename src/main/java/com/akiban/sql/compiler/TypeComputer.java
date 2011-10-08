@@ -41,6 +41,7 @@ public class TypeComputer implements Visitor
             return resultColumn((ResultColumn)node);
         case NodeTypes.AND_NODE:
         case NodeTypes.OR_NODE:
+        case NodeTypes.IS_NODE:
             return binaryLogicalOperatorNode((BinaryLogicalOperatorNode)node);
         case NodeTypes.BINARY_PLUS_OPERATOR_NODE:
         case NodeTypes.BINARY_TIMES_OPERATOR_NODE:
@@ -68,6 +69,9 @@ public class TypeComputer implements Visitor
             return aggregateNode((AggregateNode)node);
         case NodeTypes.CONCATENATION_OPERATOR_NODE:
             return concatenationOperatorNode((ConcatenationOperatorNode)node);
+        case NodeTypes.IS_NULL_NODE:
+        case NodeTypes.IS_NOT_NULL_NODE:
+            return new DataTypeDescriptor(TypeId.BOOLEAN_ID, false);
         default:
             // assert false;
             return null;
@@ -111,6 +115,8 @@ public class TypeComputer implements Visitor
                          node.getParserContext());
             node.setRightOperand(rightOperand);
         }
+        if (node.getNodeType() == NodeTypes.IS_NODE)
+            return new DataTypeDescriptor(TypeId.BOOLEAN_ID, false);
         if (leftType == null) 
             return rightType;
         else if (rightType == null)
