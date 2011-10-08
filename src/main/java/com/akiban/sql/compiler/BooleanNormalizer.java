@@ -54,22 +54,28 @@ public class BooleanNormalizer implements Visitor
         this.nodeFactory = parserContext.getNodeFactory();
     }
 
+    /** Normalize conditions anywhere in this statement. */
     public StatementNode normalize(StatementNode stmt) throws StandardException {
         return (StatementNode)stmt.accept(this);
     }
 
-    /* Normalize clauses in this SELECT node. */
+    /** Normalize WHERE clause in this SELECT node. */
     public void selectNode(SelectNode node) throws StandardException {
         node.setWhereClause(normalizeExpression(node.getWhereClause()));
         node.setHavingClause(normalizeExpression(node.getHavingClause()));
     }
 
-    /* Normalize clauses in this JOIN node. */
+    /** Normalize ON clause in this JOIN node. */
     public void joinNode(JoinNode node) throws StandardException {
         node.setJoinClause(normalizeExpression(node.getJoinClause()));
     }
 
-    /* Normalize a top-level boolean expression. */
+    /** Normalize WHEN clause in this CASE node. */
+    public void conditionalNode(ConditionalNode node) throws StandardException {
+        node.setTestCondition(normalizeExpression(node.getTestCondition()));
+    }
+
+    /** Normalize a top-level boolean expression. */
     public ValueNode normalizeExpression(ValueNode boolClause) throws StandardException {
         /* For each expression tree:
          *  o Eliminate NOTs (eliminateNots())
@@ -776,6 +782,9 @@ public class BooleanNormalizer implements Visitor
         case NodeTypes.JOIN_NODE:
         case NodeTypes.HALF_OUTER_JOIN_NODE:
             joinNode((JoinNode)node);
+            break;
+        case NodeTypes.CONDITIONAL_NODE:
+            conditionalNode((ConditionalNode)node);
             break;
         }
         return node;

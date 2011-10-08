@@ -87,6 +87,10 @@ public class ConditionalNode extends ValueNode
         return testCondition;
     }
 
+    public void setTestCondition(ValueNode testCondition) {
+        this.testCondition = testCondition;
+    }
+
     public ValueNodeList getThenElseList() {
         return thenElseList;
     }
