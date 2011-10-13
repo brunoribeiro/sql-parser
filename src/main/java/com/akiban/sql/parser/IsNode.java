@@ -40,8 +40,6 @@ package com.akiban.sql.parser;
 
 import com.akiban.sql.StandardException;
 
-// TODO: I do not know when this is ever instantiated, even in the original Derby.
-
 public class IsNode extends BinaryLogicalOperatorNode
 {
     private boolean notMe; // set to true if we're to negate the sense of this node
@@ -55,11 +53,8 @@ public class IsNode extends BinaryLogicalOperatorNode
      */
 
     public void init(Object leftOperand,
-                     Object rightOperand,
-                     Object notMe) {
-        // the false for shortCir
+                     Object rightOperand) {
         super.init(leftOperand, rightOperand, "is");
-        this.notMe = ((Boolean)notMe).booleanValue();
     }
 
     /**
