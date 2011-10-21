@@ -5,6 +5,7 @@ unique: false
 indexType: null
 indexName: g1
 tableName: group_table
+joinType: LEFT_OUTER
 properties: null
 	
 	com.akiban.sql.parser.IndexColumnList@46e45076
