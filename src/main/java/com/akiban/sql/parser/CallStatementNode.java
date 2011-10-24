@@ -106,6 +106,10 @@ public class CallStatementNode extends DMLStatementNode
         }
     }
 
+    public JavaToSQLValueNode methodCall() {
+        return methodCall;
+    }
+
     /**
      * Accept the visitor for all visitable children of this node.
      * 
