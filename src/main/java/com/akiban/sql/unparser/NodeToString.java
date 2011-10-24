@@ -683,7 +683,7 @@ public class NodeToString
             return hexConstant((byte[])value);
         else if (value instanceof Double)
             return String.format("%e", value);
-        else if (value instanceof Boolean && false) // TODO: Good idea but breaks tests.
+        else if (value instanceof Boolean)
             return value.toString().toUpperCase();
         else
             return value.toString();
