@@ -68,7 +68,7 @@ queryExpression:
 		operand: 			
 			com.akiban.sql.parser.IsNullNode@1e9e5c73
 			operator: is null
-			methodName: isNullOp
+			methodName: isNull
 			type: null
 			operand: 				
 				com.akiban.sql.parser.ColumnReference@2ec791b9
