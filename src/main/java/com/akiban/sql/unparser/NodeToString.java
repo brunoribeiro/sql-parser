@@ -125,7 +125,9 @@ public class NodeToString
             return notNode((NotNode)node);
         case NodeTypes.IS_NULL_NODE:
         case NodeTypes.IS_NOT_NULL_NODE:
-            return isNullnode((IsNullNode)node);
+            return isNullNode((IsNullNode)node);
+        case NodeTypes.IS_NODE:
+            return isNode((IsNode)node);
         case NodeTypes.LIKE_OPERATOR_NODE:
             return likeEscapeOperatorNode((LikeEscapeOperatorNode)node);
         case NodeTypes.IN_LIST_OPERATOR_NODE:
@@ -593,8 +595,26 @@ public class NodeToString
         return prefixUnary(node);
     }
 
-    protected String isNullnode(IsNullNode node) throws StandardException {
+    protected String isNullNode(IsNullNode node) throws StandardException {
         return suffixUnary(node);
+    }
+
+    protected String isNode(IsNode node) throws StandardException {
+        StringBuilder str = new StringBuilder(maybeParens(node.getLeftOperand()));
+        str.append(" IS ");
+        if (node.isNegated())
+            str.append("NOT ");
+        ValueNode rightOperand = node.getRightOperand();
+        if (rightOperand instanceof BooleanConstantNode) {
+            Boolean value = (Boolean)((BooleanConstantNode)rightOperand).getValue();
+            if (value == null)
+                str.append("UNKNOWN");
+            else
+                str.append(value.toString().toUpperCase());
+        }
+        else
+            str.append(maybeParens(rightOperand));
+        return str.toString();
     }
 
     protected String aggregateNode(AggregateNode node) throws StandardException {
@@ -663,6 +683,8 @@ public class NodeToString
             return hexConstant((byte[])value);
         else if (value instanceof Double)
             return String.format("%e", value);
+        else if (value instanceof Boolean && false) // TODO: Good idea but breaks tests.
+            return value.toString().toUpperCase();
         else
             return value.toString();
     }
