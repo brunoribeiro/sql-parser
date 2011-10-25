@@ -55,7 +55,7 @@ public final class IsNullNode extends UnaryComparisonOperatorNode
         if (nodeType == NodeTypes.IS_NULL_NODE) {
             /* By convention, the method name for the is null operator is "isNull" */
             operator = "is null";
-            methodName = "isNullOp";
+            methodName = "isNull";
         }
         else {
             assert (nodeType == NodeTypes.IS_NOT_NULL_NODE);
