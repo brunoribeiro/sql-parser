@@ -5,6 +5,7 @@ unique: true
 indexType: null
 indexName: idx2
 tableName: table2
+joinType: null
 properties: null
 	
 	com.akiban.sql.parser.IndexColumnList@557ce4e7

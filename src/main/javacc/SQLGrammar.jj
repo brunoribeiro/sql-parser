@@ -9066,6 +9066,7 @@ indexDefinition() throws StandardException :
     IndexColumnList indexColumnList = (IndexColumnList)
         nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
     boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
+    JoinNode.JoinType joinType = null;
 }
 {
     [ unique = unique() ] 
@@ -9080,6 +9081,8 @@ indexDefinition() throws StandardException :
       indexColumnList(indexColumnList)
     )
     <RIGHT_PAREN>
+    [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
+      <USING> joinType = joinType() <JOIN> ]
     [ properties = propertyList(false) <CHECK_PROPERTIES>]
     {
         /* User allowed to specify schema name on table and index.
@@ -9110,6 +9113,7 @@ indexDefinition() throws StandardException :
                                                   indexName,
                                                   tableName,
                                                   indexColumnList,
+                                                  joinType,
                                                   properties,
                                                   parserContext);
     }

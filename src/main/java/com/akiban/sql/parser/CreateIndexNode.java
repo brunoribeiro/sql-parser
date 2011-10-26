@@ -38,6 +38,8 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.parser.JoinNode.JoinType;
+
 import com.akiban.sql.StandardException;
 
 import java.util.Properties;
@@ -55,6 +57,7 @@ public class CreateIndexNode extends DDLStatementNode
     TableName indexName;
     TableName tableName;
     IndexColumnList columnList;
+    JoinType joinType;
     Properties properties;
 
     /**
@@ -75,6 +78,7 @@ public class CreateIndexNode extends DDLStatementNode
                      Object indexName,
                      Object tableName,
                      Object columnList,
+                     Object joinType,
                      Object properties) 
             throws StandardException {
         initAndCheck(indexName);
@@ -83,6 +87,7 @@ public class CreateIndexNode extends DDLStatementNode
         this.indexName = (TableName)indexName;
         this.tableName = (TableName)tableName;
         this.columnList = (IndexColumnList)columnList;
+        this.joinType = (JoinType)joinType;
         this.properties = (Properties)properties;
     }
 
@@ -101,6 +106,7 @@ public class CreateIndexNode extends DDLStatementNode
             getNodeFactory().copyNode(other.tableName, getParserContext());
         this.columnList = (IndexColumnList)
             getNodeFactory().copyNode(other.columnList, getParserContext());
+        this.joinType = other.joinType;
         this.properties = other.properties; // TODO: Clone?
     }
 
@@ -117,6 +123,7 @@ public class CreateIndexNode extends DDLStatementNode
             "indexType: " + indexType + "\n" +
             "indexName: " + indexName + "\n" +
             "tableName: " + tableName + "\n" +
+            "joinType: " + joinType + "\n" +
             "properties: " + properties + "\n";
     }
 
@@ -140,6 +147,9 @@ public class CreateIndexNode extends DDLStatementNode
     }
     public IndexColumnList getColumnList() {
         return columnList;
+    }
+    public JoinType getJoinType() {
+        return joinType;
     }
     public Properties getProperties() { 
         return properties; 
