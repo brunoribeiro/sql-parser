@@ -103,6 +103,10 @@ public class SQLToJavaValueNode extends JavaValueNode
         return value;
     }
 
+    public void setSQLValueNode(ValueNode value) {
+        this.value = value;
+    }
+
     /** @see ValueNode#getConstantValueAsObject 
      *
      * @exception StandardException Thrown on error
