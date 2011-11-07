@@ -23,5 +23,6 @@ package com.akiban.sql.parser;
 public enum SQLParserFeature
 {
     GROUPING,
-    UNSIGNED
+    UNSIGNED,
+    MYSQL_HINTS
 }

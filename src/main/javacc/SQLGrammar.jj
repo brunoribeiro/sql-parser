@@ -1458,6 +1458,18 @@ class SQLGrammar
             getToken(1).kind == UNSIGNED;
     }
 
+    boolean indexHintFollows() {
+        if (!hasFeature(SQLParserFeature.MYSQL_HINTS))
+            return false;
+        int kind = getToken(1).kind;
+        return ((kind == USE) || (kind == IGNORE) || (kind == FORCE));
+    }
+
+    boolean straightJoinFollows() {
+        return hasFeature(SQLParserFeature.MYSQL_HINTS) &&
+            getToken(1).kind == STRAIGHT_JOIN;
+    }
+
     void setParserContext(SQLParserContext parserContext) {
         this.parserContext = parserContext;
         this.nodeFactory = parserContext.getNodeFactory();
@@ -2071,6 +2083,7 @@ TOKEN [IGNORE_CASE] :
 | <ROLE: "role">
 | <ROWNUMBER: "row_number">
 | <RTRIM: "rtrim">
+| <STRAIGHT_JOIN: "straight_join">
 | <SUBSTR:  "substr">
 | <XML:  "xml">
 | <XMLEXISTS:    "xmlexists">
@@ -2091,7 +2104,7 @@ TOKEN [IGNORE_CASE] :
 // NOTE: If you add a keyword, then you must add it to nonReservedKeyword() as well.
 TOKEN [IGNORE_CASE] :
 { /* Additional non-SQL92 non-reserved keywords */
-    <AFTER: "after">
+  <AFTER: "after">
 | <BEFORE: "before">
 | <CLASS: "class">
 | <COMPRESS: "compress">
@@ -2107,6 +2120,8 @@ TOKEN [IGNORE_CASE] :
 | <EMPTY: "empty">
 | <EXCLUSIVE: "exclusive">
 | <FN: "fn">
+| <FORCE: "force">
+| <IGNORE: "ignore">
 | <INDEX: "index">
 | <INPLACE: "inplace">
 | <JAVA: "java">
@@ -2153,6 +2168,7 @@ TOKEN [IGNORE_CASE] :
 | <TRUNCATE_END: "truncate_end">
 | <UCASE: "ucase">
 | <UNSIGNED: "unsigned">
+| <USE: "use">
 | <UR: "ur">
 | <WHITESPACE: "whitespace">
 }
@@ -8086,7 +8102,7 @@ crossJoin(ResultSetNode leftRSN, boolean nestedInParens)
 TableOperatorNode
 qualifiedJoin(ResultSetNode leftRSN, boolean nestedInParens) throws StandardException :
 {
-    JoinNode.JoinType joinType = JoinNode.JoinType.INNER;
+    JoinNode.JoinType joinType;
     ResultSetNode rightRSN;
     TableOperatorNode ton = null;
     Object[] onOrUsingClause = null;
@@ -8094,7 +8110,7 @@ qualifiedJoin(ResultSetNode leftRSN, boolean nestedInParens) throws StandardExce
     ValueNode onClause;
 }
 {
-    [ joinType = joinType() ] <JOIN>
+    joinType = qualifiedJoinType()
     rightRSN = tableReferenceTypes(nestedInParens) 
     onOrUsingClause = joinSpecification(leftRSN, rightRSN)
     {
@@ -8165,6 +8181,24 @@ outerJoinType() throws StandardException :
     <RIGHT> 
     {
         return JoinNode.JoinType.RIGHT_OUTER;
+    }
+}
+
+JoinNode.JoinType
+qualifiedJoinType() throws StandardException :
+{
+    JoinNode.JoinType joinType = JoinNode.JoinType.INNER;
+}
+{
+    LOOKAHEAD( { straightJoinFollows() } ) 
+    <STRAIGHT_JOIN> 
+    {
+        return JoinNode.JoinType.STRAIGHT;
+    }
+|
+    [ joinType = joinType() ] <JOIN>
+    {
+        return joinType;
     }
 }
 
@@ -12662,6 +12696,7 @@ reservedKeyword() :
 | tok = <SQLCODE>
 | tok = <SQLERROR>
 | tok = <SQLSTATE>
+| tok = <STRAIGHT_JOIN>
 | tok = <SUBSTRING>
 | tok = <SUM>
 | tok = <SYSTEM_USER>
@@ -12764,9 +12799,11 @@ nonReservedKeyword() :
 | tok = <EMPTY>
 | tok = <EXCLUSIVE>
 | tok = <FN>
+| tok = <FORCE>
 | tok = <FORTRAN>
 | tok = <GENERATED>
 | tok = <IDENTITY_VAL_LOCAL>
+| tok = <IGNORE>
 | tok = <INCREMENT>
 | tok = <INDEX>
 | tok = <INITIAL>
@@ -12880,6 +12917,7 @@ nonReservedKeyword() :
 | tok = <UNSIGNED>
 | tok = <UR>
 | tok = <USAGE>
+| tok = <USE>
 // SQL92 says VALUE is reserved, but we want it to be nonreserved.
 | tok = <VALUE>
 | tok = <VARBINARY>
