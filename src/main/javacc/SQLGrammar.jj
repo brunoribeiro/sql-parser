@@ -7923,7 +7923,7 @@ indexHint(IndexHintList list) throws StandardException :
 {
     hintType = indexHintType()
     (<INDEX> | <KEY>)
-    [ hintScope = indexHintScope() ]
+    [ <FOR> hintScope = indexHintScope() ]
     <LEFT_PAREN>
     [ indexHintIndex(indexes)
     ( <COMMA> indexHintIndex(indexes) )* ]
