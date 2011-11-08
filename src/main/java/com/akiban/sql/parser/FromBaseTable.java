@@ -209,6 +209,22 @@ public class FromBaseTable extends FromTable
     }
 
     /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
+
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+
+        if (indexHints != null) {
+            printLabel(depth, "indexHints: ");
+            indexHints.treePrint(depth + 1);
+        }
+    }
+
+    /**
      * Accept the visitor for all visitable children of this node.
      * 
      * @param v the visitor

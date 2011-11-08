@@ -752,6 +752,9 @@ class SQLGrammar
         else if ((tokKind1 == LEFT || tokKind1 == RIGHT) && tokKind2 == JOIN) {
             retval = true;
         }
+        else if (hasFeature(SQLParserFeature.MYSQL_HINTS) && tokKind1 == STRAIGHT_JOIN) {
+            retval = true;
+        }
 
         return retval;
     }
@@ -1428,6 +1431,21 @@ class SQLGrammar
                                                  null,
                                                  parserContext);
 
+        case STRAIGHT:
+            {
+                Properties joinOrderStrategyProperties = new Properties();
+                joinOrderStrategyProperties.setProperty("STRAIGHT", "TRUE");
+                return (JoinNode)nodeFactory.getNode(NodeTypes.JOIN_NODE,
+                                                     leftRSN,
+                                                     rightRSN,
+                                                     onClause,
+                                                     usingClause,
+                                                     null,
+                                                     null,
+                                                     joinOrderStrategyProperties,
+                                                     parserContext);
+            }
+
         default:
             assert false : "Unexpected joinType: " + joinType;
             return null;
@@ -1462,8 +1480,10 @@ class SQLGrammar
     boolean indexHintFollows(int offset) {
         if (!hasFeature(SQLParserFeature.MYSQL_HINTS))
             return false;
-        int kind = getToken(offset).kind;
-        return ((kind == USE) || (kind == IGNORE) || (kind == FORCE));
+        int kind1 = getToken(offset).kind;
+        int kind2 = getToken(offset+1).kind;
+        return (((kind1 == USE) || (kind1 == IGNORE) || (kind1 == FORCE)) &&
+                ((kind2 == INDEX) || (kind2 == KEY)));
     }
 
     boolean straightJoinFollows() {
@@ -7902,6 +7922,7 @@ indexHint(IndexHintList list) throws StandardException :
 }
 {
     hintType = indexHintType()
+    (<INDEX> | <KEY>)
     [ hintScope = indexHintScope() ]
     <LEFT_PAREN>
     [ indexHintIndex(indexes)
@@ -7922,7 +7943,6 @@ IndexHintNode.HintType
 indexHintType() throws StandardException :
 {}
 {
-(    
     <USE>
     { return IndexHintNode.HintType.USE; }
 |           
@@ -7931,14 +7951,12 @@ indexHintType() throws StandardException :
 |           
     <FORCE>
     { return IndexHintNode.HintType.FORCE; }
-)
 }
 
 IndexHintNode.HintScope
 indexHintScope() throws StandardException :
 {}
 {
-(    
     <JOIN>
     { return IndexHintNode.HintScope.JOIN; }
 |           
@@ -7947,7 +7965,6 @@ indexHintScope() throws StandardException :
 |           
     <GROUP> <BY>
     { return IndexHintNode.HintScope.GROUP_BY; }
-)
 }
 
 void

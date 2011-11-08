@@ -158,6 +158,20 @@ public class JoinNode extends TableOperatorNode
     }
 
     /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+
+    public String toString() {
+        if (joinOrderStrategyProperties == null)
+            return super.toString();
+        return "joinOrderStrategyProperties: " + joinOrderStrategyProperties + "\n" +
+            super.toString();
+    }
+
+    /**
      * Prints the sub-nodes of this object.  See QueryTreeNode.java for
      * how tree printing is supposed to work.
      *
