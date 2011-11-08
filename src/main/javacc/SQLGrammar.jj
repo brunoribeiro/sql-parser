@@ -142,7 +142,8 @@ class SQLGrammar
     private static final int OPTIONAL_TABLE_PROPERTIES = 0;
     private static final int OPTIONAL_TABLE_DERIVED_RCL = 1;
     private static final int OPTIONAL_TABLE_CORRELATION_NAME = 2;
-    private static final int OPTIONAL_TABLE_NCLAUSES = 3;
+    private static final int OPTIONAL_TABLE_MYSQL_INDEX_HINTS = 3;
+    private static final int OPTIONAL_TABLE_NCLAUSES = 4;
 
     /* Possible CREATE SEQUENCE optional clauses. */
     private static final int SEQUENCE_DATA_TYPE = 0;
@@ -1458,10 +1459,10 @@ class SQLGrammar
             getToken(1).kind == UNSIGNED;
     }
 
-    boolean indexHintFollows() {
+    boolean indexHintFollows(int offset) {
         if (!hasFeature(SQLParserFeature.MYSQL_HINTS))
             return false;
-        int kind = getToken(1).kind;
+        int kind = getToken(offset).kind;
         return ((kind == USE) || (kind == IGNORE) || (kind == FORCE));
     }
 
@@ -7821,6 +7822,7 @@ optionalTableClauses() throws StandardException :
     Properties tableProperties = null;
     ResultColumnList derivedRCL = null;
     String correlationName = null;
+    IndexHintList indexHints = null;
 }
 {
     otc = optionalTableProperties() 
@@ -7830,10 +7832,19 @@ optionalTableClauses() throws StandardException :
         return otc;
     }
 |
+    LOOKAHEAD( { indexHintFollows(1) } )
+    indexHints = indexHints()
+    {
+        otc = new Object[OPTIONAL_TABLE_NCLAUSES];
+        otc[OPTIONAL_TABLE_MYSQL_INDEX_HINTS] = indexHints;
+        return otc;
+    }
+|
     [ 
         [ <AS> ] 
         correlationName = identifier()
         [ <LEFT_PAREN> derivedRCL = derivedColumnList() <RIGHT_PAREN> ] 
+        [ indexHints = indexHints() ]
         [ tableProperties = propertyList(true) <CHECK_PROPERTIES> ] 
     ]
     {
@@ -7841,6 +7852,7 @@ optionalTableClauses() throws StandardException :
         otc[OPTIONAL_TABLE_PROPERTIES] = tableProperties;
         otc[OPTIONAL_TABLE_DERIVED_RCL] = derivedRCL;
         otc[OPTIONAL_TABLE_CORRELATION_NAME] = correlationName;
+        otc[OPTIONAL_TABLE_MYSQL_INDEX_HINTS] = indexHints;
         return otc;
     }
 }
@@ -7857,6 +7869,89 @@ optionalTableProperties() throws StandardException :
         otc = new Object[OPTIONAL_TABLE_NCLAUSES];
         otc[OPTIONAL_TABLE_PROPERTIES] = tableProperties;
         return otc;
+    }
+}
+
+IndexHintList
+indexHints() throws StandardException :
+{
+    IndexHintList list = (IndexHintList)nodeFactory.getNode(NodeTypes.INDEX_HINT_LIST,
+                                                            parserContext);
+}
+{
+    indexHintList(list)
+    {
+        return list;
+    }
+}
+
+void
+indexHintList(IndexHintList list) throws StandardException :
+{
+}
+{
+    indexHint(list) 
+    ( LOOKAHEAD( { getToken(1).kind != COMMA && indexHintFollows(2) } )
+      <COMMA> indexHint(list) )*
+}
+
+void
+indexHint(IndexHintList list) throws StandardException :
+{
+    IndexHintNode.HintType hintType;
+    IndexHintNode.HintScope hintScope = null;
+    List<String> indexes = new ArrayList<String>();
+}
+{
+    hintType = indexHintType()
+    [ hintScope = indexHintScope() ]
+    <LEFT_PAREN>
+    [ indexHintIndex(indexes)
+    ( <COMMA> indexHintIndex(indexes) )* ]
+    <RIGHT_PAREN>
+}
+
+IndexHintNode.HintType
+indexHintType() throws StandardException :
+{}
+{
+(    
+    <USE>
+    { return IndexHintNode.HintType.USE; }
+|           
+    <IGNORE>
+    { return IndexHintNode.HintType.IGNORE; }
+|           
+    <FORCE>
+    { return IndexHintNode.HintType.FORCE; }
+)
+}
+
+IndexHintNode.HintScope
+indexHintScope() throws StandardException :
+{}
+{
+(    
+    <JOIN>
+    { return IndexHintNode.HintScope.JOIN; }
+|           
+    <ORDER> <BY>
+    { return IndexHintNode.HintScope.ORDER_BY; }
+|           
+    <GROUP> <BY>
+    { return IndexHintNode.HintScope.GROUP_BY; }
+)
+}
+
+void
+indexHintIndex(List<String> indexes) throws StandardException :
+{
+    String index;
+}
+{
+    index = identifier()
+    {
+        indexes.add(index);
     }
 }
 

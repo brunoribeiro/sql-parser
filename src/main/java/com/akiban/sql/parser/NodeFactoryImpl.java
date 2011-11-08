@@ -571,6 +571,12 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.INDEX_COLUMN_LIST:
             return NodeNames.INDEX_COLUMN_LIST_NAME;
 
+        case NodeTypes.INDEX_HINT_NODE:
+            return NodeNames.INDEX_HINT_NODE_NAME;
+        
+        case NodeTypes.INDEX_HINT_LIST:
+            return NodeNames.INDEX_HINT_LIST_NAME;
+
         default:
             throw new StandardException("Not implemented");
         }

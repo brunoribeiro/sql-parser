@@ -186,6 +186,10 @@ public interface NodeNames
 
     static final String INDEX_COLUMN_LIST_NAME = "com.akiban.sql.parser.IndexColumnList";
 
+    static final String INDEX_HINT_NODE_NAME = "com.akiban.sql.parser.IndexHintNode";
+
+    static final String INDEX_HINT_LIST_NAME = "com.akiban.sql.parser.IndexHintList";
+
     static final String INDEX_TO_BASE_ROW_NODE_NAME = "com.akiban.sql.parser.IndexToBaseRowNode";
 
     static final String INSERT_NODE_NAME = "com.akiban.sql.parser.InsertNode";
