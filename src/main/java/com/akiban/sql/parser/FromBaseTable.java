@@ -132,6 +132,8 @@ public class FromBaseTable extends FromTable
         this.updateOrDelete = other.updateOrDelete;
         this.templateColumns = (ResultColumnList)
             getNodeFactory().copyNode(other.templateColumns, getParserContext());
+        this.indexHints = (IndexHintList)
+            getNodeFactory().copyNode(other.indexHints, getParserContext());
     }
 
     /**
@@ -202,6 +204,10 @@ public class FromBaseTable extends FromTable
             return tableName;
     }
 
+    public IndexHintList getIndexHints() {
+        return indexHints;
+    }
+
     /**
      * Accept the visitor for all visitable children of this node.
      * 
@@ -211,6 +217,9 @@ public class FromBaseTable extends FromTable
      */
     void acceptChildren(Visitor v) throws StandardException {
         super.acceptChildren(v);
+        if (indexHints != null) {
+            indexHints = (IndexHintList)indexHints.accept(v);
+        }
     }
 
 }

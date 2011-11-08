@@ -45,6 +45,16 @@ public class IndexHintNode extends QueryTreeNode
         this.indexes = (List<String>)indexes;
     }
 
+    public HintType getHintType() {
+        return hintType;
+    }
+    public HintScope getHintScope() {
+        return hintScope;
+    }
+    public List<String> getIndexes() {
+        return indexes;
+    }
+
     /**
      * Fill this node with a deep copy of the given node.
      */
