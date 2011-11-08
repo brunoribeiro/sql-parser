@@ -1776,7 +1776,7 @@ SKIP :
 // NOTE: If you add a keyword, then you must add it to reservedKeyword() as well.
 TOKEN [IGNORE_CASE] :
 { /* SQL92 reserved Keywords */
-    <ADD: "add">
+  <ADD: "add">
 | <ALL: "all">
 | <ALLOCATE: "allocate">
 | <ALTER: "alter">
@@ -1991,7 +1991,7 @@ TOKEN [IGNORE_CASE] :
 // NOTE: If you add a keyword, then you must add it to nonReservedKeyword() as well.
 TOKEN [IGNORE_CASE] :
 { /* SQL92 non-reserved Keywords */
-    <ABS: "abs">
+  <ABS: "abs">
 | <ABSVAL: "absval">
 | <ACTION: "action">
 | <ALWAYS: "always">
@@ -2086,7 +2086,7 @@ TOKEN [IGNORE_CASE] :
 // NOTE: If you add a keyword, then you must add it to reservedKeyword() as well.
 TOKEN [IGNORE_CASE] :
 { /* Additional non-SQL92 reserved keywords */
-    <BOOLEAN: "boolean">
+  <BOOLEAN: "boolean">
 | <CALL: "call">
 | <CURDATE: "curdate">
 | <CURRENT_ROLE: "current_role">
