@@ -79,46 +79,45 @@ public class FromBaseTable extends FromTable
     private TableName tableName;
     private UpdateOrDelete updateOrDelete;
     private ResultColumnList templateColumns;
+    private IndexHintList indexHints;
 
     /**
      * Initializer for a table in a FROM list. Parameters are as follows:
-     *
      * <ul>
      * <li>tableName The name of the table</li>
      * <li>correlationName The correlation name</li>
      * <li>derivedRCL The derived column list</li>
      * <li>tableProperties The Properties list associated with the table.</li>
      * </ul>
-     *
-     * <p>
-     *  - OR -
-     * </p>
-     *
-     * <ul>
-     * <li>tableName The name of the table</li>
-     * <li>correlationName The correlation name</li>
-     * <li>updateOrDelete Table is being updated/deleted from. </li>
-     * <li>derivedRCL The derived column list</li>
-     * </ul>
      */
     public void init(Object arg1,
                      Object arg2,
                      Object arg3,
-                     Object arg4) {
-        if (arg3 instanceof UpdateOrDelete) {
-            init(arg2, null);
-            this.tableName = (TableName)arg1;
-            this.updateOrDelete = (UpdateOrDelete)arg3;
-            resultColumns = (ResultColumnList)arg4;
-        }
-        else {
-            init(arg2, arg4);
-            this.tableName = (TableName)arg1;
-            resultColumns = (ResultColumnList)arg3;
-        }
-
+                     Object arg4,
+                     Object arg5) {
+        init(arg2, arg4);
+        tableName = (TableName)arg1;
+        resultColumns = (ResultColumnList)arg3;
+        indexHints = (IndexHintList)arg5;
         setOrigTableName(this.tableName);
         templateColumns = resultColumns;
+    }
+
+    /**
+     * Initializer for a table in a DELETE/ UPDATE. Parameters are as follows:
+     * <ul>
+     * <li>tableName The name of the table</li>
+     * <li>correlationName The correlation name</li>
+     * <li>updateOrDelete Table is being updated/deleted from. </li>
+     * </ul>
+     */
+    public void init(Object arg1,
+                     Object arg2,
+                     Object arg3) {
+        init(arg2, null);        
+        tableName = (TableName)arg1;
+        updateOrDelete = (UpdateOrDelete)arg3;
+        setOrigTableName(this.tableName);
     }
 
     /**

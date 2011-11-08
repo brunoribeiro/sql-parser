@@ -2850,7 +2850,6 @@ deleteBody() throws StandardException :
                                                        tableName,
                                                        correlationName,
                                                        FromBaseTable.UpdateOrDelete.DELETE,
-                                                       null,
                                                        parserContext);
 
         if (targetProperties != null) {
@@ -3037,7 +3036,6 @@ updateBody() throws StandardException :
                                                        tableName,
                                                        correlationName,
                                                        FromBaseTable.UpdateOrDelete.UPDATE,
-                                                       null,
                                                        parserContext);
 
         if (targetProperties != null) {
@@ -7909,6 +7907,15 @@ indexHint(IndexHintList list) throws StandardException :
     [ indexHintIndex(indexes)
     ( <COMMA> indexHintIndex(indexes) )* ]
     <RIGHT_PAREN>
+    {
+        IndexHintNode indexHint = (IndexHintNode)
+            nodeFactory.getNode(NodeTypes.INDEX_HINT_NODE,
+                                hintType,
+                                hintScope,
+                                indexes,
+                                parserContext);
+        list.add(indexHint);
+    }
 }
 
 IndexHintNode.HintType
@@ -8017,6 +8024,7 @@ tableFactor() throws StandardException :
                                                    optionalTableClauses[OPTIONAL_TABLE_CORRELATION_NAME],
                                                    optionalTableClauses[OPTIONAL_TABLE_DERIVED_RCL],
                                                    optionalTableClauses[OPTIONAL_TABLE_PROPERTIES],
+                                                   optionalTableClauses[OPTIONAL_TABLE_MYSQL_INDEX_HINTS],
                                                    parserContext);
         return fromTable;
     }
