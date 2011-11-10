@@ -165,6 +165,12 @@ public class NodeToString
             return parameterNode((ParameterNode)node);
         case NodeTypes.CAST_NODE:
             return castNode((CastNode)node);
+        case NodeTypes.JAVA_TO_SQL_VALUE_NODE:
+            return javaToSQLValueNode((JavaToSQLValueNode)node);
+        case NodeTypes.SQL_TO_JAVA_VALUE_NODE:
+            return sqlToJavaValueNode((SQLToJavaValueNode)node);
+        case NodeTypes.STATIC_METHOD_CALL_NODE:
+            return methodCallNode((MethodCallNode)node);
         default:
             return "**UNKNOWN(" + node.getNodeType() +")**";
         }
@@ -755,6 +761,29 @@ public class NodeToString
     protected String castNode(CastNode node) throws StandardException {
         return "CAST(" + toString(node.getCastOperand()) + 
             " AS " + node.getType().toString() + ")";
+    }
+
+    protected String javaToSQLValueNode(JavaToSQLValueNode node) 
+            throws StandardException {
+        return toString(node.getJavaValueNode());
+    }
+
+    protected String sqlToJavaValueNode(SQLToJavaValueNode node)
+            throws StandardException {
+        return toString(node.getSQLValueNode());
+    }
+
+    protected String methodCallNode(MethodCallNode node)
+            throws StandardException {
+        StringBuilder str = new StringBuilder(node.getMethodName());
+        str.append("(");
+        JavaValueNode[] params = node.getMethodParameters();
+        for (int i = 0; i < params.length; i++) {
+            if (i > 0) str.append(", ");
+            str.append(maybeParens(params[i]));
+        }
+        str.append(")");
+        return str.toString();
     }
 
     protected String qualifiedDDLNode(DDLStatementNode node) throws StandardException {
