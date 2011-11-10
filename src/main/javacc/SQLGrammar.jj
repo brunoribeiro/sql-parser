@@ -142,7 +142,8 @@ class SQLGrammar
     private static final int OPTIONAL_TABLE_PROPERTIES = 0;
     private static final int OPTIONAL_TABLE_DERIVED_RCL = 1;
     private static final int OPTIONAL_TABLE_CORRELATION_NAME = 2;
-    private static final int OPTIONAL_TABLE_NCLAUSES = 3;
+    private static final int OPTIONAL_TABLE_MYSQL_INDEX_HINTS = 3;
+    private static final int OPTIONAL_TABLE_NCLAUSES = 4;
 
     /* Possible CREATE SEQUENCE optional clauses. */
     private static final int SEQUENCE_DATA_TYPE = 0;
@@ -749,6 +750,9 @@ class SQLGrammar
             }
         }
         else if ((tokKind1 == LEFT || tokKind1 == RIGHT) && tokKind2 == JOIN) {
+            retval = true;
+        }
+        else if (hasFeature(SQLParserFeature.MYSQL_HINTS) && tokKind1 == STRAIGHT_JOIN) {
             retval = true;
         }
 
@@ -1427,6 +1431,21 @@ class SQLGrammar
                                                  null,
                                                  parserContext);
 
+        case STRAIGHT:
+            {
+                Properties joinOrderStrategyProperties = new Properties();
+                joinOrderStrategyProperties.setProperty("STRAIGHT", "TRUE");
+                return (JoinNode)nodeFactory.getNode(NodeTypes.JOIN_NODE,
+                                                     leftRSN,
+                                                     rightRSN,
+                                                     onClause,
+                                                     usingClause,
+                                                     null,
+                                                     null,
+                                                     joinOrderStrategyProperties,
+                                                     parserContext);
+            }
+
         default:
             assert false : "Unexpected joinType: " + joinType;
             return null;
@@ -1456,6 +1475,20 @@ class SQLGrammar
     boolean unsignedFollows() {
         return hasFeature(SQLParserFeature.UNSIGNED) &&
             getToken(1).kind == UNSIGNED;
+    }
+
+    boolean indexHintFollows(int offset) {
+        if (!hasFeature(SQLParserFeature.MYSQL_HINTS))
+            return false;
+        int kind1 = getToken(offset).kind;
+        int kind2 = getToken(offset+1).kind;
+        return (((kind1 == USE) || (kind1 == IGNORE) || (kind1 == FORCE)) &&
+                ((kind2 == INDEX) || (kind2 == KEY)));
+    }
+
+    boolean straightJoinFollows() {
+        return hasFeature(SQLParserFeature.MYSQL_HINTS) &&
+            getToken(1).kind == STRAIGHT_JOIN;
     }
 
     void setParserContext(SQLParserContext parserContext) {
@@ -1743,7 +1776,7 @@ SKIP :
 // NOTE: If you add a keyword, then you must add it to reservedKeyword() as well.
 TOKEN [IGNORE_CASE] :
 { /* SQL92 reserved Keywords */
-    <ADD: "add">
+  <ADD: "add">
 | <ALL: "all">
 | <ALLOCATE: "allocate">
 | <ALTER: "alter">
@@ -1958,7 +1991,7 @@ TOKEN [IGNORE_CASE] :
 // NOTE: If you add a keyword, then you must add it to nonReservedKeyword() as well.
 TOKEN [IGNORE_CASE] :
 { /* SQL92 non-reserved Keywords */
-    <ABS: "abs">
+  <ABS: "abs">
 | <ABSVAL: "absval">
 | <ACTION: "action">
 | <ALWAYS: "always">
@@ -2053,7 +2086,7 @@ TOKEN [IGNORE_CASE] :
 // NOTE: If you add a keyword, then you must add it to reservedKeyword() as well.
 TOKEN [IGNORE_CASE] :
 { /* Additional non-SQL92 reserved keywords */
-    <BOOLEAN: "boolean">
+  <BOOLEAN: "boolean">
 | <CALL: "call">
 | <CURDATE: "curdate">
 | <CURRENT_ROLE: "current_role">
@@ -2071,6 +2104,7 @@ TOKEN [IGNORE_CASE] :
 | <ROLE: "role">
 | <ROWNUMBER: "row_number">
 | <RTRIM: "rtrim">
+| <STRAIGHT_JOIN: "straight_join">
 | <SUBSTR:  "substr">
 | <XML:  "xml">
 | <XMLEXISTS:    "xmlexists">
@@ -2091,7 +2125,7 @@ TOKEN [IGNORE_CASE] :
 // NOTE: If you add a keyword, then you must add it to nonReservedKeyword() as well.
 TOKEN [IGNORE_CASE] :
 { /* Additional non-SQL92 non-reserved keywords */
-    <AFTER: "after">
+  <AFTER: "after">
 | <BEFORE: "before">
 | <CLASS: "class">
 | <COMPRESS: "compress">
@@ -2107,6 +2141,8 @@ TOKEN [IGNORE_CASE] :
 | <EMPTY: "empty">
 | <EXCLUSIVE: "exclusive">
 | <FN: "fn">
+| <FORCE: "force">
+| <IGNORE: "ignore">
 | <INDEX: "index">
 | <INPLACE: "inplace">
 | <JAVA: "java">
@@ -2153,6 +2189,7 @@ TOKEN [IGNORE_CASE] :
 | <TRUNCATE_END: "truncate_end">
 | <UCASE: "ucase">
 | <UNSIGNED: "unsigned">
+| <USE: "use">
 | <UR: "ur">
 | <WHITESPACE: "whitespace">
 }
@@ -2833,7 +2870,6 @@ deleteBody() throws StandardException :
                                                        tableName,
                                                        correlationName,
                                                        FromBaseTable.UpdateOrDelete.DELETE,
-                                                       null,
                                                        parserContext);
 
         if (targetProperties != null) {
@@ -3020,7 +3056,6 @@ updateBody() throws StandardException :
                                                        tableName,
                                                        correlationName,
                                                        FromBaseTable.UpdateOrDelete.UPDATE,
-                                                       null,
                                                        parserContext);
 
         if (targetProperties != null) {
@@ -7805,6 +7840,7 @@ optionalTableClauses() throws StandardException :
     Properties tableProperties = null;
     ResultColumnList derivedRCL = null;
     String correlationName = null;
+    IndexHintList indexHints = null;
 }
 {
     otc = optionalTableProperties() 
@@ -7814,10 +7850,19 @@ optionalTableClauses() throws StandardException :
         return otc;
     }
 |
+    LOOKAHEAD( { indexHintFollows(1) } )
+    indexHints = indexHints()
+    {
+        otc = new Object[OPTIONAL_TABLE_NCLAUSES];
+        otc[OPTIONAL_TABLE_MYSQL_INDEX_HINTS] = indexHints;
+        return otc;
+    }
+|
     [ 
         [ <AS> ] 
         correlationName = identifier()
         [ <LEFT_PAREN> derivedRCL = derivedColumnList() <RIGHT_PAREN> ] 
+        [ indexHints = indexHints() ]
         [ tableProperties = propertyList(true) <CHECK_PROPERTIES> ] 
     ]
     {
@@ -7825,6 +7870,7 @@ optionalTableClauses() throws StandardException :
         otc[OPTIONAL_TABLE_PROPERTIES] = tableProperties;
         otc[OPTIONAL_TABLE_DERIVED_RCL] = derivedRCL;
         otc[OPTIONAL_TABLE_CORRELATION_NAME] = correlationName;
+        otc[OPTIONAL_TABLE_MYSQL_INDEX_HINTS] = indexHints;
         return otc;
     }
 }
@@ -7841,6 +7887,95 @@ optionalTableProperties() throws StandardException :
         otc = new Object[OPTIONAL_TABLE_NCLAUSES];
         otc[OPTIONAL_TABLE_PROPERTIES] = tableProperties;
         return otc;
+    }
+}
+
+IndexHintList
+indexHints() throws StandardException :
+{
+    IndexHintList list = (IndexHintList)nodeFactory.getNode(NodeTypes.INDEX_HINT_LIST,
+                                                            parserContext);
+}
+{
+    indexHintList(list)
+    {
+        return list;
+    }
+}
+
+void
+indexHintList(IndexHintList list) throws StandardException :
+{
+}
+{
+    indexHint(list) 
+    ( LOOKAHEAD( { getToken(1).kind != COMMA && indexHintFollows(2) } )
+      <COMMA> indexHint(list) )*
+}
+
+void
+indexHint(IndexHintList list) throws StandardException :
+{
+    IndexHintNode.HintType hintType;
+    IndexHintNode.HintScope hintScope = null;
+    List<String> indexes = new ArrayList<String>();
+}
+{
+    hintType = indexHintType()
+    (<INDEX> | <KEY>)
+    [ <FOR> hintScope = indexHintScope() ]
+    <LEFT_PAREN>
+    [ indexHintIndex(indexes)
+    ( <COMMA> indexHintIndex(indexes) )* ]
+    <RIGHT_PAREN>
+    {
+        IndexHintNode indexHint = (IndexHintNode)
+            nodeFactory.getNode(NodeTypes.INDEX_HINT_NODE,
+                                hintType,
+                                hintScope,
+                                indexes,
+                                parserContext);
+        list.add(indexHint);
+    }
+}
+
+IndexHintNode.HintType
+indexHintType() throws StandardException :
+{}
+{
+    <USE>
+    { return IndexHintNode.HintType.USE; }
+|           
+    <IGNORE>
+    { return IndexHintNode.HintType.IGNORE; }
+|           
+    <FORCE>
+    { return IndexHintNode.HintType.FORCE; }
+}
+
+IndexHintNode.HintScope
+indexHintScope() throws StandardException :
+{}
+{
+    <JOIN>
+    { return IndexHintNode.HintScope.JOIN; }
+|           
+    <ORDER> <BY>
+    { return IndexHintNode.HintScope.ORDER_BY; }
+|           
+    <GROUP> <BY>
+    { return IndexHintNode.HintScope.GROUP_BY; }
+}
+
+void
+indexHintIndex(List<String> indexes) throws StandardException :
+{
+    String index;
+}
+{
+    index = identifier()
+    {
+        indexes.add(index);
     }
 }
 
@@ -7906,6 +8041,7 @@ tableFactor() throws StandardException :
                                                    optionalTableClauses[OPTIONAL_TABLE_CORRELATION_NAME],
                                                    optionalTableClauses[OPTIONAL_TABLE_DERIVED_RCL],
                                                    optionalTableClauses[OPTIONAL_TABLE_PROPERTIES],
+                                                   optionalTableClauses[OPTIONAL_TABLE_MYSQL_INDEX_HINTS],
                                                    parserContext);
         return fromTable;
     }
@@ -8086,7 +8222,7 @@ crossJoin(ResultSetNode leftRSN, boolean nestedInParens)
 TableOperatorNode
 qualifiedJoin(ResultSetNode leftRSN, boolean nestedInParens) throws StandardException :
 {
-    JoinNode.JoinType joinType = JoinNode.JoinType.INNER;
+    JoinNode.JoinType joinType;
     ResultSetNode rightRSN;
     TableOperatorNode ton = null;
     Object[] onOrUsingClause = null;
@@ -8094,7 +8230,7 @@ qualifiedJoin(ResultSetNode leftRSN, boolean nestedInParens) throws StandardExce
     ValueNode onClause;
 }
 {
-    [ joinType = joinType() ] <JOIN>
+    joinType = qualifiedJoinType()
     rightRSN = tableReferenceTypes(nestedInParens) 
     onOrUsingClause = joinSpecification(leftRSN, rightRSN)
     {
@@ -8165,6 +8301,24 @@ outerJoinType() throws StandardException :
     <RIGHT> 
     {
         return JoinNode.JoinType.RIGHT_OUTER;
+    }
+}
+
+JoinNode.JoinType
+qualifiedJoinType() throws StandardException :
+{
+    JoinNode.JoinType joinType = JoinNode.JoinType.INNER;
+}
+{
+    LOOKAHEAD( { straightJoinFollows() } ) 
+    <STRAIGHT_JOIN> 
+    {
+        return JoinNode.JoinType.STRAIGHT;
+    }
+|
+    [ joinType = joinType() ] <JOIN>
+    {
+        return joinType;
     }
 }
 
@@ -12662,6 +12816,7 @@ reservedKeyword() :
 | tok = <SQLCODE>
 | tok = <SQLERROR>
 | tok = <SQLSTATE>
+| tok = <STRAIGHT_JOIN>
 | tok = <SUBSTRING>
 | tok = <SUM>
 | tok = <SYSTEM_USER>
@@ -12764,9 +12919,11 @@ nonReservedKeyword() :
 | tok = <EMPTY>
 | tok = <EXCLUSIVE>
 | tok = <FN>
+| tok = <FORCE>
 | tok = <FORTRAN>
 | tok = <GENERATED>
 | tok = <IDENTITY_VAL_LOCAL>
+| tok = <IGNORE>
 | tok = <INCREMENT>
 | tok = <INDEX>
 | tok = <INITIAL>
@@ -12880,6 +13037,7 @@ nonReservedKeyword() :
 | tok = <UNSIGNED>
 | tok = <UR>
 | tok = <USAGE>
+| tok = <USE>
 // SQL92 says VALUE is reserved, but we want it to be nonreserved.
 | tok = <VALUE>
 | tok = <VARBINARY>

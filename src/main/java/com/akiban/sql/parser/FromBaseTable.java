@@ -79,46 +79,45 @@ public class FromBaseTable extends FromTable
     private TableName tableName;
     private UpdateOrDelete updateOrDelete;
     private ResultColumnList templateColumns;
+    private IndexHintList indexHints;
 
     /**
      * Initializer for a table in a FROM list. Parameters are as follows:
-     *
      * <ul>
      * <li>tableName The name of the table</li>
      * <li>correlationName The correlation name</li>
      * <li>derivedRCL The derived column list</li>
      * <li>tableProperties The Properties list associated with the table.</li>
      * </ul>
-     *
-     * <p>
-     *  - OR -
-     * </p>
-     *
-     * <ul>
-     * <li>tableName The name of the table</li>
-     * <li>correlationName The correlation name</li>
-     * <li>updateOrDelete Table is being updated/deleted from. </li>
-     * <li>derivedRCL The derived column list</li>
-     * </ul>
      */
     public void init(Object arg1,
                      Object arg2,
                      Object arg3,
-                     Object arg4) {
-        if (arg3 instanceof UpdateOrDelete) {
-            init(arg2, null);
-            this.tableName = (TableName)arg1;
-            this.updateOrDelete = (UpdateOrDelete)arg3;
-            resultColumns = (ResultColumnList)arg4;
-        }
-        else {
-            init(arg2, arg4);
-            this.tableName = (TableName)arg1;
-            resultColumns = (ResultColumnList)arg3;
-        }
-
+                     Object arg4,
+                     Object arg5) {
+        init(arg2, arg4);
+        tableName = (TableName)arg1;
+        resultColumns = (ResultColumnList)arg3;
+        indexHints = (IndexHintList)arg5;
         setOrigTableName(this.tableName);
         templateColumns = resultColumns;
+    }
+
+    /**
+     * Initializer for a table in a DELETE/ UPDATE. Parameters are as follows:
+     * <ul>
+     * <li>tableName The name of the table</li>
+     * <li>correlationName The correlation name</li>
+     * <li>updateOrDelete Table is being updated/deleted from. </li>
+     * </ul>
+     */
+    public void init(Object arg1,
+                     Object arg2,
+                     Object arg3) {
+        init(arg2, null);        
+        tableName = (TableName)arg1;
+        updateOrDelete = (UpdateOrDelete)arg3;
+        setOrigTableName(this.tableName);
     }
 
     /**
@@ -133,6 +132,8 @@ public class FromBaseTable extends FromTable
         this.updateOrDelete = other.updateOrDelete;
         this.templateColumns = (ResultColumnList)
             getNodeFactory().copyNode(other.templateColumns, getParserContext());
+        this.indexHints = (IndexHintList)
+            getNodeFactory().copyNode(other.indexHints, getParserContext());
     }
 
     /**
@@ -203,6 +204,26 @@ public class FromBaseTable extends FromTable
             return tableName;
     }
 
+    public IndexHintList getIndexHints() {
+        return indexHints;
+    }
+
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
+
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+
+        if (indexHints != null) {
+            printLabel(depth, "indexHints: ");
+            indexHints.treePrint(depth + 1);
+        }
+    }
+
     /**
      * Accept the visitor for all visitable children of this node.
      * 
@@ -212,6 +233,9 @@ public class FromBaseTable extends FromTable
      */
     void acceptChildren(Visitor v) throws StandardException {
         super.acceptChildren(v);
+        if (indexHints != null) {
+            indexHints = (IndexHintList)indexHints.accept(v);
+        }
     }
 
 }

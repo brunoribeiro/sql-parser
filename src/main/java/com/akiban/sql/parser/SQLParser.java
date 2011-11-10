@@ -236,6 +236,7 @@ public class SQLParser implements SQLParserContext {
         switch (feature) {
         case GROUPING:
         case UNSIGNED:
+        case MYSQL_HINTS:
             return true;
         default:
             return false;

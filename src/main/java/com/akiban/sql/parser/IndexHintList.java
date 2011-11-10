@@ -13,16 +13,11 @@
  * along with this program.  If not, see http://www.gnu.org/licenses.
  */
 
-/** Features of the parser grammar. 
- * In particular, dialect-specific constructs that can be turned off for use with
- * ordinary databases.
- */
-
 package com.akiban.sql.parser;
 
-public enum SQLParserFeature
+/**
+ * MySQL's index hints.
+ */
+public class IndexHintList extends QueryTreeNodeList<IndexHintNode>
 {
-    GROUPING,
-    UNSIGNED,
-    MYSQL_HINTS
 }

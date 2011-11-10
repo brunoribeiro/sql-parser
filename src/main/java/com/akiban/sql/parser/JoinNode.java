@@ -56,7 +56,7 @@ public class JoinNode extends TableOperatorNode
 {
     /* Join semantics */
     public static enum JoinType {
-        INNER, CROSS, LEFT_OUTER, RIGHT_OUTER, FULL_OUTER, UNION
+        INNER, CROSS, LEFT_OUTER, RIGHT_OUTER, FULL_OUTER, UNION, STRAIGHT
     }
     
     /** If this flag is true, this node represents a natural join. */
@@ -155,6 +155,20 @@ public class JoinNode extends TableOperatorNode
     }
     public void setUsingClause(ResultColumnList usingClause) {
         this.usingClause = usingClause;
+    }
+
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+
+    public String toString() {
+        if (joinOrderStrategyProperties == null)
+            return super.toString();
+        return "joinOrderStrategyProperties: " + joinOrderStrategyProperties + "\n" +
+            super.toString();
     }
 
     /**

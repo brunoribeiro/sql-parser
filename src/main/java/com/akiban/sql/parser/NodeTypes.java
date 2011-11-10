@@ -174,11 +174,11 @@ public interface NodeTypes
     public static final int SESSION_USER_NODE = 125; // // special function SESSION_USER
     public static final int SYSTEM_USER_NODE = 126; // // special function SYSTEM_USER
     public static final int TRIM_OPERATOR_NODE = 127;
-    // 128 is available
+    public static final int INDEX_HINT_NODE = 128;
     public static final int SELECT_NODE = 129;
     public static final int CREATE_VIEW_NODE = 130;
     public static final int CONSTRAINT_DEFINITION_NODE = 131;
-    // 132 available;
+    public static final int INDEX_HINT_LIST = 132;
     public static final int NEW_INVOCATION_NODE = 133;
     public static final int CREATE_SCHEMA_NODE = 134;
     public static final int FROM_BASE_TABLE = 135;
