@@ -4454,15 +4454,6 @@ selectList() throws StandardException :
                             parserContext);
 }
 {
-    <ASTERISK>
-    {
-        allResultColumn = (ResultColumn)nodeFactory.getNode(NodeTypes.ALL_RESULT_COLUMN,
-                                                            null,
-                                                            parserContext);
-        resultColumns.addResultColumn(allResultColumn);
-        return resultColumns;
-    }
-|
     selectColumnList(resultColumns)
     {
         return resultColumns;
@@ -4485,6 +4476,14 @@ selectSublist(ResultColumnList resultColumns) throws StandardException :
     TableName tableName;
 }
 {
+    <ASTERISK>
+    {
+        allResultColumn = (ResultColumn)nodeFactory.getNode(NodeTypes.ALL_RESULT_COLUMN,
+                                                            null,
+                                                            parserContext);
+        resultColumns.addResultColumn(allResultColumn);
+    }
+|
     // This LOOKAHEAD is required because both a qualifiedName() and a
     // derivedColumn() can start with an identifier().  So, the two
     // cases we check for are x.* and x.y.*
