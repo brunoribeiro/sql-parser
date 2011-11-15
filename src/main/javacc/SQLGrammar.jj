@@ -3392,7 +3392,7 @@ columnDefinition(TableElementList tableElementList) throws StandardException :
 {
     // TODO: We are ignoring domains and collation.
     columnName = identifier() 
-    [ ( typeDescriptor[0] = dataTypeDDL() ) ]
+    ( typeDescriptor[0] = dataTypeDDL() )
     [ defaultNode = defaultAndConstraints(typeDescriptor, tableElementList, columnName,
                                           autoIncrementInfo) ]
     {
