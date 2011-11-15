@@ -259,6 +259,26 @@ public class AlterTableNode extends DDLStatementNode
             return "ALTER TABLE";
     }
 
+    public boolean isUpdateStatistics() {
+        return updateStatistics;
+    }
+
+    public boolean isUpdateStatisticsAll() {
+        return updateStatisticsAll;
+    }
+
+    public String getIndexNameForUpdateStatistics() {
+        return indexNameForUpdateStatistics;
+    }
+
+    public boolean isCompressTable() {
+        return compressTable;
+    }
+
+    public boolean isTruncateTable() {
+        return truncateTable;
+    }
+
     public int getChangeType() { 
         return changeType; 
     }

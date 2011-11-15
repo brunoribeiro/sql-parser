@@ -108,7 +108,7 @@ public class SQLParser implements SQLParserContext {
             return parser.parseStatement(sqlText, parameterList);
         }
         catch (ParseException ex) {
-            throw new StandardException(ex);
+            throw new StandardException(standardizeEol(ex.toString()), ex);
         }
         catch (TokenMgrError ex) {
             // Throw away the cached parser.
@@ -124,13 +124,24 @@ public class SQLParser implements SQLParserContext {
             return parser.parseStatements(sqlText);
         }
         catch (ParseException ex) {
-            throw new StandardException(ex);
+            throw new StandardException(standardizeEol(ex.toString()), ex);
         }
         catch (TokenMgrError ex) {
             // Throw away the cached parser.
             parser = null;
             throw new StandardException(ex);
         }
+    }
+
+    /** Undo ParseException.initialise()'s eol handling. 
+     * Want something platform independent.
+     */
+    private static String standardizeEol(String msg) {
+        String eol = System.getProperty("line.separator", "\n");
+        if (eol.equals("\n"))
+            return msg;
+        else
+            return msg.replaceAll(eol, "\n");
     }
 
     protected void reinit(String sqlText) throws StandardException {
