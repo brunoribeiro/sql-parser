@@ -139,6 +139,13 @@ public class TypeId
     public static final int TIME_SCALE = 0;
     public static final int TIMESTAMP_SCALE = 9;
 
+    public static final int INTERVAL_YEAR_MONTH_PRECISION = 8;
+    public static final int INTERVAL_YEAR_MONTH_SCALE = 0;
+    public static final int INTERVAL_YEAR_MONTH_MAXWIDTH = 11; // yyyyyyyy-mm
+    public static final int INTERVAL_DAY_SECOND_PRECISION = 8;
+    public static final int INTERVAL_DAY_SECOND_SCALE = 6;
+    public static final int INTERVAL_DAY_SECOND_MAXWIDTH = 24; // dddddddd hh:mm:ss.uuuuuu
+
     /* These define all the type names for SQL92 and JDBC 
      * NOTE: boolean is SQL3
      */
@@ -186,6 +193,19 @@ public class TypeId
     public static final String DOUBLE_UNSIGNED_NAME = "DOUBLE UNSIGNED";
     public static final String NUMERIC_UNSIGNED_NAME = "NUMERIC UNSIGNED";
     public static final String DECIMAL_UNSIGNED_NAME = "DECIMAL UNSIGNED";
+    public static final String INTERVAL_YEAR_NAME = "INTERVAL YEAR";
+    public static final String INTERVAL_MONTH_NAME = "INTERVAL MONTH";
+    public static final String INTERVAL_YEAR_MONTH_NAME = "INTERVAL YEAR TO MONTH";
+    public static final String INTERVAL_DAY_NAME = "INTERVAL DAY";
+    public static final String INTERVAL_HOUR_NAME = "INTERVAL HOUR";
+    public static final String INTERVAL_MINUTE_NAME = "INTERVAL MINUTE";
+    public static final String INTERVAL_SECOND_NAME = "INTERVAL SECOND";
+    public static final String INTERVAL_DAY_HOUR_NAME = "INTERVAL DAY TO HOUR";
+    public static final String INTERVAL_DAY_MINUTE_NAME = "INTERVAL DAY TO MINUTE";
+    public static final String INTERVAL_DAY_SECOND_NAME = "INTERVAL DAY TO SECOND";
+    public static final String INTERVAL_HOUR_MINUTE_NAME = "INTERVAL HOUR TO MINUTE";
+    public static final String INTERVAL_HOUR_SECOND_NAME = "INTERVAL HOUR TO SECOND";
+    public static final String INTERVAL_MINUTE_SECOND_NAME = "INTERVAL MINUTE TO SECOND";
 
     // Following use of "XML" is per SQL/XML (2003) spec,
     // section "10.2 Type name determination".
@@ -215,6 +235,7 @@ public class TypeId
     public static final int VARBIT_PRECEDENCE = 150;
     public static final int BIT_PRECEDENCE = 140;
     public static final int BOOLEAN_PRECEDENCE = 130;
+    public static final int INTERVAL_PRECEDENCE = 125;
     public static final int TIME_PRECEDENCE = 120;
     public static final int TIMESTAMP_PRECEDENCE = 110;
     public static final int DATE_PRECEDENCE = 100;
@@ -259,6 +280,8 @@ public class TypeId
         public static final int CLOB_TYPE_ID = 21;
         public static final int XML_TYPE_ID = 22;
         public static final int ROW_MULTISET_TYPE_ID_IMPL = 23;
+        public static final int INTERVAL_YEAR_MONTH_ID = 24;
+        public static final int INTERVAL_DAY_SECOND_ID = 25;
     }
 
     public static final TypeId BOOLEAN_ID = new TypeId(FormatIds.BOOLEAN_TYPE_ID);
@@ -293,6 +316,20 @@ public class TypeId
     public static final TypeId DECIMAL_UNSIGNED_ID =    new TypeId(FormatIds.DECIMAL_TYPE_ID, true);
     public static final TypeId NUMERIC_UNSIGNED_ID =    new TypeId(FormatIds.NUMERIC_TYPE_ID, true);
 
+    public static final TypeId INTERVAL_YEAR_ID = new TypeId(FormatIds.INTERVAL_YEAR_MONTH_ID, INTERVAL_YEAR_NAME);
+    public static final TypeId INTERVAL_MONTH_ID = new TypeId(FormatIds.INTERVAL_YEAR_MONTH_ID, INTERVAL_MONTH_NAME);
+    public static final TypeId INTERVAL_YEAR_MONTH_ID = new TypeId(FormatIds.INTERVAL_YEAR_MONTH_ID, INTERVAL_YEAR_MONTH_NAME);
+    public static final TypeId INTERVAL_DAY_ID = new TypeId(FormatIds.INTERVAL_DAY_SECOND_ID, INTERVAL_DAY_NAME);
+    public static final TypeId INTERVAL_HOUR_ID = new TypeId(FormatIds.INTERVAL_DAY_SECOND_ID, INTERVAL_HOUR_NAME);
+    public static final TypeId INTERVAL_MINUTE_ID = new TypeId(FormatIds.INTERVAL_DAY_SECOND_ID, INTERVAL_MINUTE_NAME);
+    public static final TypeId INTERVAL_SECOND_ID = new TypeId(FormatIds.INTERVAL_DAY_SECOND_ID, INTERVAL_SECOND_NAME);
+    public static final TypeId INTERVAL_DAY_HOUR_ID = new TypeId(FormatIds.INTERVAL_DAY_SECOND_ID, INTERVAL_DAY_HOUR_NAME);
+    public static final TypeId INTERVAL_DAY_MINUTE_ID = new TypeId(FormatIds.INTERVAL_DAY_SECOND_ID, INTERVAL_DAY_MINUTE_NAME);
+    public static final TypeId INTERVAL_DAY_SECOND_ID = new TypeId(FormatIds.INTERVAL_DAY_SECOND_ID, INTERVAL_DAY_SECOND_NAME);
+    public static final TypeId INTERVAL_HOUR_MINUTE_ID = new TypeId(FormatIds.INTERVAL_DAY_SECOND_ID, INTERVAL_HOUR_MINUTE_NAME);
+    public static final TypeId INTERVAL_HOUR_SECOND_ID = new TypeId(FormatIds.INTERVAL_DAY_SECOND_ID, INTERVAL_HOUR_SECOND_NAME);
+    public static final TypeId INTERVAL_MINUTE_SECOND_ID = new TypeId(FormatIds.INTERVAL_DAY_SECOND_ID, INTERVAL_MINUTE_SECOND_NAME);
+
     private static final TypeId[] ALL_BUILTIN_TYPE_IDS = {
         BOOLEAN_ID,
         SMALLINT_ID,
@@ -324,6 +361,19 @@ public class TypeId
         DOUBLE_UNSIGNED_ID,
         DECIMAL_UNSIGNED_ID,
         NUMERIC_UNSIGNED_ID,
+        INTERVAL_YEAR_ID,
+        INTERVAL_MONTH_ID,
+        INTERVAL_YEAR_MONTH_ID,
+        INTERVAL_DAY_ID,
+        INTERVAL_HOUR_ID,
+        INTERVAL_MINUTE_ID,
+        INTERVAL_SECOND_ID,
+        INTERVAL_DAY_HOUR_ID,
+        INTERVAL_DAY_MINUTE_ID,
+        INTERVAL_DAY_SECOND_ID,
+        INTERVAL_HOUR_MINUTE_ID,
+        INTERVAL_HOUR_SECOND_ID,
+        INTERVAL_MINUTE_SECOND_ID,
     };
 
     /*
@@ -643,6 +693,45 @@ public class TypeId
         if (SQLTypeName.equals(DECIMAL_UNSIGNED_NAME)) {
             return DECIMAL_UNSIGNED_ID;
         }
+        if (SQLTypeName.equals(INTERVAL_YEAR_NAME)) {
+            return INTERVAL_YEAR_ID;
+        }
+        if (SQLTypeName.equals(INTERVAL_MONTH_NAME)) {
+            return INTERVAL_MONTH_ID;
+        }
+        if (SQLTypeName.equals(INTERVAL_YEAR_MONTH_NAME)) {
+            return INTERVAL_YEAR_MONTH_ID;
+        }
+        if (SQLTypeName.equals(INTERVAL_DAY_NAME)) {
+            return INTERVAL_DAY_ID;
+        }
+        if (SQLTypeName.equals(INTERVAL_HOUR_NAME)) {
+            return INTERVAL_HOUR_ID;
+        }
+        if (SQLTypeName.equals(INTERVAL_MINUTE_NAME)) {
+            return INTERVAL_MINUTE_ID;
+        }
+        if (SQLTypeName.equals(INTERVAL_SECOND_NAME)) {
+            return INTERVAL_SECOND_ID;
+        }
+        if (SQLTypeName.equals(INTERVAL_DAY_HOUR_NAME)) {
+            return INTERVAL_DAY_HOUR_ID;
+        }
+        if (SQLTypeName.equals(INTERVAL_DAY_MINUTE_NAME)) {
+            return INTERVAL_DAY_MINUTE_ID;
+        }
+        if (SQLTypeName.equals(INTERVAL_DAY_SECOND_NAME)) {
+            return INTERVAL_DAY_SECOND_ID;
+        }
+        if (SQLTypeName.equals(INTERVAL_HOUR_MINUTE_NAME)) {
+            return INTERVAL_HOUR_MINUTE_ID;
+        }
+        if (SQLTypeName.equals(INTERVAL_HOUR_SECOND_NAME)) {
+            return INTERVAL_HOUR_SECOND_ID;
+        }
+        if (SQLTypeName.equals(INTERVAL_MINUTE_SECOND_NAME)) {
+            return INTERVAL_MINUTE_SECOND_ID;
+        }
 
         // Types defined below here are SQL types and non-JDBC types that are
         // supported by Derby
@@ -675,6 +764,7 @@ public class TypeId
     private boolean isFloatingPointTypeId;
     private boolean isRealTypeId;
     private boolean isDateTimeTimeStampTypeId;
+    private boolean isIntervalTypeId;
     private boolean isUserDefinedTypeId;
     private int maxPrecision;
     private int maxScale;
@@ -953,6 +1043,24 @@ public class TypeId
             isLongConcatableTypeId = true;
             break;
             
+        case FormatIds.INTERVAL_YEAR_MONTH_ID:
+            schemaName = null;
+            typePrecedence = INTERVAL_PRECEDENCE;
+            maxPrecision = TypeId.INTERVAL_YEAR_MONTH_PRECISION;
+            maxScale = TypeId.INTERVAL_YEAR_MONTH_SCALE;
+            maxMaxWidth = TypeId.INTERVAL_YEAR_MONTH_MAXWIDTH;
+            isIntervalTypeId = true;
+            break;
+            
+        case FormatIds.INTERVAL_DAY_SECOND_ID:
+            schemaName = null;
+            typePrecedence = INTERVAL_PRECEDENCE;
+            maxPrecision = TypeId.INTERVAL_DAY_SECOND_PRECISION;
+            maxScale = TypeId.INTERVAL_DAY_SECOND_SCALE;
+            maxMaxWidth = TypeId.INTERVAL_DAY_SECOND_MAXWIDTH;
+            isIntervalTypeId = true;
+            break;
+            
         case FormatIds.USERDEFINED_TYPE_ID:
             JDBCTypeId = java.sql.Types.JAVA_OBJECT;
             maxMaxWidth = -1;
@@ -1011,6 +1119,11 @@ public class TypeId
                 assert false;
             }
         }
+    }
+
+    private TypeId(int formatId, String name) {
+        this(formatId);
+        unqualifiedName = name;
     }
 
     /**
@@ -1560,6 +1673,37 @@ public class TypeId
     /** Is this one of the unsigned numeric types? */
     public boolean isUnsigned() {
         return unsigned;
+    }
+
+    public static TypeId intervalTypeId(TypeId startField, TypeId endField) {
+        if (startField == INTERVAL_YEAR_ID) {
+            if (endField == INTERVAL_MONTH_ID)
+                return INTERVAL_YEAR_MONTH_ID;
+        }
+        if (startField == INTERVAL_DAY_ID) {
+            if (endField == INTERVAL_HOUR_ID)
+                return INTERVAL_DAY_HOUR_ID;
+            if (endField == INTERVAL_MINUTE_ID)
+                return INTERVAL_DAY_MINUTE_ID;
+            if (endField == INTERVAL_SECOND_ID)
+                return INTERVAL_DAY_SECOND_ID;
+        }
+        if (startField == INTERVAL_HOUR_ID) {
+            if (endField == INTERVAL_MINUTE_ID)
+                return INTERVAL_HOUR_MINUTE_ID;
+            if (endField == INTERVAL_SECOND_ID)
+                return INTERVAL_HOUR_SECOND_ID;
+        }
+        if (startField == INTERVAL_MINUTE_ID) {
+            if (endField == INTERVAL_SECOND_ID)
+                return INTERVAL_MINUTE_SECOND_ID;
+        }
+        assert false : startField + " TO " + endField;
+        return startField;
+    }
+
+    public boolean isInterval() {
+        return isIntervalTypeId;
     }
 
 }

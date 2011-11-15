@@ -1064,4 +1064,60 @@ public final class DataTypeDescriptor
                                       isNullable, maximumWidth);
     }
 
+    public static int intervalMaxWidth(TypeId typeId, 
+                                       int precision, int scale) {
+        int maxMax;
+        if (typeId.getTypeFormatId() == TypeId.FormatIds.INTERVAL_YEAR_MONTH_ID) {
+            if (precision == 0)
+                precision = TypeId.INTERVAL_YEAR_MONTH_PRECISION;
+            maxMax = TypeId.INTERVAL_YEAR_MONTH_MAXWIDTH;
+        }
+        else {
+            if (precision == 0)
+                precision = TypeId.INTERVAL_DAY_SECOND_PRECISION;
+            maxMax = TypeId.INTERVAL_DAY_SECOND_MAXWIDTH;
+        }
+        if ((typeId == TypeId.INTERVAL_YEAR_ID) ||
+            (typeId == TypeId.INTERVAL_MONTH_ID) ||
+            (typeId == TypeId.INTERVAL_DAY_ID) ||
+            (typeId == TypeId.INTERVAL_HOUR_ID) ||
+            (typeId == TypeId.INTERVAL_MINUTE_ID)) {
+            return precision;
+        }
+        else if (typeId == TypeId.INTERVAL_SECOND_ID) {
+            if (scale == 0)
+                return precision;
+            else
+                return precision + scale + 1;
+        }
+        else if (typeId == TypeId.INTERVAL_DAY_HOUR_ID) {
+            return precision + 3;
+        }
+        else if (typeId == TypeId.INTERVAL_DAY_MINUTE_ID) {
+            return precision + 6;
+        }
+        else if (typeId == TypeId.INTERVAL_DAY_SECOND_ID) {
+            if (scale == 0)
+                return precision + 9;
+            else
+                return precision + scale + 10;
+        }
+        else if (typeId == TypeId.INTERVAL_HOUR_MINUTE_ID) {
+            return precision + 3;
+        }
+        else if (typeId == TypeId.INTERVAL_HOUR_SECOND_ID) {
+            if (scale == 0)
+                return precision + 6;
+            else
+                return precision + scale + 7;
+        }
+        else if (typeId == TypeId.INTERVAL_MINUTE_SECOND_ID) {
+            if (scale == 0)
+                return precision + 3;
+            else
+                return precision + scale + 4;
+        }
+        else
+            return maxMax;
+    }
 }

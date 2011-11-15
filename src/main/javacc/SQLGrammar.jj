@@ -2518,7 +2518,6 @@ TOKEN :
 | <#TIME_VALUE: <UINT> ":" <UINT> ":" <SECONDS_VALUE> >
 | <#TIMEZONE_INTERVAL: ("+" | "-") <UINT> ":" <UINT> >
 | <TIMESTAMP_LITERAL: "TIMESTAMP" "'" <DATE_VALUE> " " <TIME_VALUE> ( <TIMEZONE_INTERVAL> ) ? "'" >
-*****/
 | <INTERVAL_LITERAL: "INTERVAL" "'" (["+","-"])? <INTERVAL_STRING> <INTERVAL_QUALIFIER> >
 | <#INTERVAL_STRING: "'" ( <YEAR_MONTH_LITERAL> | <DAY_TIME_LITERAL> ) "'" >
 | <#INTERVAL_QUALIFIER: <SINGLE_DATETIME_FIELD> | ( <START_FIELD> <TO> <END_FIELD> ) >
@@ -2533,6 +2532,7 @@ TOKEN :
 | <#TIME_INTERVAL: <UINT> ( ":" <UINT> ( ":" <SECONDS_VALUE> ) ? ) ?
 | <UINT> ( ":" <SECONDS_VALUE> ) ?
 | <SECONDS_VALUE> >
+*****/
 }
 
 StatementNode
@@ -4119,7 +4119,9 @@ scale() throws StandardException :
 
 DataTypeDescriptor
 datetimeType() throws StandardException :
-{}
+{
+    DataTypeDescriptor typeDescriptor;
+}
 {
     <DATE> 
     {
@@ -4150,7 +4152,113 @@ datetimeType() throws StandardException :
         // TODO; Ditto
         return DataTypeDescriptor.getBuiltInDataTypeDescriptor(Types.TIMESTAMP);
     }
+|
+    <INTERVAL> typeDescriptor = intervalQualifier()
+    {
+        return typeDescriptor;
+    }
 }
+
+DataTypeDescriptor
+intervalQualifier() throws StandardException :
+{
+    TypeId typeId, otherId = null;
+    int[] precAndScale = new int[2];
+}
+{
+    (
+        LOOKAHEAD( { getToken(2).kind == TO } ) 
+        typeId = intervalStartField(precAndScale) <TO>
+        otherId = intervalEndField(precAndScale)
+        {
+            typeId = TypeId.intervalTypeId(typeId, otherId);
+        }
+    |
+        typeId = intervalSingleField(precAndScale)
+    )
+    {
+        return new DataTypeDescriptor(typeId, precAndScale[0], precAndScale[1],
+                                      true, DataTypeDescriptor.intervalMaxWidth(typeId, precAndScale[0], precAndScale[1]));
+    }
+}
+
+TypeId
+intervalStartField(int[] precAndScale) throws StandardException :
+{
+    TypeId typeId;
+    Token prec;
+}
+{
+    typeId = intervalNonSecond()
+    [ <LEFT_PAREN> prec = <EXACT_NUMERIC> <RIGHT_PAREN>
+      { precAndScale[0] = Integer.parseInt(prec.image); } ]
+    {
+        return typeId;
+    }
+}
+
+TypeId
+intervalEndField(int[] precAndScale) throws StandardException :
+{
+    TypeId typeId;
+    Token scale;
+}
+{
+    typeId = intervalNonSecond()
+    { return typeId; }
+|
+    <SECOND>
+    [ <LEFT_PAREN> scale = <EXACT_NUMERIC> <RIGHT_PAREN>
+      { precAndScale[1] = Integer.parseInt(scale.image); } ]
+    {
+        return TypeId.INTERVAL_SECOND_ID;
+    }
+}
+
+TypeId
+intervalSingleField(int[] precAndScale) throws StandardException :
+{
+    TypeId typeId;
+    Token prec = null, scale = null;
+}
+{
+    typeId = intervalNonSecond()
+    { return typeId; }
+|
+    <SECOND>
+    [ <LEFT_PAREN> prec = <EXACT_NUMERIC> 
+      [ <COMMA> scale = <EXACT_NUMERIC> ]
+      <RIGHT_PAREN> ]
+    {
+        if (prec != null)
+            precAndScale[0] = Integer.parseInt(prec.image);
+        if (scale != null)
+            precAndScale[1] = Integer.parseInt(scale.image);
+        return TypeId.INTERVAL_SECOND_ID;
+    }
+}
+
+TypeId
+intervalNonSecond() throws StandardException :
+{}
+{
+    <YEAR>
+    { return TypeId.INTERVAL_YEAR_ID; }
+|
+    <MONTH>
+    { return TypeId.INTERVAL_MONTH_ID; }
+|
+    <DAY>
+    { return TypeId.INTERVAL_DAY_ID; }
+|
+    <HOUR>
+    { return TypeId.INTERVAL_HOUR_ID; }
+|
+    <MINUTE>
+    { return TypeId.INTERVAL_MINUTE_ID; }
+}
+
+
 
 void
 qualifiedNameList(List<TableName> list) throws StandardException :
