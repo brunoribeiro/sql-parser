@@ -1028,6 +1028,7 @@ public final class DataTypeDescriptor
             else {
                 if (getPrecision() > 0) {
                     int idx = sbuf.indexOf(" ", 9);
+                    if (idx < 0) idx = sbuf.length();
                     sbuf.insert(idx, ")");
                     sbuf.insert(idx, getPrecision());
                     sbuf.insert(idx, "(");

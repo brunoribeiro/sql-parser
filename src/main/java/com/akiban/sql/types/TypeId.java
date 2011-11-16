@@ -1440,6 +1440,7 @@ public class TypeId
      *           @return String version of datatype, suitable for running through
      *                          the Parser.
      */
+    // TODO: Consider consolitation with DataTypeDescriptor.getFullSQLTypeName().
     public String toParsableString(DataTypeDescriptor dts) {
         String retval = getSQLTypeName();
 
@@ -1466,6 +1467,29 @@ public class TypeId
             }
             else
                 retval += "(" + dts.getPrecision() + "," + dts.getScale() + ")";
+            break;
+
+        case FormatIds.INTERVAL_YEAR_MONTH_ID:
+        case FormatIds.INTERVAL_DAY_SECOND_ID:
+            if (this == INTERVAL_SECOND_ID) {
+                if (dts.getPrecision() > 0) {
+                    retval += "(" + dts.getPrecision();
+                    if (dts.getScale() > 0)
+                        retval += ", " + dts.getScale();
+                    retval += ")";
+                }
+            }
+            else {
+                if (dts.getPrecision() > 0) {
+                    int idx = retval.indexOf(" ", 9);
+                    if (idx < 0) idx = retval.length();
+                    retval = retval.substring(0, idx) +
+                        "(" + dts.getPrecision() + ")" +
+                        retval.substring(idx);
+                }
+                if (dts.getScale() > 0)
+                    retval += "(" + dts.getScale() +")";
+            }
             break;
         }
 

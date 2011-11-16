@@ -4168,7 +4168,9 @@ intervalQualifier() throws StandardException :
 }
 {
     (
-        LOOKAHEAD( { getToken(2).kind == TO } ) 
+        LOOKAHEAD( { (getToken(2).kind == TO) ||
+                       ((getToken(2).kind == LEFT_PAREN) && 
+                        (getToken(5).kind == TO)) } )
         typeId = intervalStartField(precAndScale) <TO>
         otherId = intervalEndField(precAndScale)
         {
