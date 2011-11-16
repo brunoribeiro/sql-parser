@@ -10574,6 +10574,9 @@ intervalLiteral() throws StandardException :
         intervalType = mysqlIntervalQualifier(factors)
     )
     {
+        value = (ValueNode)nodeFactory.getNode(NodeTypes.CAST_NODE,
+                                               value, intervalType,    
+                                               parserContext);
         if (factors[0] != 1)
             value = (ValueNode)nodeFactory.getNode(NodeTypes.BINARY_TIMES_OPERATOR_NODE,
                                                    value,
@@ -10584,14 +10587,10 @@ intervalLiteral() throws StandardException :
         if (factors[1] != 1)
             value = (ValueNode)nodeFactory.getNode(NodeTypes.BINARY_DIVIDE_OPERATOR_NODE,
                                                    value,
-                                                   // TODO: Floating point?
                                                    nodeFactory.getNode(NodeTypes.INT_CONSTANT_NODE,
                                                                        Integer.valueOf(factors[1]),
                                                                        parserContext),
                                                    parserContext);
-        value = (ValueNode)nodeFactory.getNode(NodeTypes.CAST_NODE,
-                                               value, intervalType,    
-                                               parserContext);
         return value;
     }
 }
