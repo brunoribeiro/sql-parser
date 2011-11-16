@@ -10482,7 +10482,9 @@ dateTimeLiteral() throws StandardException :
         return constantNode;
     }
 |
-    LOOKAHEAD( { isDATETIME(getToken(1).kind) } )
+    // This LOOKAHEAD is needed because DATE, etc. are also function names that do
+    // the same thing, but with an arbitrary expression.
+    LOOKAHEAD( { isDATETIME(getToken(1).kind) && getToken(2).kind == STRING } )
     typeDescriptor = datetimeType()
     constantNode = stringLiteral()
     {
@@ -10559,12 +10561,12 @@ bareTimestampLiteral() throws StandardException :
 ValueNode
 intervalLiteral() throws StandardException :
 {
-    ValueNode expr;
+    ValueNode value;
     DataTypeDescriptor intervalType;
     int[] factors = new int[] { 1, 1 };
 }
 {
-    <INTERVAL> expr = valueExpression() 
+    <INTERVAL> value = valueExpression() 
     (
         intervalType = intervalQualifier()
     |
@@ -10572,24 +10574,24 @@ intervalLiteral() throws StandardException :
         intervalType = mysqlIntervalQualifier(factors)
     )
     {
-        ValueNode value = (ValueNode)nodeFactory.getNode(NodeTypes.CAST_NODE,
-                                                         expr, intervalType,    
-                                                         parserContext);
         if (factors[0] != 1)
             value = (ValueNode)nodeFactory.getNode(NodeTypes.BINARY_TIMES_OPERATOR_NODE,
-                                                   expr,
+                                                   value,
                                                    nodeFactory.getNode(NodeTypes.INT_CONSTANT_NODE,
                                                                        Integer.valueOf(factors[0]),
                                                                        parserContext),
                                                    parserContext);
         if (factors[1] != 1)
             value = (ValueNode)nodeFactory.getNode(NodeTypes.BINARY_DIVIDE_OPERATOR_NODE,
-                                                   expr,
+                                                   value,
                                                    // TODO: Floating point?
                                                    nodeFactory.getNode(NodeTypes.INT_CONSTANT_NODE,
                                                                        Integer.valueOf(factors[1]),
                                                                        parserContext),
                                                    parserContext);
+        value = (ValueNode)nodeFactory.getNode(NodeTypes.CAST_NODE,
+                                               value, intervalType,    
+                                               parserContext);
         return value;
     }
 }
