@@ -974,6 +974,7 @@ class SQLGrammar
         case NCLOB:
         case BINARY: // LARGE OBJECT
         case XML:
+        case INTERVAL:
             retval = true;
             break;
 
@@ -4205,7 +4206,9 @@ intervalEndField(int[] precAndScale) throws StandardException :
 }
 {
     typeId = intervalNonSecond()
-    { return typeId; }
+    { 
+        return typeId;
+    }
 |
     <SECOND>
     [ <LEFT_PAREN> scale = <EXACT_NUMERIC> <RIGHT_PAREN>
@@ -4223,7 +4226,11 @@ intervalSingleField(int[] precAndScale) throws StandardException :
 }
 {
     typeId = intervalNonSecond()
-    { return typeId; }
+    [ <LEFT_PAREN> prec = <EXACT_NUMERIC> <RIGHT_PAREN>
+      { precAndScale[0] = Integer.parseInt(prec.image); } ]
+    { 
+        return typeId;
+    }
 |
     <SECOND>
     [ <LEFT_PAREN> prec = <EXACT_NUMERIC> 
@@ -5934,13 +5941,6 @@ valueExpressionPrimary() throws StandardException :
         LOOKAHEAD( { getToken(1).kind == SELECT || getToken(1).kind == VALUES } )
         value = subquery(SubqueryNode.SubqueryType.EXPRESSION, null)
     |
-        // TODO: *** what is this comment about? There isn't any such production.
-        /*
-        ** NOTE: The optional intervalQualfier() here makes sense only for
-        ** the MINUS operator.  We will have to add a semantic check that the
-        ** valueExpression() here is a MINUS operator if the intervalQualifier
-        ** is supplied.
-        */
         value = valueExpression()
     )
     <RIGHT_PAREN>
@@ -10323,17 +10323,11 @@ literal() throws StandardException :
                                               "true".equalsIgnoreCase(tok.image) ? Boolean.TRUE : Boolean.FALSE,
                                               parserContext);
     }
-/*
-    JDBC and ODBC do not support the interval type, so let's not do it
-    ourselves for now.
 |
-    tok = <INTERVAL_LITERAL>
+    constantNode = intervalLiteral()
     {
-        return nodeFactory.getIntervalNode(tok.image,
-                                           getTypeCompilationFactory(),
-                                           parserContext);
+        return constantNode;
     }
-*/
 }
 
 NumericConstantNode
@@ -10499,6 +10493,22 @@ bareTimestampLiteral() throws StandardException :
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.USERTYPE_CONSTANT_NODE,
                                               Timestamp.valueOf(timestampString),
+                                              parserContext);
+    }
+}
+
+ValueNode
+intervalLiteral() throws StandardException :
+{
+    ValueNode expr;
+    DataTypeDescriptor intervalType;
+}
+{
+    <INTERVAL> expr = valueExpression() 
+    intervalType = intervalQualifier()
+    {
+        return (ValueNode)nodeFactory.getNode(NodeTypes.CAST_NODE,
+                                              expr, intervalType,    
                                               parserContext);
     }
 }
@@ -12855,6 +12865,7 @@ reservedKeyword() :
 | tok = <INT>
 | tok = <INTEGER>
 | tok = <INTERSECT>
+| tok = <INTERVAL>
 | tok = <INTO>
 | tok = <IS>
 | tok = <ISOLATION>
@@ -13035,8 +13046,6 @@ nonReservedKeyword() :
 | tok = <INDEX>
 | tok = <INITIAL>
 | tok = <INPLACE>
-// SQL92 says INTERVAL is reserved, but we want it to be non-reserved.
-| tok = <INTERVAL>
 | tok = <JAVA>
 | tok = <LANGUAGE>
 | tok = <LARGE>

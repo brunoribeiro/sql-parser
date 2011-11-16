@@ -1013,6 +1013,32 @@ public final class DataTypeDescriptor
             sbuf.append(getScale());
             sbuf.append(")");
         }
+        else if (typeId.isIntervalTypeId()) {
+            if (typeId == TypeId.INTERVAL_SECOND_ID) {
+                if (getPrecision() > 0) {
+                    sbuf.append("(");
+                    sbuf.append(getPrecision());
+                    if (getScale() > 0) {
+                        sbuf.append(", ");
+                        sbuf.append(getScale());
+                    }
+                    sbuf.append(")");
+                }
+            }
+            else {
+                if (getPrecision() > 0) {
+                    int idx = sbuf.indexOf(" ", 9);
+                    sbuf.insert(idx, ")");
+                    sbuf.insert(idx, getPrecision());
+                    sbuf.insert(idx, "(");
+                }
+                if (getScale() > 0) {
+                    sbuf.append("(");
+                    sbuf.append(getScale());
+                    sbuf.append(")");
+                }
+            }
+        }
         else if (typeId.variableLength()) {
             sbuf.append("(");
             sbuf.append(getMaximumWidth());

@@ -1702,7 +1702,7 @@ public class TypeId
         return startField;
     }
 
-    public boolean isInterval() {
+    public boolean isIntervalTypeId() {
         return isIntervalTypeId;
     }
 
