@@ -1492,6 +1492,30 @@ class SQLGrammar
             getToken(1).kind == STRAIGHT_JOIN;
     }
 
+    boolean mysqlIntervalFollows() {
+        if (!hasFeature(SQLParserFeature.MYSQL_INTERVAL))
+            return false;
+        switch (getToken(1).kind) {
+        case MICROSECOND:
+        case WEEK:
+        case QUARTER:
+        case SECOND_MICROSECOND:
+        case MINUTE_MICROSECOND:
+        case MINUTE_SECOND:
+        case HOUR_MICROSECOND:
+        case HOUR_SECOND:
+        case HOUR_MINUTE:
+        case DAY_MICROSECOND:
+        case DAY_SECOND:
+        case DAY_MINUTE:
+        case DAY_HOUR:
+        case YEAR_MONTH:
+            return true;
+        default:
+            return false;
+        }
+    }
+
     void setParserContext(SQLParserContext parserContext) {
         this.parserContext = parserContext;
         this.nodeFactory = parserContext.getNodeFactory();
@@ -2133,9 +2157,13 @@ TOKEN [IGNORE_CASE] :
 | <CONTENT: "content">
 | <CS: "cs">
 | <CURSORS: "cursors">
+| <DAY_HOUR: "day_hour">
+| <DAY_MICROSECOND: "day_microsecond">
+| <DAY_MINUTE: "day_minute">
+| <DAY_SECOND: "day_second">
 | <DB2SQL: "db2sql">
-| <DERBY_JDBC_RESULT_SET: "derby_jdbc_result_set">
 | <DEFRAGMENT: "defragment">
+| <DERBY_JDBC_RESULT_SET: "derby_jdbc_result_set">
 | <DIRTY: "dirty">
 | <DOCUMENT: "document">
 | <EACH: "each">
@@ -2143,6 +2171,9 @@ TOKEN [IGNORE_CASE] :
 | <EXCLUSIVE: "exclusive">
 | <FN: "fn">
 | <FORCE: "force">
+| <HOUR_MICROSECOND: "hour_microsecond">
+| <HOUR_MINUTE: "hour_minute">
+| <HOUR_SECOND: "hour_second">
 | <IGNORE: "ignore">
 | <INDEX: "index">
 | <INPLACE: "inplace">
@@ -2152,12 +2183,15 @@ TOKEN [IGNORE_CASE] :
 | <LOCK: "lock">
 | <MESSAGE_LOCALE: "message_locale">
 | <METHOD: "method">
+| <MICROSECOND: "microsecond">
+| <MINUTE_MICROSECOND: "minute_microsecond">
+| <MINUTE_SECOND: "minute_second">
 | <MODE: "mode">
 | <NEW: "new">
 | <NEW_TABLE: "new_table">
 | <NVARCHAR: "nvarchar"> 
-| <OJ: "oj">
 | <OFF: "off">
+| <OJ: "oj">
 | <OLD: "old">
 | <OLD_TABLE: "old_table">
 | <OUT: "out">
@@ -2165,6 +2199,7 @@ TOKEN [IGNORE_CASE] :
 | <PASSING: "passing">
 | <PROPERTIES: "properties">
 | <PURGE: "purge">
+| <QUARTER: "quarter">
 | <READS: "reads">
 | <REF: "ref">
 | <REFERENCING: "referencing">
@@ -2175,24 +2210,27 @@ TOKEN [IGNORE_CASE] :
 | <RETURNING: "returning">
 | <RR: "rr">
 | <RS: "rs">
-| <STATISTICS: "statistics">
+| <SECOND_MICROSECOND: "second_microsecond">
 | <SEQUENCE: "sequence">
 | <SEQUENTIAL: "sequential">
 | <SETS: "sets">
 | <SHARE: "share">
-| <SQLID: "sqlid">
 | <SPECIFIC: "specific">
+| <SQLID: "sqlid">
 | <SQRT: "sqrt">
 | <STABILITY: "stability">
+| <STATISTICS: "statistics">
 | <STRIP: "strip">
 | <STYLE: "style">
 | <TRIGGER: "trigger">
 | <TRUNCATE_END: "truncate_end">
 | <UCASE: "ucase">
 | <UNSIGNED: "unsigned">
-| <USE: "use">
 | <UR: "ur">
+| <USE: "use">
+| <WEEK: "week">
 | <WHITESPACE: "whitespace">
+| <YEAR_MONTH: "year_month">
 }
 
 TOKEN :
@@ -10504,14 +10542,128 @@ intervalLiteral() throws StandardException :
 {
     ValueNode expr;
     DataTypeDescriptor intervalType;
+    int[] factors = new int[] { 1, 1 };
 }
 {
     <INTERVAL> expr = valueExpression() 
-    intervalType = intervalQualifier()
+    (
+        intervalType = intervalQualifier()
+    |
+        LOOKAHEAD( { mysqlIntervalFollows() } )
+        intervalType = mysqlIntervalQualifier(factors)
+    )
     {
-        return (ValueNode)nodeFactory.getNode(NodeTypes.CAST_NODE,
-                                              expr, intervalType,    
-                                              parserContext);
+        ValueNode value = (ValueNode)nodeFactory.getNode(NodeTypes.CAST_NODE,
+                                                         expr, intervalType,    
+                                                         parserContext);
+        if (factors[0] != 1)
+            value = (ValueNode)nodeFactory.getNode(NodeTypes.BINARY_TIMES_OPERATOR_NODE,
+                                                   expr,
+                                                   nodeFactory.getNode(NodeTypes.INT_CONSTANT_NODE,
+                                                                       Integer.valueOf(factors[0]),
+                                                                       parserContext),
+                                                   parserContext);
+        if (factors[1] != 1)
+            value = (ValueNode)nodeFactory.getNode(NodeTypes.BINARY_DIVIDE_OPERATOR_NODE,
+                                                   expr,
+                                                   // TODO: Floating point?
+                                                   nodeFactory.getNode(NodeTypes.INT_CONSTANT_NODE,
+                                                                       Integer.valueOf(factors[1]),
+                                                                       parserContext),
+                                                   parserContext);
+        return value;
+    }
+}
+
+DataTypeDescriptor
+mysqlIntervalQualifier(int[] factors) throws StandardException :
+{
+    TypeId typeId;
+    int prec = 0, scale = 0;
+}
+{
+(
+    <MICROSECOND>
+    {
+        typeId = TypeId.INTERVAL_SECOND_ID;
+        scale = 6;
+        factors[1] = 1000;
+    }
+|
+    <WEEK>
+    {
+        typeId = TypeId.INTERVAL_DAY_ID;
+        factors[0] = 7;
+    }
+|
+    <QUARTER>
+    {
+        typeId = TypeId.INTERVAL_MONTH_ID;
+        factors[0] = 4;
+    }
+|
+    <SECOND_MICROSECOND>
+    {
+        typeId = TypeId.INTERVAL_SECOND_ID;
+        scale = 6;
+    }
+|
+    <MINUTE_MICROSECOND>
+    {
+        typeId = TypeId.INTERVAL_MINUTE_SECOND_ID;
+        scale = 6;
+    }
+|
+    <MINUTE_SECOND>
+    {
+        typeId = TypeId.INTERVAL_MINUTE_SECOND_ID;
+    }
+|
+    <HOUR_MICROSECOND>
+    {
+        typeId = TypeId.INTERVAL_HOUR_SECOND_ID;
+        scale = 6;
+    }
+|
+    <HOUR_SECOND>
+    {
+        typeId = TypeId.INTERVAL_HOUR_SECOND_ID;
+    }
+|
+    <HOUR_MINUTE>
+    {
+        typeId = TypeId.INTERVAL_HOUR_MINUTE_ID;
+    }
+|
+    <DAY_MICROSECOND>
+    {
+        typeId = TypeId.INTERVAL_DAY_SECOND_ID;
+        scale = 6;
+    }
+|
+    <DAY_SECOND>
+    {
+        typeId = TypeId.INTERVAL_DAY_SECOND_ID;
+    }
+|
+    <DAY_MINUTE>
+    {
+        typeId = TypeId.INTERVAL_DAY_MINUTE_ID;
+    }
+|
+    <DAY_HOUR>
+    {
+        typeId = TypeId.INTERVAL_DAY_HOUR_ID;
+    }
+|
+    <YEAR_MONTH>
+    {
+        typeId = TypeId.INTERVAL_YEAR_MONTH_ID;
+    }
+)
+    {
+        return new DataTypeDescriptor(typeId, prec, scale,
+                                      true, DataTypeDescriptor.intervalMaxWidth(typeId, prec, scale));
     }
 }
 
@@ -13028,6 +13180,10 @@ nonReservedKeyword() :
 | tok = <DATA>
 | tok = <DATE>
 | tok = <DAY>
+| tok = <DAY_HOUR>
+| tok = <DAY_MICROSECOND>
+| tok = <DAY_MINUTE>
+| tok = <DAY_SECOND>
 | tok = <DEFRAGMENT>
 | tok = <DIRTY>
 | tok = <DYNAMIC>
@@ -13042,6 +13198,9 @@ nonReservedKeyword() :
 | tok = <FORCE>
 | tok = <FORTRAN>
 | tok = <GENERATED>
+| tok = <HOUR_MICROSECOND>
+| tok = <HOUR_MINUTE>
+| tok = <HOUR_SECOND>
 | tok = <IDENTITY_VAL_LOCAL>
 | tok = <IGNORE>
 | tok = <INCREMENT>
@@ -13062,6 +13221,9 @@ nonReservedKeyword() :
 | tok = <LONG>
 | tok = <MESSAGE_LOCALE>
 | tok = <METHOD>
+| tok = <MICROSECOND>
+| tok = <MINUTE_MICROSECOND>
+| tok = <MINUTE_SECOND>
 | tok = <MOD>
 | tok = <MODE>
 | tok = <MODIFIES>
@@ -13092,6 +13254,7 @@ nonReservedKeyword() :
 | tok = <PRECISION>
 | tok = <PROPERTIES>
 | tok = <PURGE>
+| tok = <QUARTER>
 | tok = <READS>
 | tok = <REF>
 // SQL92 says RELEASE is reserved, but we want it to be non-reserved.
@@ -13114,6 +13277,7 @@ nonReservedKeyword() :
 | tok = <RS>
 | tok = <SCALE>
 | tok = <SAVEPOINT>
+| tok = <SECOND_MICROSECOND>
 | tok = <SECURITY>
 | tok = <SEQUENCE>
 | tok = <SEQUENTIAL>
@@ -13160,8 +13324,10 @@ nonReservedKeyword() :
 | tok = <VALUE>
 | tok = <VARBINARY>
 | tok = <PARAMETER>
+| tok = <WEEK>
 | tok = <WHEN>
 | tok = <WHITESPACE>
+| tok = <YEAR_MONTH>
 )
     {
         // Remember last identifier token and whether it was delimited.
