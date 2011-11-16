@@ -3553,6 +3553,8 @@ dataTypeCommon() throws StandardException :
 |
     typeDescriptor = datetimeType()
 |
+    typeDescriptor = intervalType()
+|
     <BOOLEAN>
     {
         typeDescriptor = new DataTypeDescriptor(TypeId.BOOLEAN_ID, true);
@@ -4191,7 +4193,14 @@ datetimeType() throws StandardException :
         // TODO; Ditto
         return DataTypeDescriptor.getBuiltInDataTypeDescriptor(Types.TIMESTAMP);
     }
-|
+}
+
+DataTypeDescriptor
+intervalType() throws StandardException :
+{
+    DataTypeDescriptor typeDescriptor;
+}
+{
     <INTERVAL> typeDescriptor = intervalQualifier()
     {
         return typeDescriptor;
@@ -10460,6 +10469,7 @@ ValueNode
 dateTimeLiteral() throws StandardException :
 {
     ValueNode constantNode;
+    DataTypeDescriptor typeDescriptor;
 }
 {
 // RESOLVE: There is an incompatibility between Derby and DB2 here. The DB2 SQL parser does not recognize
@@ -10470,6 +10480,15 @@ dateTimeLiteral() throws StandardException :
     ( <LEFT_BRACE> constantNode = escapedDateTimeLiteral() <RIGHT_BRACE> )
     {
         return constantNode;
+    }
+|
+    LOOKAHEAD( { isDATETIME(getToken(1).kind) } )
+    typeDescriptor = datetimeType()
+    constantNode = stringLiteral()
+    {
+        return (ValueNode)nodeFactory.getNode(NodeTypes.CAST_NODE,
+                                              constantNode, typeDescriptor,
+                                              parserContext);
     }
 }
 
