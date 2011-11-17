@@ -6473,12 +6473,10 @@ dateTimeScalarFunction() throws StandardException :
          */
     <TIME> <LEFT_PAREN> value = additiveExpression() <RIGHT_PAREN>
     {
-        ValueNode castValue = (ValueNode)nodeFactory.getNode(NodeTypes.CAST_NODE,
-                                                             value,
-                                                             DataTypeDescriptor.getBuiltInDataTypeDescriptor( Types.TIME),
-                                                             parserContext);
-        ((CastNode)castValue).setForExternallyGeneratedCASTnode();
-        return castValue;
+        return (ValueNode)nodeFactory.getNode(NodeTypes.UNARY_DATE_TIMESTAMP_OPERATOR_NODE,
+                                              value,
+                                              DataTypeDescriptor.getBuiltInDataTypeDescriptor( Types.TIME),
+                                              parserContext);
     }
 |
     <DATE> <LEFT_PAREN> value = additiveExpression() <RIGHT_PAREN>
