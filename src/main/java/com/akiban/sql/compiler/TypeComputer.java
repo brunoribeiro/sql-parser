@@ -447,9 +447,21 @@ public class TypeComputer implements Visitor
             else
                 result = result.getDominantType(node.getType());
         }
-        for (ValueNode node : nodeList) {
-            if (node.isParameterNode())
-                node.setType(result.getNullabilityType(true));
+        if (result != null) {
+            for (int i = 0; i < nodeList.size(); i++) {
+                ValueNode node = nodeList.get(i);
+                if (node.isParameterNode())
+                    node.setType(result.getNullabilityType(true));
+                else if ((node.getType() != null) &&
+                         (node.getType().getTypeId() != result.getTypeId())) {
+                    node = (ValueNode)node.getNodeFactory()
+                        .getNode(NodeTypes.CAST_NODE, 
+                                 node,
+                                 result.getNullabilityType(node.getType().isNullable()),
+                                 node.getParserContext());
+                    nodeList.set(i, node);
+                }
+            }
         }
         return result;
     }
