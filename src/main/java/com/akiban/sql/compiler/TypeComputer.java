@@ -452,8 +452,7 @@ public class TypeComputer implements Visitor
                 ValueNode node = nodeList.get(i);
                 if (node.isParameterNode())
                     node.setType(result.getNullabilityType(true));
-                else if ((node.getType() != null) &&
-                         (node.getType().getTypeId() != result.getTypeId())) {
+                else if (addDominantCast(result, node.getType())) {
                     node = (ValueNode)node.getNodeFactory()
                         .getNode(NodeTypes.CAST_NODE, 
                                  node,
@@ -464,6 +463,14 @@ public class TypeComputer implements Visitor
             }
         }
         return result;
+    }
+
+    protected boolean addDominantCast(DataTypeDescriptor toType,
+                                      DataTypeDescriptor fromType) {
+        if (fromType == null) return false;
+        if (toType.getTypeId().isStringTypeId())
+            return !fromType.getTypeId().isStringTypeId();
+        return fromType.getTypeId() != toType.getTypeId();
     }
 
     protected void selectNode(SelectNode node) throws StandardException {
