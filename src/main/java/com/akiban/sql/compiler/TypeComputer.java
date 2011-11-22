@@ -132,6 +132,14 @@ public class TypeComputer implements Visitor
         ValueNode rightOperand = node.getRightOperand();
         DataTypeDescriptor leftType = leftOperand.getType();
         DataTypeDescriptor rightType = rightOperand.getType();
+        if (leftOperand.isParameterNode() && (rightType != null)) {
+            leftType = rightType.getNullabilityType(true);
+            leftOperand.setType(leftType);
+        }
+        else if (rightOperand.isParameterNode() && (leftType != null)) {
+            rightType = leftType.getNullabilityType(true);
+            rightOperand.setType(rightType);
+        }
         TypeId leftTypeId = leftType.getTypeId();
         TypeId rightTypeId = rightType.getTypeId();
 
@@ -403,6 +411,10 @@ public class TypeComputer implements Visitor
                          node.getParserContext());
             node.setLeftOperand(leftOperand);
         }
+        else if (leftOperand.isParameterNode()) {
+            leftType = new DataTypeDescriptor(TypeId.VARCHAR_ID, true);
+            leftOperand.setType(leftType);
+        }
         if ((rightType != null) &&
             !rightType.getTypeId().isStringTypeId()) {
             rightType = new DataTypeDescriptor(TypeId.VARCHAR_ID,
@@ -413,6 +425,10 @@ public class TypeComputer implements Visitor
                          rightOperand, rightType, 
                          node.getParserContext());
             node.setRightOperand(rightOperand);
+        }
+        else if (rightOperand.isParameterNode()) {
+            rightType = new DataTypeDescriptor(TypeId.VARCHAR_ID, true);
+            rightOperand.setType(rightType);
         }
         if ((leftType == null) || (rightType == null))
             return null;
@@ -430,6 +446,10 @@ public class TypeComputer implements Visitor
                 result = node.getType();
             else
                 result = result.getDominantType(node.getType());
+        }
+        for (ValueNode node : nodeList) {
+            if (node.isParameterNode())
+                node.setType(result.getNullabilityType(true));
         }
         return result;
     }
