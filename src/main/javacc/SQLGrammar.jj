@@ -11500,13 +11500,14 @@ StatementNode
 dropSchemaStatement() throws StandardException :
 {
     String schemaName;
+    int[] behavior = new int[1];
 }
 {
-    <SCHEMA> schemaName = identifier() <RESTRICT>
+    <SCHEMA> schemaName = identifier() dropBehavior(behavior)
     {
         StatementNode stmt = (StatementNode)nodeFactory.getNode(NodeTypes.DROP_SCHEMA_NODE,
                                                                 schemaName,
-                                                                new Integer(StatementType.DROP_RESTRICT),
+                                                                new Integer(behavior[0]),
                                                                 parserContext);
 
         return stmt;
@@ -11741,7 +11742,7 @@ dropColumnDefinition(int []behavior) throws StandardException :
 }
 {
     [ <COLUMN> ] columnName = identifier()
-    dropColumnReferentialAction(behavior)
+    dropBehavior(behavior)
     {
         return (TableElementNode)nodeFactory.getNode(NodeTypes.DROP_COLUMN_NODE,
                                                      columnName, null,
@@ -11750,9 +11751,9 @@ dropColumnDefinition(int []behavior) throws StandardException :
     }
 }
 void
-dropColumnReferentialAction(int[] behavior) :
+dropBehavior(int[] behavior) :
 {
-    int refBehavior = StatementType.DROP_CASCADE;
+    int refBehavior = StatementType.DROP_DEFAULT;
 }
 {
     [ 
@@ -11964,14 +11965,14 @@ StatementNode
 dropTableStatement() throws StandardException :
 {
     TableName tableName;
+    int[] behavior = new int[1];
 }
 {
-    <TABLE> tableName = qualifiedName() 
+    <TABLE> tableName = qualifiedName() dropBehavior(behavior)
     {
-        // DB2 does not support a drop behaviour
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_TABLE_NODE,
                                                   tableName,
-                                                  new Integer(StatementType.DROP_DEFAULT),
+                                                  new Integer(behavior[0]),
                                                   parserContext);
     }
 }
