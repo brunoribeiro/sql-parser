@@ -470,7 +470,7 @@ public class TypeComputer implements Visitor
         if (fromType == null) return false;
         if (toType.getTypeId().isStringTypeId())
             return !fromType.getTypeId().isStringTypeId();
-        return fromType.getTypeId() != toType.getTypeId();
+        return !fromType.getTypeId().equals(toType.getTypeId());
     }
 
     protected void selectNode(SelectNode node) throws StandardException {
