@@ -56,7 +56,7 @@ public class TimestampOperatorNode extends BinaryOperatorNode
         leftOperand = (ValueNode)date;
         rightOperand = (ValueNode)time;
         operator = "timestamp";
-        methodName = "getTimestamp";
+        methodName = "timestamp";
     }
 
 }

@@ -48,12 +48,12 @@ import com.akiban.sql.StandardException;
 public class ExtractOperatorNode extends UnaryOperatorNode 
 {
     public static enum Field {
-        YEAR("YEAR", "getYear"),
-        MONTH("MONTH", "getMonth"),
-        DAY("DAY", "getDate"),
-        HOUR("HOUR", "getHours"),
-        MINUTE("MINUTE", "getMinutes"),
-        SECOND("SECOND", "getSeconds");
+        YEAR("YEAR", "year"),
+        MONTH("MONTH", "month"),
+        DAY("DAY", "day"),
+        HOUR("HOUR", "hour"),
+        MINUTE("MINUTE", "minute"),
+        SECOND("SECOND", "second");
 
         String fieldName, fieldMethod;
 
