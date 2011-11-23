@@ -4512,7 +4512,7 @@ derivedColumn(ResultColumnList resultColumns) throws StandardException :
     String columnName = null;
 }
 {
-    columnExpression = orExpression(null)
+    columnExpression = valueExpression()
     [ columnName = asClause() ]
     { 
         /* If there is no AS clause, and the expression is a simple
@@ -4548,6 +4548,11 @@ valueExpression() throws StandardException :
 {
     leftOperand = orExpression(null)
     ( <OR> leftOperand = orExpression(leftOperand) )*
+    {
+        return leftOperand;
+    }
+|
+    leftOperand = nullSpecification()
     {
         return leftOperand;
     }
@@ -5169,12 +5174,7 @@ methodParameter(List<ValueNode> parameterList) throws StandardException :
     ValueNode parameter;
 }
 {
-    parameter = orExpression(null)
-    {
-        parameterList.add(parameter);
-    }
-|
-    parameter = nullSpecification()
+    parameter = valueExpression()
     {
         parameterList.add(parameter);
     }
