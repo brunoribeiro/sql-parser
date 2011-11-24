@@ -132,6 +132,14 @@ public class TypeComputer implements Visitor
         ValueNode rightOperand = node.getRightOperand();
         DataTypeDescriptor leftType = leftOperand.getType();
         DataTypeDescriptor rightType = rightOperand.getType();
+        if (leftOperand.isParameterNode() && (rightType != null)) {
+            leftType = rightType.getNullabilityType(true);
+            leftOperand.setType(leftType);
+        }
+        else if (rightOperand.isParameterNode() && (leftType != null)) {
+            rightType = leftType.getNullabilityType(true);
+            rightOperand.setType(rightType);
+        }
         TypeId leftTypeId = leftType.getTypeId();
         TypeId rightTypeId = rightType.getTypeId();
 
@@ -403,6 +411,10 @@ public class TypeComputer implements Visitor
                          node.getParserContext());
             node.setLeftOperand(leftOperand);
         }
+        else if (leftOperand.isParameterNode()) {
+            leftType = new DataTypeDescriptor(TypeId.VARCHAR_ID, true);
+            leftOperand.setType(leftType);
+        }
         if ((rightType != null) &&
             !rightType.getTypeId().isStringTypeId()) {
             rightType = new DataTypeDescriptor(TypeId.VARCHAR_ID,
@@ -413,6 +425,10 @@ public class TypeComputer implements Visitor
                          rightOperand, rightType, 
                          node.getParserContext());
             node.setRightOperand(rightOperand);
+        }
+        else if (rightOperand.isParameterNode()) {
+            rightType = new DataTypeDescriptor(TypeId.VARCHAR_ID, true);
+            rightOperand.setType(rightType);
         }
         if ((leftType == null) || (rightType == null))
             return null;
@@ -431,7 +447,30 @@ public class TypeComputer implements Visitor
             else
                 result = result.getDominantType(node.getType());
         }
+        if (result != null) {
+            for (int i = 0; i < nodeList.size(); i++) {
+                ValueNode node = nodeList.get(i);
+                if (node.isParameterNode())
+                    node.setType(result.getNullabilityType(true));
+                else if (addDominantCast(result, node.getType())) {
+                    node = (ValueNode)node.getNodeFactory()
+                        .getNode(NodeTypes.CAST_NODE, 
+                                 node,
+                                 result.getNullabilityType(node.getType().isNullable()),
+                                 node.getParserContext());
+                    nodeList.set(i, node);
+                }
+            }
+        }
         return result;
+    }
+
+    protected boolean addDominantCast(DataTypeDescriptor toType,
+                                      DataTypeDescriptor fromType) {
+        if (fromType == null) return false;
+        if (toType.getTypeId().isStringTypeId())
+            return !fromType.getTypeId().isStringTypeId();
+        return !fromType.getTypeId().equals(toType.getTypeId());
     }
 
     protected void selectNode(SelectNode node) throws StandardException {
