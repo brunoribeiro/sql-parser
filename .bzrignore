@@ -10,3 +10,6 @@ SQLGrammarTokenManager.java
 Token.java
 TokenMgrError.java
 src/main/java/com/akiban/sql/parser/CharStream.java
+*.iml
+*.ipr
+*.iws

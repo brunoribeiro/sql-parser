@@ -74,6 +74,10 @@ public class DropTableNode extends DDLStatementNode
         this.dropBehavior = other.dropBehavior;
     }
 
+    public int getDropBehavior() {
+        return dropBehavior;
+    }
+
     /**
      * Convert this object to a String.  See comments in QueryTreeNode.java
      * for how this should be done for tree printing.

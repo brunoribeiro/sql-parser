@@ -15,6 +15,7 @@
 
 package com.akiban.sql;
 
+import org.junit.ComparisonFailure;
 import org.junit.Ignore;
 import static junit.framework.Assert.*;
 
@@ -216,8 +217,7 @@ public class TestBase
             throws IOException {
         if (!new CompareWithoutHashes(regex).match(new StringReader(expected), 
                                                    new StringReader(actual)))
-            fail("Difference in " + caseName + 
-                 ": expected='" + expected + "' actual='" + actual + "'");
+            throw new ComparisonFailure(caseName, expected, actual);
     }
 
 }

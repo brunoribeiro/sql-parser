@@ -4674,7 +4674,7 @@ derivedColumn(ResultColumnList resultColumns) throws StandardException :
     String columnName = null;
 }
 {
-    columnExpression = orExpression(null)
+    columnExpression = valueExpression()
     [ columnName = asClause() ]
     { 
         /* If there is no AS clause, and the expression is a simple
@@ -4710,6 +4710,11 @@ valueExpression() throws StandardException :
 {
     leftOperand = orExpression(null)
     ( <OR> leftOperand = orExpression(leftOperand) )*
+    {
+        return leftOperand;
+    }
+|
+    leftOperand = nullSpecification()
     {
         return leftOperand;
     }
@@ -5331,12 +5336,7 @@ methodParameter(List<ValueNode> parameterList) throws StandardException :
     ValueNode parameter;
 }
 {
-    parameter = orExpression(null)
-    {
-        parameterList.add(parameter);
-    }
-|
-    parameter = nullSpecification()
+    parameter = valueExpression()
     {
         parameterList.add(parameter);
     }
@@ -6628,12 +6628,10 @@ dateTimeScalarFunction() throws StandardException :
          */
     <TIME> <LEFT_PAREN> value = additiveExpression() <RIGHT_PAREN>
     {
-        ValueNode castValue = (ValueNode)nodeFactory.getNode(NodeTypes.CAST_NODE,
-                                                             value,
-                                                             DataTypeDescriptor.getBuiltInDataTypeDescriptor( Types.TIME),
-                                                             parserContext);
-        ((CastNode)castValue).setForExternallyGeneratedCASTnode();
-        return castValue;
+        return (ValueNode)nodeFactory.getNode(NodeTypes.UNARY_DATE_TIMESTAMP_OPERATOR_NODE,
+                                              value,
+                                              DataTypeDescriptor.getBuiltInDataTypeDescriptor( Types.TIME),
+                                              parserContext);
     }
 |
     <DATE> <LEFT_PAREN> value = additiveExpression() <RIGHT_PAREN>
@@ -11790,13 +11788,14 @@ StatementNode
 dropSchemaStatement() throws StandardException :
 {
     String schemaName;
+    int[] behavior = new int[1];
 }
 {
-    <SCHEMA> schemaName = identifier() <RESTRICT>
+    <SCHEMA> schemaName = identifier() dropBehavior(behavior)
     {
         StatementNode stmt = (StatementNode)nodeFactory.getNode(NodeTypes.DROP_SCHEMA_NODE,
                                                                 schemaName,
-                                                                new Integer(StatementType.DROP_RESTRICT),
+                                                                new Integer(behavior[0]),
                                                                 parserContext);
 
         return stmt;
@@ -12031,7 +12030,7 @@ dropColumnDefinition(int []behavior) throws StandardException :
 }
 {
     [ <COLUMN> ] columnName = identifier()
-    dropColumnReferentialAction(behavior)
+    dropBehavior(behavior)
     {
         return (TableElementNode)nodeFactory.getNode(NodeTypes.DROP_COLUMN_NODE,
                                                      columnName, null,
@@ -12040,9 +12039,9 @@ dropColumnDefinition(int []behavior) throws StandardException :
     }
 }
 void
-dropColumnReferentialAction(int[] behavior) :
+dropBehavior(int[] behavior) :
 {
-    int refBehavior = StatementType.DROP_CASCADE;
+    int refBehavior = StatementType.DROP_DEFAULT;
 }
 {
     [ 
@@ -12254,14 +12253,14 @@ StatementNode
 dropTableStatement() throws StandardException :
 {
     TableName tableName;
+    int[] behavior = new int[1];
 }
 {
-    <TABLE> tableName = qualifiedName() 
+    <TABLE> tableName = qualifiedName() dropBehavior(behavior)
     {
-        // DB2 does not support a drop behaviour
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_TABLE_NODE,
                                                   tableName,
-                                                  new Integer(StatementType.DROP_DEFAULT),
+                                                  new Integer(behavior[0]),
                                                   parserContext);
     }
 }

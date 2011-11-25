@@ -51,8 +51,9 @@ import java.sql.Types;
  */
 public class UnaryDateTimestampOperatorNode extends UnaryOperatorNode
 {
-    private static final String TIMESTAMP_METHOD_NAME = "getTimestamp";
-    private static final String DATE_METHOD_NAME = "getDate";
+    private static final String DATE_METHOD_NAME = "date";
+    private static final String TIME_METHOD_NAME = "time";
+    private static final String TIMESTAMP_METHOD_NAME = "timestamp";
         
     /**
      * @param operand The operand of the function
@@ -66,6 +67,10 @@ public class UnaryDateTimestampOperatorNode extends UnaryOperatorNode
         switch(getType().getJDBCTypeId()) {
         case Types.DATE:
             super.init(operand, "date", DATE_METHOD_NAME);
+            break;
+
+        case Types.TIME:
+            super.init(operand, "time", TIME_METHOD_NAME);
             break;
 
         case Types.TIMESTAMP:
