@@ -128,6 +128,8 @@ public class NodeToString
             return isNullNode((IsNullNode)node);
         case NodeTypes.IS_NODE:
             return isNode((IsNode)node);
+        case NodeTypes.UNARY_DATE_TIMESTAMP_OPERATOR_NODE:
+          return unaryDateTimestampOperatorNode((UnaryDateTimestampOperatorNode)node);
         case NodeTypes.LIKE_OPERATOR_NODE:
             return likeEscapeOperatorNode((LikeEscapeOperatorNode)node);
         case NodeTypes.IN_LIST_OPERATOR_NODE:
@@ -605,6 +607,11 @@ public class NodeToString
         return suffixUnary(node);
     }
 
+    protected String unaryDateTimestampOperatorNode(UnaryDateTimestampOperatorNode node) 
+            throws StandardException {
+        return functionUnary(node);
+    }
+
     protected String isNode(IsNode node) throws StandardException {
         StringBuilder str = new StringBuilder(maybeParens(node.getLeftOperand()));
         str.append(" IS ");
@@ -703,6 +710,11 @@ public class NodeToString
     protected String suffixUnary(UnaryOperatorNode node) throws StandardException {
         return maybeParens(node.getOperand()) + " " +
             node.getOperator().toUpperCase();
+    }
+
+    protected String functionUnary(UnaryOperatorNode node) throws StandardException {
+        return node.getOperator().toUpperCase() + "(" +
+            toString(node.getOperand()) + ")";
     }
 
     protected String infixBinary(BinaryOperatorNode node) throws StandardException {

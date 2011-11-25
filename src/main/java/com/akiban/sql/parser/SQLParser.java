@@ -248,6 +248,7 @@ public class SQLParser implements SQLParserContext {
         case GROUPING:
         case UNSIGNED:
         case MYSQL_HINTS:
+        case MYSQL_INTERVAL:
             return true;
         default:
             return false;
