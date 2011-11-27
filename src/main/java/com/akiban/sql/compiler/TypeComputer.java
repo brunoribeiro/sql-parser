@@ -140,6 +140,8 @@ public class TypeComputer implements Visitor
             rightType = leftType.getNullabilityType(true);
             rightOperand.setType(rightType);
         }
+        if ((leftType == null) || (rightType == null))
+            return null;
         TypeId leftTypeId = leftType.getTypeId();
         TypeId rightTypeId = rightType.getTypeId();
 
