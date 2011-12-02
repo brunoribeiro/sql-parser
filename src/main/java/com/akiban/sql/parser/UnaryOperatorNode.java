@@ -173,6 +173,10 @@ public class UnaryOperatorNode extends ValueNode
         return operand;
     }
 
+    public void setOperand(ValueNode operand) {
+        this.operand = operand;
+    }
+
     /**
      * Accept the visitor for all visitable children of this node.
      * 
