@@ -110,9 +110,13 @@ public abstract class TypeCompiler
                                                          DataTypeDescriptor rightType,
                                                          String operator)
             throws StandardException {
+        TypeId leftTypeId = leftType.getTypeId();
+        TypeId rightTypeId = rightType.getTypeId();
+        if (leftTypeId.equals(rightTypeId))
+            return leftType;
         throw new StandardException("Types not compatible for " + operator + 
-                                    ": " + leftType.getTypeId().getSQLTypeName() +
-                                    " and " + rightType.getTypeId().getSQLTypeName());
+                                    ": " + leftTypeId.getSQLTypeName() +
+                                    " and " + rightTypeId.getSQLTypeName());
     }
 
     /**
