@@ -639,9 +639,12 @@ public class NodeToString
 
     protected String likeEscapeOperatorNode(LikeEscapeOperatorNode node) 
             throws StandardException {
-        return maybeParens(node.getReceiver()) +
+        String like = maybeParens(node.getReceiver()) +
             " " + node.getOperator().toUpperCase() + " " +
             maybeParens(node.getLeftOperand());
+        if (node.getRightOperand() != null)
+            like += " ESCAPE " + maybeParens(node.getRightOperand());
+        return like;
     }
 
     protected String inListOperatorNode(InListOperatorNode node) throws StandardException {
