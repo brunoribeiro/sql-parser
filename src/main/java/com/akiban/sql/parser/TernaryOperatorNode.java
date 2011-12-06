@@ -231,6 +231,10 @@ public class TernaryOperatorNode extends ValueNode
         return receiver;
     }
 
+    public void setReceiver(ValueNode receiver) {
+        this.receiver = receiver;
+    }
+
     /**
      * Set the leftOperand to the specified ValueNode
      *
