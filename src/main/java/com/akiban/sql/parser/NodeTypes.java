@@ -69,7 +69,7 @@ public interface NodeTypes
     public static final int NOP_STATEMENT_NODE = 19;
     public static final int DB2_LENGTH_OPERATOR_NODE = 20;
     public static final int SET_TRANSACTION_ISOLATION_NODE = 21;
-    // 22 is available
+    public static final int SET_TRANSACTION_ACCESS_NODE = 22;
     public static final int CHAR_LENGTH_OPERATOR_NODE = 23;
     public static final int IS_NOT_NULL_NODE = 24;
     public static final int IS_NULL_NODE = 25;

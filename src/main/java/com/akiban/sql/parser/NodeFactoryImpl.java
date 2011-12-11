@@ -158,6 +158,9 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.NOP_STATEMENT_NODE:
             return NodeNames.NOP_STATEMENT_NODE_NAME;
 
+        case NodeTypes.SET_TRANSACTION_ACCESS_NODE:
+            return NodeNames.SET_TRANSACTION_ACCESS_NODE_NAME;
+
         case NodeTypes.SET_TRANSACTION_ISOLATION_NODE:
             return NodeNames.SET_TRANSACTION_ISOLATION_NODE_NAME;
 

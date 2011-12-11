@@ -41,26 +41,26 @@ package com.akiban.sql.parser;
 import com.akiban.sql.StandardException;
 
 /**
- * A SetTransactionIsolationNode is the root of a QueryTree that represents a SET
- * TRANSACTION ISOLATION command
+ * A SetTransactionAccessNode is the root of a QueryTree that represents a SET
+ * TRANSACTION READ ONLY / WRITE command
  *
  */
 
-public class SetTransactionIsolationNode extends TransactionStatementNode
+public class SetTransactionAccessNode extends TransactionStatementNode
 {
     private boolean current;
-    private IsolationLevel isolationLevel;
+    private AccessMode accessMode;
 
     /**
-     * Initializer for SetTransactionIsolationNode
+     * Initializer for SetTransactionAccessNode
      *
      * @param current Whether applies to current transaction or session default
      * @param isolationLevel The new isolation level
      */
     public void init(Object current,
-                     Object isolationLevel) {
+                     Object accessMode) {
         this.current = (Boolean)current;
-        this.isolationLevel = (IsolationLevel)isolationLevel;
+        this.accessMode = (AccessMode)accessMode;
     }
 
     /**
@@ -69,9 +69,9 @@ public class SetTransactionIsolationNode extends TransactionStatementNode
     public void copyFrom(QueryTreeNode node) throws StandardException {
         super.copyFrom(node);
 
-        SetTransactionIsolationNode other = (SetTransactionIsolationNode)node;
+        SetTransactionAccessNode other = (SetTransactionAccessNode)node;
         this.current = other.current;
-        this.isolationLevel = other.isolationLevel;
+        this.accessMode = other.accessMode;
     }
 
     /**
@@ -83,7 +83,7 @@ public class SetTransactionIsolationNode extends TransactionStatementNode
 
     public String toString() {
         return "current: " + current + "\n" +
-               "isolationLevel: " + isolationLevel + "\n" +
+               "accessMode: " + accessMode + "\n" +
             super.toString();
     }
 
@@ -91,15 +91,15 @@ public class SetTransactionIsolationNode extends TransactionStatementNode
         return current;
     }
 
-    public IsolationLevel getIsolationLevel() {
-        return isolationLevel;
+    public AccessMode getAccessMode() {
+        return accessMode;
     }
 
     public String statementToString() {
         if (current)
-            return "SET TRANSACTION ISOLATION";
+            return "SET TRANSACTION";
         else
-            return "SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION";
+            return "SET SESSION CHARACTERISTICS AS TRANSACTION";
     }
 
 }

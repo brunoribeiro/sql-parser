@@ -14,20 +14,18 @@
  */
 
 /**
- * Isolation levels.
+ * Transaction access modes.
+ *
  */
 
 package com.akiban.sql.parser;
 
-public enum IsolationLevel {
-    UNSPECIFIED_ISOLATION_LEVEL("UNSPECIFIED"),
-    READ_UNCOMMITTED_ISOLATION_LEVEL("READ UNCOMMITTED"),
-    READ_COMMITTED_ISOLATION_LEVEL("READ COMMITTED"),
-    REPEATABLE_READ_ISOLATION_LEVEL("REPEATABLE READ"),
-    SERIALIZABLE_ISOLATION_LEVEL("SERIALIZABLE");
+public enum AccessMode {
+    READ_ONLY_ACCESS_MODE("READ ONLY"),
+    READ_WRITE_ACCESS_MODE("READ WRITE");
 
     private String syntax;
-    IsolationLevel(String syntax) {
+    AccessMode(String syntax) {
         this.syntax = syntax;
     }
     
