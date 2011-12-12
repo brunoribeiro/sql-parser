@@ -1962,6 +1962,7 @@ TOKEN [IGNORE_CASE] :
 | <SCROLL: "scroll">
 | <SECOND: "second">
 | <SELECT: "select">
+| <SESSION: "session">
 | <SESSION_USER: "session_user">
 | <SET: "set">
 | <SMALLINT: "smallint">
@@ -2023,6 +2024,7 @@ TOKEN [IGNORE_CASE] :
 | <BLOB: "blob">
 | <C: "c">
 | <CALLED: "called">
+| <CHARACTERISTICS: "characteristics">
 | <CLOB: "clob">
 | <COBOL: "cobol">
 | <COMMITTED: "committed">
@@ -2786,6 +2788,8 @@ spsSetStatement() throws StandardException :
         statementNode = setMessageLocaleStatement() 
     |
         statementNode = setRoleStatement()
+    |
+        statementNode = setTransactionStatement()
     )
     {
         return statementNode;
@@ -11005,6 +11009,7 @@ transactionMode() throws StandardException :
     isolationLevel = isolationLevelDB2OrReset() 
     {
         return (TransactionStatementNode)nodeFactory.getNode(NodeTypes.SET_TRANSACTION_ISOLATION_NODE,
+                                                             Boolean.FALSE,
                                                              isolationLevel,
                                                              parserContext);
     }
@@ -11301,6 +11306,66 @@ setMessageLocaleStatement() throws StandardException :
         return (StatementNode)nodeFactory.getNode(NodeTypes.NOP_STATEMENT_NODE,
                                                   parserContext);
     }
+}
+
+StatementNode
+setTransactionStatement() throws StandardException :
+{
+    Boolean current;
+    StatementNode transactionStatement;
+}
+{
+(
+    <TRANSACTION> { current = Boolean.TRUE; }
+|
+    <SESSION> <CHARACTERISTICS> <AS> <TRANSACTION> { current = Boolean.FALSE; }
+)
+    transactionStatement = transactionStatement(current)
+    {
+        return transactionStatement;
+    }
+}
+
+StatementNode
+transactionStatement(Boolean current) throws StandardException :
+{
+    IsolationLevel isolationLevel;
+    AccessMode accessMode;
+}
+{
+    isolationLevel = isolationLevel()
+    {
+        return (TransactionStatementNode)nodeFactory.getNode(NodeTypes.SET_TRANSACTION_ISOLATION_NODE,
+                                                             current,
+                                                             isolationLevel,
+                                                             parserContext);
+    }
+|
+    accessMode = transactionAccessMode()
+    {
+        return (TransactionStatementNode)nodeFactory.getNode(NodeTypes.SET_TRANSACTION_ACCESS_NODE,
+                                                             current,
+                                                             accessMode,
+                                                             parserContext);
+    }
+}
+
+AccessMode
+transactionAccessMode() throws StandardException :
+{}
+{
+    <READ>
+(
+    <ONLY>
+    {
+        return AccessMode.READ_ONLY_ACCESS_MODE;
+    }
+|
+    <WRITE>
+    {
+        return AccessMode.READ_WRITE_ACCESS_MODE;
+    }
+)
 }
 
 ValueNode
@@ -12934,7 +12999,7 @@ reservedKeyword() :
     // can still be part of a Java name.
 (
     /* SQL92 reserved keywords */
-    tok = <ADD>
+  tok = <ADD>
 | tok = <ALL>
 | tok = <ALLOCATE>
 | tok = <ALTER>
@@ -13096,6 +13161,7 @@ reservedKeyword() :
 | tok = <SCROLL>
 | tok = <SECOND>
 | tok = <SELECT>
+| tok = <SESSION>
 | tok = <SESSION_USER>
 | tok = <SET>
 | tok = <SMALLINT>
@@ -13170,7 +13236,7 @@ nonReservedKeyword() :
     // NOTE: All non-reserved keywords have to be repeated here so that
     // they may be used as normal identifiers.
 (
-    tok = <ABS>  
+  tok = <ABS>  
 | tok = <ABSVAL>    
 | tok = <ACTION>
 | tok = <AFTER>
@@ -13180,6 +13246,7 @@ nonReservedKeyword() :
 | tok = <BLOB>
 | tok = <C>
 | tok = <CALLED>
+| tok = <CHARACTERISTICS>
 | tok = <CLASS>
 | tok = <CLOB>
 | tok = <COALESCE>
@@ -13260,7 +13327,7 @@ nonReservedKeyword() :
 | tok = <OBJECT>
 | tok = <OFF>
 | LOOKAHEAD( { getToken(1).kind == OFFSET && !seeingOffsetClause() } )
-    tok = <OFFSET>
+  tok = <OFFSET>
 | tok = <OLD>
 | tok = <OLD_TABLE>
 | tok = <OJ>
