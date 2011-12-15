@@ -43,6 +43,8 @@ public class TypeComputer implements Visitor
         case NodeTypes.OR_NODE:
         case NodeTypes.IS_NODE:
             return binaryLogicalOperatorNode((BinaryLogicalOperatorNode)node);
+        case NodeTypes.NOT_NODE:
+            return unaryLogicalOperatorNode((UnaryLogicalOperatorNode)node);
         case NodeTypes.BINARY_PLUS_OPERATOR_NODE:
         case NodeTypes.BINARY_TIMES_OPERATOR_NODE:
         case NodeTypes.BINARY_DIVIDE_OPERATOR_NODE:
@@ -91,6 +93,26 @@ public class TypeComputer implements Visitor
         return expr.getType();
     }
 
+    protected DataTypeDescriptor unaryLogicalOperatorNode(UnaryLogicalOperatorNode node) 
+            throws StandardException {
+        ValueNode operand = node.getOperand();
+        DataTypeDescriptor type = operand.getType();
+        if ((type != null) &&
+            !type.getTypeId().isBooleanTypeId()) {
+            type = new DataTypeDescriptor(TypeId.BOOLEAN_ID, type.isNullable());
+            operand = (ValueNode)node.getNodeFactory()
+                .getNode(NodeTypes.CAST_NODE, 
+                         operand, type, 
+                         node.getParserContext());
+            node.setOperand(operand);
+        }
+        if ((type == null) && operand.isParameterNode()) {
+            type = new DataTypeDescriptor(TypeId.BOOLEAN_ID, true);
+            operand.setType(type);
+        }
+        return type;
+    }
+
     protected DataTypeDescriptor binaryLogicalOperatorNode(BinaryLogicalOperatorNode node)
             throws StandardException {
         ValueNode leftOperand = node.getLeftOperand();
@@ -106,6 +128,10 @@ public class TypeComputer implements Visitor
                          node.getParserContext());
             node.setLeftOperand(leftOperand);
         }
+        if ((leftType == null) && leftOperand.isParameterNode()) {
+            leftType = new DataTypeDescriptor(TypeId.BOOLEAN_ID, true);
+            leftOperand.setType(leftType);
+        }
         if ((rightType != null) &&
             !rightType.getTypeId().isBooleanTypeId()) {
             rightType = new DataTypeDescriptor(TypeId.BOOLEAN_ID, rightType.isNullable());
@@ -114,6 +140,10 @@ public class TypeComputer implements Visitor
                          rightOperand, rightType, 
                          node.getParserContext());
             node.setRightOperand(rightOperand);
+        }
+        if ((rightType == null) && rightOperand.isParameterNode()) {
+            rightType = new DataTypeDescriptor(TypeId.BOOLEAN_ID, true);
+            rightOperand.setType(rightType);
         }
         if (node.getNodeType() == NodeTypes.IS_NODE)
             return new DataTypeDescriptor(TypeId.BOOLEAN_ID, false);

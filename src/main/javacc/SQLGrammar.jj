@@ -4717,11 +4717,6 @@ valueExpression() throws StandardException :
     {
         return leftOperand;
     }
-|
-    leftOperand = nullSpecification()
-    {
-        return leftOperand;
-    }
 }
     
 ValueNode
@@ -7436,11 +7431,6 @@ updateSource(String columnName) throws StandardException :
         return valueNode;
     }
 |
-    valueNode = nullSpecification() 
-    {
-        return valueNode;
-    }
-|
     <_DEFAULT>
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.DEFAULT_NODE,
@@ -7641,15 +7631,6 @@ rowValueConstructorElement(ResultColumnList resultColumns) throws StandardExcept
 }
 {
     value = orExpression(null)
-    {
-        resultColumns.addResultColumn(
-            (ResultColumn)nodeFactory.getNode(NodeTypes.RESULT_COLUMN,
-                                              null,
-                                              value,
-                                              parserContext));
-    }
-|
-    value = nullSpecification()
     {
         resultColumns.addResultColumn(
             (ResultColumn)nodeFactory.getNode(NodeTypes.RESULT_COLUMN,
@@ -8836,12 +8817,6 @@ castOperand() throws StandardException :
     value = additiveExpression()
     {
         return value;
-    }
-|
-    <NULL>
-    {
-        return (ValueNode)nodeFactory.getNode(NodeTypes.UNTYPED_NULL_CONSTANT_NODE,
-                                              parserContext);
     }
 }
 
@@ -10374,6 +10349,11 @@ literal() throws StandardException :
     }
 |
     constantNode = intervalLiteral()
+    {
+        return constantNode;
+    }
+|
+    constantNode = nullSpecification()
     {
         return constantNode;
     }
