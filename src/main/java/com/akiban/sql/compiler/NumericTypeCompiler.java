@@ -184,6 +184,11 @@ public final class NumericTypeCompiler extends TypeCompiler
         boolean supported = true;
 
         if (!(rightTypeId.isNumericTypeId())) {
+            if (rightTypeId.isIntervalTypeId() &&
+                operator.equals(TypeCompiler.TIMES_OP)) {
+                // Let interval type resolve it.
+                return getTypeCompiler(rightTypeId).resolveArithmeticOperation(rightType, leftType, operator);
+            }
             supported = false;
         }
 

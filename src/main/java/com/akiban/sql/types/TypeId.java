@@ -1061,6 +1061,7 @@ public class TypeId
         case FormatIds.INTERVAL_YEAR_MONTH_ID:
             schemaName = null;
             typePrecedence = INTERVAL_PRECEDENCE;
+            JDBCTypeId = Types.OTHER;
             maxPrecision = TypeId.INTERVAL_YEAR_MONTH_PRECISION;
             maxScale = TypeId.INTERVAL_YEAR_MONTH_SCALE;
             maxMaxWidth = TypeId.INTERVAL_YEAR_MONTH_MAXWIDTH;
@@ -1070,6 +1071,7 @@ public class TypeId
         case FormatIds.INTERVAL_DAY_SECOND_ID:
             schemaName = null;
             typePrecedence = INTERVAL_PRECEDENCE;
+            JDBCTypeId = Types.OTHER;
             maxPrecision = TypeId.INTERVAL_DAY_SECOND_PRECISION;
             maxScale = TypeId.INTERVAL_DAY_SECOND_SCALE;
             maxMaxWidth = TypeId.INTERVAL_DAY_SECOND_MAXWIDTH;

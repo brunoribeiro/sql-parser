@@ -169,6 +169,24 @@ public class NodeToString
             return constantNode((ConstantNode)node);
         case NodeTypes.PARAMETER_NODE:
             return parameterNode((ParameterNode)node);
+        case NodeTypes.USER_NODE:
+            return "USER";
+        case NodeTypes.CURRENT_USER_NODE:
+            return "CURRENT_USER";
+        case NodeTypes.SESSION_USER_NODE:
+            return "SESSION_USER";
+        case NodeTypes.SYSTEM_USER_NODE:
+            return "SYSTEM_USER";
+        case NodeTypes.CURRENT_ISOLATION_NODE:
+            return "CURRENT ISOLATION";
+        case NodeTypes.IDENTITY_VAL_NODE:
+            return "IDENTITY_VAL_LOCAL()";
+        case NodeTypes.CURRENT_SCHEMA_NODE:
+            return "CURRENT SCHEMA";
+        case NodeTypes.CURRENT_ROLE_NODE:
+            return "CURRENT_ROLE";
+        case NodeTypes.CURRENT_DATETIME_OPERATOR_NODE:
+            return currentDatetimeOperatorNode((CurrentDatetimeOperatorNode)node);
         case NodeTypes.CAST_NODE:
             return castNode((CastNode)node);
         case NodeTypes.JAVA_TO_SQL_VALUE_NODE:
@@ -775,6 +793,20 @@ public class NodeToString
 
     protected String parameterNode(ParameterNode node) throws StandardException {
         return "$" + (node.getParameterNumber() + 1);
+    }
+
+    protected String currentDatetimeOperatorNode(CurrentDatetimeOperatorNode node) 
+            throws StandardException {
+        switch (node.getField()) {
+        case DATE:
+            return "CURRENT_DATE";
+        case TIME:
+            return "CURRENT_TIME";
+        case TIMESTAMP:
+            return "CURRENT_TIMESTAMP";
+        default:
+            return "**UNKNOWN(" + node.getField() +")**";
+        }
     }
 
     protected String castNode(CastNode node) throws StandardException {
