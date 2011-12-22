@@ -137,7 +137,7 @@ public class TimeTypeCompiler extends TypeCompiler
                         (rightTypeId == TypeId.INTERVAL_HOUR_SECOND_ID) ||
                         (rightTypeId == TypeId.INTERVAL_MINUTE_SECOND_ID))
                         // TIME +/- sub day interval is TIME
-                        return new DataTypeDescriptor(getTypeId(), nullable);
+                        return leftType.getNullabilityType(nullable);
                 }
                 // TIME +/- other interval is TIMESTAMP
                 return new DataTypeDescriptor(TypeId.TIMESTAMP_ID, nullable);

@@ -132,11 +132,11 @@ public class DateTypeCompiler extends TypeCompiler
                 switch (rightTypeId.getTypeFormatId()) {
                 case TypeId.FormatIds.INTERVAL_YEAR_MONTH_ID:
                     // DATE +/- month year interval is DATE
-                    return new DataTypeDescriptor(getTypeId(), nullable);
+                    return leftType.getNullabilityType(nullable);
                 case TypeId.FormatIds.INTERVAL_DAY_SECOND_ID:
                     if (rightTypeId == TypeId.INTERVAL_DAY_ID)
                         // DATE +/- INTERVAL DAY is DATE
-                        return new DataTypeDescriptor(getTypeId(), nullable);
+                        return leftType.getNullabilityType(nullable);
                 }
                 // DATE +/- other interval is TIMESTAMP
                 return new DataTypeDescriptor(TypeId.TIMESTAMP_ID, nullable);

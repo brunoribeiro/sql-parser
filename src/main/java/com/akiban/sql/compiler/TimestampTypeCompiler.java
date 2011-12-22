@@ -149,7 +149,7 @@ public class TimestampTypeCompiler extends TypeCompiler
             if (operator.equals(TypeCompiler.PLUS_OP) ||
                 operator.equals(TypeCompiler.MINUS_OP)) {
                 // TIMESTAMP +/- interval is TIMESTAMP
-                return new DataTypeDescriptor(getTypeId(), nullable);
+                return leftType.getNullabilityType(nullable);
             }
         }
 
