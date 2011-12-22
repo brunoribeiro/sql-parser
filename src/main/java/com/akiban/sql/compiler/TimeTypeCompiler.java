@@ -103,4 +103,49 @@ public class TimeTypeCompiler extends TypeCompiler
         return TypeId.TIME_MAXWIDTH;
     }
 
+    /**
+     * @see TypeCompiler#resolveArithmeticOperation
+     *
+     * @exception StandardException     Thrown on error
+     */
+    public DataTypeDescriptor resolveArithmeticOperation(DataTypeDescriptor leftType,
+                                                         DataTypeDescriptor rightType,
+                                                         String operator)
+            throws StandardException {
+        TypeId rightTypeId = rightType.getTypeId();
+        boolean nullable = leftType.isNullable() || rightType.isNullable();
+        if (rightTypeId.isDateTimeTimeStampTypeId()) {
+            if (operator.equals(TypeCompiler.MINUS_OP)) {
+                switch (rightTypeId.getTypeFormatId()) {
+                case TypeId.FormatIds.TIME_TYPE_ID:
+                    // TIME - TIME is INTERVAL HOUR TO SECOND
+                    return new DataTypeDescriptor(TypeId.INTERVAL_HOUR_SECOND_ID, nullable);
+                }
+                // TIME - other datetime is INTERVAL DAY TO SECOND
+                return new DataTypeDescriptor(TypeId.INTERVAL_DAY_SECOND_ID, nullable);
+            }
+        }
+        else if (rightTypeId.isIntervalTypeId()) {
+            if (operator.equals(TypeCompiler.PLUS_OP) ||
+                operator.equals(TypeCompiler.MINUS_OP)) {
+                switch (rightTypeId.getTypeFormatId()) {
+                case TypeId.FormatIds.INTERVAL_DAY_SECOND_ID:
+                    if ((rightTypeId == TypeId.INTERVAL_HOUR_ID) ||
+                        (rightTypeId == TypeId.INTERVAL_MINUTE_ID) ||
+                        (rightTypeId == TypeId.INTERVAL_SECOND_ID) ||
+                        (rightTypeId == TypeId.INTERVAL_HOUR_MINUTE_ID) ||
+                        (rightTypeId == TypeId.INTERVAL_HOUR_SECOND_ID) ||
+                        (rightTypeId == TypeId.INTERVAL_MINUTE_SECOND_ID))
+                        // TIME +/- sub day interval is TIME
+                        return new DataTypeDescriptor(getTypeId(), nullable);
+                }
+                // TIME +/- other interval is TIMESTAMP
+                return new DataTypeDescriptor(TypeId.TIMESTAMP_ID, nullable);
+            }
+        }
+
+        // Unsupported
+        return super.resolveArithmeticOperation(leftType, rightType, operator);
+    }
+
 }
