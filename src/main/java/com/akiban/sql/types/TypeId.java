@@ -183,16 +183,6 @@ public class TypeId
     public static final String BLOB_NAME = "BLOB";
     public static final String CLOB_NAME = "CLOB";
     public static final String NCLOB_NAME = "NCLOB";
-    public static final String TINYINT_UNSIGNED_NAME = "TINYINT UNSIGNED";
-    public static final String SMALLINT_UNSIGNED_NAME = "SMALLINT UNSIGNED";
-    public static final String INTEGER_UNSIGNED_NAME = "INTEGER UNSIGNED";
-    public static final String INT_UNSIGNED_NAME = "INT UNSIGNED";
-    public static final String LONGINT_UNSIGNED_NAME = "BIGINT UNSIGNED";
-    public static final String FLOAT_UNSIGNED_NAME = "FLOAT UNSIGNED";
-    public static final String REAL_UNSIGNED_NAME = "REAL UNSIGNED";
-    public static final String DOUBLE_UNSIGNED_NAME = "DOUBLE UNSIGNED";
-    public static final String NUMERIC_UNSIGNED_NAME = "NUMERIC UNSIGNED";
-    public static final String DECIMAL_UNSIGNED_NAME = "DECIMAL UNSIGNED";
     public static final String INTERVAL_YEAR_NAME = "INTERVAL YEAR";
     public static final String INTERVAL_MONTH_NAME = "INTERVAL MONTH";
     public static final String INTERVAL_YEAR_MONTH_NAME = "INTERVAL YEAR TO MONTH";
@@ -223,6 +213,20 @@ public class TypeId
     // by Derby.
     public static final String ROWID_NAME = "ROWID";
     public static final String SQLXML_NAME = "SQLXML";
+
+    // MySQL compatible types.
+    public static final String TINYINT_UNSIGNED_NAME = "TINYINT UNSIGNED";
+    public static final String SMALLINT_UNSIGNED_NAME = "SMALLINT UNSIGNED";
+    public static final String INTEGER_UNSIGNED_NAME = "INTEGER UNSIGNED";
+    public static final String INT_UNSIGNED_NAME = "INT UNSIGNED";
+    public static final String LONGINT_UNSIGNED_NAME = "BIGINT UNSIGNED";
+    public static final String FLOAT_UNSIGNED_NAME = "FLOAT UNSIGNED";
+    public static final String REAL_UNSIGNED_NAME = "REAL UNSIGNED";
+    public static final String DOUBLE_UNSIGNED_NAME = "DOUBLE UNSIGNED";
+    public static final String NUMERIC_UNSIGNED_NAME = "NUMERIC UNSIGNED";
+    public static final String DECIMAL_UNSIGNED_NAME = "DECIMAL UNSIGNED";
+    public static final String DATETIME_NAME = "DATETIME";
+    public static final String YEAR_NAME = "YEAR";
 
     /**
      * The following constants define the type precedence hierarchy.
@@ -307,15 +311,6 @@ public class TypeId
     public static final TypeId CLOB_ID = new TypeId(FormatIds.CLOB_TYPE_ID);
     public static final TypeId XML_ID = new TypeId(FormatIds.XML_TYPE_ID);
 
-    public static final TypeId SMALLINT_UNSIGNED_ID = new TypeId(FormatIds.SMALLINT_TYPE_ID, true);
-    public static final TypeId INTEGER_UNSIGNED_ID = new TypeId(FormatIds.INT_TYPE_ID, true);
-    public static final TypeId TINYINT_UNSIGNED_ID = new TypeId(FormatIds.TINYINT_TYPE_ID, true);
-    public static final TypeId BIGINT_UNSIGNED_ID = new TypeId(FormatIds.LONGINT_TYPE_ID, true);
-    public static final TypeId REAL_UNSIGNED_ID = new TypeId(FormatIds.REAL_TYPE_ID, true);
-    public static final TypeId DOUBLE_UNSIGNED_ID = new TypeId(FormatIds.DOUBLE_TYPE_ID, true);
-    public static final TypeId DECIMAL_UNSIGNED_ID =    new TypeId(FormatIds.DECIMAL_TYPE_ID, true);
-    public static final TypeId NUMERIC_UNSIGNED_ID =    new TypeId(FormatIds.NUMERIC_TYPE_ID, true);
-
     public static final TypeId INTERVAL_YEAR_ID = new TypeId(FormatIds.INTERVAL_YEAR_MONTH_ID, INTERVAL_YEAR_NAME);
     public static final TypeId INTERVAL_MONTH_ID = new TypeId(FormatIds.INTERVAL_YEAR_MONTH_ID, INTERVAL_MONTH_NAME);
     public static final TypeId INTERVAL_YEAR_MONTH_ID = new TypeId(FormatIds.INTERVAL_YEAR_MONTH_ID, INTERVAL_YEAR_MONTH_NAME);
@@ -329,6 +324,17 @@ public class TypeId
     public static final TypeId INTERVAL_HOUR_MINUTE_ID = new TypeId(FormatIds.INTERVAL_DAY_SECOND_ID, INTERVAL_HOUR_MINUTE_NAME);
     public static final TypeId INTERVAL_HOUR_SECOND_ID = new TypeId(FormatIds.INTERVAL_DAY_SECOND_ID, INTERVAL_HOUR_SECOND_NAME);
     public static final TypeId INTERVAL_MINUTE_SECOND_ID = new TypeId(FormatIds.INTERVAL_DAY_SECOND_ID, INTERVAL_MINUTE_SECOND_NAME);
+
+    public static final TypeId SMALLINT_UNSIGNED_ID = new TypeId(FormatIds.SMALLINT_TYPE_ID, true);
+    public static final TypeId INTEGER_UNSIGNED_ID = new TypeId(FormatIds.INT_TYPE_ID, true);
+    public static final TypeId TINYINT_UNSIGNED_ID = new TypeId(FormatIds.TINYINT_TYPE_ID, true);
+    public static final TypeId BIGINT_UNSIGNED_ID = new TypeId(FormatIds.LONGINT_TYPE_ID, true);
+    public static final TypeId REAL_UNSIGNED_ID = new TypeId(FormatIds.REAL_TYPE_ID, true);
+    public static final TypeId DOUBLE_UNSIGNED_ID = new TypeId(FormatIds.DOUBLE_TYPE_ID, true);
+    public static final TypeId DECIMAL_UNSIGNED_ID =    new TypeId(FormatIds.DECIMAL_TYPE_ID, true);
+    public static final TypeId NUMERIC_UNSIGNED_ID =    new TypeId(FormatIds.NUMERIC_TYPE_ID, true);
+    public static final TypeId DATETIME_ID = new TypeId(FormatIds.TIMESTAMP_TYPE_ID, DATETIME_NAME);
+    public static final TypeId YEAR_ID = new TypeId(FormatIds.SMALLINT_TYPE_ID, YEAR_NAME);
 
     private static final TypeId[] ALL_BUILTIN_TYPE_IDS = {
         BOOLEAN_ID,
@@ -353,14 +359,6 @@ public class TypeId
         BLOB_ID,
         CLOB_ID,
         XML_ID,
-        SMALLINT_UNSIGNED_ID,
-        INTEGER_UNSIGNED_ID,
-        TINYINT_UNSIGNED_ID,
-        BIGINT_UNSIGNED_ID,
-        REAL_UNSIGNED_ID,
-        DOUBLE_UNSIGNED_ID,
-        DECIMAL_UNSIGNED_ID,
-        NUMERIC_UNSIGNED_ID,
         INTERVAL_YEAR_ID,
         INTERVAL_MONTH_ID,
         INTERVAL_YEAR_MONTH_ID,
@@ -374,6 +372,17 @@ public class TypeId
         INTERVAL_HOUR_MINUTE_ID,
         INTERVAL_HOUR_SECOND_ID,
         INTERVAL_MINUTE_SECOND_ID,
+
+        SMALLINT_UNSIGNED_ID,
+        INTEGER_UNSIGNED_ID,
+        TINYINT_UNSIGNED_ID,
+        BIGINT_UNSIGNED_ID,
+        REAL_UNSIGNED_ID,
+        DOUBLE_UNSIGNED_ID,
+        DECIMAL_UNSIGNED_ID,
+        NUMERIC_UNSIGNED_ID,
+        DATETIME_ID,
+        YEAR_ID,
     };
 
     /*
@@ -665,34 +674,6 @@ public class TypeId
         if (SQLTypeName.equals(XML_NAME)) {
             return XML_ID;
         }
-        if (SQLTypeName.equals(TINYINT_UNSIGNED_NAME)) {
-            return TINYINT_UNSIGNED_ID;
-        }
-        if (SQLTypeName.equals(SMALLINT_UNSIGNED_NAME)) {
-            return SMALLINT_UNSIGNED_ID;
-        }
-        if (SQLTypeName.equals(INTEGER_UNSIGNED_NAME) ||
-            SQLTypeName.equals(INT_UNSIGNED_NAME)) {
-            return INTEGER_UNSIGNED_ID;
-        }
-        if (SQLTypeName.equals(LONGINT_UNSIGNED_NAME)) {
-            return BIGINT_UNSIGNED_ID;
-        }
-        if (SQLTypeName.equals(FLOAT_UNSIGNED_NAME)) {
-            return DOUBLE_UNSIGNED_ID;
-        }
-        if (SQLTypeName.equals(REAL_UNSIGNED_NAME)) {
-            return REAL_UNSIGNED_ID;
-        }
-        if (SQLTypeName.equals(DOUBLE_UNSIGNED_NAME)) {
-            return DOUBLE_UNSIGNED_ID;
-        }
-        if (SQLTypeName.equals(NUMERIC_UNSIGNED_NAME)) {
-            return NUMERIC_UNSIGNED_ID;
-        }
-        if (SQLTypeName.equals(DECIMAL_UNSIGNED_NAME)) {
-            return DECIMAL_UNSIGNED_ID;
-        }
         if (SQLTypeName.equals(INTERVAL_YEAR_NAME)) {
             return INTERVAL_YEAR_ID;
         }
@@ -731,6 +712,40 @@ public class TypeId
         }
         if (SQLTypeName.equals(INTERVAL_MINUTE_SECOND_NAME)) {
             return INTERVAL_MINUTE_SECOND_ID;
+        }
+        if (SQLTypeName.equals(TINYINT_UNSIGNED_NAME)) {
+            return TINYINT_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(SMALLINT_UNSIGNED_NAME)) {
+            return SMALLINT_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(INTEGER_UNSIGNED_NAME) ||
+            SQLTypeName.equals(INT_UNSIGNED_NAME)) {
+            return INTEGER_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(LONGINT_UNSIGNED_NAME)) {
+            return BIGINT_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(FLOAT_UNSIGNED_NAME)) {
+            return DOUBLE_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(REAL_UNSIGNED_NAME)) {
+            return REAL_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(DOUBLE_UNSIGNED_NAME)) {
+            return DOUBLE_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(NUMERIC_UNSIGNED_NAME)) {
+            return NUMERIC_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(DECIMAL_UNSIGNED_NAME)) {
+            return DECIMAL_UNSIGNED_ID;
+        }
+        if (SQLTypeName.equals(DATETIME_NAME)) {
+            return DATETIME_ID;
+        }
+        if (SQLTypeName.equals(YEAR_NAME)) {
+            return YEAR_ID;
         }
 
         // Types defined below here are SQL types and non-JDBC types that are
@@ -1046,6 +1061,7 @@ public class TypeId
         case FormatIds.INTERVAL_YEAR_MONTH_ID:
             schemaName = null;
             typePrecedence = INTERVAL_PRECEDENCE;
+            JDBCTypeId = Types.OTHER;
             maxPrecision = TypeId.INTERVAL_YEAR_MONTH_PRECISION;
             maxScale = TypeId.INTERVAL_YEAR_MONTH_SCALE;
             maxMaxWidth = TypeId.INTERVAL_YEAR_MONTH_MAXWIDTH;
@@ -1055,6 +1071,7 @@ public class TypeId
         case FormatIds.INTERVAL_DAY_SECOND_ID:
             schemaName = null;
             typePrecedence = INTERVAL_PRECEDENCE;
+            JDBCTypeId = Types.OTHER;
             maxPrecision = TypeId.INTERVAL_DAY_SECOND_PRECISION;
             maxScale = TypeId.INTERVAL_DAY_SECOND_SCALE;
             maxMaxWidth = TypeId.INTERVAL_DAY_SECOND_MAXWIDTH;

@@ -103,4 +103,48 @@ public class DateTypeCompiler extends TypeCompiler
         return TypeId.DATE_MAXWIDTH;
     }
 
+    /**
+     * @see TypeCompiler#resolveArithmeticOperation
+     *
+     * @exception StandardException     Thrown on error
+     */
+    public DataTypeDescriptor resolveArithmeticOperation(DataTypeDescriptor leftType,
+                                                         DataTypeDescriptor rightType,
+                                                         String operator)
+            throws StandardException {
+        TypeId rightTypeId = rightType.getTypeId();
+        boolean nullable = leftType.isNullable() || rightType.isNullable();
+        if (rightTypeId.isDateTimeTimeStampTypeId()) {
+            if (operator.equals(TypeCompiler.MINUS_OP)) {
+                switch (rightTypeId.getTypeFormatId()) {
+                case TypeId.FormatIds.DATE_TYPE_ID:
+                    // DATE - DATE is INTERVAL DAY
+                    return new DataTypeDescriptor(TypeId.INTERVAL_DAY_ID, nullable);
+                default:
+                    // DATE - other datetime is INTERVAL DAY TO SECOND
+                    return new DataTypeDescriptor(TypeId.INTERVAL_DAY_SECOND_ID, nullable);
+                }
+            }
+        }
+        else if (rightTypeId.isIntervalTypeId()) {
+            if (operator.equals(TypeCompiler.PLUS_OP) ||
+                operator.equals(TypeCompiler.MINUS_OP)) {
+                switch (rightTypeId.getTypeFormatId()) {
+                case TypeId.FormatIds.INTERVAL_YEAR_MONTH_ID:
+                    // DATE +/- month year interval is DATE
+                    return leftType.getNullabilityType(nullable);
+                case TypeId.FormatIds.INTERVAL_DAY_SECOND_ID:
+                    if (rightTypeId == TypeId.INTERVAL_DAY_ID)
+                        // DATE +/- INTERVAL DAY is DATE
+                        return leftType.getNullabilityType(nullable);
+                }
+                // DATE +/- other interval is TIMESTAMP
+                return new DataTypeDescriptor(TypeId.TIMESTAMP_ID, nullable);
+            }
+        }
+
+        // Unsupported
+        return super.resolveArithmeticOperation(leftType, rightType, operator);
+    }
+
 }

@@ -128,4 +128,33 @@ public class TimestampTypeCompiler extends TypeCompiler
         return 26; // DATE TIME.milliseconds (extra few for good measure)
     }
 
+    /**
+     * @see TypeCompiler#resolveArithmeticOperation
+     *
+     * @exception StandardException     Thrown on error
+     */
+    public DataTypeDescriptor resolveArithmeticOperation(DataTypeDescriptor leftType,
+                                                         DataTypeDescriptor rightType,
+                                                         String operator)
+            throws StandardException {
+        TypeId rightTypeId = rightType.getTypeId();
+        boolean nullable = leftType.isNullable() || rightType.isNullable();
+        if (rightTypeId.isDateTimeTimeStampTypeId()) {
+            if (operator.equals(TypeCompiler.MINUS_OP)) {
+                // TIMESTAMP - other datetime is INTERVAL DAY TO SECOND
+                return new DataTypeDescriptor(TypeId.INTERVAL_DAY_SECOND_ID, nullable);
+            }
+        }
+        else if (rightTypeId.isIntervalTypeId()) {
+            if (operator.equals(TypeCompiler.PLUS_OP) ||
+                operator.equals(TypeCompiler.MINUS_OP)) {
+                // TIMESTAMP +/- interval is TIMESTAMP
+                return leftType.getNullabilityType(nullable);
+            }
+        }
+
+        // Unsupported
+        return super.resolveArithmeticOperation(leftType, rightType, operator);
+    }
+
 }

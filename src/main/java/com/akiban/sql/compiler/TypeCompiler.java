@@ -245,6 +245,7 @@ public abstract class TypeCompiler
     private static TypeCompiler blobTypeCompiler;
     private static TypeCompiler clobTypeCompiler;
     private static TypeCompiler xmlTypeCompiler;
+    private static TypeCompiler intervalMonthTypeCompiler, intervalSecondTypeCompiler;
 
     /**
      * Get the TypeCompiler that corresponds to the given TypeId.
@@ -354,6 +355,20 @@ public abstract class TypeCompiler
                 if (refTypeCompiler == null)
                     refTypeCompiler = new RefTypeCompiler(typeId);
                 return refTypeCompiler;
+            }
+            else if (typeId.isIntervalTypeId()) {
+                switch (typeId.getTypeFormatId()) {
+                case TypeId.FormatIds.INTERVAL_YEAR_MONTH_ID:
+                    if (intervalMonthTypeCompiler == null)
+                        intervalMonthTypeCompiler = new IntervalTypeCompiler(typeId);
+                    return intervalMonthTypeCompiler;
+                case TypeId.FormatIds.INTERVAL_DAY_SECOND_ID:                        
+                    if (intervalSecondTypeCompiler == null)
+                        intervalSecondTypeCompiler = new IntervalTypeCompiler(typeId);
+                    return intervalSecondTypeCompiler;
+                default:
+                    return null;
+                }
             }
             else {
                 // Cannot re-use instances of user-defined type compilers,
