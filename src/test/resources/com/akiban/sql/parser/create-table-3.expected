@@ -126,101 +126,121 @@ tableElementList:
 	name: col35
 	elementType: null
 	[24]:	
+	com.akiban.sql.parser.ColumnDefinitionNode@464c4975
+	type: DATETIME
+	name: col36
+	elementType: null
+	[25]:	
+	com.akiban.sql.parser.ColumnDefinitionNode@3a6ac461
+	type: DATETIME NOT NULL
+	name: col37
+	elementType: null
+	[26]:	
+	com.akiban.sql.parser.ColumnDefinitionNode@3782da3d
+	type: YEAR
+	name: col38
+	elementType: null
+	[27]:	
+	com.akiban.sql.parser.ColumnDefinitionNode@6fc5f743
+	type: YEAR NOT NULL
+	name: col39
+	elementType: null
+	[28]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@16a4e743
 	type: CLOB(2147483647) NOT NULL
 	name: col40
 	elementType: null
-	[25]:	
+	[29]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@244aeb52
 	type: CLOB(2147483647)
 	name: col41
 	elementType: null
-	[26]:	
+	[30]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@329f671b
 	type: BLOB(2147483647) NOT NULL
 	name: col42
 	elementType: null
-	[27]:	
+	[31]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@7f2a3793
 	type: BLOB(2147483647)
 	name: col43
 	elementType: null
-	[28]:	
+	[32]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@2ca6d51e
 	type: DECIMAL(5,0) NOT NULL
 	name: col50
 	elementType: null
-	[29]:	
+	[33]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@7cf1bb78
 	type: DECIMAL(5,0)
 	name: col51
 	elementType: null
-	[30]:	
+	[34]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@624b035d
 	type: DECIMAL(1,0) NOT NULL
 	name: col52
 	elementType: null
-	[31]:	
+	[35]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@2aca0115
 	type: DECIMAL(1,0)
 	name: col53
 	elementType: null
-	[32]:	
+	[36]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@340d1fa5
 	type: DECIMAL(10,0) NOT NULL
 	name: col54
 	elementType: null
-	[33]:	
+	[37]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@4998a455
 	type: DECIMAL(10,0)
 	name: col55
 	elementType: null
-	[34]:	
+	[38]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@444cee32
 	type: DECIMAL(1,1) NOT NULL
 	name: col56
 	elementType: null
-	[35]:	
+	[39]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@16aa37a6
 	type: DECIMAL(1,1)
 	name: col57
 	elementType: null
-	[36]:	
+	[40]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@12b7eea
 	type: DECIMAL(10,1) NOT NULL
 	name: col58
 	elementType: null
-	[37]:	
+	[41]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@4e99353f
 	type: DECIMAL(10,1)
 	name: col59
 	elementType: null
-	[38]:	
+	[42]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@2c76e369
 	type: DECIMAL(10,10) NOT NULL
 	name: col60
 	elementType: null
-	[39]:	
+	[43]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@314c194d
 	type: DECIMAL(10,10)
 	name: col61
 	elementType: null
-	[40]:	
+	[44]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@7b112783
 	type: DECIMAL(30,10) NOT NULL
 	name: col62
 	elementType: null
-	[41]:	
+	[45]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@23394894
 	type: DECIMAL(30,10)
 	name: col63
 	elementType: null
-	[42]:	
+	[46]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@5cbfe9d
 	type: NUMERIC NOT NULL
 	name: col70
 	elementType: null
-	[43]:	
+	[47]:	
 	com.akiban.sql.parser.ColumnDefinitionNode@13b8f864
 	type: NUMERIC
 	name: col71
