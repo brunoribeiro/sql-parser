@@ -526,6 +526,8 @@ public class NodeToString
             joinType = ((HalfOuterJoinNode)node).isRightOuterJoin() ? 
                 JoinNode.JoinType.RIGHT_OUTER : JoinNode.JoinType.LEFT_OUTER;
         str.append(' ');
+        if (node.isNaturalJoin())
+            str.append("NATURAL ");
         str.append(JoinNode.joinTypeToString(joinType));
         str.append(' ');
         str.append(toString(node.getRightResultSet()));

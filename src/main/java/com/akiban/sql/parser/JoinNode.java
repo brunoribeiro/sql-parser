@@ -165,10 +165,12 @@ public class JoinNode extends TableOperatorNode
      */
 
     public String toString() {
-        if (joinOrderStrategyProperties == null)
-            return super.toString();
-        return "joinOrderStrategyProperties: " + joinOrderStrategyProperties + "\n" +
-            super.toString();
+        String str = super.toString();
+        if (naturalJoin)
+            str = "naturalJoin: " + naturalJoin + "\n" + str;
+        if (joinOrderStrategyProperties != null)
+            str = "joinOrderStrategyProperties: " + joinOrderStrategyProperties + "\n" + str;
+        return str;
     }
 
     /**
@@ -198,6 +200,11 @@ public class JoinNode extends TableOperatorNode
      */
     void setNaturalJoin() {
         naturalJoin = true;
+    }
+
+    /** Is this a natural join? */
+    public boolean isNaturalJoin() {
+        return naturalJoin;
     }
 
     /**
