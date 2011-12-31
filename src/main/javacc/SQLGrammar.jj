@@ -11367,7 +11367,7 @@ StatementNode
 setConfigurationStatement() throws StandardException :
 {
     Token variable;
-    ConstantNode value;
+    CharConstantNode value;
 }
 {
     variable = <IDENTIFIER>
@@ -11375,9 +11375,8 @@ setConfigurationStatement() throws StandardException :
     value = stringLiteral()
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.SET_CONFIGURATION_NODE,
-                                                                     variable.image,
-                                                                     value.getValue(),
-                                                                     parserContext);
+                                                  variable.image, value.getValue(),
+                                                  parserContext);
     }
 }
 

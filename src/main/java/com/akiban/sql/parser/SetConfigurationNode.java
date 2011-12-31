@@ -23,8 +23,7 @@ import com.akiban.sql.StandardException;
 
 public class SetConfigurationNode extends StatementNode
 {
-    private String variable;
-    private Object value;
+    private String variable, value;
 
     /**
      * Initializer for SetTransactionIsolationNode
@@ -35,7 +34,7 @@ public class SetConfigurationNode extends StatementNode
     public void init(Object variable,
                      Object value) {
         this.variable = (String)variable;
-        this.value = value;
+        this.value = (String)value;
     }
 
     /**
@@ -66,7 +65,7 @@ public class SetConfigurationNode extends StatementNode
         return variable;
     }
 
-    public Object getValue() {
+    public String getValue() {
         return value;
     }
 

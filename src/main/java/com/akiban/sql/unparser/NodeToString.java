@@ -867,7 +867,7 @@ public class NodeToString
 
     protected String setConfigurationNode(SetConfigurationNode node)
             throws StandardException {
-        return node.statementToString() + " = '" + node.getValue().toString() + "'";
+        return node.statementToString() + " = '" + node.getValue() + "'";
     }
 
 }
