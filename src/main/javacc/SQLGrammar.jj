@@ -975,6 +975,8 @@ class SQLGrammar
         case BINARY: // LARGE OBJECT
         case XML:
         case INTERVAL:
+        case DATETIME:
+        case YEAR:
             retval = true;
             break;
 
@@ -2033,6 +2035,7 @@ TOKEN [IGNORE_CASE] :
 | <CYCLE: "cycle">
 | <DATA: "data">
 | <DATE: "date">
+| <DATETIME: "datetime">
 | <DAY: "day">
 | <DEFINER: "definer">
 | <DETERMINISTIC: "deterministic">
@@ -4194,6 +4197,16 @@ datetimeType() throws StandardException :
     {
         // TODO; Ditto
         return DataTypeDescriptor.getBuiltInDataTypeDescriptor(Types.TIMESTAMP);
+    }
+|
+    <DATETIME> 
+    {
+        return new DataTypeDescriptor(TypeId.DATETIME_ID, true);
+    }
+|
+    <YEAR> 
+    {
+        return new DataTypeDescriptor(TypeId.YEAR_ID, true);
     }
 }
 
@@ -13243,6 +13256,7 @@ nonReservedKeyword() :
 | tok = <D>
 | tok = <DATA>
 | tok = <DATE>
+| tok = <DATETIME>
 | tok = <DAY>
 | tok = <DAY_HOUR>
 | tok = <DAY_MICROSECOND>
