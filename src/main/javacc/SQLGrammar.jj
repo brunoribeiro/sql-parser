@@ -2793,6 +2793,8 @@ spsSetStatement() throws StandardException :
         statementNode = setRoleStatement()
     |
         statementNode = setTransactionStatement()
+    |
+        statementNode = setConfigurationStatement()
     )
     {
         return statementNode;
@@ -11359,6 +11361,24 @@ transactionAccessMode() throws StandardException :
         return AccessMode.READ_WRITE_ACCESS_MODE;
     }
 )
+}
+
+StatementNode
+setConfigurationStatement() throws StandardException :
+{
+    Token variable;
+    ConstantNode value;
+}
+{
+    variable = <IDENTIFIER>
+    ( <EQUALS_OPERATOR> | <TO> )
+    value = stringLiteral()
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.SET_CONFIGURATION_NODE,
+                                                                     variable.image,
+                                                                     value.getValue(),
+                                                                     parserContext);
+    }
 }
 
 ValueNode

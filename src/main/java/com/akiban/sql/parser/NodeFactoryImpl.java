@@ -175,6 +175,9 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.NOT_NODE:
             return NodeNames.NOT_NODE_NAME;
 
+        case NodeTypes.SET_CONFIGURATION_NODE:
+            return NodeNames.SET_CONFIGURATION_NODE_NAME;
+
         case NodeTypes.SQL_TO_JAVA_VALUE_NODE:
             return NodeNames.SQL_TO_JAVA_VALUE_NODE_NAME;
 

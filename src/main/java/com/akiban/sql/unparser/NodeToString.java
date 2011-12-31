@@ -45,6 +45,8 @@ public class NodeToString
             return setTransactionIsolationNode((SetTransactionIsolationNode)node);
         case NodeTypes.SET_TRANSACTION_ACCESS_NODE:
             return setTransactionAccessNode((SetTransactionAccessNode)node);
+        case NodeTypes.SET_CONFIGURATION_NODE:
+            return setConfigurationNode((SetConfigurationNode)node);
         case NodeTypes.TABLE_ELEMENT_LIST:
             return tableElementList((TableElementList)node);
         case NodeTypes.COLUMN_DEFINITION_NODE:
@@ -861,6 +863,11 @@ public class NodeToString
     protected String setTransactionAccessNode(SetTransactionAccessNode node)
             throws StandardException {
         return node.statementToString() + " " + node.getAccessMode().getSyntax();
+    }
+
+    protected String setConfigurationNode(SetConfigurationNode node)
+            throws StandardException {
+        return node.statementToString() + " = '" + node.getValue().toString() + "'";
     }
 
 }
