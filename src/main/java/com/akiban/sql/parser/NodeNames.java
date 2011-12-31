@@ -270,6 +270,8 @@ public interface NodeNames
 
     static final String SELECT_NODE_NAME = "com.akiban.sql.parser.SelectNode";
 
+    static final String SET_CONFIGURATION_NODE_NAME = "com.akiban.sql.parser.SetConfigurationNode";
+
     static final String SET_ROLE_NODE_NAME = "com.akiban.sql.parser.SetRoleNode";
 
     static final String SET_SCHEMA_NODE_NAME = "com.akiban.sql.parser.SetSchemaNode";
