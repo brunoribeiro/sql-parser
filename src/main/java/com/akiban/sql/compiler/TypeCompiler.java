@@ -112,6 +112,12 @@ public abstract class TypeCompiler
             throws StandardException {
         TypeId leftTypeId = leftType.getTypeId();
         TypeId rightTypeId = rightType.getTypeId();
+
+        if (leftTypeId.isIntervalTypeId())
+            return rightType;
+        else if (rightTypeId.isIntervalTypeId())
+            return leftType;
+        
         if (leftTypeId.equals(rightTypeId))
             return leftType;
         throw new StandardException("Types not compatible for " + operator + 
