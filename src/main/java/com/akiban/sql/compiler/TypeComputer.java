@@ -80,12 +80,23 @@ public class TypeComputer implements Visitor
         }
     }
 
+    /** Nodes whose type is inferred from the context. */
+    protected static boolean isParameterOrUntypedNull(ValueNode node) {
+        switch (node.getNodeType()) {
+        case NodeTypes.PARAMETER_NODE:
+        case NodeTypes.UNTYPED_NULL_CONSTANT_NODE:
+            return true;
+        default:
+            return false;
+        }
+    }
+
     protected DataTypeDescriptor resultColumn(ResultColumn node)
             throws StandardException {
         ValueNode expr = node.getExpression();
         if (expr == null)
             return null;
-        if (expr.isParameterNode() && (expr.getType() == null)) {
+        if (isParameterOrUntypedNull(expr) && (expr.getType() == null)) {
             ColumnReference column = node.getReference();
             if (column != null)
                 expr.setType(column.getType());
@@ -106,7 +117,7 @@ public class TypeComputer implements Visitor
                          node.getParserContext());
             node.setOperand(operand);
         }
-        if ((type == null) && operand.isParameterNode()) {
+        if ((type == null) && isParameterOrUntypedNull(operand)) {
             type = new DataTypeDescriptor(TypeId.BOOLEAN_ID, true);
             operand.setType(type);
         }
@@ -128,7 +139,7 @@ public class TypeComputer implements Visitor
                          node.getParserContext());
             node.setLeftOperand(leftOperand);
         }
-        if ((leftType == null) && leftOperand.isParameterNode()) {
+        if ((leftType == null) && isParameterOrUntypedNull(leftOperand)) {
             leftType = new DataTypeDescriptor(TypeId.BOOLEAN_ID, true);
             leftOperand.setType(leftType);
         }
@@ -141,7 +152,7 @@ public class TypeComputer implements Visitor
                          node.getParserContext());
             node.setRightOperand(rightOperand);
         }
-        if ((rightType == null) && rightOperand.isParameterNode()) {
+        if ((rightType == null) && isParameterOrUntypedNull(rightOperand)) {
             rightType = new DataTypeDescriptor(TypeId.BOOLEAN_ID, true);
             rightOperand.setType(rightType);
         }
@@ -162,11 +173,11 @@ public class TypeComputer implements Visitor
         ValueNode rightOperand = node.getRightOperand();
         DataTypeDescriptor leftType = leftOperand.getType();
         DataTypeDescriptor rightType = rightOperand.getType();
-        if (leftOperand.isParameterNode() && (rightType != null)) {
+        if (isParameterOrUntypedNull(leftOperand) && (rightType != null)) {
             leftType = rightType.getNullabilityType(true);
             leftOperand.setType(leftType);
         }
-        else if (rightOperand.isParameterNode() && (leftType != null)) {
+        else if (isParameterOrUntypedNull(rightOperand) && (leftType != null)) {
             rightType = leftType.getNullabilityType(true);
             rightOperand.setType(rightType);
         }
@@ -250,12 +261,12 @@ public class TypeComputer implements Visitor
         ValueNode rightOperand = node.getRightOperand();
 
         // Infer type for parameters from other comparand.
-        if (leftOperand.isParameterNode()) {
+        if (isParameterOrUntypedNull(leftOperand)) {
             DataTypeDescriptor rightType = rightOperand.getType();
             if (rightType != null)
                 leftOperand.setType(rightType.getNullabilityType(true));
         }
-        else if (rightOperand.isParameterNode()) {
+        else if (isParameterOrUntypedNull(rightOperand)) {
             DataTypeDescriptor leftType = leftOperand.getType();
             if (leftType != null)
                 rightOperand.setType(leftType.getNullabilityType(true));
@@ -333,10 +344,10 @@ public class TypeComputer implements Visitor
         ValueNodeList rightOperands = node.getRightOperandList();
         ValueNode lowOperand = rightOperands.get(0);
         ValueNode highOperand = rightOperands.get(1);
-        if (lowOperand.isParameterNode()) {
+        if (isParameterOrUntypedNull(lowOperand)) {
             lowOperand.setType(leftType.getNullabilityType(true));
         }
-        if (highOperand.isParameterNode()) {
+        if (isParameterOrUntypedNull(highOperand)) {
             highOperand.setType(leftType.getNullabilityType(true));
         }
 
@@ -380,7 +391,7 @@ public class TypeComputer implements Visitor
         
         for (ValueNode rightOperand : node.getRightOperandList()) {
             DataTypeDescriptor rightType;
-            if (rightOperand.isParameterNode()) {
+            if (isParameterOrUntypedNull(rightOperand)) {
                 rightType = leftType.getNullabilityType(true);
                 rightOperand.setType(rightType);
             }
@@ -443,7 +454,7 @@ public class TypeComputer implements Visitor
                          node.getParserContext());
             node.setLeftOperand(leftOperand);
         }
-        else if (leftOperand.isParameterNode()) {
+        else if (isParameterOrUntypedNull(leftOperand)) {
             leftType = new DataTypeDescriptor(TypeId.VARCHAR_ID, true);
             leftOperand.setType(leftType);
         }
@@ -458,7 +469,7 @@ public class TypeComputer implements Visitor
                          node.getParserContext());
             node.setRightOperand(rightOperand);
         }
-        else if (rightOperand.isParameterNode()) {
+        else if (isParameterOrUntypedNull(rightOperand)) {
             rightType = new DataTypeDescriptor(TypeId.VARCHAR_ID, true);
             rightOperand.setType(rightType);
         }
@@ -482,7 +493,7 @@ public class TypeComputer implements Visitor
         if (result != null) {
             for (int i = 0; i < nodeList.size(); i++) {
                 ValueNode node = nodeList.get(i);
-                if (node.isParameterNode())
+                if (isParameterOrUntypedNull(node))
                     node.setType(result.getNullabilityType(true));
                 else if (addDominantCast(result, node.getType())) {
                     node = (ValueNode)node.getNodeFactory()
