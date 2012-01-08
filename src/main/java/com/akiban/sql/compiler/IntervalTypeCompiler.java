@@ -164,7 +164,7 @@ public class IntervalTypeCompiler extends TypeCompiler
             // varchar
             if (leftTypeId.isStringTypeId() && rightTypeId.isIntervalTypeId()||
                 rightTypeId.isStringTypeId() && leftTypeId.isIntervalTypeId()
-                && operator.equals(PLUS_OP)) // when left is interval, only + is legal
+                    && operator.equals(PLUS_OP)) // when left is interval, only + is legal
                 return new DataTypeDescriptor(TypeId.DATETIME_ID, nullable);
         }
         else if (operator.equals(TIMES_OP) || operator.equals(DIVIDE_OP))
