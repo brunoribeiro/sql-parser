@@ -114,6 +114,11 @@ public abstract class TypeCompiler
         TypeId rightTypeId = rightType.getTypeId();
         if (leftTypeId.equals(rightTypeId))
             return leftType;
+
+        TypeId interval = null;
+        if ((interval = rightTypeId).isIntervalTypeId() || (interval = leftTypeId).isIntervalTypeId())
+            return IntervalTypeCompiler.getTypeCompiler(interval).resolveArithmeticOperation(leftType, rightType, operator);
+
         throw new StandardException("Types not compatible for " + operator + 
                                     ": " + leftTypeId.getSQLTypeName() +
                                     " and " + rightTypeId.getSQLTypeName());
