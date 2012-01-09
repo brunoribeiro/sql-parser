@@ -156,7 +156,7 @@ public class IntervalTypeCompiler extends TypeCompiler
             else if (getStoredFormatIdFromTypeId() == TypeId.FormatIds.INTERVAL_YEAR_MONTH_ID)
                 return new DataTypeDescriptor(TypeId.INTERVAL_MONTH_ID, nullable);
             else
-                return new DataTypeDescriptor(TypeId.INTERVAL_DAY_ID, nullable);
+                return new DataTypeDescriptor(TypeId.INTERVAL_SECOND_ID, nullable);
         }
 
         if (rightTypeId.isNumericTypeId() &&
@@ -165,7 +165,7 @@ public class IntervalTypeCompiler extends TypeCompiler
             if (getStoredFormatIdFromTypeId() == TypeId.FormatIds.INTERVAL_YEAR_MONTH_ID)
                 return new DataTypeDescriptor(TypeId.INTERVAL_MONTH_ID, nullable);
             else
-                return new DataTypeDescriptor(TypeId.INTERVAL_DAY_ID, nullable);
+                return new DataTypeDescriptor(TypeId.INTERVAL_SECOND_ID, nullable);
         }
 
         // Unsupported
