@@ -2793,6 +2793,8 @@ spsSetStatement() throws StandardException :
         statementNode = setRoleStatement()
     |
         statementNode = setTransactionStatement()
+    |
+        statementNode = setConfigurationStatement()
     )
     {
         return statementNode;
@@ -10600,7 +10602,7 @@ mysqlIntervalQualifier(int[] factors) throws StandardException :
     {
         typeId = TypeId.INTERVAL_SECOND_ID;
         scale = 6;
-        factors[1] = 1000;
+        factors[1] = 1000000;
     }
 |
     <WEEK>
@@ -10612,7 +10614,7 @@ mysqlIntervalQualifier(int[] factors) throws StandardException :
     <QUARTER>
     {
         typeId = TypeId.INTERVAL_MONTH_ID;
-        factors[0] = 4;
+        factors[0] = 3;
     }
 |
     <SECOND_MICROSECOND>
@@ -11359,6 +11361,23 @@ transactionAccessMode() throws StandardException :
         return AccessMode.READ_WRITE_ACCESS_MODE;
     }
 )
+}
+
+StatementNode
+setConfigurationStatement() throws StandardException :
+{
+    Token variable;
+    CharConstantNode value;
+}
+{
+    variable = <IDENTIFIER>
+    ( <EQUALS_OPERATOR> | <TO> )
+    value = stringLiteral()
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.SET_CONFIGURATION_NODE,
+                                                  variable.image, value.getValue(),
+                                                  parserContext);
+    }
 }
 
 ValueNode
