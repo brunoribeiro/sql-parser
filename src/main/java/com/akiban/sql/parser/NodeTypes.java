@@ -74,7 +74,7 @@ public interface NodeTypes
     public static final int IS_NOT_NULL_NODE = 24;
     public static final int IS_NULL_NODE = 25;
     public static final int NOT_NODE = 26;
-    // 27 is available
+    public static final int SET_CONFIGURATION_NODE = 27;
     public static final int SQL_TO_JAVA_VALUE_NODE = 28;
     public static final int UNARY_MINUS_OPERATOR_NODE = 29;
     public static final int UNARY_PLUS_OPERATOR_NODE = 30;
