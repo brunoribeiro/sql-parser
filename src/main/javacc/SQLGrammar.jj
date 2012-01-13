@@ -1043,6 +1043,11 @@ class SQLGrammar
         }
 
         switch (multiplicativeOperator) {
+        case MOD:
+            return (ValueNode)nodeFactory.getNode(NodeTypes.MOD_OPERATOR_NODE,
+                                                  leftOperand,
+                                                  rightOperand,
+                                                  parserContext);
         case TIMES:
             return (ValueNode)nodeFactory.getNode(NodeTypes.BINARY_TIMES_OPERATOR_NODE,
                                                   leftOperand,
@@ -5147,6 +5152,11 @@ BinaryOperatorNode.OperatorType
 multiplicativeOperator() throws StandardException :
 {}
 {
+    <PERCENT>
+    {
+        return BinaryOperatorNode.OperatorType.MOD;
+    }
+|
     <ASTERISK> 
     {
         return BinaryOperatorNode.OperatorType.TIMES;
