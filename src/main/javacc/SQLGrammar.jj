@@ -5152,6 +5152,11 @@ BinaryOperatorNode.OperatorType
 multiplicativeOperator() throws StandardException :
 {}
 {
+    <MOD>
+    {
+        return BinaryOperatorNode.OperatorType.MOD;
+    }
+|
     <PERCENT>
     {
         return BinaryOperatorNode.OperatorType.MOD;
