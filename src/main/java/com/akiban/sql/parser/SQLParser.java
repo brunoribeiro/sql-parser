@@ -18,20 +18,6 @@
  *
  */
 
-/* Copyright (C) 2011 Akiban Technologies Inc.
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License, version 3,
- * as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
 // TODO: The Derby exception handling coordinated localized messages
 // and SQLSTATE values, which will be needed, but in the context of
 // the new engine.
@@ -108,12 +94,21 @@ public class SQLParser implements SQLParserContext {
             return parser.parseStatement(sqlText, parameterList);
         }
         catch (ParseException ex) {
-            throw new StandardException(standardizeEol(ex.toString()), ex);
+            throw new SQLParserException(standardizeEol(ex.getMessage()),
+                                         ex, 
+                                         tokenErrorPosition(ex.currentToken, sqlText));
         }
         catch (TokenMgrError ex) {
             // Throw away the cached parser.
             parser = null;
-            throw new StandardException(ex);
+            if (ex.errorCode == TokenMgrError.LEXICAL_ERROR)
+                throw new SQLParserException(ex.getMessage(),
+                                             ex,
+                                             lineColumnErrorPosition(ex.errorLine,
+                                                                     ex.errorColumn,
+                                                                     sqlText));
+            else
+                throw new StandardException(ex);
         }
     }
 
@@ -124,12 +119,21 @@ public class SQLParser implements SQLParserContext {
             return parser.parseStatements(sqlText);
         }
         catch (ParseException ex) {
-            throw new StandardException(standardizeEol(ex.toString()), ex);
+            throw new SQLParserException(standardizeEol(ex.getMessage()),
+                                         ex, 
+                                         tokenErrorPosition(ex.currentToken, sqlText));
         }
         catch (TokenMgrError ex) {
             // Throw away the cached parser.
             parser = null;
-            throw new StandardException(ex);
+            if (ex.errorCode == TokenMgrError.LEXICAL_ERROR)
+                throw new SQLParserException(ex.getMessage(),
+                                             ex,
+                                             lineColumnErrorPosition(ex.errorLine,
+                                                                     ex.errorColumn,
+                                                                     sqlText));
+            else
+                throw new StandardException(ex);
         }
     }
 
@@ -142,6 +146,26 @@ public class SQLParser implements SQLParserContext {
             return msg;
         else
             return msg.replaceAll(eol, "\n");
+    }
+
+    /** Translate position of token into linear position. */
+    private static int tokenErrorPosition(Token token, String sql) {
+        if (token == null) return 0;
+        return lineColumnErrorPosition(token.next.beginLine, token.next.beginColumn, sql);
+    }
+
+    /** Translate line position into linear position. */
+    private static int lineColumnErrorPosition(int line, int column, String sql) {
+        if (line <= 0) return 0;
+        int position = 0;
+        while (line-- > 1) {
+            position = sql.indexOf('\n', position);
+            if (position < 0)
+                return 0;
+            position++;
+        }
+        position += column;
+        return position;
     }
 
     protected void reinit(String sqlText) throws StandardException {
