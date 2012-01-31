@@ -11367,15 +11367,16 @@ StatementNode
 setConfigurationStatement() throws StandardException :
 {
     Token variable;
-    CharConstantNode value;
+    CharConstantNode value = null;
 }
 {
     variable = <IDENTIFIER>
     ( <EQUALS_OPERATOR> | <TO> )
-    value = stringLiteral()
+    ( value = stringLiteral() | <_DEFAULT> )
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.SET_CONFIGURATION_NODE,
-                                                  variable.image, value.getValue(),
+                                                  variable.image, 
+                                                  (value == null) ? null : value.getValue(),
                                                   parserContext);
     }
 }
