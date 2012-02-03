@@ -1663,7 +1663,7 @@ public class TypeId
         }
     }
 
-    static class RowMultiSetTypeId extends TypeId {
+    public static class RowMultiSetTypeId extends TypeId {
         String[] columnNames;
         DataTypeDescriptor[] columnTypes;
 
@@ -1699,6 +1699,18 @@ public class TypeId
             buffer.append( " )" );
 
             return buffer.toString();
+        }
+
+        public boolean isRowMultiSet() {
+            return true;
+        }
+
+        public String[] getColumnNames() {
+            return columnNames;
+        }
+
+        public DataTypeDescriptor[] getColumnTypes() {
+            return columnTypes;
         }
     }
 
