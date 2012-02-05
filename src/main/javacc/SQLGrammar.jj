@@ -1499,6 +1499,16 @@ class SQLGrammar
             getToken(1).kind == STRAIGHT_JOIN;
     }
 
+    boolean modInfixFollows() {
+        if (!hasFeature(SQLParserFeature.MOD_INFIX))
+            return false;
+        switch(getToken(1).kind) {
+        case MOD:
+        case PERCENT:   return true;
+        default:        return false;
+        }
+   }
+
     boolean mysqlIntervalFollows() {
         if (!hasFeature(SQLParserFeature.MYSQL_INTERVAL))
             return false;
@@ -5121,7 +5131,7 @@ multiplicativeExpression(ValueNode farLeftOperand,
 }
 {
     leftOperand = unaryExpression(null, null)
-    ( multOp = multiplicativeOperator() 
+    ( multOp = multiplicativeOperator()
         leftOperand = unaryExpression(leftOperand, multOp) 
     )*
     {
@@ -5152,15 +5162,11 @@ BinaryOperatorNode.OperatorType
 multiplicativeOperator() throws StandardException :
 {}
 {
-    <MOD>
-    {
-        return BinaryOperatorNode.OperatorType.MOD;
-    }
-|
-    <PERCENT>
-    {
-        return BinaryOperatorNode.OperatorType.MOD;
-    }
+    LOOKAHEAD ( {modInfixFollows()} )
+       (<MOD> | <PERCENT>)
+       {
+            return BinaryOperatorNode.OperatorType.MOD;
+       }
 |
     <ASTERISK> 
     {

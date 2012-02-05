@@ -85,7 +85,7 @@ public class BinaryArithmeticOperatorNode extends BinaryOperatorNode
             break;
 
         case NodeTypes.MOD_OPERATOR_NODE:
-            operator = "%";
+            operator = "mod";
             methodName = "mod";
             break;
 

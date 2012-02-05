@@ -269,6 +269,7 @@ public class SQLParser implements SQLParserContext {
 
     public boolean hasFeature(SQLParserFeature feature) {
         switch (feature) {
+        case MOD_INFIX:
         case GROUPING:
         case UNSIGNED:
         case MYSQL_HINTS:
