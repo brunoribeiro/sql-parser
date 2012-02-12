@@ -137,36 +137,48 @@ public class IntervalTypeCompiler extends TypeCompiler
                                                          String operator)
             throws StandardException {
         TypeId rightTypeId = rightType.getTypeId();
-
-        if (rightTypeId.isDateTimeTimeStampTypeId() && 
-            operator.equals(TypeCompiler.PLUS_OP))
-            // Let specific datetime type resolve it.
-            return getTypeCompiler(rightTypeId).resolveArithmeticOperation(rightType, leftType, operator);
-        
+        TypeId leftTypeId = leftType.getTypeId();
         boolean nullable = leftType.isNullable() || rightType.isNullable();
 
-        if (rightTypeId.isIntervalTypeId() &&
-            (operator.equals(TypeCompiler.PLUS_OP) ||
-             operator.equals(TypeCompiler.MINUS_OP)) &&
-            (getStoredFormatIdFromTypeId() == rightTypeId.getTypeFormatId())) {
-            // +/- of compatible intervals.
-            if (leftType.getTypeId() == rightTypeId)
-                // Keep the specific interval range if the same.
-                return leftType.getNullabilityType(nullable);
-            else if (getStoredFormatIdFromTypeId() == TypeId.FormatIds.INTERVAL_YEAR_MONTH_ID)
-                return new DataTypeDescriptor(TypeId.INTERVAL_MONTH_ID, nullable);
-            else
-                return new DataTypeDescriptor(TypeId.INTERVAL_SECOND_ID, nullable);
+        if (operator.equals(PLUS_OP) || operator.equals(MINUS_OP))
+        {
+            // date/time and interval
+            TypeId datetimeType;
+            if ((datetimeType = rightTypeId).isDateTimeTimeStampTypeId() && leftTypeId.isIntervalTypeId() ||
+                  (datetimeType = leftTypeId).isDateTimeTimeStampTypeID() && rightTypeId.isIntervalTypeId())
+                // Let specific datetime type resolve it.
+                return getTypeCompiler(datetimeType).resolveArithmeticOperation(rightType, leftType, operator);
+        
+            // interval and interval
+            int typeFormatId = 0;
+            if (leftTypeId.isIntervalTypeId() && rightTypeId.isIntervalTypeId())
+                // two intervals are exactly the same
+                if (leftTypeId == rightTypeId)                    
+                    return leftType.getNullabilityType(nullable);
+                // two intervals are of the same *type*
+                else if ((typeFormatId = leftTypeId.getTypeFormatId()) == rightTypeId.getTypeFormatId())
+                    return new DataTypeDescriptor(typeFormatId == TypeId.FormatIds.INTERVAL_DAY_SECOND_ID ?
+                                                    TypeId.INTERVAL_SECOND_ID : TypeId.INTERVAL_MONTH_ID,
+                                                    nullable);
+                        
+            // varchar
+             DataTypeDescriptor varcharType;
+             if ((varcharType = leftType).getTypeId().isStringTypeId() && rightTypeId.isIntervalTypeId()||
+                 (varcharType = rightType).getTypeId().isStringTypeId() && leftTypeId.isIntervalTypeId()
+                    && operator.equals(PLUS_OP)) // when left is interval, only + is legal
+                return new DataTypeDescriptor(varcharType.getPrecision() > 10 ? TypeId.DATETIME_ID : TypeId.DATE_ID, nullable);
         }
-
-        if (rightTypeId.isNumericTypeId() &&
-            (operator.equals(TypeCompiler.TIMES_OP) ||
-             operator.equals(TypeCompiler.DIVIDE_OP))) {
-            if (getStoredFormatIdFromTypeId() == TypeId.FormatIds.INTERVAL_YEAR_MONTH_ID)
-                return new DataTypeDescriptor(TypeId.INTERVAL_MONTH_ID, nullable);
-            else
-                return new DataTypeDescriptor(TypeId.INTERVAL_SECOND_ID, nullable);
-        }
+        else if (operator.equals(TIMES_OP) || operator.equals(DIVIDE_OP))
+        {   
+            // numeric / varchar and interval
+            TypeId intervalId = null;
+            if ((intervalId = leftTypeId).isIntervalTypeId() && 
+                    (rightTypeId.isNumericTypeId() || rightTypeId.isStringTypeId())||
+                (intervalId = rightTypeId).isIntervalTypeId() && 
+                    (leftTypeId.isNumericTypeId() || leftTypeId.isStringTypeId()) &&
+                    operator.equals(TIMES_OP)) // when right is interval, only * is legal
+                return new DataTypeDescriptor(intervalId, nullable);            
+        }        
 
         // Unsupported
         return super.resolveArithmeticOperation(leftType, rightType, operator);

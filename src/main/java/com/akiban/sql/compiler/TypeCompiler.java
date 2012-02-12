@@ -114,7 +114,8 @@ public abstract class TypeCompiler
         TypeId rightTypeId = rightType.getTypeId();
         if (leftTypeId.equals(rightTypeId))
             return leftType;
-        throw new StandardException("Types not compatible for " + operator + 
+
+        throw new StandardException("Types not compatible for " + operator +
                                     ": " + leftTypeId.getSQLTypeName() +
                                     " and " + rightTypeId.getSQLTypeName());
     }
