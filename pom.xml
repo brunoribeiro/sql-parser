@@ -68,6 +68,21 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
+            <!-- Build source jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- JavaCC plugin -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -135,6 +150,14 @@
                 <version>1.10.b1</version>
                 <configuration>
                     <header>src/etc/header.txt</header>
+                    <headerSections>
+                        <headerSection>
+                            <key>__YEAR_SECTION__</key>
+                            <defaultValue>2012</defaultValue>
+                            <ensureMatch>2011|2012|2011-2012</ensureMatch>
+                        </headerSection>
+                    </headerSections>
+                    <strictCheck>true</strictCheck>
                     <failIfMissing>true</failIfMissing>
                     <excludes>
                         <!-- General files that can't have or don't need header -->
@@ -148,9 +171,6 @@
                         <g>JAVADOC_STYLE</g>
                         <yml>SCRIPT_STYLE</yml>
                     </mapping>
-                    <properties>
-                        <year>2011</year>
-                    </properties>
                 </configuration>
                 <executions>
                     <execution>
