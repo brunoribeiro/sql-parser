@@ -5802,7 +5802,7 @@ characterValueFunction() throws StandardException :
     ValueNode length = null;
 }
 {
-    <SUBSTR> <LEFT_PAREN> value = additiveExpression() 
+    ( <SUBSTR> | <SUBSTRING> ) <LEFT_PAREN> value = additiveExpression() 
     <COMMA> startPosition = additiveExpression() 
     [ <COMMA> length = additiveExpression() ] 
     <RIGHT_PAREN>
