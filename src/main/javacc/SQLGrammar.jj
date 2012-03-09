@@ -5494,15 +5494,6 @@ escapedValueFunction() throws StandardException :
         return value;
     }
 |
-    /* Escaped function SUBSTRING() */
-        <SUBSTRING> <LEFT_PAREN> value = additiveExpression() 
-        <COMMA> startPosition = additiveExpression() 
-        [ <COMMA> length = additiveExpression() ] 
-        <RIGHT_PAREN>
-    {
-        return getSubstringNode(value, startPosition, length, Boolean.FALSE);
-    }
-|
     /* CURDATE() is an escaped function supported by JCC 2.2 or higher */
     <CURDATE> <LEFT_PAREN> <RIGHT_PAREN>
     {
