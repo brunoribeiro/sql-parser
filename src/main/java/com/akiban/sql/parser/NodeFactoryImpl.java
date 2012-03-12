@@ -406,9 +406,6 @@ public final class NodeFactoryImpl extends NodeFactory
 
         case NodeTypes.DISTINCT_NODE:
             return NodeNames.DISTINCT_NODE_NAME;
-
-        case NodeTypes.POSITION_FUNCTION_NODE:
-            return NodeNames.POSITION_FUNCTION_NODE_NAME;
             
         case NodeTypes.LOCATE_FUNCTION_NODE:
         case NodeTypes.SUBSTRING_OPERATOR_NODE:

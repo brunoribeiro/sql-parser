@@ -5845,9 +5845,12 @@ characterValueFunction() throws StandardException :
     (<COMMA> | <IN>)  str2 = additiveExpression()
     <RIGHT_PAREN>
     {
-        return (ValueNode)nodeFactory.getNode(NodeTypes.POSITION_FUNCTION_NODE,
+        return (ValueNode)nodeFactory.getNode(NodeTypes.LOCATE_FUNCTION_NODE,
                                               str1,
                                               str2,
+                                              nodeFactory.getNode(NodeTypes.INT_CONSTANT_NODE, 1, parserContext),
+                                              TernaryOperatorNode.OperatorType.LOCATE,
+                                              null,
                                               parserContext);
     }
 }
