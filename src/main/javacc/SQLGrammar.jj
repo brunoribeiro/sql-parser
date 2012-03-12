@@ -5845,7 +5845,6 @@ characterValueFunction() throws StandardException :
     (<COMMA> | <IN>)  str2 = additiveExpression()
     <RIGHT_PAREN>
     {
-        // If start is missing, start is equal to 1.
         return (ValueNode)nodeFactory.getNode(NodeTypes.POSITION_FUNCTION_NODE,
                                               str1,
                                               str2,
