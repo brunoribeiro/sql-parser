@@ -306,8 +306,6 @@ public interface NodeNames
 
     static final String TERNARY_OPERATOR_NODE_NAME = "com.akiban.sql.parser.TernaryOperatorNode";
 
-    static final String POSITION_FUNCTION_NODE_NAME = "com.akiban.sql.parser.PositionOperatorNode";
-    
     static final String TEST_CONSTRAINT_NODE_NAME = "com.akiban.sql.parser.TestConstraintNode";
 
     static final String TIMESTAMP_OPERATOR_NODE_NAME = "com.akiban.sql.parser.TimestampOperatorNode";
