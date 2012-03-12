@@ -467,6 +467,7 @@ class SQLGrammar
         case SECOND:
         case LENGTH:
         case LOCATE:
+        case POSITION:
         case XMLPARSE:
         case XMLSERIALIZE:
         case XMLEXISTS:
@@ -2200,6 +2201,7 @@ TOKEN [IGNORE_CASE] :
 | <JAVA: "java">
 | <LCASE: "lcase">
 | <LOCATE: "locate">
+| <POSITION: "position">
 | <LOCK: "lock">
 | <MESSAGE_LOCALE: "message_locale">
 | <METHOD: "method">
@@ -5824,8 +5826,8 @@ characterValueFunction() throws StandardException :
         return value;
     }
 |
-    <LOCATE> <LEFT_PAREN> str1 = additiveExpression() 
-    <COMMA> str2 = additiveExpression()
+    (<LOCATE> | <POSITION>) <LEFT_PAREN> str1 = additiveExpression() 
+    (<COMMA> | <IN>)  str2 = additiveExpression()
     [ <COMMA> value = additiveExpression() ]
     <RIGHT_PAREN>
     {
@@ -13324,6 +13326,7 @@ nonReservedKeyword() :
 | tok = <LENGTH>
 | tok = <LEVEL>
 | tok = <LOCATE>
+| tok = <POSITION>
 | tok = <LOCK>
 | tok = <LOCKS>
 | tok = <LOCKSIZE>
