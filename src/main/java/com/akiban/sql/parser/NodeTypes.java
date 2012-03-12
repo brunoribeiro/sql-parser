@@ -204,7 +204,8 @@ public interface NodeTypes
     // UNUSED public static final int BOOLEAN_NODE = 155;
     public static final int DROP_ALIAS_NODE = 156;
     public static final int INTERSECT_OR_EXCEPT_NODE = 157;
-    // 158 - 183 available
+    // 158 - 182 available
+    public static final int POSITION_FUNCTION_NODE = 183;
     public static final int TIMESTAMP_ADD_FN_NODE = 184;
     public static final int TIMESTAMP_DIFF_FN_NODE = 185;
     public static final int MODIFY_COLUMN_TYPE_NODE = 186;
