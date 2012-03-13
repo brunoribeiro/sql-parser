@@ -2088,6 +2088,7 @@ TOKEN [IGNORE_CASE] :
 | <OFFSET: "offset">
 | <PASCAL: "pascal">
 | <PLI: "pli">
+| <POSITION: "position">
 | <PRECISION: "precision">
 | <RELEASE: "release">
 | <REPEATABLE: "repeatable">
@@ -13339,7 +13340,6 @@ nonReservedKeyword() :
 | tok = <LENGTH>
 | tok = <LEVEL>
 | tok = <LOCATE>
-| tok = <POSITION>
 | tok = <LOCK>
 | tok = <LOCKS>
 | tok = <LOCKSIZE>
@@ -13377,6 +13377,7 @@ nonReservedKeyword() :
 | tok = <PASCAL>
 | tok = <PASSING>
 | tok = <PLI>
+| tok = <POSITION>
 | tok = <PRECISION>
 | tok = <PROPERTIES>
 | tok = <PURGE>
