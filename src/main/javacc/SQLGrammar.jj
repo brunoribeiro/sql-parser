@@ -2202,7 +2202,6 @@ TOKEN [IGNORE_CASE] :
 | <JAVA: "java">
 | <LCASE: "lcase">
 | <LOCATE: "locate">
-| <POSITION: "position">
 | <LOCK: "lock">
 | <MESSAGE_LOCALE: "message_locale">
 | <METHOD: "method">
