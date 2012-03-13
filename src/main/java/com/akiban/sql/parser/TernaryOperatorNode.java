@@ -52,11 +52,6 @@ import com.akiban.sql.types.ValueClassName;
 public class TernaryOperatorNode extends ValueNode
 {
     public static enum OperatorType {
-        TRIM("trim", "ansiTrim", 
-             ValueClassName.StringDataValue, 
-             new String[] { ValueClassName.StringDataValue, 
-                            ValueClassName.StringDataValue, 
-                            "java.lang.Integer" }),
         LOCATE("LOCATE", "locate",
                ValueClassName.NumberDataValue,
                new String[] { ValueClassName.StringDataValue, 
@@ -110,11 +105,6 @@ public class TernaryOperatorNode extends ValueNode
     protected String leftInterfaceType;
     protected String rightInterfaceType;
 
-    public static enum TrimType {
-        LEADING, TRAILING, BOTH
-    }
-    protected TrimType trimType;
-
     // TODO: Could be enum, but note how passed as Integer constant.
     public static final int YEAR_INTERVAL = 0;
     public static final int QUARTER_INTERVAL = 1;
@@ -150,7 +140,6 @@ public class TernaryOperatorNode extends ValueNode
         this.receiverInterfaceType = this.operatorType.argTypes[0];
         this.leftInterfaceType = this.operatorType.argTypes[1];
         this.rightInterfaceType = this.operatorType.argTypes[2];
-        this.trimType = (TrimType)trimType;
     }
 
     /**
@@ -173,7 +162,6 @@ public class TernaryOperatorNode extends ValueNode
         this.receiverInterfaceType = other.receiverInterfaceType;
         this.leftInterfaceType = other.leftInterfaceType;
         this.rightInterfaceType = other.rightInterfaceType;
-        this.trimType = other.trimType;
     }
 
     /**
