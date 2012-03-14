@@ -467,6 +467,7 @@ class SQLGrammar
         case SECOND:
         case LENGTH:
         case LOCATE:
+        case POSITION:
         case XMLPARSE:
         case XMLSERIALIZE:
         case XMLEXISTS:
@@ -2087,6 +2088,7 @@ TOKEN [IGNORE_CASE] :
 | <OFFSET: "offset">
 | <PASCAL: "pascal">
 | <PLI: "pli">
+| <POSITION: "position">
 | <PRECISION: "precision">
 | <RELEASE: "release">
 | <REPEATABLE: "repeatable">
@@ -5825,7 +5827,7 @@ characterValueFunction() throws StandardException :
     }
 |
     <LOCATE> <LEFT_PAREN> str1 = additiveExpression() 
-    <COMMA> str2 = additiveExpression()
+    (<COMMA> | <IN>)  str2 = additiveExpression()
     [ <COMMA> value = additiveExpression() ]
     <RIGHT_PAREN>
     {
@@ -5834,6 +5836,19 @@ characterValueFunction() throws StandardException :
                                               str1,
                                               str2,
                                               (value == null) ? nodeFactory.getNode(NodeTypes.INT_CONSTANT_NODE, 1, parserContext) : value,
+                                              TernaryOperatorNode.OperatorType.LOCATE,
+                                              null,
+                                              parserContext);
+    }
+|
+    <POSITION> <LEFT_PAREN> str1 = additiveExpression() 
+    (<COMMA> | <IN>)  str2 = additiveExpression()
+    <RIGHT_PAREN>
+    {
+        return (ValueNode)nodeFactory.getNode(NodeTypes.LOCATE_FUNCTION_NODE,
+                                              str1,
+                                              str2,
+                                              nodeFactory.getNode(NodeTypes.INT_CONSTANT_NODE, 1, parserContext),
                                               TernaryOperatorNode.OperatorType.LOCATE,
                                               null,
                                               parserContext);
@@ -13361,6 +13376,7 @@ nonReservedKeyword() :
 | tok = <PASCAL>
 | tok = <PASSING>
 | tok = <PLI>
+| tok = <POSITION>
 | tok = <PRECISION>
 | tok = <PROPERTIES>
 | tok = <PURGE>
