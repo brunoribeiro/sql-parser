@@ -198,7 +198,10 @@ public final class NodeFactoryImpl extends NodeFactory
 
         case NodeTypes.AND_NODE:
             return NodeNames.AND_NODE_NAME;
-
+        
+        case NodeTypes.TRIM_OPERATOR_NODE:
+            return NodeNames.TRIM_OPERATOR_NODE_NAME;
+            
         case NodeTypes.BINARY_EQUALS_OPERATOR_NODE:
         case NodeTypes.BINARY_GREATER_EQUALS_OPERATOR_NODE:
         case NodeTypes.BINARY_GREATER_THAN_OPERATOR_NODE:
@@ -409,7 +412,6 @@ public final class NodeFactoryImpl extends NodeFactory
 
         case NodeTypes.LOCATE_FUNCTION_NODE:
         case NodeTypes.SUBSTRING_OPERATOR_NODE:
-        case NodeTypes.TRIM_OPERATOR_NODE:
         case NodeTypes.TIMESTAMP_ADD_FN_NODE:
         case NodeTypes.TIMESTAMP_DIFF_FN_NODE:
             return NodeNames.TERNARY_OPERATOR_NODE_NAME;
