@@ -1280,7 +1280,7 @@ class SQLGrammar
      * to ' '.
      * @param trimSource expression to be trimmed.
      */
-    ValueNode getTrimOperatorNode(TernaryOperatorNode.TrimType trimSpec,
+    ValueNode getTrimOperatorNode(BinaryOperatorNode.OperatorType trimType,
                                   ValueNode trimChar,
                                   ValueNode trimSource) 
             throws StandardException {
@@ -1290,11 +1290,9 @@ class SQLGrammar
                                                              parserContext);
         }
         return (ValueNode)nodeFactory.getNode(NodeTypes.TRIM_OPERATOR_NODE,
-                                              trimSource, // receiver
-                                              trimChar,       // leftOperand.
-                                              null,
-                                              TernaryOperatorNode.OperatorType.TRIM,
-                                              trimSpec,
+                                              trimSource, // left
+                                              trimChar,   // right
+                                              trimType,
                                               parserContext);
     }
 
@@ -5859,7 +5857,8 @@ ValueNode
 trimFunction() throws StandardException :
 {
     ValueNode source;
-    TernaryOperatorNode.TrimType trimType;
+    BinaryOperatorNode.OperatorType trimType;
+
     ValueNode ansiTrimNode;
 }
 {
@@ -5877,26 +5876,26 @@ trimFunction() throws StandardException :
 ValueNode
 ansiTrim() throws StandardException  :
 {
-    TernaryOperatorNode.TrimType trimSpec = TernaryOperatorNode.TrimType.BOTH;
+    BinaryOperatorNode.OperatorType trimType = BinaryOperatorNode.OperatorType.TRIM;
     ValueNode trimChar = null;
     ValueNode trimSource = null;
 }
 {
     LOOKAHEAD( { ansiTrimSpecFollows() } )
-    <LEFT_PAREN> trimSpec = ansiTrimSpec()
+    <LEFT_PAREN> trimType = ansiTrimSpec()
     (
         // LEADING FROM <source>
         LOOKAHEAD( <FROM> )
         <FROM> trimSource = additiveExpression() <RIGHT_PAREN>
     {
-        return getTrimOperatorNode(trimSpec, trimChar, trimSource);
+        return getTrimOperatorNode(trimType, trimChar, trimSource);
     }
     |
         // LEADING <char> FROM <source>
         trimChar = additiveExpression() 
         <FROM> trimSource = additiveExpression() <RIGHT_PAREN>
     {
-        return getTrimOperatorNode(trimSpec, trimChar, trimSource);
+        return getTrimOperatorNode(trimType, trimChar, trimSource);
     }
     )
 |
@@ -5905,49 +5904,49 @@ ansiTrim() throws StandardException  :
     (
         <FROM> trimSource = additiveExpression() <RIGHT_PAREN>
     {
-        return getTrimOperatorNode(trimSpec, trimChar, trimSource);
+        return getTrimOperatorNode(trimType, trimChar, trimSource);
     }
     |
         <RIGHT_PAREN>
     {
         // expr was trim(e)-- we assigned e to trimChar but it is really the trimSource
-        return getTrimOperatorNode(trimSpec, null, trimChar);
+        return getTrimOperatorNode(trimType, null, trimChar);
     }
     )
 }
 
-TernaryOperatorNode.TrimType
+BinaryOperatorNode.OperatorType
 ansiTrimSpec() :
 {}
 {
     <TRAILING>
     {
-        return TernaryOperatorNode.TrimType.TRAILING;
+        return BinaryOperatorNode.OperatorType.RTRIM;
     }
 |
     <LEADING>
     {
-        return TernaryOperatorNode.TrimType.LEADING;
+        return BinaryOperatorNode.OperatorType.LTRIM;
     }
 |
     <BOTH>
     {
-        return TernaryOperatorNode.TrimType.BOTH;
+        return BinaryOperatorNode.OperatorType.TRIM;
     }
 }
 
-TernaryOperatorNode.TrimType
+BinaryOperatorNode.OperatorType
 trimType() :
 {}
 {
     <RTRIM>
     {
-        return TernaryOperatorNode.TrimType.TRAILING;
+        return BinaryOperatorNode.OperatorType.RTRIM;
     }
 |
     <LTRIM>
     {
-        return TernaryOperatorNode.TrimType.LEADING;
+        return BinaryOperatorNode.OperatorType.LTRIM;
     }
 }
 
@@ -6120,7 +6119,7 @@ miscBuiltinsCore(boolean isJDBCEscape) throws StandardException :
     {
         if (isJDBCEscape)
             return (ValueNode)nodeFactory.getNode(NodeTypes.CHAR_LENGTH_OPERATOR_NODE,
-                                                  getTrimOperatorNode(TernaryOperatorNode.TrimType.TRAILING,
+                                                  getTrimOperatorNode(BinaryOperatorNode.OperatorType.RTRIM,
                                                                       null,
                                                                       value),
                                                   parserContext);
