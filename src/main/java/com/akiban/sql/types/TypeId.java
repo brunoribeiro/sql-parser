@@ -431,10 +431,10 @@ public class TypeId
         case Types.BIGINT:
             return BIGINT_ID;
 
+        case Types.FLOAT:
         case Types.REAL:
             return REAL_ID;
 
-        case Types.FLOAT:
         case Types.DOUBLE:
             return DOUBLE_ID;
 
@@ -620,7 +620,7 @@ public class TypeId
             return DOUBLE_ID;
         }
         if (SQLTypeName.equals(FLOAT_NAME)) {
-            return DOUBLE_ID;
+            return REAL_ID;
         }
         if (SQLTypeName.equals(INTEGER_NAME) ||
             SQLTypeName.equals(INT_NAME)) {
@@ -727,7 +727,7 @@ public class TypeId
             return BIGINT_UNSIGNED_ID;
         }
         if (SQLTypeName.equals(FLOAT_UNSIGNED_NAME)) {
-            return DOUBLE_UNSIGNED_ID;
+            return REAL_UNSIGNED_ID;
         }
         if (SQLTypeName.equals(REAL_UNSIGNED_NAME)) {
             return REAL_UNSIGNED_ID;
