@@ -166,6 +166,7 @@
                         <exclude>**/*.error</exclude>
                         <exclude>**/*.jj</exclude>
                         <exclude>.bzrignore</exclude>
+                        <exclude>LICENSE.txt</exclude>
                     </excludes>
                     <mapping>
                         <g>JAVADOC_STYLE</g>
