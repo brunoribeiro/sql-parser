@@ -257,6 +257,7 @@ class SQLGrammar
      * Remove first and last quotes and compress adjacent ones in the
      * middle.
      */
+    // TODO: Need to support backslash escaping for compatible double-quoted string.
     // TODO: This looks pretty inefficient.
     private static String trimAndCompressQuotes(String source, String quotes, boolean backslash) {
         String result = source.substring(1, source.length() - 1);

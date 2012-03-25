@@ -29,9 +29,11 @@ import com.akiban.sql.StandardException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SQLParser implements SQLParserContext {
     private String sqlText;
@@ -55,6 +57,14 @@ public class SQLParser implements SQLParserContext {
 
     // TODO: Needs much more thought.
     private String messageLocale = null;
+
+    // TODO: For now, has most MySQL stuff turned on.
+    private Set<SQLParserFeature> features = 
+        EnumSet.of(SQLParserFeature.GROUPING,
+                   SQLParserFeature.MOD_INFIX, 
+                   SQLParserFeature.UNSIGNED,
+                   SQLParserFeature.MYSQL_HINTS,
+                   SQLParserFeature.MYSQL_INTERVAL);
 
     NodeFactory nodeFactory;
 
@@ -267,18 +277,13 @@ public class SQLParser implements SQLParserContext {
     public String generateColumnName() {
         return "_SQL_COL_" + generatedColumnNameIndex++;
     }
+    
+    public Set<SQLParserFeature> getFeatures() {
+        return features;
+    }
 
     public boolean hasFeature(SQLParserFeature feature) {
-        switch (feature) {
-        case MOD_INFIX:
-        case GROUPING:
-        case UNSIGNED:
-        case MYSQL_HINTS:
-        case MYSQL_INTERVAL:
-            return true;
-        default:
-            return false;
-        }
+        return features.contains(feature);
     }
 
     public IdentifierCase getIdentifierCase() {
