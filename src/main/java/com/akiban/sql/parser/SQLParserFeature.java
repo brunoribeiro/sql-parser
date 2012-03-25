@@ -26,5 +26,6 @@ public enum SQLParserFeature
     GROUPING,
     UNSIGNED,
     MYSQL_HINTS,
-    MYSQL_INTERVAL
+    MYSQL_INTERVAL,
+    DOUBLE_QUOTED_STRING
 }

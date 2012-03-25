@@ -178,7 +178,7 @@ public class SQLParser implements SQLParserContext {
             charStream.ReInit(reader, 1, 1, LARGE_TOKEN_SIZE);
         }
         if (tokenManager == null) {
-            tokenManager = new SQLGrammarTokenManager(charStream);
+            tokenManager = new SQLGrammarTokenManager(null, charStream);
         } 
         else {
             tokenManager.ReInit(charStream);
@@ -190,6 +190,7 @@ public class SQLParser implements SQLParserContext {
         else {
             parser.ReInit(tokenManager);
         }
+        tokenManager.parser = parser;
         parameterList = new ArrayList<ParameterNode>();
         returnParameterFlag = false;
         printedObjectsMap = null;
