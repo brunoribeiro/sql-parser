@@ -56,6 +56,7 @@ options
     USER_CHAR_STREAM = true;
     TOKEN_EXTENDS = "BaseToken";
     COMMON_TOKEN_ACTION = true;
+    TOKEN_MANAGER_USES_PARSER = true;
     // Some performance gain from this.
     CACHE_TOKENS = true;
     // Debugging normally off.
@@ -175,6 +176,7 @@ class SQLGrammar
     /* Different kinds of string delimiters. */
     static final String SINGLEQUOTES = "\'\'";
     static final String DOUBLEQUOTES = "\"\"";
+    static final String BACKQUOTES = "``";
 
     // TODO: Probably not right.
     static final String IBM_SYSTEM_FUN_SCHEMA_NAME = "SYSFUN";
@@ -255,8 +257,9 @@ class SQLGrammar
      * Remove first and last quotes and compress adjacent ones in the
      * middle.
      */
+    // TODO: Need to support backslash escaping for compatible double-quoted string.
     // TODO: This looks pretty inefficient.
-    private static String trimAndCompressQuotes(String source, String quotes) {
+    private static String trimAndCompressQuotes(String source, String quotes, boolean backslash) {
         String result = source.substring(1, source.length() - 1);
 
         /* Find the first occurrence of adjacent quotes. */
@@ -2255,8 +2258,7 @@ TOKEN [IGNORE_CASE] :
 
 TOKEN :
 { /* Operators and punctuation */
-    <DOUBLE_QUOTE: "\"">
-| <PERCENT: "%">
+  <PERCENT: "%">
 | <AMPERSAND: "&">
 | <QUOTE: "'">
 | <LEFT_BRACE: "{">
@@ -2543,28 +2545,56 @@ TOKEN :
               ]>
 }
 
+/* Delimited Identifier - NOTE: this does not allow zero-length identifiers */
 TOKEN :
-{ /* Delimited Identifiers - NOTE: this does not allow zero-length identifiers */
-    <DELIMITED_IDENTIFIER: "\""
-        (
-         ("\"\"") |
-         (~["\""])
-         ) +
-        "\"">
+{
+  <BACKQUOTED_IDENTIFIER: "`"
+    (
+      ("``") |
+      (~["`"])
+    ) +
+    "`">
+}
+
+MORE :
+{
+  "\"" { SwitchTo(parser.hasFeature(SQLParserFeature.DOUBLE_QUOTED_STRING) ?
+                  IN_DOUBLEQUOTED_STRING : IN_DOUBLEQUOTED_IDENTIFIER); }
+}
+
+<IN_DOUBLEQUOTED_IDENTIFIER> TOKEN :
+{
+  <DOUBLEQUOTED_IDENTIFIER:
+    (
+      ("\"\"") |
+      (~["\""])
+    ) +
+    "\""> : DEFAULT
+}
+
+<IN_DOUBLEQUOTED_STRING> TOKEN :
+{
+  <DOUBLEQUOTED_STRING:
+    (
+      ("\"\"") |
+      ("\\" ["\u0001" - "\uffdc"]) |
+      (~["\"", "\\"])
+    ) +
+    "\""> : DEFAULT
 }
 
 TOKEN :
 { /* Literals */
-    <EXACT_NUMERIC: ( <UINT> ( "." ( <UINT> )? )? | "." <UINT> )>
+  <EXACT_NUMERIC: ( <UINT> ( "." ( <UINT> )? )? | "." <UINT> )>
 | <UINT: (["0" - "9"])+ >
 | <LENGTH_MODIFIER: ( <UINT> ["K","M","G","k","m","g"] )>
-| <STRING: "'"
-        (
-         "''" |
-         ~["'"]
-         ) *
-        "'">
-        /* TODO: does not allow multiple ' ... ' sequences with space separators. */
+| <SINGLEQUOTED_STRING: "'"
+    (
+      "''" |
+      ~["'"]
+    ) *
+    "'">
+  /* TODO: does not allow multiple ' ... ' sequences with space separators. */
 | <HEX_STRING: ["X","x"] "'" (["0"-"9","a"-"f","A"-"F"])*"'">
 | <APPROXIMATE_NUMERIC: <EXACT_NUMERIC> ["e","E"] ( ("+" | "-") )? ( ["0" - "9"] )+ >
 /*****
@@ -9334,10 +9364,10 @@ propertyList(boolean propertiesUseAllowed) throws StandardException :
                 parserContext.checkStringLiteralLengthLimit(value);
                 /* Trim off the leading and trailing ', and compress all '' to ' */
                 if (value.startsWith("'") && value.endsWith("'"))
-                    value = trimAndCompressQuotes(value, SINGLEQUOTES);
+                    value = trimAndCompressQuotes(value, SINGLEQUOTES, false);
                 /* Trim off the leading and trailing ", and compress all "" to " */
                 else if (value.startsWith("\"") && value.endsWith("\""))
-                    value = trimAndCompressQuotes(value, DOUBLEQUOTES);
+                    value = trimAndCompressQuotes(value, DOUBLEQUOTES, false);
                 else 
                     value = value.toUpperCase();
                 // Do not allow user to specify multiple values for the same key
@@ -10505,7 +10535,7 @@ dateTimeLiteral() throws StandardException :
 |
     // This LOOKAHEAD is needed because DATE, etc. are also function names that do
     // the same thing, but with an arbitrary expression.
-    LOOKAHEAD( { isDATETIME(getToken(1).kind) && getToken(2).kind == STRING } )
+    LOOKAHEAD( { isDATETIME(getToken(1).kind) && getToken(2).kind == SINGLEQUOTED_STRING } )
     typeDescriptor = datetimeType()
     constantNode = stringLiteral()
     {
@@ -10714,11 +10744,18 @@ string() throws StandardException :
     Token tok;
 }
 {
-    tok = <STRING>
+    tok = <SINGLEQUOTED_STRING>
     {
         parserContext.checkStringLiteralLengthLimit(tok.image);
         /* Trim off the leading and trailing ', and compress all '' to ' */
-        return trimAndCompressQuotes(tok.image, SINGLEQUOTES);
+        return trimAndCompressQuotes(tok.image, SINGLEQUOTES, false);
+    }
+|
+    tok = <DOUBLEQUOTED_STRING>
+    {
+        parserContext.checkStringLiteralLengthLimit(tok.image);
+        /* Trim off the leading and trailing ', and compress all '' to ' */
+        return trimAndCompressQuotes(tok.image, DOUBLEQUOTES, true);
     }
 }
 
@@ -10729,10 +10766,20 @@ stringLiteral() throws StandardException :
     String string;
 }
 {
-    tok = <STRING>
+(
+    tok = <SINGLEQUOTED_STRING>
     {
         parserContext.checkStringLiteralLengthLimit(tok.image);
-        string = trimAndCompressQuotes(tok.image, SINGLEQUOTES);
+        string = trimAndCompressQuotes(tok.image, SINGLEQUOTES, false);
+    }
+|
+    tok = <DOUBLEQUOTED_STRING>
+    {
+        parserContext.checkStringLiteralLengthLimit(tok.image);
+        string = trimAndCompressQuotes(tok.image, DOUBLEQUOTES, true);
+    }
+)
+    {
         return (CharConstantNode)nodeFactory.getNode(NodeTypes.CHAR_CONSTANT_NODE,
                                                      string,
                                                      parserContext);
@@ -13014,11 +13061,19 @@ delimitedIdentifier() :
     Token tok;
 }
 {
-    tok = <DELIMITED_IDENTIFIER>
+(
+    tok = <DOUBLEQUOTED_IDENTIFIER>
     {
         // Strip quotes and correct interior ones.
-        str = trimAndCompressQuotes(tok.image, DOUBLEQUOTES);
-
+        str = trimAndCompressQuotes(tok.image, DOUBLEQUOTES, false);
+    }
+|
+    tok = <BACKQUOTED_IDENTIFIER>
+    {
+        str = trimAndCompressQuotes(tok.image, BACKQUOTES, false);
+    }
+)
+    {
         // Remember last identifier token and whether it was delimited.
         nextToLastTokenDelimitedIdentifier = lastTokenDelimitedIdentifier;
         lastTokenDelimitedIdentifier = Boolean.TRUE;
