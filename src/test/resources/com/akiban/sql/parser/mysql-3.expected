@@ -1,0 +1,49 @@
+com.akiban.sql.parser.CursorNode@424ecfdd
+name: null
+updateMode: UNSPECIFIED
+statementType: SELECT
+resultSet: 	
+	com.akiban.sql.parser.SelectNode@4430d82d
+	isDistinct: false
+	resultColumns: 		
+		com.akiban.sql.parser.ResultColumnList@62c09554
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@518bf072
+		exposedName: null
+		name: null
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.JavaToSQLValueNode@3a56f631
+			type: null
+			javaNode: 				
+				com.akiban.sql.parser.StaticMethodCallNode@233d28e3
+				javaClassName: null
+				methodName: concat
+				methodParms[0] :					
+					com.akiban.sql.parser.SQLToJavaValueNode@4476128
+
+					value: 						
+						com.akiban.sql.parser.CharConstantNode@6a3b8b49
+						value: hello 
+						type: CHAR(6) NOT NULL
+				methodParms[1] :					
+					com.akiban.sql.parser.SQLToJavaValueNode@6b359c1b
+
+					value: 						
+						com.akiban.sql.parser.ColumnReference@c9be79a
+						columnName: x
+						tableName: null
+						type: null
+	fromList: 		
+		com.akiban.sql.parser.FromList@4f8235ed
+
+		[0]:		
+		com.akiban.sql.parser.FromBaseTable@6da28362
+		tableName: names
+		updateOrDelete: null
+		null
+		correlation Name: null
+		null
