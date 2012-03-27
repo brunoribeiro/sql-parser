@@ -111,9 +111,9 @@ public interface NodeTypes
     public static final int CHAR_CONSTANT_NODE = 61;
     public static final int COLUMN_REFERENCE = 62;
     public static final int DROP_INDEX_NODE = 63;
-    // 64 available;
+    public static final int UNARY_BITNOT_OPERATOR_NODE = 64;
     public static final int DROP_TRIGGER_NODE = 65;
-    // 66 available;
+    public static final int BINARY_BIT_OPERATOR_NODE = 66;
     public static final int DECIMAL_CONSTANT_NODE = 67;
     public static final int DOUBLE_CONSTANT_NODE = 68;
     public static final int FLOAT_CONSTANT_NODE = 69;

@@ -23,9 +23,11 @@ package com.akiban.sql.parser;
 public enum SQLParserFeature
 {
     GROUPING,
-    MOD_INFIX,
-    UNSIGNED,
     MYSQL_HINTS,
     MYSQL_INTERVAL,
+    UNSIGNED,
+    INFIX_MOD,
+    INFIX_BIT_OPERATORS,
+    INFIX_LOGICAL_OPERATORS,
     DOUBLE_QUOTED_STRING
 }

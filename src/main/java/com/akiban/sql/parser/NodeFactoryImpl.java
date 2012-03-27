@@ -264,8 +264,14 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.DROP_INDEX_NODE:
             return NodeNames.DROP_INDEX_NODE_NAME;
 
+        case NodeTypes.UNARY_BITNOT_OPERATOR_NODE:
+            return NodeNames.UNARY_BIT_OPERATOR_NODE_NAME;
+
         case NodeTypes.DROP_TRIGGER_NODE:
             return NodeNames.DROP_TRIGGER_NODE_NAME;
+
+        case NodeTypes.BINARY_BIT_OPERATOR_NODE:
+            return NodeNames.BINARY_BIT_OPERATOR_NODE_NAME;
 
         case NodeTypes.TINYINT_CONSTANT_NODE:
         case NodeTypes.SMALLINT_CONSTANT_NODE:
