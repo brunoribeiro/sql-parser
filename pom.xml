@@ -150,13 +150,6 @@
                 <version>1.10.b1</version>
                 <configuration>
                     <header>src/etc/header.txt</header>
-                    <headerSections>
-                        <headerSection>
-                            <key>__YEAR_SECTION__</key>
-                            <defaultValue>2012</defaultValue>
-                            <ensureMatch>2011|2012|2011-2012</ensureMatch>
-                        </headerSection>
-                    </headerSections>
                     <strictCheck>true</strictCheck>
                     <failIfMissing>true</failIfMissing>
                     <excludes>
@@ -165,6 +158,7 @@
                         <exclude>**/*.expected</exclude>
                         <exclude>**/*.error</exclude>
                         <exclude>**/*.jj</exclude>
+                        <exclude>**/*.features</exclude>
                         <exclude>.bzrignore</exclude>
                         <exclude>LICENSE.txt</exclude>
                     </excludes>
