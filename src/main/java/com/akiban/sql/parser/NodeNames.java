@@ -72,6 +72,8 @@ public interface NodeNames
 
     static final String BINARY_ARITHMETIC_OPERATOR_NODE_NAME = "com.akiban.sql.parser.BinaryArithmeticOperatorNode";
 
+    static final String BINARY_BIT_OPERATOR_NODE_NAME = "com.akiban.sql.parser.BinaryBitOperatorNode";
+
     static final String BINARY_OPERATOR_NODE_NAME = "com.akiban.sql.parser.BinaryOperatorNode";
 
     static final String BINARY_RELATIONAL_OPERATOR_NODE_NAME = "com.akiban.sql.parser.BinaryRelationalOperatorNode";
@@ -315,6 +317,8 @@ public interface NodeNames
     static final String TRIM_OPERATOR_NODE_NAME = "com.akiban.sql.parser.TrimOperatorNode";
     
     static final String UNARY_ARITHMETIC_OPERATOR_NODE_NAME = "com.akiban.sql.parser.UnaryArithmeticOperatorNode";
+
+    static final String UNARY_BIT_OPERATOR_NODE_NAME = "com.akiban.sql.parser.UnaryBitOperatorNode";
 
     static final String UNARY_DATE_TIMESTAMP_OPERATOR_NODE_NAME = "com.akiban.sql.parser.UnaryDateTimestampOperatorNode";
 
