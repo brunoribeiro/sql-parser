@@ -1509,7 +1509,7 @@ class SQLGrammar
         case PERCENT:   return true;
         default:        return false;
         }
-   }
+    }
 
     boolean infixBitFollows() {
         if (!hasFeature(SQLParserFeature.INFIX_BIT_OPERATORS))
@@ -1524,7 +1524,18 @@ class SQLGrammar
         default:
             return false;
         }
-   }
+    }
+
+    boolean unaryBitFollows() {
+        if (!hasFeature(SQLParserFeature.INFIX_BIT_OPERATORS))
+            return false;
+        switch(getToken(1).kind) {
+        case TILDE:
+            return true;
+        default:        
+            return false;
+        }
+    }
 
     // This LOOKAHEAD is required because a + or - sign can come
     // before any expression, and also can be part of a literal. If it
@@ -1547,16 +1558,6 @@ class SQLGrammar
             return true;
         }
     }
-
-    boolean unaryBitFollows() {
-        if (!hasFeature(SQLParserFeature.INFIX_BIT_OPERATORS))
-            return false;
-        switch(getToken(1).kind) {
-        case TILDE:
-        default:        
-            return false;
-        }
-   }
 
     boolean mysqlIntervalFollows() {
         if (!hasFeature(SQLParserFeature.MYSQL_INTERVAL))
