@@ -8047,7 +8047,7 @@ SelectNode
 tableExpression(ResultColumnList selectList) throws StandardException :
 {
     SelectNode selectNode;
-    FromList fromList;
+    FromList fromList = null;
     ValueNode whereClause = null;
     GroupByList groupByList = null;
     ValueNode havingClause = null;
@@ -8055,7 +8055,7 @@ tableExpression(ResultColumnList selectList) throws StandardException :
     WindowList windows = null;
 }
 {
-    fromList = fromClause()
+    [ fromList = fromClause() ]
     [ whereToken = <WHERE> whereClause = whereClause(whereToken) ]
     [ groupByList = groupByClause() ]
     [ havingClause = havingClause() ]
@@ -8075,6 +8075,11 @@ tableExpression(ResultColumnList selectList) throws StandardException :
             // n.replaceAggregatesWithColumnReferences(selectList, 0);          
         }
         
+        if (fromList == null)
+          fromList = (FromList)nodeFactory.getNode(NodeTypes.FROM_LIST, 
+                                                   true, 
+                                                   parserContext);
+
         selectNode = (SelectNode)nodeFactory.getNode(NodeTypes.SELECT_NODE,
                                                      selectList,
                                                      null,       /* AGGREGATE list */
