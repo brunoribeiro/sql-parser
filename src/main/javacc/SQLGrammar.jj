@@ -1501,15 +1501,63 @@ class SQLGrammar
             getToken(1).kind == STRAIGHT_JOIN;
     }
 
-    boolean modInfixFollows() {
-        if (!hasFeature(SQLParserFeature.MOD_INFIX))
+    boolean infixModFollows() {
+        if (!hasFeature(SQLParserFeature.INFIX_MOD))
             return false;
         switch(getToken(1).kind) {
         case MOD:
         case PERCENT:   return true;
         default:        return false;
         }
-   }
+    }
+
+    boolean infixBitFollows() {
+        if (!hasFeature(SQLParserFeature.INFIX_BIT_OPERATORS))
+            return false;
+        switch(getToken(1).kind) {
+        case AMPERSAND:
+        case VERTICAL_BAR:
+        case CARET:
+        case DOUBLE_LESS:
+        case DOUBLE_GREATER:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    boolean unaryBitFollows() {
+        if (!hasFeature(SQLParserFeature.INFIX_BIT_OPERATORS))
+            return false;
+        switch(getToken(1).kind) {
+        case TILDE:
+            return true;
+        default:        
+            return false;
+        }
+    }
+
+    // This LOOKAHEAD is required because a + or - sign can come
+    // before any expression, and also can be part of a literal. If it
+    // comes before a number, we want it to be considered part of the
+    // literal, because the literal() rule knows how to handle the
+    // minimum value for an int without changing it to a long.
+    boolean unaryArithmeticFollows() {
+        switch (getToken(1).kind) {
+        case PLUS_SIGN:
+        case MINUS_SIGN:
+            break;
+        default:
+            return false;
+        }
+        switch (getToken(2).kind) {
+        case EXACT_NUMERIC:
+        case APPROXIMATE_NUMERIC:
+            return false;
+        default:
+            return true;
+        }
+    }
 
     boolean mysqlIntervalFollows() {
         if (!hasFeature(SQLParserFeature.MYSQL_INTERVAL))
@@ -2260,6 +2308,9 @@ TOKEN :
 { /* Operators and punctuation */
   <PERCENT: "%">
 | <AMPERSAND: "&">
+| <CARET: "^">
+| <VERTICAL_BAR: "|">
+| <TILDE: "~">
 | <QUOTE: "'">
 | <LEFT_BRACE: "{">
 | <RIGHT_BRACE: "}">
@@ -2283,11 +2334,21 @@ TOKEN :
 | <GREATER_THAN_OR_EQUALS_OPERATOR: ">=">
 | <QUESTION_MARK: "?">
 | <UNDERSCORE: "_">
-| <VERTICAL_BAR: "|">
 | <LEFT_BRACKET: "[">
 | <RIGHT_BRACKET: "]">
-| <CONCATENATION_OPERATOR: "||">
+| <DOUBLE_LESS: "<<">
+| <DOUBLE_GREATER: ">>">
 | <FIELD_REFERENCE: "->">
+}
+
+TOKEN :
+{
+  <CONCATENATION_OPERATOR: "||"> 
+  { if (parser.hasFeature(SQLParserFeature.INFIX_LOGICAL_OPERATORS))
+        matchedToken.kind = OR; }
+| <DOUBLE_AMPERSAND: "&&">
+  { if (parser.hasFeature(SQLParserFeature.INFIX_LOGICAL_OPERATORS))
+        matchedToken.kind = AND; }
 }
 
 TOKEN :
@@ -5091,7 +5152,7 @@ additiveExpression(ValueNode farLeftOperand, BinaryOperatorNode.OperatorType com
 }
 {
     leftOperand = multiplicativeExpression(null, null)
-    ( operator = additiveOperator()              
+    ( operator = additiveOperator()
         leftOperand = multiplicativeExpression(leftOperand, operator) 
     )*
     {
@@ -5138,6 +5199,7 @@ additiveExpression(ValueNode farLeftOperand, BinaryOperatorNode.OperatorType com
 BinaryOperatorNode.OperatorType
 additiveOperator() throws StandardException :
 {
+    BinaryOperatorNode.OperatorType operator;
 }
 {    
     <PLUS_SIGN> 
@@ -5148,6 +5210,43 @@ additiveOperator() throws StandardException :
     <MINUS_SIGN>
     {
         return BinaryOperatorNode.OperatorType.MINUS;
+    }
+|
+    LOOKAHEAD( { infixBitFollows() } )
+    operator = infixBitOperator()
+    {
+        return operator;
+    }
+}
+
+BinaryOperatorNode.OperatorType
+infixBitOperator() throws StandardException :
+{
+}
+{    
+    <AMPERSAND>
+    {
+        return BinaryOperatorNode.OperatorType.BITAND;
+    }
+|
+    <VERTICAL_BAR>
+    {
+        return BinaryOperatorNode.OperatorType.BITOR;
+    }
+|
+    <CARET>
+    {
+        return BinaryOperatorNode.OperatorType.BITXOR;
+    }
+|
+    <DOUBLE_LESS>
+    {
+        return BinaryOperatorNode.OperatorType.LEFT_SHIFT;
+    }
+|
+    <DOUBLE_GREATER>
+    {
+        return BinaryOperatorNode.OperatorType.RIGHT_SHIFT;
     }
 }
 
@@ -5181,6 +5280,17 @@ multiplicativeExpression(ValueNode farLeftOperand,
                                                   leftOperand,
                                                   parserContext);
 
+        case BITAND:
+        case BITOR:
+        case BITXOR:
+        case LEFT_SHIFT:
+        case RIGHT_SHIFT:
+            return (ValueNode)nodeFactory.getNode(NodeTypes.BINARY_BIT_OPERATOR_NODE,
+                                                  additiveOperator,
+                                                  farLeftOperand,
+                                                  leftOperand,
+                                                  parserContext);
+
         default:
             assert false : "Unexpected operator value of " + additiveOperator;
             return null;
@@ -5192,11 +5302,11 @@ BinaryOperatorNode.OperatorType
 multiplicativeOperator() throws StandardException :
 {}
 {
-    LOOKAHEAD ( {modInfixFollows()} )
-       (<MOD> | <PERCENT>)
-       {
-            return BinaryOperatorNode.OperatorType.MOD;
-       }
+    LOOKAHEAD ( {infixModFollows()} )
+    (<MOD> | <PERCENT>)
+    {
+        return BinaryOperatorNode.OperatorType.MOD;
+    }
 |
     <ASTERISK> 
     {
@@ -5221,19 +5331,16 @@ unaryExpression(ValueNode farLeftOperand,
 {
     ValueNode value;
     String sign = null;
-    int tokKind1;
-    int tokKind2;
 }
 {
     [
-        // This LOOKAHEAD is required because a + or - sign can come
-        // before any expression, and also can be part of a literal. If it
-        // comes before a number, we want it to be considered part of the
-        // literal, because the literal() rule knows how to handle the
-        // minimum value for an int without changing it to a long.
-        LOOKAHEAD( { ((tokKind1 = getToken(1).kind) == PLUS_SIGN || tokKind1 == MINUS_SIGN) &&
-                                     ( (tokKind2 = getToken(2).kind) != EXACT_NUMERIC && tokKind2 != APPROXIMATE_NUMERIC) } )
+    (
+        LOOKAHEAD( { unaryArithmeticFollows() } )
         sign = sign()
+    |
+        LOOKAHEAD( { unaryBitFollows() })
+        sign = unaryBitOperator()
+    )
     ]
     value = primaryExpression()
     {
@@ -5244,6 +5351,11 @@ unaryExpression(ValueNode farLeftOperand,
         }
         else if ("+".equals(sign)) {
             value = (ValueNode)nodeFactory.getNode(NodeTypes.UNARY_PLUS_OPERATOR_NODE,
+                                                   value,
+                                                   parserContext);
+        }
+        else if ("~".equals(sign)) {
+            value = (ValueNode)nodeFactory.getNode(NodeTypes.UNARY_BITNOT_OPERATOR_NODE,
                                                    value,
                                                    parserContext);
         }
@@ -5266,6 +5378,18 @@ sign() :
     }
 |
     s = <MINUS_SIGN>
+    {
+        return s.image;
+    }
+}
+
+String
+unaryBitOperator() :
+{
+    Token s;
+}
+{
+    s = <TILDE>
     {
         return s.image;
     }
