@@ -1501,8 +1501,8 @@ class SQLGrammar
             getToken(1).kind == STRAIGHT_JOIN;
     }
 
-    boolean modInfixFollows() {
-        if (!hasFeature(SQLParserFeature.MOD_INFIX))
+    boolean infixModFollows() {
+        if (!hasFeature(SQLParserFeature.INFIX_MOD))
             return false;
         switch(getToken(1).kind) {
         case MOD:
@@ -2260,6 +2260,9 @@ TOKEN :
 { /* Operators and punctuation */
   <PERCENT: "%">
 | <AMPERSAND: "&">
+| <CARET: "^">
+| <VERTICAL_BAR: "|">
+| <TILDE: "~">
 | <QUOTE: "'">
 | <LEFT_BRACE: "{">
 | <RIGHT_BRACE: "}">
@@ -2283,11 +2286,21 @@ TOKEN :
 | <GREATER_THAN_OR_EQUALS_OPERATOR: ">=">
 | <QUESTION_MARK: "?">
 | <UNDERSCORE: "_">
-| <VERTICAL_BAR: "|">
 | <LEFT_BRACKET: "[">
 | <RIGHT_BRACKET: "]">
-| <CONCATENATION_OPERATOR: "||">
+| <DOUBLE_LESS: "<<">
+| <DOUBLE_GREATER: ">>">
 | <FIELD_REFERENCE: "->">
+}
+
+TOKEN :
+{
+  <CONCATENATION_OPERATOR: "||"> 
+  { if (parser.hasFeature(SQLParserFeature.INFIX_LOGICAL_OPERATORS))
+        matchedToken.kind = OR; }
+| <DOUBLE_AMPERSAND: "&&">
+  { if (parser.hasFeature(SQLParserFeature.INFIX_LOGICAL_OPERATORS))
+        matchedToken.kind = AND; }
 }
 
 TOKEN :
@@ -5192,11 +5205,11 @@ BinaryOperatorNode.OperatorType
 multiplicativeOperator() throws StandardException :
 {}
 {
-    LOOKAHEAD ( {modInfixFollows()} )
-       (<MOD> | <PERCENT>)
-       {
-            return BinaryOperatorNode.OperatorType.MOD;
-       }
+    LOOKAHEAD ( {infixModFollows()} )
+    (<MOD> | <PERCENT>)
+    {
+        return BinaryOperatorNode.OperatorType.MOD;
+    }
 |
     <ASTERISK> 
     {
