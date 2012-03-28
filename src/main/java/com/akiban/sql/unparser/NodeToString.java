@@ -359,8 +359,10 @@ public class NodeToString
         if (node.isDistinct())
             str.append("DISTINCT ");
         str.append(toString(node.getResultColumns()));
-        str.append(" FROM ");
-        str.append(toString(node.getFromList()));
+        if (!node.getFromList().isEmpty()) {
+            str.append(" FROM ");
+            str.append(toString(node.getFromList()));
+        }
         if (node.getWhereClause() != null) {
             str.append(" WHERE ");
             str.append(toString(node.getWhereClause()));

@@ -67,7 +67,8 @@ public class BinaryOperatorNode extends ValueNode
 
     public static enum OperatorType {
         PLUS, MINUS, TIMES, DIVIDE, CONCATENATE, MOD,
-        EQ, NE, GT, GE, LT, LE, AND, OR, LIKE, LTRIM, TRIM, RTRIM
+        EQ, NE, GT, GE, LT, LE, AND, OR, LIKE, LTRIM, TRIM, RTRIM,
+        BITAND, BITOR, BITXOR, LEFT_SHIFT, RIGHT_SHIFT
     }
 
     protected ValueNode leftOperand;
