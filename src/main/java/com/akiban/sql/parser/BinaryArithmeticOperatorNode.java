@@ -92,6 +92,7 @@ public class BinaryArithmeticOperatorNode extends BinaryOperatorNode
         case NodeTypes.BINARY_DIV_OPERATOR_NODE:
             operator = "div";
             methodName = "div";
+            break;
         default:
             assert false : "Unexpected nodeType:" + nodeType;
         }
