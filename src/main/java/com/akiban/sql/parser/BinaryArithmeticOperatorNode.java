@@ -89,6 +89,9 @@ public class BinaryArithmeticOperatorNode extends BinaryOperatorNode
             methodName = "mod";
             break;
 
+        case NodeTypes.BINARY_DIV_OPERATOR_NODE:
+            operator = "div";
+            methodName = "div";
         default:
             assert false : "Unexpected nodeType:" + nodeType;
         }

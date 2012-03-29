@@ -126,7 +126,7 @@ public interface NodeTypes
     public static final int USERTYPE_CONSTANT_NODE = 76;
     public static final int VARCHAR_CONSTANT_NODE = 77;
     public static final int PREDICATE = 78;
-    // 79 available
+    public static final int BINARY_DIV_OPERATOR_NODE = 79;
     public static final int RESULT_COLUMN = 80;
     public static final int SET_SCHEMA_NODE = 81;
     public static final int UPDATE_COLUMN = 82;

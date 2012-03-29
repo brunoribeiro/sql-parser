@@ -61,6 +61,7 @@ public class SQLParser implements SQLParserContext {
     // TODO: For now, has most MySQL stuff turned on.
     private Set<SQLParserFeature> features = 
         EnumSet.of(SQLParserFeature.GROUPING,
+                   SQLParserFeature.DIV_OPERATOR,
                    SQLParserFeature.MYSQL_HINTS,
                    SQLParserFeature.MYSQL_INTERVAL,
                    SQLParserFeature.UNSIGNED,

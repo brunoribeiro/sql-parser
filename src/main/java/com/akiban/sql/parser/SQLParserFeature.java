@@ -22,6 +22,7 @@ package com.akiban.sql.parser;
 
 public enum SQLParserFeature
 {
+    DIV_OPERATOR, // integer division
     GROUPING,
     MYSQL_HINTS,
     MYSQL_INTERVAL,

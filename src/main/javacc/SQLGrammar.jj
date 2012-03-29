@@ -384,6 +384,12 @@ class SQLGrammar
         return retval;
     }
 
+    private boolean divOperatorFollows() {
+        if (!hasFeature(SQLParserFeature.DIV_OPERATOR))
+            return false;
+        return getToken(1).kind == DIV;
+    }
+
     /**
      * Determine whether the next sequence of tokens can be the beginning
      * of a miscBuiltins().
@@ -1057,7 +1063,11 @@ class SQLGrammar
                                                   leftOperand,
                                                   rightOperand,
                                                   parserContext);
-
+        case DIV:
+            return (ValueNode)nodeFactory.getNode(NodeTypes.BINARY_DIV_OPERATOR_NODE,
+                                                  leftOperand,
+                                                  rightOperand,
+                                                  parserContext);
         case DIVIDE:
             return (ValueNode)nodeFactory.getNode(NodeTypes.BINARY_DIVIDE_OPERATOR_NODE,
                                                   leftOperand,
@@ -2104,6 +2114,7 @@ TOKEN [IGNORE_CASE] :
 | <DAY: "day">
 | <DEFINER: "definer">
 | <DETERMINISTIC: "deterministic">
+| <DIV: "div">
 | <DYNAMIC: "dynamic">
 | <FORTRAN: "fortran">
 | <GENERATED: "generated">
@@ -5306,6 +5317,12 @@ multiplicativeOperator() throws StandardException :
     (<MOD> | <PERCENT>)
     {
         return BinaryOperatorNode.OperatorType.MOD;
+    }
+|
+    LOOKAHEAD ({divOperatorFollows()})
+    <DIV>
+    {
+        return BinaryOperatorNode.OperatorType.DIV;
     }
 |
     <ASTERISK> 
@@ -13494,6 +13511,7 @@ nonReservedKeyword() :
 | tok = <DAY_SECOND>
 | tok = <DEFRAGMENT>
 | tok = <DIRTY>
+| tok = <DIV>
 | tok = <DYNAMIC>
 | tok = <DATABASE>
 | tok = <DB2SQL>
