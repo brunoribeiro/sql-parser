@@ -93,6 +93,7 @@ public class BinaryArithmeticOperatorNode extends BinaryOperatorNode
             operator = "div";
             methodName = "div";
             break;
+            
         default:
             assert false : "Unexpected nodeType:" + nodeType;
         }
