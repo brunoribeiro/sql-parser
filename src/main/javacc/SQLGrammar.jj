@@ -475,6 +475,7 @@ class SQLGrammar
         case XMLSERIALIZE:
         case XMLEXISTS:
         case XMLQUERY:
+        case EXTRACT:
             break;
         default:
             return false;
@@ -2105,6 +2106,7 @@ TOKEN [IGNORE_CASE] :
 | <DEFINER: "definer">
 | <DETERMINISTIC: "deterministic">
 | <DYNAMIC: "dynamic">
+| <EXTRACT: "extract">
 | <FORTRAN: "fortran">
 | <GENERATED: "generated">
 | <IDENTITY_VAL_LOCAL: "identity_val_local">
@@ -6820,6 +6822,17 @@ dateTimeScalarFunction() throws StandardException :
          * NOTE: If you add a new rule here, you must add the appropriate
          *      LOOKAHEAD rule to miscBuiltins().
          */
+
+    <EXTRACT><LEFT_PAREN> field = datetimeField()
+    <FROM> value = additiveExpression()
+    <RIGHT_PAREN>
+    {
+        return (ValueNode)nodeFactory.getNode(NodeTypes.EXTRACT_OPERATOR_NODE,
+                                              field,
+                                              value,
+                                              parserContext);
+    }
+|
     <TIME> <LEFT_PAREN> value = additiveExpression() <RIGHT_PAREN>
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.UNARY_DATE_TIMESTAMP_OPERATOR_NODE,
@@ -13502,6 +13515,7 @@ nonReservedKeyword() :
 | tok = <EACH>
 | tok = <EMPTY>
 | tok = <EXCLUSIVE>
+| tok = <EXTRACT>
 | tok = <FN>
 | tok = <FORCE>
 | tok = <FORTRAN>
