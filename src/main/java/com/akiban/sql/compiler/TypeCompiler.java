@@ -89,6 +89,7 @@ public abstract class TypeCompiler
 
     public static final String PLUS_OP = "+";
     public static final String DIVIDE_OP = "/";
+    public static final String DIV_OP = "div";
     public static final String MINUS_OP = "-";
     public static final String TIMES_OP = "*";
     public static final String SUM_OP = "sum";

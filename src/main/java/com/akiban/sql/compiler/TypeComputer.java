@@ -59,6 +59,7 @@ public class TypeComputer implements Visitor
         case NodeTypes.BINARY_PLUS_OPERATOR_NODE:
         case NodeTypes.BINARY_TIMES_OPERATOR_NODE:
         case NodeTypes.BINARY_DIVIDE_OPERATOR_NODE:
+        case NodeTypes.BINARY_DIV_OPERATOR_NODE:
         case NodeTypes.BINARY_MINUS_OPERATOR_NODE:
             return binaryArithmeticOperatorNode((BinaryArithmeticOperatorNode)node);
         case NodeTypes.BINARY_EQUALS_OPERATOR_NODE:

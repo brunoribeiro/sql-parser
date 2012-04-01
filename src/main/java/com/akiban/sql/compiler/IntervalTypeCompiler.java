@@ -179,7 +179,7 @@ public class IntervalTypeCompiler extends TypeCompiler
                     && operator.equals(PLUS_OP)) // when left is interval, only + is legal
                 return new DataTypeDescriptor(varcharType.getPrecision() > 10 ? TypeId.DATETIME_ID : TypeId.DATE_ID, nullable);
         }
-        else if (operator.equals(TIMES_OP) || operator.equals(DIVIDE_OP))
+        else if (operator.equals(TIMES_OP) || operator.equals(DIVIDE_OP) || operator.equals(DIV_OP))
         {   
             // numeric / varchar and interval
             TypeId intervalId = null;

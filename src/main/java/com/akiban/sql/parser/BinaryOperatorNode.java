@@ -66,7 +66,7 @@ public class BinaryOperatorNode extends ValueNode
     protected String methodName;
 
     public static enum OperatorType {
-        PLUS, MINUS, TIMES, DIVIDE, CONCATENATE, MOD,
+        PLUS, MINUS, TIMES, DIVIDE, CONCATENATE, MOD, DIV,
         EQ, NE, GT, GE, LT, LE, AND, OR, LIKE, LTRIM, TRIM, RTRIM,
         BITAND, BITOR, BITXOR, LEFT_SHIFT, RIGHT_SHIFT
     }
