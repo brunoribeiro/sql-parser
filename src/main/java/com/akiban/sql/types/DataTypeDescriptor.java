@@ -752,6 +752,7 @@ public final class DataTypeDescriptor
         //user types.
         if (typeId.getJDBCTypeId() == Types.DATE)
             if (compareWithJDBCTypeId == Types.DATE || 
+                compareWithJDBCTypeId == Types.TIMESTAMP || 
                 compareWithTypeID.isStringTypeId())
                 return true;
             else
@@ -770,6 +771,7 @@ public final class DataTypeDescriptor
         //comparable user types.
         if (typeId.getJDBCTypeId() == Types.TIMESTAMP)
             if (compareWithJDBCTypeId == Types.TIMESTAMP || 
+                compareWithJDBCTypeId == Types.DATE || 
                 compareWithTypeID.isStringTypeId())
                 return true;
             else
