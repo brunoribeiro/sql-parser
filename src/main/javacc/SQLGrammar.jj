@@ -3555,6 +3555,7 @@ columnDefinition(TableElementList tableElementList) throws StandardException :
     ValueNode defaultNode = null;
     String columnName;
     long[] autoIncrementInfo = new long[4]; // *** TODO: constant ***
+    TableName collation = null;
 }
 {
     // TODO: We are ignoring domains and collation.
@@ -3562,6 +3563,7 @@ columnDefinition(TableElementList tableElementList) throws StandardException :
     ( typeDescriptor[0] = dataTypeDDL() )
     [ defaultNode = defaultAndConstraints(typeDescriptor, tableElementList, columnName,
                                           autoIncrementInfo) ]
+    [ collation = collateClause() ]
     {
         // Only pass autoincrement info for autoincrement columns
         if (autoIncrementInfo[QueryTreeNode.AUTOINCREMENT_IS_AUTOINCREMENT_INDEX] == 0) {
@@ -3665,16 +3667,11 @@ dataTypeCommon() throws StandardException :
     /* TODO: Ignoring decimal, numeric, long *** Not sure what that refers to. */
 
     ( LOOKAHEAD( { getToken(2).kind != LARGE } )
-        typeDescriptor = characterStringType() 
+      typeDescriptor = characterStringType() 
     )
-    /* TODO: ***
-    ** We are not planning to support character sets, so I commented
-    ** out characterSetSpecification().
-    */
-        /* [ <CHARACTER> <SET> characterSetSpecification() ] */
 |
     ( LOOKAHEAD( { getToken(3).kind != LARGE } )
-        typeDescriptor = nationalCharacterStringType()
+      typeDescriptor = nationalCharacterStringType()
     )
 |
     typeDescriptor = numericType()
@@ -5162,12 +5159,14 @@ additiveExpression(ValueNode farLeftOperand, BinaryOperatorNode.OperatorType com
     ValueNode leftOperand;
     BinaryOperatorNode.OperatorType operator;
     int nodeType;
+    TableName collation;
 }
 {
     leftOperand = multiplicativeExpression(null, null)
     ( operator = additiveOperator()
         leftOperand = multiplicativeExpression(leftOperand, operator) 
     )*
+    [ collation = collateClause() ]
     {
         if (farLeftOperand == null)
             return leftOperand;
@@ -10942,6 +10941,18 @@ stringLiteral() throws StandardException :
         return (CharConstantNode)nodeFactory.getNode(NodeTypes.CHAR_CONSTANT_NODE,
                                                      string,
                                                      parserContext);
+    }
+}
+
+TableName
+collateClause() throws StandardException :
+{
+    TableName collation;
+}
+{
+    <COLLATE> collation = qualifiedName()
+    {
+        return collation;
     }
 }
 
