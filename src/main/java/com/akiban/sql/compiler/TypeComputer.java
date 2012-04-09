@@ -446,6 +446,9 @@ public class TypeComputer implements Visitor
         if ((operand == null) ||
             (operand.getType() == null))
             return null;
+        if (node.getAggregateName().equals("AVG") &&
+            operand.getType().getTypeId().isIntegerTypeId())
+            return new DataTypeDescriptor(TypeId.DOUBLE_ID, true);
         return operand.getType().getNullabilityType(true);
     }
 
