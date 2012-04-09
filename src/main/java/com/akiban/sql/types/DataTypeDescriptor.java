@@ -321,6 +321,7 @@ public final class DataTypeDescriptor
     private int scale;
     private boolean isNullable;
     private int maximumWidth;
+    private String collation;
 
     /**
      * Constructor for use with numeric types
@@ -649,6 +650,16 @@ public final class DataTypeDescriptor
         return typeId.isRowMultiSet();
     }
 
+    public String getCollation() {
+        return collation;
+    }
+
+    public void setCollation(String collation) throws StandardException {
+        if (!typeId.isStringTypeId())
+            throw new StandardException("Collation not allowed for " + this);
+        this.collation = collation;
+    }
+
     /**
      * Return a type descriptor identical to the this type
      * with the exception of its nullability. If the nullablity
@@ -676,7 +687,8 @@ public final class DataTypeDescriptor
             this.precision != odtd.getPrecision() ||
             this.scale != odtd.getScale() ||
             this.isNullable != odtd.isNullable() ||
-            this.maximumWidth != odtd.getMaximumWidth())
+            this.maximumWidth != odtd.getMaximumWidth() ||
+            ((this.collation == null) ? (odtd.collation != null) : !this.collation.equals(odtd.collation)))
             return false;
         else
             return true;                            // TODO: Collation info, too, once there.

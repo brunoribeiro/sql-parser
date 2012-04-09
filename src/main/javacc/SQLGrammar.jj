@@ -3555,15 +3555,15 @@ columnDefinition(TableElementList tableElementList) throws StandardException :
     ValueNode defaultNode = null;
     String columnName;
     long[] autoIncrementInfo = new long[4]; // *** TODO: constant ***
-    TableName collation = null;
+    String collation = null;
 }
 {
-    // TODO: We are ignoring domains and collation.
     columnName = identifier() 
     ( typeDescriptor[0] = dataTypeDDL() )
     [ defaultNode = defaultAndConstraints(typeDescriptor, tableElementList, columnName,
-                                          autoIncrementInfo) ]
-    [ collation = collateClause() ]
+                                          autoIncrementInfo)
+      [ collation = collateClause() { typeDescriptor[0].setCollation(collation); } ]
+    ]
     {
         // Only pass autoincrement info for autoincrement columns
         if (autoIncrementInfo[QueryTreeNode.AUTOINCREMENT_IS_AUTOINCREMENT_INDEX] == 0) {
@@ -3661,6 +3661,7 @@ dataTypeCommon() throws StandardException :
 {
     DataTypeDescriptor typeDescriptor;
     boolean checkCS = false;
+    String collation = null;
 }
 {
 (
@@ -3669,10 +3670,12 @@ dataTypeCommon() throws StandardException :
     ( LOOKAHEAD( { getToken(2).kind != LARGE } )
       typeDescriptor = characterStringType() 
     )
+    [ collation = collateClause() { typeDescriptor.setCollation(collation); } ]
 |
     ( LOOKAHEAD( { getToken(3).kind != LARGE } )
       typeDescriptor = nationalCharacterStringType()
     )
+    [ collation = collateClause() { typeDescriptor.setCollation(collation); } ]
 |
     typeDescriptor = numericType()
 |
@@ -5159,7 +5162,7 @@ additiveExpression(ValueNode farLeftOperand, BinaryOperatorNode.OperatorType com
     ValueNode leftOperand;
     BinaryOperatorNode.OperatorType operator;
     int nodeType;
-    TableName collation;
+    String collation;
 }
 {
     leftOperand = multiplicativeExpression(null, null)
@@ -7383,7 +7386,6 @@ sortSpecification(OrderByList orderCols) throws StandardException :
 {    OrderByColumn orderCol; }
 {
     orderCol = sortKey()
-    /* [ collateClause() ] */ 
     [ orderingSpecification(orderCol) ] 
     [ nullOrdering(orderCol) ]
     {
@@ -10944,7 +10946,7 @@ stringLiteral() throws StandardException :
     }
 }
 
-TableName
+String
 collateClause() throws StandardException :
 {
     TableName collation;
@@ -10952,7 +10954,7 @@ collateClause() throws StandardException :
 {
     <COLLATE> collation = qualifiedName()
     {
-        return collation;
+        return collation.toString();
     }
 }
 
