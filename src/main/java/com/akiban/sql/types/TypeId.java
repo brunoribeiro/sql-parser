@@ -1543,6 +1543,15 @@ public class TypeId
     }
 
     /**
+     * Is this a type id for an integer type?
+     *
+     * @return Whether or not this a type id for a integer type.
+     */
+    public boolean isIntegerTypeId() {
+        return isNumericTypeId && !isDecimalTypeId && !isFloatingPointTypeId;
+    }
+    
+    /**
      * Is this a type id for a boolean type?
      *
      * @return Whether or not this a type id for a boolean type.
