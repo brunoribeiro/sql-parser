@@ -202,7 +202,7 @@ public interface NodeTypes
     public static final int UNION_NODE = 142;
     public static final int CREATE_TRIGGER_NODE = 143;
     public static final int HALF_OUTER_JOIN_NODE = 144;
-    // UNUSED public static final int CREATE_SPS_NODE = 145;
+    public static final int EXPLICIT_COLLATE_NODE = 145;
     public static final int CREATE_INDEX_NODE = 146;
     public static final int CURSOR_NODE = 147;
     public static final int HASH_TABLE_NODE = 148;

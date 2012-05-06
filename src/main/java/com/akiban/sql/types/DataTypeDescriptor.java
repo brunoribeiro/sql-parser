@@ -691,7 +691,7 @@ public final class DataTypeDescriptor
             ((this.collation == null) ? (odtd.collation != null) : !this.collation.equals(odtd.collation)))
             return false;
         else
-            return true;                            // TODO: Collation info, too, once there.
+            return true;
     }
 
     /**

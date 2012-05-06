@@ -5161,53 +5161,58 @@ additiveExpression(ValueNode farLeftOperand, BinaryOperatorNode.OperatorType com
 {
     ValueNode leftOperand;
     BinaryOperatorNode.OperatorType operator;
-    int nodeType;
-    String collation;
+    String collation = null;
 }
 {
     leftOperand = multiplicativeExpression(null, null)
     ( operator = additiveOperator()
-        leftOperand = multiplicativeExpression(leftOperand, operator) 
+      leftOperand = multiplicativeExpression(leftOperand, operator) 
     )*
     [ collation = collateClause() ]
     {
-        if (farLeftOperand == null)
-            return leftOperand;
-        switch (compOp) {
-        case EQ:
-            nodeType = NodeTypes.BINARY_EQUALS_OPERATOR_NODE;
-            break;
+        if (farLeftOperand != null) {
+            int nodeType;
+            switch (compOp) {
+            case EQ:
+                nodeType = NodeTypes.BINARY_EQUALS_OPERATOR_NODE;
+                break;
 
-        case NE:
-            nodeType = NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE;
-            break;
+            case NE:
+                nodeType = NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE;
+                break;
 
-        case LT:
-            nodeType = NodeTypes.BINARY_LESS_THAN_OPERATOR_NODE;
-            break;
+            case LT:
+                nodeType = NodeTypes.BINARY_LESS_THAN_OPERATOR_NODE;
+                break;
 
-        case GT:
-            nodeType = NodeTypes.BINARY_GREATER_THAN_OPERATOR_NODE;
-            break;
+            case GT:
+                nodeType = NodeTypes.BINARY_GREATER_THAN_OPERATOR_NODE;
+                break;
 
-        case LE:
-            nodeType = NodeTypes.BINARY_LESS_EQUALS_OPERATOR_NODE;
-            break;
+            case LE:
+                nodeType = NodeTypes.BINARY_LESS_EQUALS_OPERATOR_NODE;
+                break;
 
-        case GE:
-            nodeType = NodeTypes.BINARY_GREATER_EQUALS_OPERATOR_NODE;
-            break;
+            case GE:
+                nodeType = NodeTypes.BINARY_GREATER_EQUALS_OPERATOR_NODE;
+                break;
 
-        default:
-            assert false : "Unknown comparison operator " + compOp;
-            nodeType = 0;
-            break;
+            default:
+                assert false : "Unknown comparison operator " + compOp;
+                nodeType = 0;
+                break;
+            }
+            leftOperand = (ValueNode)nodeFactory.getNode(nodeType,
+                                                         farLeftOperand,
+                                                         leftOperand,
+                                                         parserContext);
         }
-
-        return (ValueNode)nodeFactory.getNode(nodeType,
-                                              farLeftOperand,
-                                              leftOperand,
-                                              parserContext);
+        if (collation != null)
+            leftOperand = (ValueNode)nodeFactory.getNode(NodeTypes.EXPLICIT_COLLATE_NODE,
+                                                         leftOperand,
+                                                         collation,
+                                                         parserContext);
+        return leftOperand;
     }
 }
 
