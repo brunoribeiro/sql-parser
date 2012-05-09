@@ -4710,13 +4710,18 @@ querySpecification() throws StandardException :
     ResultColumnList selectList;
     SelectNode selectNode;
     boolean isDistinct = false;
+    Token straightJoin = null;
 }
 {
-    <SELECT> [ isDistinct = setQuantifier() ]
-        selectList = selectList()
-        selectNode = tableExpression(selectList)
+    <SELECT> 
+    [ isDistinct = setQuantifier() ]
+    [ LOOKAHEAD( { straightJoinFollows() } ) 
+      straightJoin = <STRAIGHT_JOIN> ]
+    selectList = selectList()
+    selectNode = tableExpression(selectList)
     {
         if (isDistinct) selectNode.makeDistinct();
+        if (straightJoin != null) selectNode.makeStraightJoin();
         return selectNode;
     }
 }

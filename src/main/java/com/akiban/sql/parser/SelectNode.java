@@ -91,7 +91,7 @@ public class SelectNode extends ResultSetNode
      */
     private WindowList windows;
 
-    private boolean isDistinct;
+    private boolean isDistinct, isStraightJoin;
 
     private ValueNode havingClause;
 
@@ -171,6 +171,14 @@ public class SelectNode extends ResultSetNode
 
     public boolean isDistinct() {
         return isDistinct;
+    }
+
+    public void makeStraightJoin() {
+        isStraightJoin = true;
+    }
+
+    public boolean isStraightJoin() {
+        return isStraightJoin;
     }
 
     /**
