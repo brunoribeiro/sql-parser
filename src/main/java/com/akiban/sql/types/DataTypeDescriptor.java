@@ -692,7 +692,7 @@ public final class DataTypeDescriptor
      */
     public boolean comparable(DataTypeDescriptor compareWithDTD, boolean forEquals) {
         
-        // if the two type are equal, they shouold be comparable
+        // if the two types are equal, they should be comparable
         if (equals(compareWithDTD))
             return true;
         
