@@ -4714,8 +4714,10 @@ querySpecification() throws StandardException :
 }
 {
     <SELECT> 
+    [ LOOKAHEAD( { straightJoinFollows() } )
+      straightJoin = <STRAIGHT_JOIN> ]
     [ isDistinct = setQuantifier() ]
-    [ LOOKAHEAD( { straightJoinFollows() } ) 
+    [ LOOKAHEAD( { (straightJoin == null) && straightJoinFollows() } )
       straightJoin = <STRAIGHT_JOIN> ]
     selectList = selectList()
     selectNode = tableExpression(selectList)
