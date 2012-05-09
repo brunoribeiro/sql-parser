@@ -692,9 +692,7 @@ public final class DataTypeDescriptor
      */
     public boolean comparable(DataTypeDescriptor compareWithDTD, boolean forEquals) {
         
-        // if the two types are equal, they should be comparable
-        if (equals(compareWithDTD))
-            return true;
+
         
         TypeId compareWithTypeID = compareWithDTD.getTypeId();
         int compareWithJDBCTypeId = compareWithTypeID.getJDBCTypeId();
@@ -712,7 +710,11 @@ public final class DataTypeDescriptor
         // Ref types cannot be compared
         if (typeId.isRefTypeId() || compareWithTypeID.isRefTypeId())
             return false;
-
+        
+        // if the two types are equal, they should be comparable
+        if (equals(compareWithDTD))
+            return true;
+        
         //If this DTD is not user defined type but the DTD to be compared with 
         //is user defined type, then let the other DTD decide what should be the
         //outcome of the comparable method.
