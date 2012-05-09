@@ -701,8 +701,10 @@ public final class DataTypeDescriptor
         // "XML values are not comparable."
         // An XML value cannot be compared to any type--
         // not even to other XML values.
-        if (compareWithTypeID.isLongConcatableTypeId() || typeId.isLongConcatableTypeId())
+        if (!compareWithTypeID.isLongVarbinaryTypeId() && compareWithTypeID.isLongConcatableTypeId()
+                || !typeId.isLongVarbinaryTypeId() && typeId.isLongConcatableTypeId())
             return false;
+            
 
         // Ref types cannot be compared
         if (typeId.isRefTypeId() || compareWithTypeID.isRefTypeId())
