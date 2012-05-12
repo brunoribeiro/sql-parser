@@ -701,7 +701,7 @@ public final class DataTypeDescriptor
             return false;
         
         // if the two types are equal, they should be comparable
-        if (equals(compareWithDTD))
+        if (typeId.equals(compareWithTypeID))
             return true;
         
         //If this DTD is not user defined type but the DTD to be compared with 
