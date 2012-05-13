@@ -694,20 +694,16 @@ public final class DataTypeDescriptor
         TypeId compareWithTypeID = compareWithDTD.getTypeId();
         int compareWithJDBCTypeId = compareWithTypeID.getJDBCTypeId();
 
-        // Long types cannot be compared. 
-        // XML types also fall in this window
-        // Says SQL/XML[2003] spec:
-        // 4.2.2 XML comparison and assignment
-        // "XML values are not comparable."
-        // An XML value cannot be compared to any type--
-        // not even to other XML values.
-        if (compareWithTypeID.isLongConcatableTypeId() || typeId.isLongConcatableTypeId())
+        // Incomparable types include:
+            // XML (SQL/XML[2003] spec, section 4.2.2)
+            // ref types
+        if (!typeId.isComparable() || !compareWithTypeID.isComparable())
             return false;
-
-        // Ref types cannot be compared
-        if (typeId.isRefTypeId() || compareWithTypeID.isRefTypeId())
-            return false;
-
+        
+        // if the two types are equal, they should be comparable
+        if (typeId.equals(compareWithTypeID))
+            return true;
+        
         //If this DTD is not user defined type but the DTD to be compared with 
         //is user defined type, then let the other DTD decide what should be the
         //outcome of the comparable method.
@@ -776,15 +772,6 @@ public final class DataTypeDescriptor
                 return true;
             else
                 return false;
-
-        // Right now, user defined types are only comparable to the
-        // identical type.
-        // This removes old logic which we might want
-        // to revive when we support comparable UDTs. See
-        // DERBY-4470.
-        if (typeId.isUserDefinedTypeId() || typeId.getJDBCTypeId() == Types.OTHER) { 
-            return typeId.equals(compareWithTypeID); 
-        }
 
         return false;
     }

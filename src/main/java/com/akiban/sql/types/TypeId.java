@@ -792,6 +792,7 @@ public class TypeId
     private boolean isDateTimeTimeStampTypeId;
     private boolean isIntervalTypeId;
     private boolean isUserDefinedTypeId;
+    private boolean isComparable;
     private int maxPrecision;
     private int maxScale;
     private int maxMaxWidth;
@@ -804,7 +805,9 @@ public class TypeId
      */
     private TypeId(int formatId) {
         this.formatId = formatId;
-
+        // most types are comparable to themselves (with a few exceptions)
+        isComparable = true;
+        
         switch (formatId) {
         case FormatIds.BIT_TYPE_ID:
             schemaName = null;
@@ -935,6 +938,7 @@ public class TypeId
             isStringTypeId = true;
             isConcatableTypeId = true;
             isLongConcatableTypeId = true;
+            isComparable = false;
             break;
 
         case FormatIds.REAL_TYPE_ID:
@@ -958,6 +962,7 @@ public class TypeId
             typePrecedence = REF_PRECEDENCE;
             javaTypeName = "java.sql.Ref";
             isRefTypeId = true;
+            isComparable = false;
             break;
 
         case FormatIds.SMALLINT_TYPE_ID:
@@ -1028,7 +1033,7 @@ public class TypeId
             maxMaxWidth = TypeId.BLOB_MAXWIDTH;
             isBitTypeId = true;
             isConcatableTypeId = true;
-            isLongConcatableTypeId = true; // ??
+            isComparable = false;
             isLOBTypeId = true;
             break;
 
@@ -1052,7 +1057,7 @@ public class TypeId
             maxMaxWidth = TypeId.CLOB_MAXWIDTH;
             isStringTypeId = true;
             isConcatableTypeId = true;
-            isLongConcatableTypeId = true; // ??
+            isComparable = false;
             isLOBTypeId = true;
             break;
 
@@ -1063,10 +1068,7 @@ public class TypeId
             typePrecedence = XML_PRECEDENCE;
             javaTypeName = "com.akiban.sql.types.XML";
             maxMaxWidth = TypeId.XML_MAXWIDTH;
-
-            // We set this to true in order to disallow use
-            // of the XML datatype for procedure/function args.
-            isLongConcatableTypeId = true;
+            isComparable = false;
             break;
             
         case FormatIds.INTERVAL_YEAR_MONTH_ID:
@@ -1386,6 +1388,15 @@ public class TypeId
         return (formatId == FormatIds.XML_TYPE_ID);
     }
 
+    /**
+     * @return <code>false</code> if this type is not comparable to any other types or even to itself
+     *         <code>true</code> otherwise.
+     */
+    public boolean isComparable()
+    {
+        return isComparable;
+    }
+    
     /**
      * Each built-in type in JSQL has a precedence.  This precedence determines
      * how to do type promotion when using binary operators.    For example, float
