@@ -490,9 +490,11 @@ public class TypeComputer implements Visitor
         }
         if ((leftType == null) || (rightType == null))
             return null;
-        return new DataTypeDescriptor(TypeId.VARCHAR_ID,
-                                      leftType.isNullable() || rightType.isNullable(),
-                                      leftType.getMaximumWidth() + rightType.getMaximumWidth());
+        DataTypeDescriptor result = new DataTypeDescriptor(TypeId.VARCHAR_ID,
+                                                           leftType.isNullable() || rightType.isNullable(),
+                                                           leftType.getMaximumWidth() + rightType.getMaximumWidth());
+        result.mergeCollations(leftType, rightType);
+        return result;
     }
 
     protected DataTypeDescriptor dominantType(ValueNodeList nodeList) 

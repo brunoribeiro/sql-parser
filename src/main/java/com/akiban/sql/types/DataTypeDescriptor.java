@@ -313,6 +313,10 @@ public final class DataTypeDescriptor
                                       true);
     }
 
+    public static enum CollationDerivation {
+        NONE, IMPLICIT, EXPLICIT
+    }
+
     /*
     ** Instance fields & methods
     */
@@ -322,6 +326,7 @@ public final class DataTypeDescriptor
     private boolean isNullable;
     private int maximumWidth;
     private String collation;
+    private CollationDerivation collationDerivation;
 
     /**
      * Constructor for use with numeric types
@@ -569,7 +574,7 @@ public final class DataTypeDescriptor
         higherType = new DataTypeDescriptor(higherType, 
                                             precision, scale, nullable, maximumWidth);
 
-        // TODO: Collation merge was here (with long comment at function head).
+        higherType.mergeCollations(this, otherDTS);
 
         return higherType;
     }
@@ -654,10 +659,48 @@ public final class DataTypeDescriptor
         return collation;
     }
 
-    public void setCollation(String collation) throws StandardException {
+    public void setCollation(String collation)
+            throws StandardException {
         if (!typeId.isStringTypeId())
             throw new StandardException("Collation not allowed for " + this);
         this.collation = collation;
+        this.collationDerivation = CollationDerivation.EXPLICIT;
+    }
+
+    public void mergeCollations(DataTypeDescriptor dtd1, DataTypeDescriptor dtd2)
+            throws StandardException {
+        if (dtd1.collationDerivation == null) {
+            collation = dtd2.collation;
+            collationDerivation = dtd2.collationDerivation;
+        }
+        else if (dtd1.collationDerivation == null) {
+            collation = dtd1.collation;
+            collationDerivation = dtd1.collationDerivation;
+        }
+        else if (dtd1.collationDerivation == CollationDerivation.EXPLICIT) {
+            if (dtd2.collationDerivation == CollationDerivation.EXPLICIT) {
+                if (!dtd1.collation.equals(dtd2.collation))
+                    throw new StandardException("Incompatible collations: " +
+                                                dtd1 + " " + dtd1.collation + " and " +
+                                                dtd2 + " " + dtd2.collation);
+            }
+            collation = dtd1.collation;
+            collationDerivation = dtd2.collationDerivation;
+        }
+        else if (dtd2.collationDerivation == CollationDerivation.EXPLICIT) {
+            collation = dtd2.collation;
+            collationDerivation = dtd2.collationDerivation;
+        }
+        else if ((dtd1.collationDerivation == CollationDerivation.IMPLICIT) &&
+                 (dtd2.collationDerivation == CollationDerivation.IMPLICIT) &&
+                 dtd1.collation.equals(dtd2.collation)) {
+            collation = dtd1.collation;
+            collationDerivation = dtd1.collationDerivation;
+        }
+        else {
+            collation = null;
+            collationDerivation = CollationDerivation.NONE;
+        }
     }
 
     /**
