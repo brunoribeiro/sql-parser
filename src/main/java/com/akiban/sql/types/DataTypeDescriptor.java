@@ -677,7 +677,7 @@ public final class DataTypeDescriptor
             collation = dtd2.collation;
             collationDerivation = dtd2.collationDerivation;
         }
-        else if (dtd1.collationDerivation == null) {
+        else if (dtd2.collationDerivation == null) {
             collation = dtd1.collation;
             collationDerivation = dtd1.collationDerivation;
         }
