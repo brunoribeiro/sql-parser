@@ -389,7 +389,8 @@ public final class DataTypeDescriptor
         this.maximumWidth = maximumWidth;
     }
 
-    public DataTypeDescriptor(DataTypeDescriptor source, String collation)
+    public DataTypeDescriptor(DataTypeDescriptor source, 
+                              String collation, CollationDerivation derivation)
             throws StandardException {
         this.typeId = source.typeId;
         this.precision = source.precision;
@@ -397,7 +398,7 @@ public final class DataTypeDescriptor
         this.isNullable = source.isNullable;
         this.maximumWidth = source.maximumWidth;
         this.collation = collation;
-        this.collationDerivation = CollationDerivation.EXPLICIT;
+        this.collationDerivation = derivation;
     }
 
     /**

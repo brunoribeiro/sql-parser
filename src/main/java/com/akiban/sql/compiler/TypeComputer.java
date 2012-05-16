@@ -514,7 +514,9 @@ public class TypeComputer implements Visitor
         if (origType != null) {
             if (!origType.getTypeId().isStringTypeId())
                 throw new StandardException("Collation not allowed for " + origType);
-            operand.setType(new DataTypeDescriptor(origType, node.getCollation()));
+            operand.setType(new DataTypeDescriptor(origType, 
+                                                   node.getCollation(),
+                                                   DataTypeDescriptor.CollationDerivation.EXPLICIT));
         }
         return operand;
     }
