@@ -389,6 +389,17 @@ public final class DataTypeDescriptor
         this.maximumWidth = maximumWidth;
     }
 
+    public DataTypeDescriptor(DataTypeDescriptor source, String collation)
+            throws StandardException {
+        this.typeId = source.typeId;
+        this.precision = source.precision;
+        this.scale = source.scale;
+        this.isNullable = source.isNullable;
+        this.maximumWidth = source.maximumWidth;
+        this.collation = collation;
+        this.collationDerivation = CollationDerivation.EXPLICIT;
+    }
+
     /**
      * Get the dominant type (DataTypeDescriptor) of the 2.
      * For variable length types, the resulting type will have the
@@ -657,14 +668,6 @@ public final class DataTypeDescriptor
 
     public String getCollation() {
         return collation;
-    }
-
-    public void setCollation(String collation)
-            throws StandardException {
-        if (!typeId.isStringTypeId())
-            throw new StandardException("Collation not allowed for " + this);
-        this.collation = collation;
-        this.collationDerivation = CollationDerivation.EXPLICIT;
     }
 
     public void mergeCollations(DataTypeDescriptor dtd1, DataTypeDescriptor dtd2)

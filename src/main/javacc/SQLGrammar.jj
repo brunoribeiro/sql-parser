@@ -3562,7 +3562,7 @@ columnDefinition(TableElementList tableElementList) throws StandardException :
     ( typeDescriptor[0] = dataTypeDDL() )
     [ defaultNode = defaultAndConstraints(typeDescriptor, tableElementList, columnName,
                                           autoIncrementInfo)
-      [ collation = collateClause() { typeDescriptor[0].setCollation(collation); } ]
+      [ collation = collateClause() { typeDescriptor[0] = new DataTypeDescriptor(typeDescriptor[0], collation); } ]
     ]
     {
         // Only pass autoincrement info for autoincrement columns
@@ -3670,12 +3670,12 @@ dataTypeCommon() throws StandardException :
     ( LOOKAHEAD( { getToken(2).kind != LARGE } )
       typeDescriptor = characterStringType() 
     )
-    [ collation = collateClause() { typeDescriptor.setCollation(collation); } ]
+    [ collation = collateClause() { typeDescriptor = new DataTypeDescriptor(typeDescriptor, collation); } ]
 |
     ( LOOKAHEAD( { getToken(3).kind != LARGE } )
       typeDescriptor = nationalCharacterStringType()
     )
-    [ collation = collateClause() { typeDescriptor.setCollation(collation); } ]
+    [ collation = collateClause() { typeDescriptor = new DataTypeDescriptor(typeDescriptor, collation); } ]
 |
     typeDescriptor = numericType()
 |

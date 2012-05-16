@@ -44,6 +44,16 @@ public class TypeComputer implements Visitor
         stmt.accept(this);
     }
     
+    protected ValueNode setType(ValueNode node) throws StandardException {
+        switch (node.getNodeType()) {
+        case NodeTypes.EXPLICIT_COLLATE_NODE:
+            return collateNode((ExplicitCollateNode)node);
+        default:
+            node.setType(computeType(node));
+            return node;
+        }
+    }
+
     /** Probably need to subclass and handle <code>NodeTypes.COLUMN_REFERENCE</code>
      * to get type propagation started. */
     protected DataTypeDescriptor computeType(ValueNode node) throws StandardException {
@@ -497,6 +507,18 @@ public class TypeComputer implements Visitor
         return result;
     }
 
+    protected ValueNode collateNode(ExplicitCollateNode node)
+            throws StandardException {
+        ValueNode operand = node.getOperand();
+        DataTypeDescriptor origType = operand.getType();
+        if (origType != null) {
+            if (!origType.getTypeId().isStringTypeId())
+                throw new StandardException("Collation not allowed for " + origType);
+            operand.setType(new DataTypeDescriptor(origType, node.getCollation()));
+        }
+        return operand;
+    }
+
     protected DataTypeDescriptor dominantType(ValueNodeList nodeList) 
             throws StandardException {
         DataTypeDescriptor result = null;
@@ -575,7 +597,7 @@ public class TypeComputer implements Visitor
             // Value nodes compute type if necessary.
             ValueNode valueNode = (ValueNode)node;
             if (valueNode.getType() == null) {
-                valueNode.setType(computeType(valueNode));
+                return setType(valueNode);
             }
         }
         else {
