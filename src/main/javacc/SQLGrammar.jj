@@ -2011,6 +2011,7 @@ TOKEN [IGNORE_CASE] :
 | <NULL: "null">
 | <NULLIF: "nullif">
 | <NUMERIC: "numeric">
+| <OCTET_LENGTH: "octet_length">
 | <OF: "of">
 | <ON: "on">
 | <ONLY: "only">
@@ -6307,6 +6308,13 @@ miscBuiltinsCore(boolean isJDBCEscape) throws StandardException :
     (<CHAR_LENGTH> | <CHARACTER_LENGTH>)<LEFT_PAREN> value = additiveExpression() <RIGHT_PAREN>
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.CHAR_LENGTH_OPERATOR_NODE,
+                                              value,
+                                              parserContext);
+    }
+|
+    <OCTET_LENGTH><LEFT_PAREN> value = additiveExpression() <RIGHT_PAREN>
+    {
+        return (ValueNode)nodeFactory.getNode(NodeTypes.DB2_LENGTH_OPERATOR_NODE,
                                               value,
                                               parserContext);
     }
@@ -13393,6 +13401,7 @@ reservedKeyword() :
 | tok = <NULL>
 | tok = <NULLIF>
 | tok = <NUMERIC>
+| tok = <OCTET_LENGTH>
 | tok = <OF>
 | tok = <ON>
 | tok = <ONLY>
