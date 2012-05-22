@@ -6300,6 +6300,11 @@ miscBuiltinsCore(boolean isJDBCEscape) throws StandardException :
                                                                       null,
                                                                       value),
                                                   parserContext);
+                                                 
+        /*
+            TODO: DECIDE wether LENGTH should be OCTET_LENGTH or CHARACTER_LENGTH
+                  dependent upon some mode
+        */
         return (ValueNode)nodeFactory.getNode(NodeTypes.DB2_LENGTH_OPERATOR_NODE,
                                               value,
                                               parserContext);
