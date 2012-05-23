@@ -531,7 +531,7 @@ public final class NodeFactoryImpl extends NodeFactory
             return NodeNames.TIMESTAMP_OPERATOR_NODE_NAME;
 
         case NodeTypes.OCTET_LENGTH_OPERATOR_NODE:
-            return NodeNames.DB2_LENGTH_OPERATOR_NODE_NAME;
+            return NodeNames.OCTET_LENGTH_OPERATOR_NODE_NAME;
 
         case NodeTypes.XML_PARSE_OPERATOR_NODE:
         case NodeTypes.XML_SERIALIZE_OPERATOR_NODE:
