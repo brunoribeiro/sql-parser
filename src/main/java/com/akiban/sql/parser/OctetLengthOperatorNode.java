@@ -28,7 +28,7 @@
 
 /*
 
-   Derby - Class org.apache.derby.impl.sql.compile.DB2LengthOperatorNode
+   Derby - Class org.apache.derby.impl.sql.compile.OctetLengthOperatorNode
 
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
@@ -59,16 +59,16 @@ import java.sql.Types;
  *
  */
 
-public class DB2LengthOperatorNode extends UnaryOperatorNode
+public class OctetLengthOperatorNode extends UnaryOperatorNode
 {
 		
 	/**
-	 * Initializer for a DB2LengthOperatorNode
+	 * Initializer for a OctetLengthOperatorNode
 	 *
 	 * @param operand The operand of the node
 	 */
 	public void init(Object operand) throws StandardException {
-		super.init(operand, "length", "getDB2Length");
+		super.init(operand, "length", "getOctetLength");
 	}
 
 }

@@ -78,7 +78,7 @@ public interface NodeTypes
     public static final int INDEX_COLUMN_LIST = 17;
     public static final int GET_CURRENT_CONNECTION_NODE = 18;
     public static final int NOP_STATEMENT_NODE = 19;
-    public static final int DB2_LENGTH_OPERATOR_NODE = 20;
+    public static final int OCTET_LENGTH_OPERATOR_NODE = 20;
     public static final int SET_TRANSACTION_ISOLATION_NODE = 21;
     public static final int SET_TRANSACTION_ACCESS_NODE = 22;
     public static final int CHAR_LENGTH_OPERATOR_NODE = 23;

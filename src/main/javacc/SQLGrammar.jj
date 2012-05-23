@@ -476,6 +476,7 @@ class SQLGrammar
         case SECOND:
         case CHAR_LENGTH:
         case CHARACTER_LENGTH:
+        case OCTET_LENGTH:
         case LENGTH:
         case LOCATE:
         case POSITION:
@@ -6305,7 +6306,7 @@ miscBuiltinsCore(boolean isJDBCEscape) throws StandardException :
             TODO: DECIDE wether LENGTH should be OCTET_LENGTH or CHARACTER_LENGTH
                   dependent upon some mode
         */
-        return (ValueNode)nodeFactory.getNode(NodeTypes.DB2_LENGTH_OPERATOR_NODE,
+        return (ValueNode)nodeFactory.getNode(NodeTypes.OCTET_LENGTH_OPERATOR_NODE,
                                               value,
                                               parserContext);
     }
@@ -6319,7 +6320,7 @@ miscBuiltinsCore(boolean isJDBCEscape) throws StandardException :
 |
     <OCTET_LENGTH><LEFT_PAREN> value = additiveExpression() <RIGHT_PAREN>
     {
-        return (ValueNode)nodeFactory.getNode(NodeTypes.DB2_LENGTH_OPERATOR_NODE,
+        return (ValueNode)nodeFactory.getNode(NodeTypes.OCTET_LENGTH_OPERATOR_NODE,
                                               value,
                                               parserContext);
     }
