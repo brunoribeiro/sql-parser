@@ -461,6 +461,8 @@ class SQLGrammar
         case DATE:
         case TIME:
         case TIMESTAMP:
+        case TIMESTAMPADD:
+        case TIMESTAMPDIFF:
         case DOUBLE:
         case CHAR:
         case VARCHAR:
@@ -6910,6 +6912,7 @@ numericFunctionType() throws StandardException :
 ValueNode
 dateTimeScalarFunction() throws StandardException :
 {
+
     ValueNode value;
     ValueNode timestampNode;
     ExtractOperatorNode.Field field;
@@ -6959,6 +6962,11 @@ dateTimeScalarFunction() throws StandardException :
                                               field,
                                               value,
                                               parserContext);
+    }
+|
+    value = timestampArithmeticFuncion()
+    {
+        return value;
     }
 }
 
