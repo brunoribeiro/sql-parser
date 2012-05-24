@@ -5798,9 +5798,9 @@ timestampArithmeticFuncion() throws StandardException :
     <RIGHT_PAREN>
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.TIMESTAMP_DIFF_FN_NODE,
-                                              tstamp2,
                                               intervalType,
                                               tstamp1,
+                                              tstamp2,
                                               TernaryOperatorNode.OperatorType.TIMESTAMPDIFF,
                                               null,
                                               parserContext);
@@ -5811,47 +5811,47 @@ ValueNode
 jdbcIntervalType() throws StandardException :
 {}
 {
-    <SQL_TSI_FRAC_SECOND>
+    (<SQL_TSI_FRAC_SECOND> | <MICROSECOND>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.FRAC_SECOND_INTERVAL);
     }
 |
-    <SQL_TSI_SECOND>
+    (<SQL_TSI_SECOND> | <SECOND>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.SECOND_INTERVAL);
     }
 |
-    <SQL_TSI_MINUTE>
+    (<SQL_TSI_MINUTE> | <MINUTE>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.MINUTE_INTERVAL);
     }
 |
-    <SQL_TSI_HOUR>
+    (<SQL_TSI_HOUR> | <HOUR>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.HOUR_INTERVAL);
     }
 |
-    <SQL_TSI_DAY>
+    (<SQL_TSI_DAY> | <DAY>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.DAY_INTERVAL);
     }
 |
-    <SQL_TSI_WEEK>
+    (<SQL_TSI_WEEK> | <WEEK>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.WEEK_INTERVAL);
     }
 |
-    <SQL_TSI_MONTH>
+    (<SQL_TSI_MONTH> | <MONTH>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.MONTH_INTERVAL);
     }
 |
-    <SQL_TSI_QUARTER>
+    (<SQL_TSI_QUARTER> | <QUARTER>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.QUARTER_INTERVAL);
     }
 |
-    <SQL_TSI_YEAR>
+    (<SQL_TSI_YEAR> | <YEAR>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.YEAR_INTERVAL);
     }
