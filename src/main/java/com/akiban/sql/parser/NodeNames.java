@@ -135,7 +135,7 @@ public interface NodeNames
 
     static final String CURSOR_NODE_NAME = "com.akiban.sql.parser.CursorNode";
 
-    static final String DB2_LENGTH_OPERATOR_NODE_NAME = "com.akiban.sql.parser.DB2LengthOperatorNode";
+    static final String OCTET_LENGTH_OPERATOR_NODE_NAME = "com.akiban.sql.parser.OctetLengthOperatorNode";
 
     static final String DEFAULT_NODE_NAME = "com.akiban.sql.parser.DefaultNode";
 
