@@ -107,4 +107,18 @@ public class CompareWithoutHashes
         return matches.toArray(new String[matches.size()]);
     }
 
+    public String converter(String s1, String s2) {
+        String[] ha1 = findHashes(s1);
+        String[] ha2 = findHashes(s2);
+        for (int i = 0; i < Math.min(ha1.length, ha2.length); i++) {
+            String h1 = ha1[i];
+            String h2 = ha2[i];
+            if (h1.substring(0,h1.indexOf('@')).equals(h2.substring(0,h2.indexOf('@'))))
+                s1 = s1.replace(ha1[i], "%!" + i + "!%");
+        }
+        for (int i = 0; i < Math.min(ha1.length, ha2.length); i++) {
+            s1 = s1.replace("%!" + i + "!%", ha2[i]);
+        }
+        return s1;
+    }
 }
