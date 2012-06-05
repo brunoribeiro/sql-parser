@@ -73,9 +73,6 @@ public class CompareWithoutHashes
     }
 
     public boolean match(String s1, String s2) {
-        if (s1.equals(s2))
-            return true;
-
         String[] ha1 = findHashes(s1);
         String[] ha2 = findHashes(s2);
         if (ha1.length != ha2.length)
@@ -83,6 +80,8 @@ public class CompareWithoutHashes
         for (int i = 0; i < ha1.length; i++) {
             String h1 = ha1[i];
             String h2 = ha2[i];
+            if (!(h1.substring(0,h1.indexOf('@')).equals(h2.substring(0,h2.indexOf('@'))))) // checks that the part before the hash matches
+            	return false;
             String oh2 = equivalences.put(h1, h2);
             if ((oh2 != null) && !oh2.equals(h2))
                 return false;
