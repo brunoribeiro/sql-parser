@@ -52,22 +52,6 @@ public class CompareWithoutHashesTest {
 
     /**
      * Test of match method, of class CompareWithoutHashes.
-     *
-    @Test
-    public void testMatch_Reader_Reader() throws Exception {
-        System.out.println("match");
-        Reader r1 = null;
-        Reader r2 = null;
-        CompareWithoutHashes instance = new CompareWithoutHashes();
-        boolean expResult = false;
-        boolean result = instance.match(r1, r2);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }*/
-
-    /**
-     * Test of match method, of class CompareWithoutHashes.
      */
     @Test
     public void testMatch_String_String() {
@@ -81,17 +65,16 @@ public class CompareWithoutHashesTest {
     }
 
     /**
-     * Test of findHashes method, of class CompareWithoutHashes.
-     *
+     * Test of converter method, of class CompareWithoutHashes.
+     */
     @Test
-    public void testFindHashes() {
-        System.out.println("findHashes");
-        String s = "";
+    public void testConverter() {
+        System.out.println("converter");
+        String s1 = "ABC@123 XYZ@789";
+        String s2 = "XYZ@456";
         CompareWithoutHashes instance = new CompareWithoutHashes();
-        String[] expResult = null;
-        String[] result = instance.findHashes(s);
+        String expResult = "ABC@123 XYZ@456";
+        String result = instance.converter(s1, s2);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }*/
+    }
 }
