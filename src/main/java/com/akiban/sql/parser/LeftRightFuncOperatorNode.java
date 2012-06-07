@@ -24,23 +24,40 @@
  * PREVAIL OVER ANY CONFLICTING TERMS OR CONDITIONS IN THIS AGREEMENT.
  */
 
-/** Features of the parser grammar. 
- * In particular, dialect-specific constructs that can be turned off for use with
- * ordinary databases.
- */
-
 package com.akiban.sql.parser;
 
-public enum SQLParserFeature
+import com.akiban.sql.types.ValueClassName;
+
+public class LeftRightFuncOperatorNode extends BinaryOperatorNode
 {
-    MYSQL_LEFT_RIGHT_FUNC,
-    DIV_OPERATOR, // integer division
-    GROUPING,
-    MYSQL_HINTS,
-    MYSQL_INTERVAL,
-    UNSIGNED,
-    INFIX_MOD,
-    INFIX_BIT_OPERATORS,
-    INFIX_LOGICAL_OPERATORS,
-    DOUBLE_QUOTED_STRING
+    @Override
+    public void init (Object leftOperand, Object rightOperand)
+    {
+        super.init(leftOperand, rightOperand,
+                ValueClassName.StringDataValue, ValueClassName.NumberDataValue);
+    }
+    
+    @Override
+    public void setNodeType(int nodeType) 
+    {
+        String op = null;
+        String method = null;
+        
+        switch(nodeType)
+        {
+            case NodeTypes.LEFT_FN_NODE:
+                op = "getLeft";
+                method = "getLeft";
+                break;
+            case NodeTypes.RIGHT_FN_NODE:
+                op = "getRight";
+                method = "getRight";
+                break;
+            default:
+                assert false : "Unexpected nodeType: " + nodeType;
+        }
+        setOperator(op);
+        setMethodName(method);
+        super.setNodeType(nodeType);
+    }
 }

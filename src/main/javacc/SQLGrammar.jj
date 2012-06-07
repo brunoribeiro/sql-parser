@@ -390,6 +390,23 @@ class SQLGrammar
         return getToken(1).kind == DIV;
     }
 
+    private boolean mysqlLeftRightFuncFollows() 
+    {
+        if (!hasFeature(SQLParserFeature.MYSQL_LEFT_RIGHT_FUNC))
+            return false;
+
+        switch(getToken(1).kind) 
+        {
+            case LEFT:
+            case RIGHT:
+                if (getToken(2).kind == LEFT_PAREN)
+                    return true;
+             
+            default:
+                return false;
+        }
+    }
+
     /**
      * Determine whether the next sequence of tokens can be the beginning
      * of a miscBuiltins().
@@ -441,6 +458,7 @@ class SQLGrammar
         // NOTE: If you add rule to miscBuiltinsCore(), you must add the
         // appropriate token(s) here.
         switch (getToken(1).kind) {
+        case LEFT:
         case GET_CURRENT_CONNECTION:
         case ABS:
         case ABSVAL:
@@ -6036,6 +6054,17 @@ characterValueFunction() throws StandardException :
                                               null,
                                               parserContext);
     }
+|
+    LOOKAHEAD ( {mysqlLeftRightFuncFollows()} )
+    <LEFT> <LEFT_PAREN> str1 = additiveExpression()
+    <COMMA> str2 = additiveExpression()
+    <RIGHT_PAREN>
+    {
+        return (ValueNode)nodeFactory.getNode(NodeTypes.LEFT_FN_NODE,
+                                                str1,
+                                                str2,
+                                                parserContext);
+    }
 }
 
 ValueNode
@@ -8692,7 +8721,7 @@ outerJoinType() throws StandardException :
 {}
 {
     <LEFT> 
-    {
+    {       
         return JoinNode.JoinType.LEFT_OUTER;
     }
 |

@@ -68,7 +68,7 @@ public class OctetLengthOperatorNode extends UnaryOperatorNode
 	 * @param operand The operand of the node
 	 */
 	public void init(Object operand) throws StandardException {
-		super.init(operand, "length", "getOctetLength");
+                    super.init(operand, "length", "getOctetLength");
 	}
 
 }
