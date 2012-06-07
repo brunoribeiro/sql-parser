@@ -459,6 +459,7 @@ class SQLGrammar
         // appropriate token(s) here.
         switch (getToken(1).kind) {
         case LEFT:
+        case RIGHT:
         case GET_CURRENT_CONNECTION:
         case ABS:
         case ABSVAL:
@@ -8721,7 +8722,7 @@ outerJoinType() throws StandardException :
 {}
 {
     <LEFT> 
-    {       
+    {
         return JoinNode.JoinType.LEFT_OUTER;
     }
 |
