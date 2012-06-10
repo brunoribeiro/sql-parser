@@ -89,6 +89,8 @@ public interface NodeNames
 
     static final String BINARY_RELATIONAL_OPERATOR_NODE_NAME = "com.akiban.sql.parser.BinaryRelationalOperatorNode";
 
+    static final String LEFT_RIGHT_FUNC_OPERATOR_NODE_NAME = "com.akiban.sql.parser.LeftRightFuncOperatorNode";
+    
     static final String BIT_CONSTANT_NODE_NAME = "com.akiban.sql.parser.BitConstantNode";
 
     static final String BOOLEAN_CONSTANT_NODE_NAME = "com.akiban.sql.parser.BooleanConstantNode";
