@@ -113,18 +113,25 @@ public class CompareWithoutHashes
     public String converter(String s1, String s2) {
         String[][] ha1 = findHashes(s1);
         String[][] ha2 = findHashes(s2);
+        int j = 0;
+        int k = 0;
         for (int i = 0; i < Math.min(ha1.length, ha2.length); i++) {
-            if (ha1[i][0].equals(ha2[i][0]))
+            if (j == k && ha1[i][0].equals(ha2[i][0]))
                 s1 = s1.replace(ha1[i][1], "%!" + i + "!%");
             else {
-                for (int j = 0; j < Math.min(2,ha1.length-i); j++) {
-                    for (int k = 0; k < Math.min(2,ha2.length-i); k++) {
-                        if (ha1[i+j][0].equals(ha2[i+k][0])) {
-                            s1 = s1.replace(ha1[i+j][1], "%!" + (i + k) + "!%");
+                for (int ja = j; ja < Math.min(j+2,ha1.length); ja++) {
+                    for (int ka = k; ka < Math.min(j+2,ha2.length); ka++) {
+                        if (ha1[ja][0].equals(ha2[ka][0])) {
+                            s1 = s1.replace(ha1[ja][1], "%!" + (ka) + "!%");
+                            j = ja;
+                            k = ka;
+                            ja = ha1.length;
+                            break;
                         }
                     }
                 }
-                i += 2;
+                j++;
+                k++;
             }
         }
         for (int i = 0; i < ha2.length; i++) {
