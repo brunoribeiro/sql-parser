@@ -113,26 +113,24 @@ public class CompareWithoutHashes
     public String converter(String s1, String s2) {
         String[][] ha1 = findHashes(s1);
         String[][] ha2 = findHashes(s2);
-        int j = 0;
-        int k = 0;
-        for (int i = 0; i < Math.min(ha1.length, ha2.length); i++) {
-            if (j == k && ha1[i][0].equals(ha2[i][0]))
-                s1 = s1.replace(ha1[i][1], "%!" + i + "!%");
+        int i1 = 0;
+        for (int i2 = 0; i1 < ha1.length && i2 < ha2.length; i1++) {
+            if (ha1[i1][0].equals(ha2[i2][0]))
+                s1 = s1.replace(ha1[i1][1], "%!" + i2 + "!%");
             else {
-                for (int ja = j; ja < Math.min(j+2,ha1.length); ja++) {
-                    for (int ka = k; ka < Math.min(j+2,ha2.length); ka++) {
-                        if (ha1[ja][0].equals(ha2[ka][0])) {
-                            s1 = s1.replace(ha1[ja][1], "%!" + (ka) + "!%");
-                            j = ja;
-                            k = ka;
-                            ja = ha1.length;
-                            break;
+                adjust:
+                for (int ia1 = i1; ia1 < Math.min(i1+2,ha1.length); ia1++) {
+                    for (int ia2 = i2; ia2 < Math.min(i2+2,ha2.length); ia2++) {
+                        if (ha1[ia1][0].equals(ha2[ia2][0])) {
+                            s1 = s1.replace(ha1[ia1][1], "%!" + ia2 + "!%");
+                            i1 = ia1;
+                            i2 = ia2;
+                            break adjust;
                         }
                     }
                 }
-                j++;
-                k++;
             }
+            i2++;
         }
         for (int i = 0; i < ha2.length; i++) {
             s1 = s1.replace("%!" + i + "!%", ha2[i][1]);

@@ -25,7 +25,6 @@
  */
 package com.akiban.sql;
 
-import java.io.Reader;
 import static org.junit.Assert.*;
 import org.junit.*;
 
