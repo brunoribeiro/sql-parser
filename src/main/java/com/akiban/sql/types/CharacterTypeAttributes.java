@@ -39,9 +39,9 @@ public final class CharacterTypeAttributes
     private String collation;
     private CollationDerivation collationDerivation;
 
-    private CharacterTypeAttributes(String characterSet,
-                                    String collation, 
-                                    CollationDerivation collationDerivation) {
+    public CharacterTypeAttributes(String characterSet,
+                                   String collation, 
+                                   CollationDerivation collationDerivation) {
         this.characterSet = characterSet;
         this.collation = collation;
         this.collationDerivation = collationDerivation;
