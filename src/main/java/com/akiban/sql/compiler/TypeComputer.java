@@ -501,11 +501,10 @@ public class TypeComputer implements Visitor
         }
         if ((leftType == null) || (rightType == null))
             return null;
-        DataTypeDescriptor result = new DataTypeDescriptor(TypeId.VARCHAR_ID,
-                                                           leftType.isNullable() || rightType.isNullable(),
-                                                           leftType.getMaximumWidth() + rightType.getMaximumWidth(),
-                                                           CharacterTypeAttributes.mergeCollations(leftType.getCharacterAttributes(), rightType.getCharacterAttributes()));
-        return result;
+        return new DataTypeDescriptor(TypeId.VARCHAR_ID,
+                                      leftType.isNullable() || rightType.isNullable(),
+                                      leftType.getMaximumWidth() + rightType.getMaximumWidth(),
+                                      CharacterTypeAttributes.mergeCollations(leftType.getCharacterAttributes(), rightType.getCharacterAttributes()));
     }
 
     protected ValueNode collateNode(ExplicitCollateNode node)
