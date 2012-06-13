@@ -72,6 +72,7 @@ package com.akiban.sql.parser;
 import com.akiban.sql.StandardException;
 import com.akiban.sql.types.AliasInfo;
 import com.akiban.sql.types.RoutineAliasInfo;
+import com.akiban.sql.types.CharacterTypeAttributes;
 import com.akiban.sql.types.DataTypeDescriptor;
 import com.akiban.sql.types.TypeId;
 
@@ -3562,7 +3563,7 @@ columnDefinition(TableElementList tableElementList) throws StandardException :
     ( typeDescriptor[0] = dataTypeDDL() )
     [ defaultNode = defaultAndConstraints(typeDescriptor, tableElementList, columnName,
                                           autoIncrementInfo)
-      [ collation = collateClause() { typeDescriptor[0] = new DataTypeDescriptor(typeDescriptor[0], collation, DataTypeDescriptor.CollationDerivation.EXPLICIT); } ]
+      [ collation = collateClause() { typeDescriptor[0] = new DataTypeDescriptor(typeDescriptor[0], CharacterTypeAttributes.forCollation(null, collation, CharacterTypeAttributes.CollationDerivation.EXPLICIT)); } ]
     ]
     {
         // Only pass autoincrement info for autoincrement columns
@@ -3661,7 +3662,7 @@ dataTypeCommon() throws StandardException :
 {
     DataTypeDescriptor typeDescriptor;
     boolean checkCS = false;
-    String collation = null;
+    CharacterTypeAttributes characterAttributes = null;
 }
 {
 (
@@ -3670,12 +3671,12 @@ dataTypeCommon() throws StandardException :
     ( LOOKAHEAD( { getToken(2).kind != LARGE } )
       typeDescriptor = characterStringType() 
     )
-    [ collation = collateClause() { typeDescriptor = new DataTypeDescriptor(typeDescriptor, collation, DataTypeDescriptor.CollationDerivation.EXPLICIT); } ]
+    characterAttributes = characterTypeAttributes()
 |
     ( LOOKAHEAD( { getToken(3).kind != LARGE } )
       typeDescriptor = nationalCharacterStringType()
     )
-    [ collation = collateClause() { typeDescriptor = new DataTypeDescriptor(typeDescriptor, collation, DataTypeDescriptor.CollationDerivation.EXPLICIT); } ]
+    characterAttributes = characterTypeAttributes()
 |
     typeDescriptor = numericType()
 |
@@ -3695,6 +3696,8 @@ dataTypeCommon() throws StandardException :
     typeDescriptor = XMLType()
 )
     {
+        if (characterAttributes != null)
+            typeDescriptor = new DataTypeDescriptor(typeDescriptor, characterAttributes);
         return typeDescriptor;
     }
 }
@@ -3821,6 +3824,21 @@ nationalCharacterStringType() throws StandardException :
     {
         return DataTypeDescriptor.getBuiltInDataTypeDescriptor(type, length);
     } 
+}
+
+CharacterTypeAttributes 
+characterTypeAttributes()  throws StandardException :
+{
+    TableName characterSet = null;
+    String collation = null;
+    CharacterTypeAttributes characterAttributes = null;
+}
+{
+    [ <CHARACTER> <SET> characterSet = qualifiedName() { characterAttributes = CharacterTypeAttributes.forCharacterSet(characterSet.toString()); } ]
+    [ collation = collateClause() { characterAttributes = CharacterTypeAttributes.forCollation(characterAttributes, collation, CharacterTypeAttributes.CollationDerivation.EXPLICIT); } ]
+    {
+        return characterAttributes;
+    }
 }
 
 DataTypeDescriptor
