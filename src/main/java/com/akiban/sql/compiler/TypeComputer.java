@@ -29,6 +29,7 @@ package com.akiban.sql.compiler;
 import com.akiban.sql.parser.*;
 
 import com.akiban.sql.StandardException;
+import com.akiban.sql.types.CharacterTypeAttributes;
 import com.akiban.sql.types.DataTypeDescriptor;
 import com.akiban.sql.types.TypeId;
 
@@ -502,8 +503,8 @@ public class TypeComputer implements Visitor
             return null;
         DataTypeDescriptor result = new DataTypeDescriptor(TypeId.VARCHAR_ID,
                                                            leftType.isNullable() || rightType.isNullable(),
-                                                           leftType.getMaximumWidth() + rightType.getMaximumWidth());
-        result.mergeCollations(leftType, rightType);
+                                                           leftType.getMaximumWidth() + rightType.getMaximumWidth(),
+                                                           CharacterTypeAttributes.mergeCollations(leftType.getCharacterAttributes(), rightType.getCharacterAttributes()));
         return result;
     }
 
@@ -514,9 +515,11 @@ public class TypeComputer implements Visitor
         if (origType != null) {
             if (!origType.getTypeId().isStringTypeId())
                 throw new StandardException("Collation not allowed for " + origType);
-            operand.setType(new DataTypeDescriptor(origType, 
-                                                   node.getCollation(),
-                                                   DataTypeDescriptor.CollationDerivation.EXPLICIT));
+            CharacterTypeAttributes characterAttributes =
+                CharacterTypeAttributes.forCollation(origType.getCharacterAttributes(),
+                                                     node.getCollation(),
+                                                     CharacterTypeAttributes.CollationDerivation.EXPLICIT);
+            operand.setType(new DataTypeDescriptor(origType, characterAttributes));
         }
         return operand;
     }

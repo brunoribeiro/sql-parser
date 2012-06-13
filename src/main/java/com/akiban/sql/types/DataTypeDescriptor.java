@@ -313,10 +313,6 @@ public final class DataTypeDescriptor
                                       true);
     }
 
-    public static enum CollationDerivation {
-        NONE, IMPLICIT, EXPLICIT
-    }
-
     /*
     ** Instance fields & methods
     */
@@ -325,8 +321,7 @@ public final class DataTypeDescriptor
     private int scale;
     private boolean isNullable;
     private int maximumWidth;
-    private String collation;
-    private CollationDerivation collationDerivation;
+    private CharacterTypeAttributes characterAttributes;
 
     /**
      * Constructor for use with numeric types
@@ -389,16 +384,23 @@ public final class DataTypeDescriptor
         this.maximumWidth = maximumWidth;
     }
 
-    public DataTypeDescriptor(DataTypeDescriptor source, 
-                              String collation, CollationDerivation derivation)
+    public DataTypeDescriptor(TypeId typeId, boolean isNullable, int maximumWidth,
+                              CharacterTypeAttributes characterAttributes) {
+        this.typeId = typeId;
+        this.isNullable = isNullable;
+        this.maximumWidth = maximumWidth;
+        this.characterAttributes = characterAttributes;
+    }
+
+    public DataTypeDescriptor(DataTypeDescriptor source,
+                              CharacterTypeAttributes characterAttributes)
             throws StandardException {
         this.typeId = source.typeId;
         this.precision = source.precision;
         this.scale = source.scale;
         this.isNullable = source.isNullable;
         this.maximumWidth = source.maximumWidth;
-        this.collation = collation;
-        this.collationDerivation = derivation;
+        this.characterAttributes = characterAttributes;
     }
 
     /**
@@ -586,7 +588,9 @@ public final class DataTypeDescriptor
         higherType = new DataTypeDescriptor(higherType, 
                                             precision, scale, nullable, maximumWidth);
 
-        higherType.mergeCollations(this, otherDTS);
+        higherType.characterAttributes = 
+            CharacterTypeAttributes.mergeCollations(characterAttributes, 
+                                                    otherDTS.characterAttributes);
 
         return higherType;
     }
@@ -667,46 +671,6 @@ public final class DataTypeDescriptor
         return typeId.isRowMultiSet();
     }
 
-    public String getCollation() {
-        return collation;
-    }
-
-    public void mergeCollations(DataTypeDescriptor dtd1, DataTypeDescriptor dtd2)
-            throws StandardException {
-        if (dtd1.collationDerivation == null) {
-            collation = dtd2.collation;
-            collationDerivation = dtd2.collationDerivation;
-        }
-        else if (dtd2.collationDerivation == null) {
-            collation = dtd1.collation;
-            collationDerivation = dtd1.collationDerivation;
-        }
-        else if (dtd1.collationDerivation == CollationDerivation.EXPLICIT) {
-            if (dtd2.collationDerivation == CollationDerivation.EXPLICIT) {
-                if (!dtd1.collation.equals(dtd2.collation))
-                    throw new StandardException("Incompatible collations: " +
-                                                dtd1 + " " + dtd1.collation + " and " +
-                                                dtd2 + " " + dtd2.collation);
-            }
-            collation = dtd1.collation;
-            collationDerivation = dtd2.collationDerivation;
-        }
-        else if (dtd2.collationDerivation == CollationDerivation.EXPLICIT) {
-            collation = dtd2.collation;
-            collationDerivation = dtd2.collationDerivation;
-        }
-        else if ((dtd1.collationDerivation == CollationDerivation.IMPLICIT) &&
-                 (dtd2.collationDerivation == CollationDerivation.IMPLICIT) &&
-                 dtd1.collation.equals(dtd2.collation)) {
-            collation = dtd1.collation;
-            collationDerivation = dtd1.collationDerivation;
-        }
-        else {
-            collation = null;
-            collationDerivation = CollationDerivation.NONE;
-        }
-    }
-
     /**
      * Return a type descriptor identical to the this type
      * with the exception of its nullability. If the nullablity
@@ -719,6 +683,10 @@ public final class DataTypeDescriptor
             return this;
                 
         return new DataTypeDescriptor(this, isNullable);
+    }
+
+    public CharacterTypeAttributes getCharacterAttributes() {
+        return characterAttributes;
     }
 
     /**
@@ -735,7 +703,7 @@ public final class DataTypeDescriptor
             this.scale != odtd.getScale() ||
             this.isNullable != odtd.isNullable() ||
             this.maximumWidth != odtd.getMaximumWidth() ||
-            ((this.collation == null) ? (odtd.collation != null) : !this.collation.equals(odtd.collation)))
+            ((this.characterAttributes == null) ? (odtd.characterAttributes != null) : !this.characterAttributes.equals(odtd.characterAttributes)))
             return false;
         else
             return true;
@@ -1115,7 +1083,7 @@ public final class DataTypeDescriptor
      * @param precision The precision (number of digits) of the data value.
      * @param scale The number of fractional digits (digits to the right of the decimal point).
      *
-     * @return The maximum number of chracters needed to display the value.
+     * @return The maximum number of characters needed to display the value.
      */
     public static int computeMaxWidth (int precision, int scale) {
         // There are 3 possible cases with respect to finding the correct max
