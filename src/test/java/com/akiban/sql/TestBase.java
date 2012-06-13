@@ -226,9 +226,9 @@ public class TestBase
                                                   String expected, String actual, 
                                                   String regex) 
             throws IOException {
-        if (!new CompareWithoutHashes(regex).match(new StringReader(expected), 
-                                                   new StringReader(actual)))
-            throw new ComparisonFailure(caseName, expected, actual);
+        CompareWithoutHashes comparer = new CompareWithoutHashes(regex);
+        if (!comparer.match(new StringReader(expected), new StringReader(actual)))
+            throw new ComparisonFailure(caseName, comparer.converter(expected,actual), actual);
     }
 
 }
