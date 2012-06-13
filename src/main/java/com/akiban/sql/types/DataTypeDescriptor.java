@@ -372,6 +372,7 @@ public final class DataTypeDescriptor
         this.scale = source.scale;
         this.isNullable = isNullable;
         this.maximumWidth = source.maximumWidth;
+        this.characterAttributes = source.characterAttributes;
     }
 
     private DataTypeDescriptor(DataTypeDescriptor source, 
@@ -1021,8 +1022,10 @@ public final class DataTypeDescriptor
 
     public String toString() {
         String s = getSQLstring();
+        if (characterAttributes != null)
+            s += " " + characterAttributes;
         if (!isNullable())
-            return s + " NOT NULL";
+            s += " NOT NULL";
         return s;
     }
 

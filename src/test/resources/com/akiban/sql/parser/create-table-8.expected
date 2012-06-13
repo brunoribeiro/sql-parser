@@ -1,0 +1,12 @@
+com.akiban.sql.parser.CreateTableNode@43f46f3b
+name: t8
+statementType: CREATE TABLE
+lockGranularity: R
+tableElementList: 	
+	com.akiban.sql.parser.TableElementList@64b2ad57
+
+	[0]:	
+	com.akiban.sql.parser.ColumnDefinitionNode@e925e67
+	type: VARCHAR(10) CHARACTER SET latin1 COLLATE en_GB NOT NULL
+	name: s
+	elementType: null

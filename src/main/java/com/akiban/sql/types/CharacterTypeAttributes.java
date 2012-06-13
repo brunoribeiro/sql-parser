@@ -119,10 +119,15 @@ public final class CharacterTypeAttributes
     public String toString() {
         if ((characterSet == null) && (collation == null)) return "none";
         StringBuilder str = new StringBuilder();
-        if (characterSet != null)
-            str.append("CHARACTER SET ").append(characterSet);
-        if (collation != null)
-            str.append("COLLATE ").append(collation);
+        if (characterSet != null) {
+            str.append("CHARACTER SET ");
+            str.append(characterSet);
+        }
+        if (collation != null) {
+            if (characterSet != null) str.append(" ");
+            str.append("COLLATE ");
+            str.append(collation);
+        }
         return str.toString();
     }
     
