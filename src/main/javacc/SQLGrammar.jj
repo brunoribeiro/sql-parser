@@ -5703,11 +5703,6 @@ escapedValueFunction() throws StandardException :
     {
         return value;
     }
-|
-    value = timestampArithmeticFuncion()
-    {
-        return value;
-    }
 |       
     LOOKAHEAD( { getEscapedSYSFUN(getToken(1).image) != null } )
     value = escapedSYSFUNFunction()
