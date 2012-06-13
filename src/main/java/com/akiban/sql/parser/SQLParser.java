@@ -75,6 +75,7 @@ public class SQLParser implements SQLParserContext {
                    SQLParserFeature.DIV_OPERATOR,
                    SQLParserFeature.MYSQL_HINTS,
                    SQLParserFeature.MYSQL_INTERVAL,
+                   SQLParserFeature.MYSQL_LEFT_RIGHT_FUNC,
                    SQLParserFeature.UNSIGNED,
                    SQLParserFeature.INFIX_MOD);
 

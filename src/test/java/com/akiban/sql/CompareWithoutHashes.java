@@ -73,39 +73,68 @@ public class CompareWithoutHashes
     }
 
     public boolean match(String s1, String s2) {
-        if (s1.equals(s2))
-            return true;
-
-        String[] ha1 = findHashes(s1);
-        String[] ha2 = findHashes(s2);
+        String[][] ha1 = findHashes(s1);
+        String[][] ha2 = findHashes(s2);
         if (ha1.length != ha2.length)
             return false;
         for (int i = 0; i < ha1.length; i++) {
-            String h1 = ha1[i];
-            String h2 = ha2[i];
-            String oh2 = equivalences.put(h1, h2);
-            if ((oh2 != null) && !oh2.equals(h2))
+            if (!ha1[i][0].equals(ha2[i][0])) // checks that the part before the hash matches
+            	return false;
+            String oh2 = equivalences.put(ha1[i][1], ha2[i][1]);
+            if ((oh2 != null) && !oh2.equals(ha2[i][1]))
                 return false;
         }
 
         // It's possible that equivalences swaps two matches, so need intermediate.
         for (int i = 0; i < ha1.length; i++) {
-            s1 = s1.replace(ha1[i], "%!" + i + "!%");
+            s1 = s1.replace(ha1[i][1], "%!" + i + "!%");
         }
         for (int i = 0; i < ha1.length; i++) {
-            s1 = s1.replace("%!" + i + "!%", ha2[i]);
+            s1 = s1.replace("%!" + i + "!%", ha2[i][1]);
         }
         
         return s1.equals(s2);
     }
 
-    protected String[] findHashes(String s) {
+    protected String[][] findHashes(String s) {
         Matcher matcher = pattern.matcher(s);
-        List<String> matches = new ArrayList<String>();
+        List<String[]> matches = new ArrayList<String[]>();
         while (matcher.find()) {
-            matches.add(matcher.group());
+            String hash = matcher.group();
+            String[] match = {
+                hash.substring(0,hash.indexOf('@')),
+                hash
+            };
+            matches.add(match);
         }
-        return matches.toArray(new String[matches.size()]);
+        return matches.toArray(new String[matches.size()][2]);
     }
 
+    public String converter(String s1, String s2) {
+        String[][] ha1 = findHashes(s1);
+        String[][] ha2 = findHashes(s2);
+        int i1 = 0;
+        for (int i2 = 0; i1 < ha1.length && i2 < ha2.length; i1++) {
+            if (ha1[i1][0].equals(ha2[i2][0]))
+                s1 = s1.replace(ha1[i1][1], "%!" + i2 + "!%");
+            else {
+                adjust:
+                for (int ia1 = i1; ia1 < Math.min(i1+2,ha1.length); ia1++) {
+                    for (int ia2 = i2; ia2 < Math.min(i2+2,ha2.length); ia2++) {
+                        if (ha1[ia1][0].equals(ha2[ia2][0])) {
+                            s1 = s1.replace(ha1[ia1][1], "%!" + ia2 + "!%");
+                            i1 = ia1;
+                            i2 = ia2;
+                            break adjust;
+                        }
+                    }
+                }
+            }
+            i2++;
+        }
+        for (int i = 0; i < ha2.length; i++) {
+            s1 = s1.replace("%!" + i + "!%", ha2[i][1]);
+        }
+        return s1;
+    }
 }

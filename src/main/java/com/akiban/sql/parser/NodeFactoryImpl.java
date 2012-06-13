@@ -533,8 +533,8 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.TIMESTAMP_OPERATOR_NODE:
             return NodeNames.TIMESTAMP_OPERATOR_NODE_NAME;
 
-        case NodeTypes.DB2_LENGTH_OPERATOR_NODE:
-            return NodeNames.DB2_LENGTH_OPERATOR_NODE_NAME;
+        case NodeTypes.OCTET_LENGTH_OPERATOR_NODE:
+            return NodeNames.OCTET_LENGTH_OPERATOR_NODE_NAME;
 
         case NodeTypes.XML_PARSE_OPERATOR_NODE:
         case NodeTypes.XML_SERIALIZE_OPERATOR_NODE:
@@ -605,6 +605,10 @@ public final class NodeFactoryImpl extends NodeFactory
         
         case NodeTypes.INDEX_HINT_LIST:
             return NodeNames.INDEX_HINT_LIST_NAME;
+        
+        case NodeTypes.RIGHT_FN_NODE:
+        case NodeTypes.LEFT_FN_NODE:
+            return NodeNames.LEFT_RIGHT_FUNC_OPERATOR_NODE_NAME;
 
         default:
             throw new StandardException("Not implemented");
