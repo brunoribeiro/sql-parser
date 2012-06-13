@@ -64,12 +64,12 @@ public final class CharacterTypeAttributes
     }
 
     public static CharacterTypeAttributes forCollation(CharacterTypeAttributes base,
-                                                       String collation, 
-                                                       CollationDerivation collationDerivation) {
+                                                       String collation) {
         String characterSet = null;
         if (base != null)
             characterSet = base.characterSet;
-        return new CharacterTypeAttributes(characterSet, collation, collationDerivation);
+        return new CharacterTypeAttributes(characterSet, 
+                                           collation, CollationDerivation.EXPLICIT);
     }
 
     public static CharacterTypeAttributes mergeCollations(CharacterTypeAttributes ta1,

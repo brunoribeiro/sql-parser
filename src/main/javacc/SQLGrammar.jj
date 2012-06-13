@@ -3563,7 +3563,7 @@ columnDefinition(TableElementList tableElementList) throws StandardException :
     ( typeDescriptor[0] = dataTypeDDL() )
     [ defaultNode = defaultAndConstraints(typeDescriptor, tableElementList, columnName,
                                           autoIncrementInfo)
-      [ collation = collateClause() { typeDescriptor[0] = new DataTypeDescriptor(typeDescriptor[0], CharacterTypeAttributes.forCollation(null, collation, CharacterTypeAttributes.CollationDerivation.EXPLICIT)); } ]
+      [ collation = collateClause() { typeDescriptor[0] = new DataTypeDescriptor(typeDescriptor[0], CharacterTypeAttributes.forCollation(null, collation)); } ]
     ]
     {
         // Only pass autoincrement info for autoincrement columns
@@ -3835,7 +3835,7 @@ characterTypeAttributes()  throws StandardException :
 }
 {
     [ <CHARACTER> <SET> characterSet = qualifiedName() { characterAttributes = CharacterTypeAttributes.forCharacterSet(characterSet.toString()); } ]
-    [ collation = collateClause() { characterAttributes = CharacterTypeAttributes.forCollation(characterAttributes, collation, CharacterTypeAttributes.CollationDerivation.EXPLICIT); } ]
+    [ collation = collateClause() { characterAttributes = CharacterTypeAttributes.forCollation(characterAttributes, collation); } ]
     {
         return characterAttributes;
     }
@@ -9222,31 +9222,37 @@ schemaDefinition() throws StandardException :
 {
     String schemaName = null;
     String authName = null;
+    TableName characterSet = null;
+    TableName collation = null;
+    CharacterTypeAttributes defaultCharacterAttributes = null;
 }
 {
     /*
     ** CREATE SCHEMA:
-    ** We are not currently handling character set
-    ** specifications for schema, or schema bodies.
+    ** We are not currently handling schema bodies.
     */
     <SCHEMA>
     (
         schemaName = identifier() [ <AUTHORIZATION> authName = identifier() ]
+    |
+        <AUTHORIZATION> authName = identifier() 
+        {
+            schemaName = authName;
+        }
+    )
+    [ LOOKAHEAD( { getToken(2).kind == CHARACTER } )
+      <_DEFAULT> <CHARACTER> <SET> characterSet = qualifiedName() 
+      { defaultCharacterAttributes = CharacterTypeAttributes.forCharacterSet(characterSet.toString()); } ]
+    [ LOOKAHEAD( { getToken(2).kind == COLLATION } )
+      <_DEFAULT> <COLLATION> collation = qualifiedName() 
+      { defaultCharacterAttributes = CharacterTypeAttributes.forCollation(defaultCharacterAttributes, collation.toString()); } ]
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_SCHEMA_NODE,
                                                   schemaName,
                                                   authName,
+                                                  defaultCharacterAttributes,
                                                   parserContext);
     }
-    |
-        <AUTHORIZATION> authName = identifier() 
-        {
-            return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_SCHEMA_NODE,
-                                                      authName,
-                                                      authName,
-                                                      parserContext);
-        }
-    )
 }
 
 StatementNode

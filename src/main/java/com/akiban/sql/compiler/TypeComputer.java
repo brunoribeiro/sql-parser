@@ -517,8 +517,7 @@ public class TypeComputer implements Visitor
                 throw new StandardException("Collation not allowed for " + origType);
             CharacterTypeAttributes characterAttributes =
                 CharacterTypeAttributes.forCollation(origType.getCharacterAttributes(),
-                                                     node.getCollation(),
-                                                     CharacterTypeAttributes.CollationDerivation.EXPLICIT);
+                                                     node.getCollation());
             operand.setType(new DataTypeDescriptor(origType, characterAttributes));
         }
         return operand;
