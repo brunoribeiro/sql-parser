@@ -87,8 +87,8 @@ public class TernaryOperatorNode extends ValueNode
         TIMESTAMPDIFF("TIMESTAMPDIFF", "timestampDiff",
                       ValueClassName.NumberDataValue,
                       // time2.timestampDiff(interval, time1)
-                      new String[] { ValueClassName.DateTimeDataValue, 
-                                     "java.lang.Integer", 
+                      new String[] {"java.lang.Integer",
+                                     ValueClassName.DateTimeDataValue,
                                      ValueClassName.DateTimeDataValue });
 
         String operator, methodName;

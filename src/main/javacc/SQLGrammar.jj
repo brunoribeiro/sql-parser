@@ -480,6 +480,8 @@ class SQLGrammar
         case DATE:
         case TIME:
         case TIMESTAMP:
+        case TIMESTAMPADD:
+        case TIMESTAMPDIFF:
         case DOUBLE:
         case CHAR:
         case VARCHAR:
@@ -5732,11 +5734,6 @@ escapedValueFunction() throws StandardException :
     {
         return value;
     }
-|
-    value = timestampArithmeticFuncion()
-    {
-        return value;
-    }
 |       
     LOOKAHEAD( { getEscapedSYSFUN(getToken(1).image) != null } )
     value = escapedSYSFUNFunction()
@@ -5784,24 +5781,41 @@ escapedSYSFUNFunction() throws StandardException :
 ValueNode
 timestampArithmeticFuncion() throws StandardException :
 {
+    DataTypeDescriptor intervalTypeDesc;
     ValueNode intervalType;
     ValueNode tstamp1;
     ValueNode tstamp2;
-    ValueNode count;
+    ValueNode interval;
+    int[] factors = new int[] { 1, 1 };
 }
 {
-    <TIMESTAMPADD> <LEFT_PAREN> intervalType = jdbcIntervalType() 
-    <COMMA> count = additiveExpression()
+    <TIMESTAMPADD> <LEFT_PAREN> intervalTypeDesc = jdbcIntervalTypeDescriptor(factors) 
+    <COMMA> interval = additiveExpression()
     <COMMA> tstamp1 = additiveExpression() 
     <RIGHT_PAREN>
     {
-        return (ValueNode)nodeFactory.getNode(NodeTypes.TIMESTAMP_ADD_FN_NODE,
-                                              tstamp1,
-                                              intervalType,
-                                              count,
-                                              TernaryOperatorNode.OperatorType.TIMESTAMPADD,
-                                              null,
-                                              parserContext);
+        interval = (ValueNode)nodeFactory.getNode(NodeTypes.CAST_NODE,
+                                               interval, intervalTypeDesc,    
+                                               parserContext);
+        if (factors[0] != 1)
+            interval = (ValueNode)nodeFactory.getNode(NodeTypes.BINARY_TIMES_OPERATOR_NODE,
+                                                   interval,
+                                                   nodeFactory.getNode(NodeTypes.INT_CONSTANT_NODE,
+                                                                       Integer.valueOf(factors[0]),
+                                                                       parserContext),
+                                                   parserContext);
+        if (factors[1] != 1)
+            interval = (ValueNode)nodeFactory.getNode(NodeTypes.BINARY_DIVIDE_OPERATOR_NODE,
+                                                   interval,
+                                                   nodeFactory.getNode(NodeTypes.INT_CONSTANT_NODE,
+                                                                       Integer.valueOf(factors[1]),
+                                                                       parserContext),
+                                                   parserContext);
+                 
+        return (ValueNode)nodeFactory.getNode(NodeTypes.BINARY_PLUS_OPERATOR_NODE,
+                                                  tstamp1,
+                                                  interval,
+                                                  parserContext);
     }
 |
     <TIMESTAMPDIFF> <LEFT_PAREN> intervalType = jdbcIntervalType() 
@@ -5810,62 +5824,125 @@ timestampArithmeticFuncion() throws StandardException :
     <RIGHT_PAREN>
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.TIMESTAMP_DIFF_FN_NODE,
-                                              tstamp2,
                                               intervalType,
                                               tstamp1,
+                                              tstamp2,
                                               TernaryOperatorNode.OperatorType.TIMESTAMPDIFF,
                                               null,
                                               parserContext);
     }
-}               
-
+}        
+       
 ValueNode
 jdbcIntervalType() throws StandardException :
 {}
 {
-    <SQL_TSI_FRAC_SECOND>
+    (<SQL_TSI_FRAC_SECOND> | <MICROSECOND>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.FRAC_SECOND_INTERVAL);
     }
 |
-    <SQL_TSI_SECOND>
+    (<SQL_TSI_SECOND> | <SECOND>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.SECOND_INTERVAL);
     }
 |
-    <SQL_TSI_MINUTE>
+    (<SQL_TSI_MINUTE> | <MINUTE>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.MINUTE_INTERVAL);
     }
 |
-    <SQL_TSI_HOUR>
+    (<SQL_TSI_HOUR> | <HOUR>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.HOUR_INTERVAL);
     }
 |
-    <SQL_TSI_DAY>
+    (<SQL_TSI_DAY> | <DAY>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.DAY_INTERVAL);
     }
 |
-    <SQL_TSI_WEEK>
+    (<SQL_TSI_WEEK> | <WEEK>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.WEEK_INTERVAL);
     }
 |
-    <SQL_TSI_MONTH>
+    (<SQL_TSI_MONTH> | <MONTH>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.MONTH_INTERVAL);
     }
 |
-    <SQL_TSI_QUARTER>
+    (<SQL_TSI_QUARTER> | <QUARTER>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.QUARTER_INTERVAL);
     }
 |
-    <SQL_TSI_YEAR>
+    (<SQL_TSI_YEAR> | <YEAR>)
     {
         return getJdbcIntervalNode(TernaryOperatorNode.YEAR_INTERVAL);
+    }
+}
+
+DataTypeDescriptor 
+jdbcIntervalTypeDescriptor(int[] factors) throws StandardException :
+{
+    TypeId typeId;
+    int prec = 0, scale = 0;
+}
+{
+(
+    (<SQL_TSI_FRAC_SECOND> | <MICROSECOND>)
+    {   
+        typeId = TypeId.INTERVAL_SECOND_ID;
+        scale = 6;
+        factors[1] = 1000000;
+    }
+|
+    (<SQL_TSI_SECOND> | <SECOND>)
+    {
+        typeId = TypeId.INTERVAL_SECOND_ID;
+    }
+|
+    (<SQL_TSI_MINUTE> | <MINUTE>)
+    {
+        typeId = TypeId.INTERVAL_MINUTE_ID;
+    }
+|
+    (<SQL_TSI_HOUR> | <HOUR>)
+    {
+        typeId = TypeId.INTERVAL_HOUR_ID;
+    }
+|
+    (<SQL_TSI_DAY> | <DAY>)
+    {
+        typeId = TypeId.INTERVAL_DAY_ID;
+    }
+|
+    (<SQL_TSI_WEEK> | <WEEK>)
+    {
+        typeId = TypeId.INTERVAL_DAY_ID;
+        factors[0] = 7;
+    }
+|
+    (<SQL_TSI_MONTH> | <MONTH>)
+    {
+        typeId = TypeId.INTERVAL_MONTH_ID;
+    }
+|
+    (<SQL_TSI_QUARTER> | <QUARTER>)
+    {
+        typeId = TypeId.INTERVAL_MONTH_ID;
+        factors[0] = 3;
+    }
+|
+    (<SQL_TSI_YEAR> | <YEAR>)
+    {
+        typeId = TypeId.INTERVAL_YEAR_ID;
+    }
+)
+    {
+        return new DataTypeDescriptor(typeId, prec, scale,
+                                      true, DataTypeDescriptor.intervalMaxWidth(typeId, prec, scale));
     }
 }
 
@@ -6891,6 +6968,7 @@ numericFunctionType() throws StandardException :
 ValueNode
 dateTimeScalarFunction() throws StandardException :
 {
+
     ValueNode value;
     ValueNode timestampNode;
     ExtractOperatorNode.Field field;
@@ -6940,6 +7018,11 @@ dateTimeScalarFunction() throws StandardException :
                                               field,
                                               value,
                                               parserContext);
+    }
+|
+    value = timestampArithmeticFuncion()
+    {
+        return value;
     }
 }
 
