@@ -51,6 +51,8 @@ package com.akiban.sql.parser;
 
 import com.akiban.sql.StandardException;
 
+import com.akiban.sql.types.CharacterTypeAttributes;
+
 /**
  * A CreateSchemaNode is the root of a QueryTree that 
  * represents a CREATE SCHEMA statement.
@@ -61,6 +63,7 @@ public class CreateSchemaNode extends DDLStatementNode
 {
     private String name;
     private String aid;
+    private CharacterTypeAttributes defaultCharacterAttributes;
 
     /**
      * Initializer for a CreateSchemaNode
@@ -70,7 +73,10 @@ public class CreateSchemaNode extends DDLStatementNode
      *
      * @exception StandardException Thrown on error
      */
-    public void init(Object schemaName, Object aid) throws StandardException {
+    public void init(Object schemaName, 
+                     Object aid,
+                     Object defaultCharacterAttributes)
+            throws StandardException {
         /*
         ** DDLStatementNode expects tables, null out
         ** objectName explicitly to clarify that we
@@ -80,6 +86,7 @@ public class CreateSchemaNode extends DDLStatementNode
 
         this.name = (String)schemaName;
         this.aid = (String)aid;
+        this.defaultCharacterAttributes = (CharacterTypeAttributes)defaultCharacterAttributes;
     }
 
     /**
@@ -91,6 +98,7 @@ public class CreateSchemaNode extends DDLStatementNode
         CreateSchemaNode other = (CreateSchemaNode)node;
         this.name = other.name;
         this.aid = other.aid;
+        this.defaultCharacterAttributes = other.defaultCharacterAttributes;
     }
 
     /**
@@ -103,7 +111,8 @@ public class CreateSchemaNode extends DDLStatementNode
     public String toString() {
         return super.toString() +
             "schemaName: " + "\n" + name + "\n" +
-            "authorizationId: " + "\n" + aid + "\n";
+            "authorizationId: " + "\n" + aid + "\n" +
+            "defaultChar: " + "\n" + defaultCharacterAttributes + "\n";
     }
 
     public String statementToString() {
@@ -116,5 +125,9 @@ public class CreateSchemaNode extends DDLStatementNode
     
     public String getAuthorizationID() {
         return this.aid;
+    }
+
+    public CharacterTypeAttributes getDefaultCharacterAttributes() {
+        return defaultCharacterAttributes;
     }
 }

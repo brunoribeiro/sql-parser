@@ -321,6 +321,7 @@ public final class DataTypeDescriptor
     private int scale;
     private boolean isNullable;
     private int maximumWidth;
+    private CharacterTypeAttributes characterAttributes;
 
     /**
      * Constructor for use with numeric types
@@ -371,6 +372,7 @@ public final class DataTypeDescriptor
         this.scale = source.scale;
         this.isNullable = isNullable;
         this.maximumWidth = source.maximumWidth;
+        this.characterAttributes = source.characterAttributes;
     }
 
     private DataTypeDescriptor(DataTypeDescriptor source, 
@@ -381,6 +383,25 @@ public final class DataTypeDescriptor
         this.scale = scale;
         this.isNullable = isNullable;
         this.maximumWidth = maximumWidth;
+    }
+
+    public DataTypeDescriptor(TypeId typeId, boolean isNullable, int maximumWidth,
+                              CharacterTypeAttributes characterAttributes) {
+        this.typeId = typeId;
+        this.isNullable = isNullable;
+        this.maximumWidth = maximumWidth;
+        this.characterAttributes = characterAttributes;
+    }
+
+    public DataTypeDescriptor(DataTypeDescriptor source,
+                              CharacterTypeAttributes characterAttributes)
+            throws StandardException {
+        this.typeId = source.typeId;
+        this.precision = source.precision;
+        this.scale = source.scale;
+        this.isNullable = source.isNullable;
+        this.maximumWidth = source.maximumWidth;
+        this.characterAttributes = characterAttributes;
     }
 
     /**
@@ -568,7 +589,9 @@ public final class DataTypeDescriptor
         higherType = new DataTypeDescriptor(higherType, 
                                             precision, scale, nullable, maximumWidth);
 
-        // TODO: Collation merge was here (with long comment at function head).
+        higherType.characterAttributes = 
+            CharacterTypeAttributes.mergeCollations(characterAttributes, 
+                                                    otherDTS.characterAttributes);
 
         return higherType;
     }
@@ -663,6 +686,10 @@ public final class DataTypeDescriptor
         return new DataTypeDescriptor(this, isNullable);
     }
 
+    public CharacterTypeAttributes getCharacterAttributes() {
+        return characterAttributes;
+    }
+
     /**
      * Compare if two DataTypeDescriptors are exactly the same
      * @param other the type to compare to.
@@ -676,10 +703,11 @@ public final class DataTypeDescriptor
             this.precision != odtd.getPrecision() ||
             this.scale != odtd.getScale() ||
             this.isNullable != odtd.isNullable() ||
-            this.maximumWidth != odtd.getMaximumWidth())
+            this.maximumWidth != odtd.getMaximumWidth() ||
+            ((this.characterAttributes == null) ? (odtd.characterAttributes != null) : !this.characterAttributes.equals(odtd.characterAttributes)))
             return false;
         else
-            return true;                            // TODO: Collation info, too, once there.
+            return true;
     }
 
     /**
@@ -994,8 +1022,10 @@ public final class DataTypeDescriptor
 
     public String toString() {
         String s = getSQLstring();
+        if (characterAttributes != null)
+            s += " " + characterAttributes;
         if (!isNullable())
-            return s + " NOT NULL";
+            s += " NOT NULL";
         return s;
     }
 
@@ -1056,7 +1086,7 @@ public final class DataTypeDescriptor
      * @param precision The precision (number of digits) of the data value.
      * @param scale The number of fractional digits (digits to the right of the decimal point).
      *
-     * @return The maximum number of chracters needed to display the value.
+     * @return The maximum number of characters needed to display the value.
      */
     public static int computeMaxWidth (int precision, int scale) {
         // There are 3 possible cases with respect to finding the correct max

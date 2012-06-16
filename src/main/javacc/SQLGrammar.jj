@@ -72,6 +72,7 @@ package com.akiban.sql.parser;
 import com.akiban.sql.StandardException;
 import com.akiban.sql.types.AliasInfo;
 import com.akiban.sql.types.RoutineAliasInfo;
+import com.akiban.sql.types.CharacterTypeAttributes;
 import com.akiban.sql.types.DataTypeDescriptor;
 import com.akiban.sql.types.TypeId;
 
@@ -3581,13 +3582,15 @@ columnDefinition(TableElementList tableElementList) throws StandardException :
     ValueNode defaultNode = null;
     String columnName;
     long[] autoIncrementInfo = new long[4]; // *** TODO: constant ***
+    String collation = null;
 }
 {
-    // TODO: We are ignoring domains and collation.
     columnName = identifier() 
     ( typeDescriptor[0] = dataTypeDDL() )
     [ defaultNode = defaultAndConstraints(typeDescriptor, tableElementList, columnName,
-                                          autoIncrementInfo) ]
+                                          autoIncrementInfo)
+      [ collation = collateClause() { typeDescriptor[0] = new DataTypeDescriptor(typeDescriptor[0], CharacterTypeAttributes.forCollation(null, collation)); } ]
+    ]
     {
         // Only pass autoincrement info for autoincrement columns
         if (autoIncrementInfo[QueryTreeNode.AUTOINCREMENT_IS_AUTOINCREMENT_INDEX] == 0) {
@@ -3685,23 +3688,21 @@ dataTypeCommon() throws StandardException :
 {
     DataTypeDescriptor typeDescriptor;
     boolean checkCS = false;
+    CharacterTypeAttributes characterAttributes = null;
 }
 {
 (
     /* TODO: Ignoring decimal, numeric, long *** Not sure what that refers to. */
 
     ( LOOKAHEAD( { getToken(2).kind != LARGE } )
-        typeDescriptor = characterStringType() 
+      typeDescriptor = characterStringType() 
     )
-    /* TODO: ***
-    ** We are not planning to support character sets, so I commented
-    ** out characterSetSpecification().
-    */
-        /* [ <CHARACTER> <SET> characterSetSpecification() ] */
+    characterAttributes = characterTypeAttributes()
 |
     ( LOOKAHEAD( { getToken(3).kind != LARGE } )
-        typeDescriptor = nationalCharacterStringType()
+      typeDescriptor = nationalCharacterStringType()
     )
+    characterAttributes = characterTypeAttributes()
 |
     typeDescriptor = numericType()
 |
@@ -3721,6 +3722,8 @@ dataTypeCommon() throws StandardException :
     typeDescriptor = XMLType()
 )
     {
+        if (characterAttributes != null)
+            typeDescriptor = new DataTypeDescriptor(typeDescriptor, characterAttributes);
         return typeDescriptor;
     }
 }
@@ -3847,6 +3850,21 @@ nationalCharacterStringType() throws StandardException :
     {
         return DataTypeDescriptor.getBuiltInDataTypeDescriptor(type, length);
     } 
+}
+
+CharacterTypeAttributes 
+characterTypeAttributes()  throws StandardException :
+{
+    TableName characterSet = null;
+    String collation = null;
+    CharacterTypeAttributes characterAttributes = null;
+}
+{
+    [ <CHARACTER> <SET> characterSet = qualifiedName() { characterAttributes = CharacterTypeAttributes.forCharacterSet(characterSet.toString()); } ]
+    [ collation = collateClause() { characterAttributes = CharacterTypeAttributes.forCollation(characterAttributes, collation); } ]
+    {
+        return characterAttributes;
+    }
 }
 
 DataTypeDescriptor
@@ -5194,51 +5212,58 @@ additiveExpression(ValueNode farLeftOperand, BinaryOperatorNode.OperatorType com
 {
     ValueNode leftOperand;
     BinaryOperatorNode.OperatorType operator;
-    int nodeType;
+    String collation = null;
 }
 {
     leftOperand = multiplicativeExpression(null, null)
     ( operator = additiveOperator()
-        leftOperand = multiplicativeExpression(leftOperand, operator) 
+      leftOperand = multiplicativeExpression(leftOperand, operator) 
     )*
+    [ collation = collateClause() ]
     {
-        if (farLeftOperand == null)
-            return leftOperand;
-        switch (compOp) {
-        case EQ:
-            nodeType = NodeTypes.BINARY_EQUALS_OPERATOR_NODE;
-            break;
+        if (farLeftOperand != null) {
+            int nodeType;
+            switch (compOp) {
+            case EQ:
+                nodeType = NodeTypes.BINARY_EQUALS_OPERATOR_NODE;
+                break;
 
-        case NE:
-            nodeType = NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE;
-            break;
+            case NE:
+                nodeType = NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE;
+                break;
 
-        case LT:
-            nodeType = NodeTypes.BINARY_LESS_THAN_OPERATOR_NODE;
-            break;
+            case LT:
+                nodeType = NodeTypes.BINARY_LESS_THAN_OPERATOR_NODE;
+                break;
 
-        case GT:
-            nodeType = NodeTypes.BINARY_GREATER_THAN_OPERATOR_NODE;
-            break;
+            case GT:
+                nodeType = NodeTypes.BINARY_GREATER_THAN_OPERATOR_NODE;
+                break;
 
-        case LE:
-            nodeType = NodeTypes.BINARY_LESS_EQUALS_OPERATOR_NODE;
-            break;
+            case LE:
+                nodeType = NodeTypes.BINARY_LESS_EQUALS_OPERATOR_NODE;
+                break;
 
-        case GE:
-            nodeType = NodeTypes.BINARY_GREATER_EQUALS_OPERATOR_NODE;
-            break;
+            case GE:
+                nodeType = NodeTypes.BINARY_GREATER_EQUALS_OPERATOR_NODE;
+                break;
 
-        default:
-            assert false : "Unknown comparison operator " + compOp;
-            nodeType = 0;
-            break;
+            default:
+                assert false : "Unknown comparison operator " + compOp;
+                nodeType = 0;
+                break;
+            }
+            leftOperand = (ValueNode)nodeFactory.getNode(nodeType,
+                                                         farLeftOperand,
+                                                         leftOperand,
+                                                         parserContext);
         }
-
-        return (ValueNode)nodeFactory.getNode(nodeType,
-                                              farLeftOperand,
-                                              leftOperand,
-                                              parserContext);
+        if (collation != null)
+            leftOperand = (ValueNode)nodeFactory.getNode(NodeTypes.EXPLICIT_COLLATE_NODE,
+                                                         leftOperand,
+                                                         collation,
+                                                         parserContext);
+        return leftOperand;
     }
 }
 
@@ -7528,7 +7553,6 @@ sortSpecification(OrderByList orderCols) throws StandardException :
 {    OrderByColumn orderCol; }
 {
     orderCol = sortKey()
-    /* [ collateClause() ] */ 
     [ orderingSpecification(orderCol) ] 
     [ nullOrdering(orderCol) ]
     {
@@ -9342,31 +9366,37 @@ schemaDefinition() throws StandardException :
 {
     String schemaName = null;
     String authName = null;
+    TableName characterSet = null;
+    TableName collation = null;
+    CharacterTypeAttributes defaultCharacterAttributes = null;
 }
 {
     /*
     ** CREATE SCHEMA:
-    ** We are not currently handling character set
-    ** specifications for schema, or schema bodies.
+    ** We are not currently handling schema bodies.
     */
     <SCHEMA>
     (
         schemaName = identifier() [ <AUTHORIZATION> authName = identifier() ]
+    |
+        <AUTHORIZATION> authName = identifier() 
+        {
+            schemaName = authName;
+        }
+    )
+    [ LOOKAHEAD( { getToken(2).kind == CHARACTER } )
+      <_DEFAULT> <CHARACTER> <SET> characterSet = qualifiedName() 
+      { defaultCharacterAttributes = CharacterTypeAttributes.forCharacterSet(characterSet.toString()); } ]
+    [ LOOKAHEAD( { getToken(2).kind == COLLATION } )
+      <_DEFAULT> <COLLATION> collation = qualifiedName() 
+      { defaultCharacterAttributes = CharacterTypeAttributes.forCollation(defaultCharacterAttributes, collation.toString()); } ]
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_SCHEMA_NODE,
                                                   schemaName,
                                                   authName,
+                                                  defaultCharacterAttributes,
                                                   parserContext);
     }
-    |
-        <AUTHORIZATION> authName = identifier() 
-        {
-            return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_SCHEMA_NODE,
-                                                      authName,
-                                                      authName,
-                                                      parserContext);
-        }
-    )
 }
 
 StatementNode
@@ -11086,6 +11116,18 @@ stringLiteral() throws StandardException :
         return (CharConstantNode)nodeFactory.getNode(NodeTypes.CHAR_CONSTANT_NODE,
                                                      string,
                                                      parserContext);
+    }
+}
+
+String
+collateClause() throws StandardException :
+{
+    TableName collation;
+}
+{
+    <COLLATE> collation = qualifiedName()
+    {
+        return collation.toString();
     }
 }
 
