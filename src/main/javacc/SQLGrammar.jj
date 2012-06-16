@@ -6159,15 +6159,27 @@ characterValueFunction() throws StandardException :
     }
 |
     LOOKAHEAD ( {mysqlLeftRightFuncFollows()} )
-    <LEFT> <LEFT_PAREN> str1 = additiveExpression()
-    <COMMA> str2 = additiveExpression()
-    <RIGHT_PAREN>
-    {
-        return (ValueNode)nodeFactory.getNode(NodeTypes.LEFT_FN_NODE,
-                                                str1,
-                                                str2,
-                                                parserContext);
-    }
+    (
+        <LEFT> <LEFT_PAREN> str1 = additiveExpression()
+        <COMMA> str2 = additiveExpression()
+        <RIGHT_PAREN>
+        {
+            return (ValueNode)nodeFactory.getNode(NodeTypes.LEFT_FN_NODE,
+                                                    str1,
+                                                    str2,
+                                                    parserContext);
+        }
+    |   
+        <RIGHT> <LEFT_PAREN> str1 = additiveExpression()
+        <COMMA> str2 = additiveExpression()
+        <RIGHT_PAREN>
+        {
+            return (ValueNode)nodeFactory.getNode(NodeTypes.RIGHT_FN_NODE,
+                                                    str1,
+                                                    str2,
+                                                    parserContext);
+        }
+    )
 }
 
 ValueNode
