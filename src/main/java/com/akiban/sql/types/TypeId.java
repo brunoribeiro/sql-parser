@@ -1759,7 +1759,8 @@ public class TypeId
         return unsigned;
     }
 
-    public static TypeId intervalTypeId(TypeId startField, TypeId endField) {
+    public static TypeId intervalTypeId(TypeId startField, TypeId endField) 
+            throws StandardException {
         if (startField == INTERVAL_YEAR_ID) {
             if (endField == INTERVAL_MONTH_ID)
                 return INTERVAL_YEAR_MONTH_ID;
@@ -1782,8 +1783,8 @@ public class TypeId
             if (endField == INTERVAL_SECOND_ID)
                 return INTERVAL_MINUTE_SECOND_ID;
         }
-        assert false : startField + " TO " + endField;
-        return startField;
+        throw new StandardException("Illegal " + startField.unqualifiedName +
+                                    " TO " + endField.unqualifiedName.substring("INTERVAL ".length()));
     }
 
     public boolean isIntervalTypeId() {
