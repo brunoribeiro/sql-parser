@@ -394,8 +394,7 @@ public final class DataTypeDescriptor
     }
 
     public DataTypeDescriptor(DataTypeDescriptor source,
-                              CharacterTypeAttributes characterAttributes)
-            throws StandardException {
+                              CharacterTypeAttributes characterAttributes) {
         this.typeId = source.typeId;
         this.precision = source.precision;
         this.scale = source.scale;
