@@ -1549,7 +1549,7 @@ class SQLGrammar
 
     boolean parensFollow()
     {
-        if (!hasFeature(SQLParserFeature.MYSQL_CURDATETIME_WITH_PARENS))
+        if (!hasFeature(SQLParserFeature.MYSQL_COLUMN_AS_FUNCS))
             return false;
 
         if (getToken(1).kind == LEFT_PAREN && getToken(2).kind == RIGHT_PAREN)

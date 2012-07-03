@@ -33,7 +33,7 @@ package com.akiban.sql.parser;
 
 public enum SQLParserFeature
 {
-    MYSQL_CURDATETIME_WITH_PARENS,
+    MYSQL_COLUMN_AS_FUNCS,
     MYSQL_LEFT_RIGHT_FUNC,
     DIV_OPERATOR, // integer division
     GROUPING,
