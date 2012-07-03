@@ -1550,7 +1550,7 @@ class SQLGrammar
     boolean parensFollow()
     {
         if (!hasFeature(SQLParserFeature.MYSQL_COLUMN_AS_FUNCS))
-            return false;
+           return false;
 
         if (getToken(1).kind == LEFT_PAREN && getToken(2).kind == RIGHT_PAREN)
             return true;
