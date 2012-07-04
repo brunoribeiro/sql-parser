@@ -398,6 +398,9 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.ALTER_TABLE_NODE:
             return NodeNames.ALTER_TABLE_NODE_NAME;
 
+        case NodeTypes.ALTER_SERVER_NODE:
+            return NodeNames.ALTER_SERVER_NODE_NAME;
+            
         case NodeTypes.AGGREGATE_NODE:
             return NodeNames.AGGREGATE_NODE_NAME;
 

@@ -2322,10 +2322,12 @@ TOKEN [IGNORE_CASE] :
 | <RR: "rr">
 | <RS: "rs">
 | <SECOND_MICROSECOND: "second_microsecond">
+| <SERVER: "server">
 | <SEQUENCE: "sequence">
 | <SEQUENTIAL: "sequential">
 | <SETS: "sets">
 | <SHARE: "share">
+| <SHUTDOWN: "shutdown">
 | <SPECIFIC: "specific">
 | <SQLID: "sqlid">
 | <SQRT: "sqrt">
@@ -2914,7 +2916,7 @@ spsAlterStatement() throws StandardException :
 {
     <ALTER>
 (
-    statementNode = alterTableStatement()
+    statementNode = alterStatement()
 )
     {
         return statementNode;
@@ -12311,7 +12313,7 @@ dropSchemaStatement() throws StandardException :
 }
 
 StatementNode
-alterTableStatement() throws StandardException :
+alterStatement() throws StandardException :
 {
     StatementNode node;
     TableName tableName;
@@ -12320,6 +12322,37 @@ alterTableStatement() throws StandardException :
     <TABLE> tableName = qualifiedName() node = alterTableBody(tableName)
     {
         return node;
+    }
+|   
+    <SERVER> node = alterServerBody()
+    {
+        return node;
+    }  
+}
+
+StatementNode
+alterServerBody () throws StandardException:
+{
+    StatementNode sn;
+    int sessionId;
+    Token immediate = null;
+}
+{
+    <SET> sn = setConfigurationStatement() 
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_SERVER_NODE,
+        					sn,
+        					parserContext);
+    }
+|
+    <SHUTDOWN>
+    (
+        [ immediate = <IMMEDIATE> ]
+    )
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_SERVER_NODE,
+                                                 new Boolean(immediate != null),
+                                                 parserContext);
     }
 }
 
@@ -13821,11 +13854,13 @@ nonReservedKeyword() :
 | tok = <SAVEPOINT>
 | tok = <SECOND_MICROSECOND>
 | tok = <SECURITY>
+| tok = <SERVER>
 | tok = <SEQUENCE>
 | tok = <SEQUENTIAL>
 | tok = <SERIALIZABLE>
 | tok = <SETS>
 | tok = <SHARE>
+| tok = <SHUTDOWN>
 | tok = <SPECIFIC>
 | tok = <SQLID>
 | tok = <SQL_TSI_FRAC_SECOND>
