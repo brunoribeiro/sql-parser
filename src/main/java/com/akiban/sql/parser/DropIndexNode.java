@@ -93,7 +93,8 @@ public class DropIndexNode extends DDLStatementNode
      * @return This object as a String
      */
     public String toString() {
-        return super.toString() + "indexName: " + indexName;
+        return super.toString() + "indexName: " + indexName 
+               + "\nexistenceCheck: " + existenceCheck;
     }
 
     public String statementToString() {
