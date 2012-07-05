@@ -174,4 +174,8 @@ public class CreateIndexNode extends DDLStatementNode
         return tableName; 
     }
 
+    public ExistenceCheck getExistenceCheck()
+    {
+        return existenceCheck;
+    }
 }

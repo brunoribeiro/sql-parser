@@ -142,7 +142,8 @@ public class CreateViewNode extends DDLStatementNode
     public String toString() {
         return super.toString() +
             "checkOption: " + checkOption + "\n" +
-            "qeText: " + qeText + "\n";
+            "qeText: " + qeText + "\n"
+          + "existenceCheck: " + existenceCheck + "\n";
     }
 
     public String statementToString() {
@@ -205,5 +206,10 @@ public class CreateViewNode extends DDLStatementNode
 
     public ValueNode getFetchFirst() {
         return fetchFirst;
+    }
+    
+    public ExistenceCheck getExistenceCheck()
+    {
+        return existenceCheck;
     }
 }

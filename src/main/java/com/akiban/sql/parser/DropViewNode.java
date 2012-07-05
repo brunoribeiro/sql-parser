@@ -73,6 +73,10 @@ public class DropViewNode extends DDLStatementNode
         this.existenceCheck = (ExistenceCheck)ec;
     }
 
+    public ExistenceCheck getExistenceCheck()
+    {
+        return existenceCheck;
+    }
      /**
      * Fill this node with a deep copy of the given node.
      */
