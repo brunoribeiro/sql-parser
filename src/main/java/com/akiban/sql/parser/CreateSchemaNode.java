@@ -64,7 +64,9 @@ public class CreateSchemaNode extends DDLStatementNode
     private String name;
     private String aid;
     private CharacterTypeAttributes defaultCharacterAttributes;
-    private ExistenceCheck existenceCheck;
+    //private ExistenceCheck existenceCheck;
+    private Integer existenceCheck;
+
     /**
      * Initializer for a CreateSchemaNode
      *
@@ -77,6 +79,7 @@ public class CreateSchemaNode extends DDLStatementNode
                      Object aid,
                      Object defaultCharacterAttributes
 //                     ExistenceCheck c
+                     , Object c
             )
             throws StandardException {
         /*
@@ -89,7 +92,7 @@ public class CreateSchemaNode extends DDLStatementNode
         this.name = (String)schemaName;
         this.aid = (String)aid;
         this.defaultCharacterAttributes = (CharacterTypeAttributes)defaultCharacterAttributes;
-//        this.existenceCheck = c;
+        this.existenceCheck = (Integer)c;
     }
 
     /**
@@ -102,7 +105,7 @@ public class CreateSchemaNode extends DDLStatementNode
         this.name = other.name;
         this.aid = other.aid;
         this.defaultCharacterAttributes = other.defaultCharacterAttributes;
-//        this.existenceCheck = other.existenceCheck;
+        this.existenceCheck = other.existenceCheck;
     }
 
     /**
@@ -117,7 +120,7 @@ public class CreateSchemaNode extends DDLStatementNode
             "schemaName: " + "\n" + name + "\n" +
             "authorizationId: " + "\n" + aid + "\n" +
             "defaultChar: " + "\n" + defaultCharacterAttributes + "\n" 
-//            "existence check: \n" + existenceCheck
+            + "existence check: \n" + existenceCheck
                 ;
     }
 
@@ -137,8 +140,8 @@ public class CreateSchemaNode extends DDLStatementNode
         return defaultCharacterAttributes;
     }
     
-//    public ExistenceCheck getExistenceCheck()
-//    {
-//        return existenceCheck
-//    }
+    public /*ExistenceCheck*/ Integer getExistenceCheck()
+    {
+        return existenceCheck;
+    }
 }

@@ -9418,7 +9418,7 @@ schemaDefinition() throws StandardException :
     TableName collation = null;
     CharacterTypeAttributes defaultCharacterAttributes = null;
     //ExistenceCheck cond = ExistenceCheck.NO_CONDITION;
-    int cond = 0;
+    int cond;
 }
 {
     /*
@@ -9445,7 +9445,7 @@ schemaDefinition() throws StandardException :
                                                   schemaName,
                                                   authName,
                                                   defaultCharacterAttributes,
-                                                  //cond,
+                                                  cond,
                                                   parserContext);
     }
 }
