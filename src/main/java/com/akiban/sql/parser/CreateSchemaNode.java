@@ -67,6 +67,24 @@ public class CreateSchemaNode extends DDLStatementNode
     //private ExistenceCheck existenceCheck;
     private Integer existenceCheck;
 
+        
+    public void init(Object schemaName, 
+                     Object aid,
+                     Object defaultCharacterAttributes
+            )
+            throws StandardException {
+        /*
+        ** DDLStatementNode expects tables, null out
+        ** objectName explicitly to clarify that we
+        ** can't hang with schema.object specifiers.
+        */
+        initAndCheck(null);
+
+        this.name = (String)schemaName;
+        this.aid = (String)aid;
+        this.defaultCharacterAttributes = (CharacterTypeAttributes)defaultCharacterAttributes;
+    }
+
     /**
      * Initializer for a CreateSchemaNode
      *
@@ -120,7 +138,7 @@ public class CreateSchemaNode extends DDLStatementNode
             "schemaName: " + "\n" + name + "\n" +
             "authorizationId: " + "\n" + aid + "\n" +
             "defaultChar: " + "\n" + defaultCharacterAttributes + "\n" 
-            + "existence check: \n" + existenceCheck
+//            + "existence check: \n" + existenceCheck + "\n"
                 ;
     }
 

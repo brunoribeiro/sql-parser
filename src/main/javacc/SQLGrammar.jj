@@ -9652,9 +9652,11 @@ tableDefinition() throws StandardException :
     ResultColumnList resultColumns = null;
     ResultSetNode queryExpression;
     boolean withData = true;
+    // ExistenceCheck cond;
+    int cond;
 }
 {
-    <TABLE> tableName = qualifiedName()
+    <TABLE> cond = getCondition() tableName = qualifiedName()
     // Lookahead needed to choose between tableElementList and
     // tableColumnList.
     (        
@@ -9668,6 +9670,7 @@ tableDefinition() throws StandardException :
                                                   tableElementList,
                                                   properties,
                                                   new Character(lockGranularity),
+                                                  cond,
                                                   parserContext);
     }
     |
@@ -9687,6 +9690,7 @@ tableDefinition() throws StandardException :
                                                                   tableName,
                                                                   resultColumns,
                                                                   queryExpression,
+                                                                  cond,
                                                                   parserContext);
         if (withData) {
             ((CreateTableNode)result).markWithData();
