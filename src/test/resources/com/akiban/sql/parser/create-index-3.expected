@@ -7,6 +7,7 @@ indexName: g1
 tableName: group_table
 joinType: LEFT_OUTER
 properties: null
+existenceCheck: NO_CONDITION
 	
 	com.akiban.sql.parser.IndexColumnList@46e45076
 

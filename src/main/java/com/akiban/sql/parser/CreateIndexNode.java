@@ -139,7 +139,8 @@ public class CreateIndexNode extends DDLStatementNode
             "indexName: " + indexName + "\n" +
             "tableName: " + tableName + "\n" +
             "joinType: " + joinType + "\n" +
-            "properties: " + properties + "\n";
+            "properties: " + properties + "\n" +
+            "existenceCheck: " + existenceCheck + "\n";
     }
 
     public void printSubNodes(int depth) {
