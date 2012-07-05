@@ -75,7 +75,6 @@ import com.akiban.sql.types.RoutineAliasInfo;
 import com.akiban.sql.types.CharacterTypeAttributes;
 import com.akiban.sql.types.DataTypeDescriptor;
 import com.akiban.sql.types.TypeId;
-import com.akiban.sql.parser.Condition;
 
 import java.sql.ParameterMetaData;
 
@@ -2000,6 +1999,7 @@ TOKEN [IGNORE_CASE] :
 | <HAVING: "having">
 | <HOUR: "hour">
 | <IDENTITY: "identity">
+| <IF: "if">
 | <IMMEDIATE: "immediate">
 | <IN: "in">
 | <INDICATOR: "indicator">
@@ -2149,7 +2149,6 @@ TOKEN [IGNORE_CASE] :
 | <FORTRAN: "fortran">
 | <GENERATED: "generated">
 | <IDENTITY_VAL_LOCAL: "identity_val_local">
-| <IF: "if">
 | <INCREMENT: "increment">
 | <INITIAL: "initial">
 | <INOUT: "inout">
@@ -2851,29 +2850,14 @@ existsOrNotExists() throws StandardException :
     LOOKAHEAD( { (getToken(1).kind == NOT && getToken(2).kind == EXISTS ) } )
     <NOT> <EXISTS>
     {
-        return ExistenceCheck.NOT_EXISTS;
+        return Condition.NOT_EXISTS;
+        //return 1;
     }
 |
     <EXISTS>
     {
-        return ExistenceCheck.EXISTS;
-    }
-}
-
-ExistenceCheck
-hasCondtion() throws StandardException :
-{
-}
-{
-    /*[IF [NOT] EXISTS]*/
-    LOOKAHEAD ( { ( getToken(1).kind == IF} )
-    <IF> 
-    {
-        return existsOrNotExists();
-    }
-|
-    {
-        return ExistenceCheck.NO_CONDITION;
+        return Condition.EXISTS;
+        //return 2;
     }
 }
 
@@ -9427,7 +9411,6 @@ schemaDefinition() throws StandardException :
     */
     <SCHEMA>
     (
-        cond = hasCondition();
         schemaName = identifier() [ <AUTHORIZATION> authName = identifier() ]
     |
         <AUTHORIZATION> authName = identifier() 
@@ -9435,6 +9418,8 @@ schemaDefinition() throws StandardException :
             schemaName = authName;
         }
     )
+    [ LOOKAHEAD( { getToken(2).kind == IF } )
+        <IF>{cond = existsOrNotExists();} ]
     [ LOOKAHEAD( { getToken(2).kind == CHARACTER } )
       <_DEFAULT> <CHARACTER> <SET> characterSet = qualifiedName() 
       { defaultCharacterAttributes = CharacterTypeAttributes.forCharacterSet(characterSet.toString()); } ]
@@ -9446,7 +9431,7 @@ schemaDefinition() throws StandardException :
                                                   schemaName,
                                                   authName,
                                                   defaultCharacterAttributes,
-                                                  cond,
+                                                  //cond,
                                                   parserContext);
     }
 }
