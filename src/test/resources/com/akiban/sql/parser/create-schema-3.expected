@@ -6,3 +6,5 @@ authorizationId:
 null
 defaultChar: 
 CHARACTER SET latin1 COLLATE fr_FR
+existenceCheck:
+NO_CONDITION

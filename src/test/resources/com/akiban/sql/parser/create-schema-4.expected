@@ -7,4 +7,4 @@ null
 defaultChar: 
 null
 existenceCheck:
-NO_CONDITION
+IF_NOT_EXISTS

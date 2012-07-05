@@ -118,7 +118,7 @@ public class CreateSchemaNode extends DDLStatementNode
             "schemaName: " + "\n" + name + "\n" +
             "authorizationId: " + "\n" + aid + "\n" +
             "defaultChar: " + "\n" + defaultCharacterAttributes + "\n" 
-//            + "existence check: \n" + existenceCheck + "\n"
+            + "existenceCheck:\n" + existenceCheck + "\n"
                 ;
     }
 
