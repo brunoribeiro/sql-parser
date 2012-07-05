@@ -9811,10 +9811,13 @@ indexDefinition() throws StandardException :
         nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
     boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
     JoinNode.JoinType joinType = null;
+    // ExistenceCheck cond;
+    int cond;
 }
 {
     [ unique = unique() ] 
     <INDEX>
+    cond = getCondition()
     indexName = qualifiedName() 
     <ON> tableName = qualifiedName()
     <LEFT_PAREN>
@@ -10301,9 +10304,11 @@ viewDefinition(Token beginToken) throws StandardException :
     Token endToken;
     OrderByList orderCols = null;
     ValueNode[] offsetAndFetchFirst = new ValueNode[2];
+    //ExistenceCheck cond;
+    int cond
 }
 {
-    <VIEW> tableName = qualifiedName() 
+    <VIEW> cond = getCondition() tableName = qualifiedName() 
     [ <LEFT_PAREN> resultColumns = viewColumnList() <RIGHT_PAREN> ]
     <AS> queryExpression = queryExpression(null, NO_SET_OP)
     [ orderCols = orderByClause() ]
@@ -12340,9 +12345,11 @@ dropSchemaStatement() throws StandardException :
 {
     String schemaName;
     int[] behavior = new int[1];
+    //ExistenceCheck cond;
+    int cond;
 }
 {
-    <SCHEMA> schemaName = identifier() dropBehavior(behavior)
+    <SCHEMA> cond = getCondtion() schemaName = identifier() dropBehavior(behavior)
     {
         StatementNode stmt = (StatementNode)nodeFactory.getNode(NodeTypes.DROP_SCHEMA_NODE,
                                                                 schemaName,
@@ -12805,9 +12812,11 @@ dropTableStatement() throws StandardException :
 {
     TableName tableName;
     int[] behavior = new int[1];
+    //ExistenceCheck cond;
+    int cond;
 }
 {
-    <TABLE> tableName = qualifiedName() dropBehavior(behavior)
+    <TABLE> cond = getCondtion() tableName = qualifiedName() dropBehavior(behavior)
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_TABLE_NODE,
                                                   tableName,
@@ -12821,9 +12830,11 @@ dropIndexStatement() throws StandardException :
 {
     String indexName;
     TableName tableName[] = new TableName[1];
+    //ExistenceCheck cond;
+    int cond;
 }
 {
-    <INDEX> indexName = indexName(tableName)
+    <INDEX> cond = getCondition() indexName = indexName(tableName)
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_INDEX_NODE,
                                                   tableName[0],
@@ -12863,9 +12874,11 @@ StatementNode
 dropViewStatement() throws StandardException :
 {
     TableName viewName;
+    //ExistenceCheck cond;
+    int cond;
 }
 {
-    <VIEW> viewName = qualifiedName() 
+    <VIEW> cond = getCondition() viewName = qualifiedName() 
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_VIEW_NODE,
                                                   viewName,
