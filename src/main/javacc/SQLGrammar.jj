@@ -2842,7 +2842,7 @@ StatementPart(Token[] tokenHolder) throws StandardException :
     }
 }
 
-ExistenceCheck
+int
 existsOrNotExists() throws StandardException :
 {
 }
@@ -2850,17 +2850,31 @@ existsOrNotExists() throws StandardException :
     LOOKAHEAD( { (getToken(1).kind == NOT && getToken(2).kind == EXISTS ) } )
     <NOT> <EXISTS>
     {
-        return Condition.NOT_EXISTS;
-        //return 1;
+        //return Condition.NOT_EXISTS;
+        return 1;
     }
 |
     <EXISTS>
     {
-        return Condition.EXISTS;
-        //return 2;
+        //return Condition.EXISTS;
+        return 2;
     }
 }
 
+int
+getCondition() throws StandardException :
+{
+}
+{
+    <IF>
+    {
+        return existsOrNotExists();
+    }
+|
+    {
+        return 0;
+    }
+}
 
 StatementNode
 createStatements() throws StandardException :
@@ -9402,14 +9416,15 @@ schemaDefinition() throws StandardException :
     TableName characterSet = null;
     TableName collation = null;
     CharacterTypeAttributes defaultCharacterAttributes = null;
-    ExistenceCheck cond = ExistenceCheck.NO_CONDITION;
+    //ExistenceCheck cond = ExistenceCheck.NO_CONDITION;
+    int cond = 0;
 }
 {
     /*
     ** CREATE SCHEMA:
     ** We are not currently handling schema bodies.
     */
-    <SCHEMA>
+    <SCHEMA> cond = getCondition()
     (
         schemaName = identifier() [ <AUTHORIZATION> authName = identifier() ]
     |
@@ -9418,8 +9433,6 @@ schemaDefinition() throws StandardException :
             schemaName = authName;
         }
     )
-    [ LOOKAHEAD( { getToken(2).kind == IF } )
-        <IF>{cond = existsOrNotExists();} ]
     [ LOOKAHEAD( { getToken(2).kind == CHARACTER } )
       <_DEFAULT> <CHARACTER> <SET> characterSet = qualifiedName() 
       { defaultCharacterAttributes = CharacterTypeAttributes.forCharacterSet(characterSet.toString()); } ]
