@@ -95,7 +95,8 @@ public class CreateViewNode extends DDLStatementNode
                      Object qeText,
                      Object orderCols,
                      Object offset,
-                     Object fetchFirst) 
+                     Object fetchFirst,
+                     Object existenceCheck) 
             throws StandardException {
         initAndCheck(newObjectName);
         this.resultColumns = (ResultColumnList)resultColumns;
@@ -105,7 +106,7 @@ public class CreateViewNode extends DDLStatementNode
         this.orderByList = (OrderByList)orderCols;
         this.offset = (ValueNode)offset;
         this.fetchFirst = (ValueNode)fetchFirst;
-
+        this.existenceCheck = (ExistenceCheck)existenceCheck;
         implicitCreateSchema = true;
     }
 
@@ -128,6 +129,7 @@ public class CreateViewNode extends DDLStatementNode
             getNodeFactory().copyNode(other.offset, getParserContext());
         this.fetchFirst = (ValueNode)
             getNodeFactory().copyNode(other.fetchFirst, getParserContext());
+        this.existenceCheck = other.existenceCheck;
     }
 
     /**

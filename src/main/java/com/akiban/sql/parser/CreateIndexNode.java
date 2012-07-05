@@ -70,6 +70,7 @@ public class CreateIndexNode extends DDLStatementNode
     IndexColumnList columnList;
     JoinType joinType;
     Properties properties;
+    ExistenceCheck existenceCheck;
 
     /**
      * Initializer for a CreateIndexNode
@@ -90,7 +91,8 @@ public class CreateIndexNode extends DDLStatementNode
                      Object tableName,
                      Object columnList,
                      Object joinType,
-                     Object properties) 
+                     Object properties,
+                     Object existenceCheck) 
             throws StandardException {
         initAndCheck(indexName);
         this.unique = ((Boolean)unique).booleanValue();
@@ -100,6 +102,7 @@ public class CreateIndexNode extends DDLStatementNode
         this.columnList = (IndexColumnList)columnList;
         this.joinType = (JoinType)joinType;
         this.properties = (Properties)properties;
+        this.existenceCheck = (ExistenceCheck)existenceCheck;
     }
 
     /**
@@ -119,6 +122,7 @@ public class CreateIndexNode extends DDLStatementNode
             getNodeFactory().copyNode(other.columnList, getParserContext());
         this.joinType = other.joinType;
         this.properties = other.properties; // TODO: Clone?
+        this.existenceCheck = other.existenceCheck;
     }
 
     /**

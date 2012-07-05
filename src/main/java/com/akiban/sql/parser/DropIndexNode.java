@@ -60,12 +60,15 @@ import com.akiban.sql.StandardException;
 public class DropIndexNode extends DDLStatementNode
 {
     protected String indexName;
+    private ExistenceCheck existenceCheck;
 
     public void init(Object tableName,
-                     Object indexName)
+                     Object indexName,
+                     Object ec)
             throws StandardException {
         initAndCheck((TableName)tableName);
         this.indexName = (String)indexName;
+        this.existenceCheck = (ExistenceCheck)ec;
     }
 
     public String getIndexName() {
@@ -80,6 +83,7 @@ public class DropIndexNode extends DDLStatementNode
 
         DropIndexNode other = (DropIndexNode)node;
         this.indexName = other.indexName;
+        this.existenceCheck = other.existenceCheck;
     }
 
     /**
@@ -96,4 +100,8 @@ public class DropIndexNode extends DDLStatementNode
         return "DROP INDEX";
     }
 
+    public ExistenceCheck getExistenceCheck()
+    {
+        return existenceCheck;
+    }
 }

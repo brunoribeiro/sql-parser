@@ -9857,6 +9857,7 @@ indexDefinition() throws StandardException :
                                                   indexColumnList,
                                                   joinType,
                                                   properties,
+                                                  cond,
                                                   parserContext);
     }
 }
@@ -10327,6 +10328,7 @@ viewDefinition(Token beginToken) throws StandardException :
                                                   orderCols,
                                                   offsetAndFetchFirst[0],
                                                   offsetAndFetchFirst[1],
+                                                  cond,
                                                   parserContext);
     }
 }
@@ -12347,6 +12349,7 @@ dropSchemaStatement() throws StandardException :
         StatementNode stmt = (StatementNode)nodeFactory.getNode(NodeTypes.DROP_SCHEMA_NODE,
                                                                 schemaName,
                                                                 new Integer(behavior[0]),
+                                                                cond,
                                                                 parserContext);
 
         return stmt;
@@ -12813,6 +12816,7 @@ dropTableStatement() throws StandardException :
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_TABLE_NODE,
                                                   tableName,
                                                   new Integer(behavior[0]),
+                                                  cond,
                                                   parserContext);
     }
 }
@@ -12830,6 +12834,7 @@ dropIndexStatement() throws StandardException :
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_INDEX_NODE,
                                                   tableName[0],
                                                   indexName,
+                                                  cond,
                                                   parserContext);
     }
 }
@@ -12872,6 +12877,7 @@ dropViewStatement() throws StandardException :
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_VIEW_NODE,
                                                   viewName,
+                                                  cond,
                                                   parserContext);
     }
 }
