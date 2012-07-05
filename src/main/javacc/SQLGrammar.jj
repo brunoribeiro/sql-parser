@@ -2847,16 +2847,15 @@ existsOrNotExists() throws StandardException :
 {
 }
 {
-    LOOKAHEAD( { (getToken(1).kind == NOT && getToken(2).kind == EXISTS ) } )
     <NOT> <EXISTS>
     {
-        //return Condition.NOT_EXISTS;
+        //return ExistenceCheck.NOT_EXISTS;
         return 1;
     }
 |
     <EXISTS>
     {
-        //return Condition.EXISTS;
+        //return ExistenceCheck.EXISTS;
         return 2;
     }
 }
@@ -2866,12 +2865,14 @@ getCondition() throws StandardException :
 {
 }
 {
+    LOOKAHEAD ( {getToken(1).kind == IF} )
     <IF>
     {
         return existsOrNotExists();
     }
 |
     {
+        // return ExistenceCheck.NO_CONDITION;
         return 0;
     }
 }
