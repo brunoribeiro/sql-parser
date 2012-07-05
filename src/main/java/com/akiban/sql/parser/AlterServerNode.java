@@ -26,7 +26,10 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 public class AlterServerNode extends MiscellaneousStatementNode {
+
 
     public enum AlterType {
         SET_SERVER_VARIABLE,
@@ -36,7 +39,7 @@ public class AlterServerNode extends MiscellaneousStatementNode {
         SHUTDOWN
     }
 
-    private int sessionID;
+    private Integer sessionID = null;
     private AlterType alterSessionType;
     private SetConfigurationNode scn = null;
     private boolean shutdownImmediate;
@@ -52,9 +55,33 @@ public class AlterServerNode extends MiscellaneousStatementNode {
             alterSessionType = AlterType.SHUTDOWN;
             shutdownImmediate = ((Boolean)config).booleanValue();
         }
-        
     }
     
+    public void init (Object interrupt, Object disconnect, Object kill, Object session)
+    {
+        if (interrupt != null) {
+            alterSessionType = AlterType.INTERRUPT_SESSION;
+        } else if (disconnect != null) {
+            alterSessionType = AlterType.DISCONNECT_SESSION;
+        } else if (kill != null) {
+            alterSessionType = AlterType.KILL_SESSION;
+        }
+        if (session instanceof ConstantNode) {
+            sessionID = (Integer)((ConstantNode)session).getValue();
+        }
+    }
+    
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
+        AlterServerNode other = (AlterServerNode)node;
+        this.sessionID = other.sessionID;
+        this.alterSessionType = other.alterSessionType;
+        this.scn = (SetConfigurationNode)getNodeFactory().copyNode(other.scn, getParserContext());
+        this.shutdownImmediate = other.shutdownImmediate;
+    }
     
     @Override
     public String statementToString() {
@@ -71,8 +98,35 @@ public class AlterServerNode extends MiscellaneousStatementNode {
         case SHUTDOWN:
             ret = "shutdown immediate: " + shutdownImmediate;
             break;
+        case INTERRUPT_SESSION:
+        case DISCONNECT_SESSION:
+        case KILL_SESSION:
+            ret = "sessionType: " + alterSessionType.name() + "\n" +  
+                    "sessionID: " + sessionID;
+            break;
         }
         ret = super.toString() + ret;
         return ret;
     }
+    
+    public final Integer getSessionID() {
+        return sessionID;
+    }
+
+    public final AlterType getAlterSessionType() {
+        return alterSessionType;
+    }
+
+    public final boolean isShutdownImmediate() {
+        return shutdownImmediate;
+    }
+
+    public String getVariable() {
+        return scn.getVariable();
+    }
+
+    public String getValue() {
+        return scn.getValue();
+    }
+    
 }

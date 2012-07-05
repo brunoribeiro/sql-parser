@@ -2288,7 +2288,9 @@ TOKEN [IGNORE_CASE] :
 | <IGNORE: "ignore">
 | <INDEX: "index">
 | <INPLACE: "inplace">
+| <INTERRUPT: "interrupt">
 | <JAVA: "java">
+| <KILL: "kill">
 | <LCASE: "lcase">
 | <LOCATE: "locate">
 | <LOCK: "lock">
@@ -12334,8 +12336,11 @@ StatementNode
 alterServerBody () throws StandardException:
 {
     StatementNode sn;
-    int sessionId;
+    ValueNode sessionID;
     Token immediate = null;
+    Token interrupt = null;
+    Token disconnect = null;
+    Token kill = null;
 }
 {
     <SET> sn = setConfigurationStatement() 
@@ -12354,8 +12359,38 @@ alterServerBody () throws StandardException:
                                                  new Boolean(immediate != null),
                                                  parserContext);
     }
+|
+    ( interrupt = <INTERRUPT> | disconnect = <DISCONNECT> | kill = <KILL>)
+    <SESSION>
+    sessionID = alterSessionID()
+    {
+    	return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_SERVER_NODE,
+    						interrupt,
+    						disconnect, 
+    						kill,
+    						sessionID,
+    						parserContext);
+    }
 }
 
+ValueNode
+alterSessionID() throws StandardException:
+{
+    ValueNode valueNode;
+}
+{
+    valueNode = intLiteral()
+    {
+        return valueNode;
+    }
+|
+    <ALL>
+    {
+        return (ValueNode)nodeFactory.getNode(NodeTypes.DEFAULT_NODE,
+                                              null,
+                                              parserContext); 
+    }
+}
 StatementNode
 alterTableBody(TableName tableName) throws StandardException :
 {
@@ -13781,7 +13816,9 @@ nonReservedKeyword() :
 | tok = <INDEX>
 | tok = <INITIAL>
 | tok = <INPLACE>
+| tok = <INTERRUPT>
 | tok = <JAVA>
+| tok = <KILL>
 | tok = <LANGUAGE>
 | tok = <LARGE>
 | tok = <LCASE>
