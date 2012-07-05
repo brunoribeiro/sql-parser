@@ -103,10 +103,10 @@ public class DropTableNode extends DDLStatementNode
      *
      * @return This object as a String
      */
-
     public String toString() {
         return super.toString() +
-            "dropBehavior: " + "\n" + dropBehavior + "\n";
+            "dropBehavior: " + "\n" + dropBehavior + "\n"
+           + "existenceChec: " + "\n" + existenceCheck + "\n";
     }
 
     public String statementToString() {

@@ -4,4 +4,4 @@ statementType: DROP TABLE
 dropBehavior: 
 2
 existenceChec: 
-NO_CONDITION
+IF_EXISTS
