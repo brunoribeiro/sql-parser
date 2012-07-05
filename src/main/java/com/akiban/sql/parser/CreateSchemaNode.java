@@ -64,26 +64,7 @@ public class CreateSchemaNode extends DDLStatementNode
     private String name;
     private String aid;
     private CharacterTypeAttributes defaultCharacterAttributes;
-    //private ExistenceCheck existenceCheck;
-    private Integer existenceCheck;
-
-        
-    public void init(Object schemaName, 
-                     Object aid,
-                     Object defaultCharacterAttributes
-            )
-            throws StandardException {
-        /*
-        ** DDLStatementNode expects tables, null out
-        ** objectName explicitly to clarify that we
-        ** can't hang with schema.object specifiers.
-        */
-        initAndCheck(null);
-
-        this.name = (String)schemaName;
-        this.aid = (String)aid;
-        this.defaultCharacterAttributes = (CharacterTypeAttributes)defaultCharacterAttributes;
-    }
+    private ExistenceCheck existenceCheck;
 
     /**
      * Initializer for a CreateSchemaNode
@@ -95,9 +76,8 @@ public class CreateSchemaNode extends DDLStatementNode
      */
     public void init(Object schemaName, 
                      Object aid,
-                     Object defaultCharacterAttributes
-//                     ExistenceCheck c
-                     , Object c
+                     Object defaultCharacterAttributes,
+                     Object c
             )
             throws StandardException {
         /*
@@ -110,7 +90,7 @@ public class CreateSchemaNode extends DDLStatementNode
         this.name = (String)schemaName;
         this.aid = (String)aid;
         this.defaultCharacterAttributes = (CharacterTypeAttributes)defaultCharacterAttributes;
-        this.existenceCheck = (Integer)c;
+        this.existenceCheck = (ExistenceCheck)c;
     }
 
     /**
@@ -158,7 +138,7 @@ public class CreateSchemaNode extends DDLStatementNode
         return defaultCharacterAttributes;
     }
     
-    public /*ExistenceCheck*/ Integer getExistenceCheck()
+    public ExistenceCheck getExistenceCheck()
     {
         return existenceCheck;
     }

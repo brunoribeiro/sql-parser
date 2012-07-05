@@ -2842,25 +2842,24 @@ StatementPart(Token[] tokenHolder) throws StandardException :
     }
 }
 
-int
+
+ExistenceCheck
 existsOrNotExists() throws StandardException :
 {
 }
 {
     <NOT> <EXISTS>
     {
-        //return ExistenceCheck.NOT_EXISTS;
-        return 1;
+        return ExistenceCheck.IF_NOT_EXISTS;
     }
 |
     <EXISTS>
     {
-        //return ExistenceCheck.EXISTS;
-        return 2;
+        return ExistenceCheck.IF_EXISTS;
     }
 }
 
-int
+ExistenceCheck
 getCondition() throws StandardException :
 {
 }
@@ -2872,8 +2871,7 @@ getCondition() throws StandardException :
     }
 |
     {
-        // return ExistenceCheck.NO_CONDITION;
-        return 0;
+        return ExistenceCheck.NO_CONDITION;
     }
 }
 
@@ -9417,8 +9415,7 @@ schemaDefinition() throws StandardException :
     TableName characterSet = null;
     TableName collation = null;
     CharacterTypeAttributes defaultCharacterAttributes = null;
-    //ExistenceCheck cond = ExistenceCheck.NO_CONDITION;
-    int cond;
+    ExistenceCheck cond = ExistenceCheck.NO_CONDITION;
 }
 {
     /*
@@ -9652,8 +9649,7 @@ tableDefinition() throws StandardException :
     ResultColumnList resultColumns = null;
     ResultSetNode queryExpression;
     boolean withData = true;
-    // ExistenceCheck cond;
-    int cond;
+    ExistenceCheck cond;
 }
 {
     <TABLE> cond = getCondition() tableName = qualifiedName()
@@ -9811,8 +9807,7 @@ indexDefinition() throws StandardException :
         nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
     boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
     JoinNode.JoinType joinType = null;
-    // ExistenceCheck cond;
-    int cond;
+    ExistenceCheck cond;
 }
 {
     [ unique = unique() ] 
@@ -10304,8 +10299,7 @@ viewDefinition(Token beginToken) throws StandardException :
     Token endToken;
     OrderByList orderCols = null;
     ValueNode[] offsetAndFetchFirst = new ValueNode[2];
-    //ExistenceCheck cond;
-    int cond
+    ExistenceCheck cond;
 }
 {
     <VIEW> cond = getCondition() tableName = qualifiedName() 
@@ -12345,11 +12339,10 @@ dropSchemaStatement() throws StandardException :
 {
     String schemaName;
     int[] behavior = new int[1];
-    //ExistenceCheck cond;
-    int cond;
+    ExistenceCheck cond;
 }
 {
-    <SCHEMA> cond = getCondtion() schemaName = identifier() dropBehavior(behavior)
+    <SCHEMA> cond = getCondition() schemaName = identifier() dropBehavior(behavior)
     {
         StatementNode stmt = (StatementNode)nodeFactory.getNode(NodeTypes.DROP_SCHEMA_NODE,
                                                                 schemaName,
@@ -12812,11 +12805,10 @@ dropTableStatement() throws StandardException :
 {
     TableName tableName;
     int[] behavior = new int[1];
-    //ExistenceCheck cond;
-    int cond;
+    ExistenceCheck cond;
 }
 {
-    <TABLE> cond = getCondtion() tableName = qualifiedName() dropBehavior(behavior)
+    <TABLE> cond = getCondition() tableName = qualifiedName() dropBehavior(behavior)
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_TABLE_NODE,
                                                   tableName,
@@ -12830,8 +12822,7 @@ dropIndexStatement() throws StandardException :
 {
     String indexName;
     TableName tableName[] = new TableName[1];
-    //ExistenceCheck cond;
-    int cond;
+    ExistenceCheck cond;
 }
 {
     <INDEX> cond = getCondition() indexName = indexName(tableName)
@@ -12874,8 +12865,7 @@ StatementNode
 dropViewStatement() throws StandardException :
 {
     TableName viewName;
-    //ExistenceCheck cond;
-    int cond;
+    ExistenceCheck cond;
 }
 {
     <VIEW> cond = getCondition() viewName = qualifiedName() 

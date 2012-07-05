@@ -81,8 +81,7 @@ public class CreateTableNode extends DDLStatementNode
     private ResultColumnList resultColumns;
     private ResultSetNode queryExpression;
     private boolean withData;
-    //private ExistenceCheck existenceCheck;
-    private Integer existenceCheck;
+    private ExistenceCheck existenceCheck;
 
     /**
      * Initializer for a CreateTableNode for a base table
@@ -101,7 +100,7 @@ public class CreateTableNode extends DDLStatementNode
                      Object tableElementList,
                      Object properties,
                      Object lockGranularity,
-                     Object c)
+                     Object existenceCheck)
             throws StandardException {
         tableType = BASE_TABLE_TYPE;
         this.lockGranularity = ((Character)lockGranularity).charValue();
@@ -113,7 +112,7 @@ public class CreateTableNode extends DDLStatementNode
         initAndCheck(newObjectName);
         this.tableElementList = (TableElementList)tableElementList;
         this.properties = (Properties)properties;
-        this.existenceCheck = (Integer)c;
+        this.existenceCheck = (ExistenceCheck)existenceCheck;
     }
 
     /**
@@ -135,7 +134,7 @@ public class CreateTableNode extends DDLStatementNode
                      Object properties,
                      Object onCommitDeleteRows,
                      Object onRollbackDeleteRows,
-                     Object c)
+                     Object existenceCheck)
             throws StandardException {
         tableType = GLOBAL_TEMPORARY_TABLE_TYPE;
         newObjectName = tempTableSchemaNameCheck(newObjectName);
@@ -144,7 +143,7 @@ public class CreateTableNode extends DDLStatementNode
         initAndCheck(newObjectName);
         this.tableElementList = (TableElementList)tableElementList;
         this.properties = (Properties)properties;
-        this.existenceCheck = (Integer)c;
+        this.existenceCheck = (ExistenceCheck)existenceCheck;
         assert this.onRollbackDeleteRows;
     }
 
@@ -167,7 +166,7 @@ public class CreateTableNode extends DDLStatementNode
         initAndCheck(newObjectName);
         this.resultColumns = (ResultColumnList)resultColumns;
         this.queryExpression = (ResultSetNode)queryExpression;
-        this.existenceCheck = (Integer) c;
+        this.existenceCheck = (ExistenceCheck) c;
     }
 
     /**
@@ -246,7 +245,7 @@ public class CreateTableNode extends DDLStatementNode
         withData = true;
     }
     
-    public Integer getExistenceCheck()
+    public ExistenceCheck getExistenceCheck()
     {
         return existenceCheck;
     }

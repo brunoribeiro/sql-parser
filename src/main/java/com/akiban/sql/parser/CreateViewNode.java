@@ -69,6 +69,7 @@ public class CreateViewNode extends DDLStatementNode
     private OrderByList orderByList;
     private ValueNode offset;
     private ValueNode fetchFirst;
+    private ExistenceCheck existenceCheck;
 
     /**
      * Initializer for a CreateViewNode
