@@ -64,7 +64,7 @@ public class CreateSchemaNode extends DDLStatementNode
     private String name;
     private String aid;
     private CharacterTypeAttributes defaultCharacterAttributes;
-
+    private ExistenceCheck existenceCheck;
     /**
      * Initializer for a CreateSchemaNode
      *
@@ -75,7 +75,8 @@ public class CreateSchemaNode extends DDLStatementNode
      */
     public void init(Object schemaName, 
                      Object aid,
-                     Object defaultCharacterAttributes)
+                     Object defaultCharacterAttributes,
+                     ExistenceCheck c)
             throws StandardException {
         /*
         ** DDLStatementNode expects tables, null out
@@ -87,6 +88,7 @@ public class CreateSchemaNode extends DDLStatementNode
         this.name = (String)schemaName;
         this.aid = (String)aid;
         this.defaultCharacterAttributes = (CharacterTypeAttributes)defaultCharacterAttributes;
+        this.existenceCheck = c;
     }
 
     /**
@@ -99,6 +101,7 @@ public class CreateSchemaNode extends DDLStatementNode
         this.name = other.name;
         this.aid = other.aid;
         this.defaultCharacterAttributes = other.defaultCharacterAttributes;
+        this.existenceCheck = other.existenceCheck;
     }
 
     /**
@@ -112,7 +115,8 @@ public class CreateSchemaNode extends DDLStatementNode
         return super.toString() +
             "schemaName: " + "\n" + name + "\n" +
             "authorizationId: " + "\n" + aid + "\n" +
-            "defaultChar: " + "\n" + defaultCharacterAttributes + "\n";
+            "defaultChar: " + "\n" + defaultCharacterAttributes + "\n" +
+            "existence check: \n" + existenceCheck;
     }
 
     public String statementToString() {
@@ -129,5 +133,10 @@ public class CreateSchemaNode extends DDLStatementNode
 
     public CharacterTypeAttributes getDefaultCharacterAttributes() {
         return defaultCharacterAttributes;
+    }
+    
+    public ExistenceCheck getExistenceCheck()
+    {
+        return existenceCheck;
     }
 }

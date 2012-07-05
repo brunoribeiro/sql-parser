@@ -75,6 +75,7 @@ import com.akiban.sql.types.RoutineAliasInfo;
 import com.akiban.sql.types.CharacterTypeAttributes;
 import com.akiban.sql.types.DataTypeDescriptor;
 import com.akiban.sql.types.TypeId;
+import com.akiban.sql.parser.Condition;
 
 import java.sql.ParameterMetaData;
 
@@ -2148,6 +2149,7 @@ TOKEN [IGNORE_CASE] :
 | <FORTRAN: "fortran">
 | <GENERATED: "generated">
 | <IDENTITY_VAL_LOCAL: "identity_val_local">
+| <IF: "if">
 | <INCREMENT: "increment">
 | <INITIAL: "initial">
 | <INOUT: "inout">
@@ -2840,6 +2842,41 @@ StatementPart(Token[] tokenHolder) throws StandardException :
         return statementNode;
     }
 }
+
+ExistenceCheck
+existsOrNotExists() throws StandardException :
+{
+}
+{
+    LOOKAHEAD( { (getToken(1).kind == NOT && getToken(2).kind == EXISTS ) } )
+    <NOT> <EXISTS>
+    {
+        return ExistenceCheck.NOT_EXISTS;
+    }
+|
+    <EXISTS>
+    {
+        return ExistenceCheck.EXISTS;
+    }
+}
+
+ExistenceCheck
+hasCondtion() throws StandardException :
+{
+}
+{
+    /*[IF [NOT] EXISTS]*/
+    LOOKAHEAD ( { ( getToken(1).kind == IF} )
+    <IF> 
+    {
+        return existsOrNotExists();
+    }
+|
+    {
+        return ExistenceCheck.NO_CONDITION;
+    }
+}
+
 
 StatementNode
 createStatements() throws StandardException :
@@ -9381,6 +9418,7 @@ schemaDefinition() throws StandardException :
     TableName characterSet = null;
     TableName collation = null;
     CharacterTypeAttributes defaultCharacterAttributes = null;
+    ExistenceCheck cond = ExistenceCheck.NO_CONDITION;
 }
 {
     /*
@@ -9389,6 +9427,7 @@ schemaDefinition() throws StandardException :
     */
     <SCHEMA>
     (
+        cond = hasCondition();
         schemaName = identifier() [ <AUTHORIZATION> authName = identifier() ]
     |
         <AUTHORIZATION> authName = identifier() 
@@ -9407,6 +9446,7 @@ schemaDefinition() throws StandardException :
                                                   schemaName,
                                                   authName,
                                                   defaultCharacterAttributes,
+                                                  cond,
                                                   parserContext);
     }
 }
@@ -13744,6 +13784,7 @@ nonReservedKeyword() :
 | tok = <HOUR_SECOND>
 | tok = <IDENTITY_VAL_LOCAL>
 | tok = <IGNORE>
+| tok = <IF>
 | tok = <INCREMENT>
 | tok = <INDEX>
 | tok = <INITIAL>
