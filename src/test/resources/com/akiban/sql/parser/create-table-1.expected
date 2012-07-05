@@ -2,6 +2,7 @@ com.akiban.sql.parser.CreateTableNode@199836ed
 name: t2
 statementType: CREATE TABLE
 lockGranularity: R
+existenceCheck: NO_CONDITION
 queryExpression: 	
 	com.akiban.sql.parser.SelectNode@583e0ebb
 	isDistinct: false

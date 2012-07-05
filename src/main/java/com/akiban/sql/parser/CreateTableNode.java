@@ -225,7 +225,7 @@ public class CreateTableNode extends DDLStatementNode
                 (properties != null ? "properties: " + "\n" + properties + "\n" : "") +
                 (withData ? "withData: " + withData + "\n" : "") +
                 "lockGranularity: " + lockGranularity + "\n";
-        // TODO: add existence check here
+        tempString += "existenceCheck: " + existenceCheck + "\n";
         return super.toString() +    tempString;
     }
 
