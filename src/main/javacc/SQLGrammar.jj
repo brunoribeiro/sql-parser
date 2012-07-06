@@ -2856,32 +2856,33 @@ StatementPart(Token[] tokenHolder) throws StandardException :
     }
 }
 
-
 ExistenceCheck
-existsOrNotExists() throws StandardException :
-{
-}
-{
-    <NOT> <EXISTS>
-    {
-        return ExistenceCheck.IF_NOT_EXISTS;
-    }
-|
-    <EXISTS>
-    {
-        return ExistenceCheck.IF_EXISTS;
-    }
-}
-
-ExistenceCheck
-getCondition() throws StandardException :
+createCondition() throws StandardException :
 {
 }
 {
     LOOKAHEAD ( {getToken(1).kind == IF} )
     <IF>
+    <NOT> <EXISTS>
     {
-        return existsOrNotExists();
+        return ExistenceCheck.IF_NOT_EXISTS;
+    }
+|
+    {
+        return ExistenceCheck.NO_CONDITION;
+    }
+}
+
+ExistenceCheck
+dropCondition() throws StandardException :
+{
+}
+{
+    LOOKAHEAD ( {getToken(1).kind == IF} )
+    <IF>
+    <EXISTS>
+    {
+        return ExistenceCheck.IF_EXISTS;
     }
 |
     {
@@ -9457,7 +9458,7 @@ schemaDefinition() throws StandardException :
     ** CREATE SCHEMA:
     ** We are not currently handling schema bodies.
     */
-    <SCHEMA> cond = getCondition()
+    <SCHEMA> cond = createCondition()
     (
         schemaName = identifier() [ <AUTHORIZATION> authName = identifier() ]
     |
@@ -9687,7 +9688,7 @@ tableDefinition() throws StandardException :
     ExistenceCheck cond;
 }
 {
-    <TABLE> cond = getCondition() tableName = qualifiedName()
+    <TABLE> cond = createCondition() tableName = qualifiedName()
     // Lookahead needed to choose between tableElementList and
     // tableColumnList.
     (        
@@ -9847,7 +9848,7 @@ indexDefinition() throws StandardException :
 {
     [ unique = unique() ] 
     <INDEX>
-    cond = getCondition()
+    cond = createCondition()
     indexName = qualifiedName() 
     <ON> tableName = qualifiedName()
     <LEFT_PAREN>
@@ -10338,7 +10339,7 @@ viewDefinition(Token beginToken) throws StandardException :
     ExistenceCheck cond;
 }
 {
-    <VIEW> cond = getCondition() tableName = qualifiedName() 
+    <VIEW> cond = createCondition() tableName = qualifiedName() 
     [ <LEFT_PAREN> resultColumns = viewColumnList() <RIGHT_PAREN> ]
     <AS> queryExpression = queryExpression(null, NO_SET_OP)
     [ orderCols = orderByClause() ]
@@ -12379,7 +12380,7 @@ dropSchemaStatement() throws StandardException :
     ExistenceCheck cond;
 }
 {
-    <SCHEMA> cond = getCondition() schemaName = identifier() dropBehavior(behavior)
+    <SCHEMA> cond = dropCondition() schemaName = identifier() dropBehavior(behavior)
     {
         StatementNode stmt = (StatementNode)nodeFactory.getNode(NodeTypes.DROP_SCHEMA_NODE,
                                                                 schemaName,
@@ -12910,7 +12911,7 @@ dropTableStatement() throws StandardException :
     ExistenceCheck cond;
 }
 {
-    <TABLE> cond = getCondition() tableName = qualifiedName() dropBehavior(behavior)
+    <TABLE> cond = dropCondition() tableName = qualifiedName() dropBehavior(behavior)
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_TABLE_NODE,
                                                   tableName,
@@ -12928,7 +12929,7 @@ dropIndexStatement() throws StandardException :
     ExistenceCheck cond;
 }
 {
-    <INDEX> cond = getCondition() indexName = indexName(tableName)
+    <INDEX> cond = dropCondition() indexName = indexName(tableName)
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_INDEX_NODE,
                                                   tableName[0],
@@ -12972,7 +12973,7 @@ dropViewStatement() throws StandardException :
     ExistenceCheck cond;
 }
 {
-    <VIEW> cond = getCondition() viewName = qualifiedName() 
+    <VIEW> cond = dropCondition() viewName = qualifiedName() 
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_VIEW_NODE,
                                                   viewName,

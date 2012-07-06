@@ -1,5 +1,4 @@
 com.akiban.sql.parser.SQLParserException: Encountered " <IDENTIFIER> "test "" at line 1, column 18.
-Was expecting one of:
-    "exists" ...
+Was expecting:
     "not" ...
     
