@@ -1547,6 +1547,16 @@ class SQLGrammar
         }
     }
 
+    boolean parensFollow()
+    {
+        if (!hasFeature(SQLParserFeature.MYSQL_COLUMN_AS_FUNCS))
+           return false;
+
+        if (getToken(1).kind == LEFT_PAREN && getToken(2).kind == RIGHT_PAREN)
+            return true;
+        return false;
+    }
+
     boolean infixBitFollows() {
         if (!hasFeature(SQLParserFeature.INFIX_BIT_OPERATORS))
             return false;
@@ -7171,12 +7181,14 @@ userNode() throws StandardException :
 |
     <CURRENT_USER>
     {
+        checkOptionalParens();
         return (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_USER_NODE,
                                               parserContext);
     }
 |
     <SESSION_USER>
     {
+        checkOptionalParens();
         return (ValueNode)nodeFactory.getNode(NodeTypes.SESSION_USER_NODE,
                                               parserContext);
     }
@@ -8980,6 +8992,22 @@ tableValueConstructorList() throws StandardException :
     }
 }
 
+void
+checkOptionalParens() throws StandardException:
+{
+}
+{
+    LOOKAHEAD ( {parensFollow()} )
+    <LEFT_PAREN> <RIGHT_PAREN>
+    {
+        return;
+    }
+|
+    {
+        return;
+    }
+}
+
 ValueNode
 datetimeValueFunction() throws StandardException :
 {
@@ -8996,6 +9024,7 @@ datetimeValueFunction() throws StandardException :
 | 
     <CURRENT_DATE>
     {
+        checkOptionalParens();
         return (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_DATETIME_OPERATOR_NODE,
                                               CurrentDatetimeOperatorNode.Field.DATE,
                                               parserContext);
@@ -9011,6 +9040,7 @@ datetimeValueFunction() throws StandardException :
 | 
     <CURRENT_TIME> 
     {
+        checkOptionalParens();
         return (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_DATETIME_OPERATOR_NODE,
                                               CurrentDatetimeOperatorNode.Field.TIME,
                                               parserContext);
@@ -9026,6 +9056,7 @@ datetimeValueFunction() throws StandardException :
     | 
     <CURRENT_TIMESTAMP> 
     {
+        checkOptionalParens();
         return (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_DATETIME_OPERATOR_NODE,
                                               CurrentDatetimeOperatorNode.Field.TIMESTAMP,
                                               parserContext);
