@@ -2299,7 +2299,9 @@ TOKEN [IGNORE_CASE] :
 | <IGNORE: "ignore">
 | <INDEX: "index">
 | <INPLACE: "inplace">
+| <INTERRUPT: "interrupt">
 | <JAVA: "java">
+| <KILL: "kill">
 | <LCASE: "lcase">
 | <LOCATE: "locate">
 | <LOCK: "lock">
@@ -2333,10 +2335,12 @@ TOKEN [IGNORE_CASE] :
 | <RR: "rr">
 | <RS: "rs">
 | <SECOND_MICROSECOND: "second_microsecond">
+| <SERVER: "server">
 | <SEQUENCE: "sequence">
 | <SEQUENTIAL: "sequential">
 | <SETS: "sets">
 | <SHARE: "share">
+| <SHUTDOWN: "shutdown">
 | <SPECIFIC: "specific">
 | <SQLID: "sqlid">
 | <SQRT: "sqrt">
@@ -2958,7 +2962,7 @@ spsAlterStatement() throws StandardException :
 {
     <ALTER>
 (
-    statementNode = alterTableStatement()
+    statementNode = alterStatement()
 )
     {
         return statementNode;
@@ -12388,7 +12392,7 @@ dropSchemaStatement() throws StandardException :
 }
 
 StatementNode
-alterTableStatement() throws StandardException :
+alterStatement() throws StandardException :
 {
     StatementNode node;
     TableName tableName;
@@ -12398,8 +12402,72 @@ alterTableStatement() throws StandardException :
     {
         return node;
     }
+|   
+    <SERVER> node = alterServerBody()
+    {
+        return node;
+    }  
 }
 
+StatementNode
+alterServerBody () throws StandardException:
+{
+    StatementNode sn;
+    ValueNode sessionID;
+    Token immediate = null;
+    Token interrupt = null;
+    Token disconnect = null;
+    Token kill = null;
+}
+{
+    <SET> sn = setConfigurationStatement() 
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_SERVER_NODE,
+        					sn,
+        					parserContext);
+    }
+|
+    <SHUTDOWN>
+    (
+        [ immediate = <IMMEDIATE> ]
+    )
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_SERVER_NODE,
+                                                 new Boolean(immediate != null),
+                                                 parserContext);
+    }
+|
+    ( interrupt = <INTERRUPT> | disconnect = <DISCONNECT> | kill = <KILL>)
+    <SESSION>
+    sessionID = alterSessionID()
+    {
+    	return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_SERVER_NODE,
+    						interrupt,
+    						disconnect, 
+    						kill,
+    						sessionID,
+    						parserContext);
+    }
+}
+
+ValueNode
+alterSessionID() throws StandardException:
+{
+    ValueNode valueNode;
+}
+{
+    valueNode = intLiteral()
+    {
+        return valueNode;
+    }
+|
+    <ALL>
+    {
+        return (ValueNode)nodeFactory.getNode(NodeTypes.DEFAULT_NODE,
+                                              null,
+                                              parserContext); 
+    }
+}
 StatementNode
 alterTableBody(TableName tableName) throws StandardException :
 {
@@ -13832,7 +13900,9 @@ nonReservedKeyword() :
 | tok = <INDEX>
 | tok = <INITIAL>
 | tok = <INPLACE>
+| tok = <INTERRUPT>
 | tok = <JAVA>
+| tok = <KILL>
 | tok = <LANGUAGE>
 | tok = <LARGE>
 | tok = <LCASE>
@@ -13905,11 +13975,13 @@ nonReservedKeyword() :
 | tok = <SAVEPOINT>
 | tok = <SECOND_MICROSECOND>
 | tok = <SECURITY>
+| tok = <SERVER>
 | tok = <SEQUENCE>
 | tok = <SEQUENTIAL>
 | tok = <SERIALIZABLE>
 | tok = <SETS>
 | tok = <SHARE>
+| tok = <SHUTDOWN>
 | tok = <SPECIFIC>
 | tok = <SQLID>
 | tok = <SQL_TSI_FRAC_SECOND>

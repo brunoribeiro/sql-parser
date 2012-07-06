@@ -73,6 +73,8 @@ public interface NodeNames
 
     static final String ALL_RESULT_COLUMN_NAME = "com.akiban.sql.parser.AllResultColumn";
 
+    static final String ALTER_SERVER_NODE_NAME = "com.akiban.sql.parser.AlterServerNode";
+    
     static final String ALTER_TABLE_NODE_NAME = "com.akiban.sql.parser.AlterTableNode";
 
     static final String AND_NODE_NAME = "com.akiban.sql.parser.AndNode";
