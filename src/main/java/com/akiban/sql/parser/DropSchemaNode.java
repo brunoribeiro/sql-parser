@@ -61,6 +61,7 @@ public class DropSchemaNode extends DDLStatementNode
 {
     private int dropBehavior;
     private String schemaName;
+    private ExistenceCheck existenceCheck;
 
     /**
      * Initializer for a DropSchemaNode
@@ -69,10 +70,11 @@ public class DropSchemaNode extends DDLStatementNode
      * @param dropBehavior Drop behavior (RESTRICT | CASCADE)
      *
      */
-    public void init(Object schemaName, Object dropBehavior) throws StandardException {
+    public void init(Object schemaName, Object dropBehavior, Object ec) throws StandardException {
         initAndCheck(null);
         this.schemaName = (String)schemaName;
         this.dropBehavior = ((Integer)dropBehavior).intValue();
+        this.existenceCheck = (ExistenceCheck)ec;
     }
 
     /**
@@ -84,6 +86,7 @@ public class DropSchemaNode extends DDLStatementNode
         DropSchemaNode other = (DropSchemaNode)node;
         this.dropBehavior = other.dropBehavior;
         this.schemaName = other.schemaName;
+        this.existenceCheck = other.existenceCheck;
     }
 
     /**
@@ -97,6 +100,7 @@ public class DropSchemaNode extends DDLStatementNode
         return super.toString() +
             "schemaName: " + "\n" + schemaName + "\n" +
             "dropBehavior: " + "\n" + dropBehavior + "\n";
+        //TODO: add existence check here
     }
 
     public String statementToString() {
@@ -109,5 +113,10 @@ public class DropSchemaNode extends DDLStatementNode
     
     public String getSchemaName() {
         return this.schemaName;
+    }
+    
+    public ExistenceCheck getExistenceCheck()
+    {
+        return existenceCheck;
     }
 }

@@ -81,6 +81,7 @@ public class CreateTableNode extends DDLStatementNode
     private ResultColumnList resultColumns;
     private ResultSetNode queryExpression;
     private boolean withData;
+    private ExistenceCheck existenceCheck;
 
     /**
      * Initializer for a CreateTableNode for a base table
@@ -98,7 +99,8 @@ public class CreateTableNode extends DDLStatementNode
     public void init(Object newObjectName,
                      Object tableElementList,
                      Object properties,
-                     Object lockGranularity)
+                     Object lockGranularity,
+                     Object existenceCheck)
             throws StandardException {
         tableType = BASE_TABLE_TYPE;
         this.lockGranularity = ((Character)lockGranularity).charValue();
@@ -110,6 +112,7 @@ public class CreateTableNode extends DDLStatementNode
         initAndCheck(newObjectName);
         this.tableElementList = (TableElementList)tableElementList;
         this.properties = (Properties)properties;
+        this.existenceCheck = (ExistenceCheck)existenceCheck;
     }
 
     /**
@@ -130,7 +133,8 @@ public class CreateTableNode extends DDLStatementNode
                      Object tableElementList,
                      Object properties,
                      Object onCommitDeleteRows,
-                     Object onRollbackDeleteRows)
+                     Object onRollbackDeleteRows,
+                     Object existenceCheck)
             throws StandardException {
         tableType = GLOBAL_TEMPORARY_TABLE_TYPE;
         newObjectName = tempTableSchemaNameCheck(newObjectName);
@@ -139,7 +143,7 @@ public class CreateTableNode extends DDLStatementNode
         initAndCheck(newObjectName);
         this.tableElementList = (TableElementList)tableElementList;
         this.properties = (Properties)properties;
-
+        this.existenceCheck = (ExistenceCheck)existenceCheck;
         assert this.onRollbackDeleteRows;
     }
 
@@ -153,7 +157,8 @@ public class CreateTableNode extends DDLStatementNode
      */
     public void init(Object newObjectName,
                      Object resultColumns,
-                     Object queryExpression) 
+                     Object queryExpression,
+                     Object c) 
             throws StandardException {
         tableType = BASE_TABLE_TYPE;
         lockGranularity = DEFAULT_LOCK_GRANULARITY;
@@ -161,6 +166,7 @@ public class CreateTableNode extends DDLStatementNode
         initAndCheck(newObjectName);
         this.resultColumns = (ResultColumnList)resultColumns;
         this.queryExpression = (ResultSetNode)queryExpression;
+        this.existenceCheck = (ExistenceCheck) c;
     }
 
     /**
@@ -182,6 +188,7 @@ public class CreateTableNode extends DDLStatementNode
         this.queryExpression = (ResultSetNode)
             getNodeFactory().copyNode(other.queryExpression, getParserContext());
         this.withData = other.withData;
+        this.existenceCheck = other.existenceCheck;
     }
 
     /**
@@ -218,6 +225,7 @@ public class CreateTableNode extends DDLStatementNode
                 (properties != null ? "properties: " + "\n" + properties + "\n" : "") +
                 (withData ? "withData: " + withData + "\n" : "") +
                 "lockGranularity: " + lockGranularity + "\n";
+        tempString += "existenceCheck: " + existenceCheck + "\n";
         return super.toString() +    tempString;
     }
 
@@ -235,6 +243,11 @@ public class CreateTableNode extends DDLStatementNode
 
     public void markWithData() {
         withData = true;
+    }
+    
+    public ExistenceCheck getExistenceCheck()
+    {
+        return existenceCheck;
     }
 
     /**

@@ -60,6 +60,7 @@ import com.akiban.sql.StandardException;
 public class DropTableNode extends DDLStatementNode
 {
     private int dropBehavior;
+    private ExistenceCheck existenceCheck;
 
     /**
      * Intializer for a DropTableNode
@@ -69,10 +70,11 @@ public class DropTableNode extends DDLStatementNode
      *
      */
 
-    public void init(Object dropObjectName, Object dropBehavior)
+    public void init(Object dropObjectName, Object dropBehavior, Object ec)
             throws StandardException {
         initAndCheck(dropObjectName);
         this.dropBehavior = ((Integer)dropBehavior).intValue();
+        this.existenceCheck = (ExistenceCheck)ec;
     }
 
     /**
@@ -83,10 +85,16 @@ public class DropTableNode extends DDLStatementNode
 
         DropTableNode other = (DropTableNode)node;
         this.dropBehavior = other.dropBehavior;
+        this.existenceCheck = other.existenceCheck;
     }
 
     public int getDropBehavior() {
         return dropBehavior;
+    }
+    
+    public ExistenceCheck getExistenceCheck()
+    {
+        return existenceCheck;
     }
 
     /**
@@ -95,14 +103,13 @@ public class DropTableNode extends DDLStatementNode
      *
      * @return This object as a String
      */
-
     public String toString() {
         return super.toString() +
-            "dropBehavior: " + "\n" + dropBehavior + "\n";
+            "dropBehavior: " + "\n" + dropBehavior + "\n"
+           + "existenceChec: " + "\n" + existenceCheck + "\n";
     }
 
     public String statementToString() {
         return "DROP TABLE";
     }
-
 }

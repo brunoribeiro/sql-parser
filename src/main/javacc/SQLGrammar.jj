@@ -1999,6 +1999,7 @@ TOKEN [IGNORE_CASE] :
 | <HAVING: "having">
 | <HOUR: "hour">
 | <IDENTITY: "identity">
+| <IF: "if">
 | <IMMEDIATE: "immediate">
 | <IN: "in">
 | <INDICATOR: "indicator">
@@ -2838,6 +2839,39 @@ StatementPart(Token[] tokenHolder) throws StandardException :
 )
     {
         return statementNode;
+    }
+}
+
+
+ExistenceCheck
+existsOrNotExists() throws StandardException :
+{
+}
+{
+    <NOT> <EXISTS>
+    {
+        return ExistenceCheck.IF_NOT_EXISTS;
+    }
+|
+    <EXISTS>
+    {
+        return ExistenceCheck.IF_EXISTS;
+    }
+}
+
+ExistenceCheck
+getCondition() throws StandardException :
+{
+}
+{
+    LOOKAHEAD ( {getToken(1).kind == IF} )
+    <IF>
+    {
+        return existsOrNotExists();
+    }
+|
+    {
+        return ExistenceCheck.NO_CONDITION;
     }
 }
 
@@ -9381,13 +9415,14 @@ schemaDefinition() throws StandardException :
     TableName characterSet = null;
     TableName collation = null;
     CharacterTypeAttributes defaultCharacterAttributes = null;
+    ExistenceCheck cond = ExistenceCheck.NO_CONDITION;
 }
 {
     /*
     ** CREATE SCHEMA:
     ** We are not currently handling schema bodies.
     */
-    <SCHEMA>
+    <SCHEMA> cond = getCondition()
     (
         schemaName = identifier() [ <AUTHORIZATION> authName = identifier() ]
     |
@@ -9407,6 +9442,7 @@ schemaDefinition() throws StandardException :
                                                   schemaName,
                                                   authName,
                                                   defaultCharacterAttributes,
+                                                  cond,
                                                   parserContext);
     }
 }
@@ -9613,9 +9649,10 @@ tableDefinition() throws StandardException :
     ResultColumnList resultColumns = null;
     ResultSetNode queryExpression;
     boolean withData = true;
+    ExistenceCheck cond;
 }
 {
-    <TABLE> tableName = qualifiedName()
+    <TABLE> cond = getCondition() tableName = qualifiedName()
     // Lookahead needed to choose between tableElementList and
     // tableColumnList.
     (        
@@ -9629,6 +9666,7 @@ tableDefinition() throws StandardException :
                                                   tableElementList,
                                                   properties,
                                                   new Character(lockGranularity),
+                                                  cond,
                                                   parserContext);
     }
     |
@@ -9648,6 +9686,7 @@ tableDefinition() throws StandardException :
                                                                   tableName,
                                                                   resultColumns,
                                                                   queryExpression,
+                                                                  cond,
                                                                   parserContext);
         if (withData) {
             ((CreateTableNode)result).markWithData();
@@ -9768,10 +9807,12 @@ indexDefinition() throws StandardException :
         nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
     boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
     JoinNode.JoinType joinType = null;
+    ExistenceCheck cond;
 }
 {
     [ unique = unique() ] 
     <INDEX>
+    cond = getCondition()
     indexName = qualifiedName() 
     <ON> tableName = qualifiedName()
     <LEFT_PAREN>
@@ -9816,6 +9857,7 @@ indexDefinition() throws StandardException :
                                                   indexColumnList,
                                                   joinType,
                                                   properties,
+                                                  cond,
                                                   parserContext);
     }
 }
@@ -10258,9 +10300,10 @@ viewDefinition(Token beginToken) throws StandardException :
     Token endToken;
     OrderByList orderCols = null;
     ValueNode[] offsetAndFetchFirst = new ValueNode[2];
+    ExistenceCheck cond;
 }
 {
-    <VIEW> tableName = qualifiedName() 
+    <VIEW> cond = getCondition() tableName = qualifiedName() 
     [ <LEFT_PAREN> resultColumns = viewColumnList() <RIGHT_PAREN> ]
     <AS> queryExpression = queryExpression(null, NO_SET_OP)
     [ orderCols = orderByClause() ]
@@ -10285,6 +10328,7 @@ viewDefinition(Token beginToken) throws StandardException :
                                                   orderCols,
                                                   offsetAndFetchFirst[0],
                                                   offsetAndFetchFirst[1],
+                                                  cond,
                                                   parserContext);
     }
 }
@@ -12297,13 +12341,15 @@ dropSchemaStatement() throws StandardException :
 {
     String schemaName;
     int[] behavior = new int[1];
+    ExistenceCheck cond;
 }
 {
-    <SCHEMA> schemaName = identifier() dropBehavior(behavior)
+    <SCHEMA> cond = getCondition() schemaName = identifier() dropBehavior(behavior)
     {
         StatementNode stmt = (StatementNode)nodeFactory.getNode(NodeTypes.DROP_SCHEMA_NODE,
                                                                 schemaName,
                                                                 new Integer(behavior[0]),
+                                                                cond,
                                                                 parserContext);
 
         return stmt;
@@ -12762,13 +12808,15 @@ dropTableStatement() throws StandardException :
 {
     TableName tableName;
     int[] behavior = new int[1];
+    ExistenceCheck cond;
 }
 {
-    <TABLE> tableName = qualifiedName() dropBehavior(behavior)
+    <TABLE> cond = getCondition() tableName = qualifiedName() dropBehavior(behavior)
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_TABLE_NODE,
                                                   tableName,
                                                   new Integer(behavior[0]),
+                                                  cond,
                                                   parserContext);
     }
 }
@@ -12778,13 +12826,15 @@ dropIndexStatement() throws StandardException :
 {
     String indexName;
     TableName tableName[] = new TableName[1];
+    ExistenceCheck cond;
 }
 {
-    <INDEX> indexName = indexName(tableName)
+    <INDEX> cond = getCondition() indexName = indexName(tableName)
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_INDEX_NODE,
                                                   tableName[0],
                                                   indexName,
+                                                  cond,
                                                   parserContext);
     }
 }
@@ -12820,12 +12870,14 @@ StatementNode
 dropViewStatement() throws StandardException :
 {
     TableName viewName;
+    ExistenceCheck cond;
 }
 {
-    <VIEW> viewName = qualifiedName() 
+    <VIEW> cond = getCondition() viewName = qualifiedName() 
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_VIEW_NODE,
                                                   viewName,
+                                                  cond,
                                                   parserContext);
     }
 }
@@ -13744,6 +13796,7 @@ nonReservedKeyword() :
 | tok = <HOUR_SECOND>
 | tok = <IDENTITY_VAL_LOCAL>
 | tok = <IGNORE>
+| tok = <IF>
 | tok = <INCREMENT>
 | tok = <INDEX>
 | tok = <INITIAL>

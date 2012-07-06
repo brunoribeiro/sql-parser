@@ -3,3 +3,5 @@ name: test.t1
 statementType: DROP TABLE
 dropBehavior: 
 2
+existenceChec: 
+NO_CONDITION

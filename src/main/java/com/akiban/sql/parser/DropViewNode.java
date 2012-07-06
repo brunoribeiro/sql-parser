@@ -59,6 +59,7 @@ import com.akiban.sql.StandardException;
 
 public class DropViewNode extends DDLStatementNode
 {
+    private ExistenceCheck existenceCheck;
 
     /**
      * Initializer for a DropViewNode
@@ -67,8 +68,22 @@ public class DropViewNode extends DDLStatementNode
      *
      */
 
-    public void init(Object dropObjectName) throws StandardException {
+    public void init(Object dropObjectName, Object ec) throws StandardException {
         initAndCheck(dropObjectName);
+        this.existenceCheck = (ExistenceCheck)ec;
+    }
+
+    public ExistenceCheck getExistenceCheck()
+    {
+        return existenceCheck;
+    }
+     /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException
+    {
+        super.copyFrom(node);
+        this.existenceCheck = ((DropViewNode)node).existenceCheck;
     }
 
     public String statementToString() {

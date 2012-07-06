@@ -7,7 +7,7 @@ indexName: idx1
 tableName: table1
 joinType: null
 properties: null
-existenceCheck: NO_CONDITION
+existenceCheck: IF_EXISTS
 	
 	com.akiban.sql.parser.IndexColumnList@1572e449
 

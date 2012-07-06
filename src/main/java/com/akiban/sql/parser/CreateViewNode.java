@@ -69,6 +69,7 @@ public class CreateViewNode extends DDLStatementNode
     private OrderByList orderByList;
     private ValueNode offset;
     private ValueNode fetchFirst;
+    private ExistenceCheck existenceCheck;
 
     /**
      * Initializer for a CreateViewNode
@@ -94,7 +95,8 @@ public class CreateViewNode extends DDLStatementNode
                      Object qeText,
                      Object orderCols,
                      Object offset,
-                     Object fetchFirst) 
+                     Object fetchFirst,
+                     Object existenceCheck) 
             throws StandardException {
         initAndCheck(newObjectName);
         this.resultColumns = (ResultColumnList)resultColumns;
@@ -104,7 +106,7 @@ public class CreateViewNode extends DDLStatementNode
         this.orderByList = (OrderByList)orderCols;
         this.offset = (ValueNode)offset;
         this.fetchFirst = (ValueNode)fetchFirst;
-
+        this.existenceCheck = (ExistenceCheck)existenceCheck;
         implicitCreateSchema = true;
     }
 
@@ -127,6 +129,7 @@ public class CreateViewNode extends DDLStatementNode
             getNodeFactory().copyNode(other.offset, getParserContext());
         this.fetchFirst = (ValueNode)
             getNodeFactory().copyNode(other.fetchFirst, getParserContext());
+        this.existenceCheck = other.existenceCheck;
     }
 
     /**
@@ -139,7 +142,8 @@ public class CreateViewNode extends DDLStatementNode
     public String toString() {
         return super.toString() +
             "checkOption: " + checkOption + "\n" +
-            "qeText: " + qeText + "\n";
+            "qeText: " + qeText + "\n"
+          + "existenceCheck: " + existenceCheck + "\n";
     }
 
     public String statementToString() {
@@ -202,5 +206,10 @@ public class CreateViewNode extends DDLStatementNode
 
     public ValueNode getFetchFirst() {
         return fetchFirst;
+    }
+    
+    public ExistenceCheck getExistenceCheck()
+    {
+        return existenceCheck;
     }
 }

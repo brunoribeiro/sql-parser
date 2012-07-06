@@ -2,8 +2,8 @@ com.akiban.sql.parser.CreateViewNode@58d9660d
 name: v1
 statementType: CREATE VIEW
 checkOption: 0
-qeText: CREATE VIEW v1(x,y) AS (SELECT y,z FROM t1 WHERE y IS NOT NULL)
-existenceCheck: NO_CONDITION
+qeText: CREATE VIEW if Not Exists v1(x,y) AS (SELECT y,z FROM t1 WHERE y IS NOT NULL)
+existenceCheck: IF_NOT_EXISTS
 resultColumns: 	
 	com.akiban.sql.parser.ResultColumnList@28bb0d0d
 

@@ -2,4 +2,4 @@ com.akiban.sql.parser.DropIndexNode@4ac9131c
 name: table1
 statementType: DROP INDEX
 indexName: bad_index
-existenceCheck: NO_CONDITION
+existenceCheck: IF_EXISTS
