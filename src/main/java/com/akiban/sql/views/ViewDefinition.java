@@ -35,6 +35,7 @@ public class ViewDefinition
     private SQLParserContext parserContext;
     private NodeFactory nodeFactory;
     private CreateViewNode definition;
+    private FromSubquery subquery = null;
 
     /**
      * Parse the given SQL as CREATE VIEW and remember the definition.
@@ -61,12 +62,25 @@ public class ViewDefinition
         return definition.getObjectName();
     }
 
-    private FromSubquery subquery = null;
+    /**
+     * @deprecated
+     * @see #copySubquery
+     **/
+    @Deprecated
+    public FromSubquery getSubquery(Visitor binder) throws StandardException {
+        return copySubquery(binder, parserContext);
+    }
 
     /**
-     * Get the view as an equivalent subquery.
+     * Get the view as an equivalent subquery belonging to the given context.
      */
-    public FromSubquery getSubquery(Visitor binder) throws StandardException {
+    public FromSubquery copySubquery(Visitor binder, SQLParserContext parserContext) 
+            throws StandardException {
+        ensureSubquery(binder);
+        return (FromSubquery)nodeFactory.copyNode(subquery, parserContext);
+    }
+
+    protected void ensureSubquery(Visitor binder) throws StandardException {
         if (subquery == null) {
             subquery = (FromSubquery)
                 nodeFactory.getNode(NodeTypes.FROM_SUBQUERY,
@@ -78,7 +92,6 @@ public class ViewDefinition
                                     parserContext);
             subquery = (FromSubquery)subquery.accept(binder);
         }
-        // Return a clone so caller can mess with it and not affect us.
-        return (FromSubquery)nodeFactory.copyNode(subquery, parserContext);
     }
+
 }
