@@ -192,6 +192,10 @@ public class CreateViewNode extends DDLStatementNode
         return resultColumns;
     }
 
+    public String getQueryExpression() {
+        return qeText;
+    }
+
     public ResultSetNode getParsedQueryExpression() { 
         return queryExpression; 
     }
