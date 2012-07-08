@@ -67,6 +67,13 @@ public class ViewDefinition
     }
 
     /**
+     * Get the text of the view definition.
+     */
+    public String getQueryExpression() {
+        return definition.getQueryExpression();
+    }
+
+    /**
      * Get the result columns for this view.
      */
     public ResultColumnList getResultColumns() {
@@ -74,7 +81,7 @@ public class ViewDefinition
         if (rcl == null)
             rcl = subquery.getSubquery().getResultColumns();
         return rcl;
- }
+    }
 
     /**
      * Get the original subquery for binding.
