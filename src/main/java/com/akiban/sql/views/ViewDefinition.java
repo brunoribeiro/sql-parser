@@ -32,10 +32,8 @@ import com.akiban.sql.StandardException;
 
 public class ViewDefinition
 {
-    private SQLParserContext parserContext;
-    private NodeFactory nodeFactory;
     private CreateViewNode definition;
-    private FromSubquery subquery = null;
+    private FromSubquery subquery;
 
     /**
      * Parse the given SQL as CREATE VIEW and remember the definition.
@@ -45,14 +43,20 @@ public class ViewDefinition
         this(parser.parseStatement(sql), parser);
     }
 
-    public ViewDefinition(QueryTreeNode parsed, SQLParser parser)
+    public ViewDefinition(StatementNode parsed, SQLParserContext parserContext)
             throws StandardException {
-        parserContext = parser;
-        nodeFactory = parserContext.getNodeFactory();
         if (parsed.getNodeType() != NodeTypes.CREATE_VIEW_NODE) {
             throw new StandardException("Parsed statement was not a view");
         }
         definition = (CreateViewNode)parsed;
+        subquery = (FromSubquery)
+            parserContext.getNodeFactory().getNode(NodeTypes.FROM_SUBQUERY,
+                                                   definition.getParsedQueryExpression(),
+                                                   null, null, null,
+                                                   getName().getTableName(),
+                                                   definition.getResultColumns(),
+                                                   null,
+                                                   parserContext);
     }
 
     /** 
@@ -63,35 +67,37 @@ public class ViewDefinition
     }
 
     /**
-     * @deprecated
-     * @see #copySubquery
-     **/
-    @Deprecated
-    public FromSubquery getSubquery(Visitor binder) throws StandardException {
-        return copySubquery(binder, parserContext);
+     * Get the result columns for this view.
+     * Also binds the view to detect unresolved references.
+     */
+    public ResultColumnList getResultColumns() {
+        return definition.getResultColumns();
+    }
+
+    /**
+     * Get the original subquery for binding.
+     */
+    public FromSubquery getSubquery() {
+        return subquery;
     }
 
     /**
      * Get the view as an equivalent subquery belonging to the given context.
      */
-    public FromSubquery copySubquery(Visitor binder, SQLParserContext parserContext) 
+    public FromSubquery copySubquery(SQLParserContext parserContext) 
             throws StandardException {
-        ensureSubquery(binder);
-        return (FromSubquery)nodeFactory.copyNode(subquery, parserContext);
+        return (FromSubquery)
+            parserContext.getNodeFactory().copyNode(subquery, parserContext);
     }
 
-    protected void ensureSubquery(Visitor binder) throws StandardException {
-        if (subquery == null) {
-            subquery = (FromSubquery)
-                nodeFactory.getNode(NodeTypes.FROM_SUBQUERY,
-                                    definition.getParsedQueryExpression(),
-                                    null, null, null,
-                                    getName().getTableName(),
-                                    definition.getResultColumns(),
-                                    null,
-                                    parserContext);
-            subquery = (FromSubquery)subquery.accept(binder);
-        }
+    /**
+     * @deprecated
+     * @see #copySubquery
+     */
+    @Deprecated
+    public FromSubquery getSubquery(Visitor binder) throws StandardException {
+        subquery = (FromSubquery)subquery.accept(binder);
+        return copySubquery(subquery.getParserContext());
     }
 
 }
