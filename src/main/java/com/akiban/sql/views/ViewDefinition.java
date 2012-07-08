@@ -68,11 +68,13 @@ public class ViewDefinition
 
     /**
      * Get the result columns for this view.
-     * Also binds the view to detect unresolved references.
      */
     public ResultColumnList getResultColumns() {
-        return definition.getResultColumns();
-    }
+        ResultColumnList rcl = subquery.getResultColumns();
+        if (rcl == null)
+            rcl = subquery.getSubquery().getResultColumns();
+        return rcl;
+ }
 
     /**
      * Get the original subquery for binding.
