@@ -52,7 +52,9 @@ public class ViewDefinition
         subquery = (FromSubquery)
             parserContext.getNodeFactory().getNode(NodeTypes.FROM_SUBQUERY,
                                                    definition.getParsedQueryExpression(),
-                                                   null, null, null,
+                                                   definition.getOrderByList(),
+                                                   definition.getOffset(),
+                                                   definition.getFetchFirst(),
                                                    getName().getTableName(),
                                                    definition.getResultColumns(),
                                                    null,

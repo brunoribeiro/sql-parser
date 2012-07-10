@@ -167,6 +167,11 @@ public class CreateViewNode extends DDLStatementNode
 
         printLabel(depth, "queryExpression: ");
         queryExpression.treePrint(depth + 1);
+
+        if (orderByList != null) {
+            printLabel(depth, "orderByList: ");
+            orderByList.treePrint(depth + 1);
+        }
     }
 
     /**
