@@ -87,7 +87,8 @@ public class NextSequenceNode extends ValueNode
      */
 
     public String toString() {
-        return super.toString();
+        return super.toString() +
+         "Sequence: " + sequenceName;
     }
 
     protected boolean isEquivalent(ValueNode other) throws StandardException {

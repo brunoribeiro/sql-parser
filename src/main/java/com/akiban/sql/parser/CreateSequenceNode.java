@@ -156,7 +156,12 @@ public class CreateSequenceNode extends DDLStatementNode
 
     public String toString() {
         return super.toString() +
-            "sequenceName: " + "\n" + sequenceName + "\n";
+            "sequenceName: " + sequenceName + "\n" +
+            "initial value: " + initialValue + "\n" +
+            "step value: " + stepValue + "\n" +
+            "maxValue: " + maxValue + "\n" +
+            "minValue:" + minValue + "\n" +
+            "cycle: " + cycle + "\n";
     }
 
     public String statementToString() {

@@ -1,0 +1,62 @@
+com.akiban.sql.parser.InsertNode@f581593
+null
+statementType: INSERT
+resultSet: 	
+	com.akiban.sql.parser.RowResultSetNode@5ff06dc3
+	correlation Name: null
+	null
+	resultColumns: 		
+		com.akiban.sql.parser.ResultColumnList@21b64e6a
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@47d62270
+		exposedName: null
+		name: null
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.NumericConstantNode@3b6f0be8
+			value: 1
+			type: INTEGER NOT NULL
+		[1]:		
+		com.akiban.sql.parser.ResultColumn@7776cad3
+		exposedName: null
+		name: null
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.NextSequenceNode@17fe1feb
+			type: null
+			Sequence: test.new_sequence
+targetTableName: 	
+	com.akiban.sql.parser.TableName@e3d
+	t1
+targetColumnList: 	
+	com.akiban.sql.parser.ResultColumnList@2ce1899b
+
+	[0]:	
+	com.akiban.sql.parser.ResultColumn@b113622
+	exposedName: cid
+	name: cid
+	tableName: null
+	isDefaultColumn: false
+	type: null
+	reference: 		
+		com.akiban.sql.parser.ColumnReference@16f8f7db
+		columnName: cid
+		tableName: null
+		type: null
+	[1]:	
+	com.akiban.sql.parser.ResultColumn@335856a5
+	exposedName: iid
+	name: iid
+	tableName: null
+	isDefaultColumn: false
+	type: null
+	reference: 		
+		com.akiban.sql.parser.ColumnReference@6ca084f8
+		columnName: iid
+		tableName: null
+		type: null
