@@ -61,14 +61,18 @@ import com.akiban.sql.StandardException;
 public class AllResultColumn extends ResultColumn
 {
     private TableName tableName;
+    private boolean recursive;
 
     /**
      * This initializer is for use in the parser for a "*".
      * 
-     * @param tableName Dot expression qualifying "*"
+     * @param arg TableName Dot expression qualifying "*" or Boolean recursive
      */
-    public void init(Object tableName) {
-        this.tableName = (TableName)tableName;
+    public void init(Object arg) {
+        if (arg instanceof Boolean)
+            this.recursive = (Boolean)arg;
+        else
+            this.tableName = (TableName)arg;
     }
 
     /**
@@ -80,6 +84,7 @@ public class AllResultColumn extends ResultColumn
         AllResultColumn other = (AllResultColumn)node;
         this.tableName = (TableName)getNodeFactory().copyNode(other.tableName,
                                                               getParserContext());
+        this.recursive = other.recursive;
     }
 
     /** 
@@ -98,6 +103,10 @@ public class AllResultColumn extends ResultColumn
 
     public TableName getTableNameObject() {
         return tableName;
+    }
+
+    public boolean isRecursive() {
+        return recursive;
     }
 
     /**

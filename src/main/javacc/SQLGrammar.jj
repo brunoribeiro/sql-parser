@@ -2394,6 +2394,7 @@ TOKEN :
 | <DOUBLE_LESS: "<<">
 | <DOUBLE_GREATER: ">>">
 | <FIELD_REFERENCE: "->">
+| <ASTERISK_ASTERISK: "**">
 }
 
 TOKEN :
@@ -4879,7 +4880,15 @@ selectSublist(ResultColumnList resultColumns) throws StandardException :
     <ASTERISK>
     {
         allResultColumn = (ResultColumn)nodeFactory.getNode(NodeTypes.ALL_RESULT_COLUMN,
-                                                            null,
+                                                            Boolean.FALSE,
+                                                            parserContext);
+        resultColumns.addResultColumn(allResultColumn);
+    }
+|
+    <ASTERISK_ASTERISK>
+    {
+        allResultColumn = (ResultColumn)nodeFactory.getNode(NodeTypes.ALL_RESULT_COLUMN,
+                                                            Boolean.TRUE,
                                                             parserContext);
         resultColumns.addResultColumn(allResultColumn);
     }
