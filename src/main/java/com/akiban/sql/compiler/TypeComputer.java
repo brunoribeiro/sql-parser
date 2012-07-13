@@ -596,9 +596,6 @@ public class TypeComputer implements Visitor
     protected void insertNode(InsertNode node) throws StandardException {
     }
 
-    protected void updateNode(UpdateNode node) throws StandardException {
-    }
-
     /* Visitor interface. */
 
     public Visitable visit(Visitable node) throws StandardException {
@@ -620,9 +617,6 @@ public class TypeComputer implements Visitor
                 break;
             case NodeTypes.INSERT_NODE:
                 insertNode((InsertNode)node);
-                break;
-            case NodeTypes.UPDATE_NODE:
-                updateNode((UpdateNode)node);
                 break;
             }
         }
