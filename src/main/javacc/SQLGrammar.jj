@@ -12827,7 +12827,7 @@ columnAlterClause(String columnName) throws StandardException :
 TableElementNode
 dropTableConstraintDefinition() throws StandardException :
 {
-    TableName constraintName;
+    TableName constraintName = null;
 }
 {
     LOOKAHEAD( { getToken(1).kind == CONSTRAINT } )
@@ -12858,8 +12858,9 @@ dropTableConstraintDefinition() throws StandardException :
                                                      parserContext);
     }
 |
-    LOOKAHEAD( { getToken(1).kind == FOREIGN } )
-    <FOREIGN> <KEY> constraintName = qualifiedName()
+    LOOKAHEAD( { (getToken(1).kind == FOREIGN) || 
+                 (groupConstructFollows(GROUPING) && (getToken(2).kind == FOREIGN)) } )
+    [ <GROUPING> ] <FOREIGN> <KEY> [ constraintName = qualifiedName() ]
     {
         return (TableElementNode)nodeFactory.getNode(NodeTypes.CONSTRAINT_DEFINITION_NODE,
                                                      constraintName,
