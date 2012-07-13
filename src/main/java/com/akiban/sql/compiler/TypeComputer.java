@@ -582,7 +582,7 @@ public class TypeComputer implements Visitor
         }
     }
 
-    private void fromSubquery(FromSubquery node) throws StandardException {
+    protected void fromSubquery(FromSubquery node) throws StandardException {
         if (node.getResultColumns() != null) {
             ResultColumnList rcl1 = node.getResultColumns(); 
             ResultColumnList rcl2 = node.getSubquery().getResultColumns();
@@ -591,6 +591,9 @@ public class TypeComputer implements Visitor
                 rcl1.get(i).setType(rcl2.get(i).getType());
             }
         }
+    }
+
+    protected void insertNode(InsertNode node) throws StandardException {
     }
 
     /* Visitor interface. */
@@ -611,6 +614,9 @@ public class TypeComputer implements Visitor
                 break;
             case NodeTypes.FROM_SUBQUERY:
                 fromSubquery((FromSubquery)node);
+                break;
+            case NodeTypes.INSERT_NODE:
+                insertNode((InsertNode)node);
                 break;
             }
         }
