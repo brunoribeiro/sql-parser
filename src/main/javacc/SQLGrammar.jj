@@ -12427,8 +12427,8 @@ alterGroup() throws StandardException :
             nodeFactory.getNode(NodeTypes.FK_CONSTRAINT_DEFINITION_NODE,
                                  childTable,
                                  parentTable,
-                                 childColumn,
-                                 parentColumn,
+                                 childColumns,
+                                 parentColumns,
                                  new int[] {StatementType.RA_NOACTION,StatementType.RA_NOACTION},
                                  Boolean.TRUE,
                                  parserContext));
@@ -12461,7 +12461,7 @@ alterGroup() throws StandardException :
          return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_TABLE_NODE,
                                                    childTable,
                                                    tableElementList,
-                                                   new Character(lockGranularity),
+                                                   new Character('\0'),
                                                    new int[]{DDLStatementNode.DROP_TYPE},
                                                    new int[]{StatementType.DROP_DEFAULT},
                                                    parserContext);
