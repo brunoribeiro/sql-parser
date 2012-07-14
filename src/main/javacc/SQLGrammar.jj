@@ -12416,7 +12416,7 @@ alterGroup() throws StandardException :
     <ADD> <TABLE> childTable = qualifiedName()
     <LEFT_PAREN> childColumns = tableColumnList() <RIGHT_PAREN>
     <TO> parentTable = qualifiedName()
-    [<LEFT_PAREN> parentColumns = tableColumnList() <RIGHT_PARENT>]
+    [<LEFT_PAREN> parentColumns = tableColumnList() <RIGHT_PAREN>]
     {
         // this is the same as
         // ALTER TABLE <child schema table name>
@@ -12429,9 +12429,9 @@ alterGroup() throws StandardException :
                                  parentTable,
                                  childColumn,
                                  parentColumn,
-                                 new int[] {StatementType.RA_NOACTION,vStatementType.RA_NOACTION},
+                                 new int[] {StatementType.RA_NOACTION,StatementType.RA_NOACTION},
                                  Boolean.TRUE,
-                                 parserContext);
+                                 parserContext));
 
         return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_TABLE_NODE,
                                                   childTable,
