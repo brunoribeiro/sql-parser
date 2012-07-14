@@ -12423,7 +12423,23 @@ alterGroup() throws StandardException :
         //      ADD GROUPING FOREIGN KEY ( <column name> [ , ... n ] )
         //          REFERENCES <parent schema table name> [ ( <column name> [ , ... n ] ) ]
 
-        
+        tableElementList.addTableElement((TableElementNode)
+            nodeFactory.getNode(NodeTypes.FK_CONSTRAINT_DEFINITION_NODE,
+                                 childTable,
+                                 parentTable,
+                                 childColumn,
+                                 parentColumn,
+                                 new int[] {StatementType.RA_NOACTION,vStatementType.RA_NOACTION},
+                                 Boolean.TRUE,
+                                 parserContext);
+
+        return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_TABLE_NODE,
+                                                  childTable,
+                                                  tableElementList,
+                                                  new Character('\0'),
+                                                  new int[] {DDLStatementNode.ADD_TYPE},
+                                                  new int[]{0}, // not used
+                                                  parserContext);
     }
     <DROP> <TABLE> childTable = qualifiedName()
     {
