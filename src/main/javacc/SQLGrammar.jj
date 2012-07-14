@@ -12402,6 +12402,58 @@ dropSchemaStatement() throws StandardException :
 }
 
 StatementNode
+alterGroup() throws StandardException :
+{
+    TableName childTable;
+    TableName parentTable;
+    ResultColumnList childColumns;
+    ResultColumnList parentColumns = null;
+    TableElementList tableElementList = (TableElementList)
+        nodeFactory.getNode(NodeTypes.TABLE_ELEMENT_LIST, parserContext);
+
+}
+{
+    <ADD> <TABLE> childTable = qualifiedName()
+    <LEFT_PAREN> childColumns = tableColumnList() <RIGHT_PAREN>
+    <TO> parentTable = qualifiedName()
+    [<LEFT_PAREN> parentColumns = tableColumnList() <RIGHT_PARENT>]
+    {
+        // this is the same as
+        // ALTER TABLE <child schema table name>
+        //      ADD GROUPING FOREIGN KEY ( <column name> [ , ... n ] )
+        //          REFERENCES <parent schema table name> [ ( <column name> [ , ... n ] ) ]
+
+        
+    }
+    <DROP> <TABLE> childTable = qualifiedName()
+    {
+        // This is the same as 
+        // ALTER TABLE <leaf schema table name> DROP GROUPING FOREIGN KEY
+
+        tableElementList.addTableElement((TableElementNode)
+            nodeFactory.getNode(NodeTypes.CONSTRAINT_DEFINITION_NODE,
+                                 null,
+                                 ConstraintDefinitionNode.ConstraintType.DROP,
+                                 null,
+                                 null,
+                                 null,
+                                 null,
+                                 StatementType.DROP_DEFAULT,
+                                 ConstraintDefinitionNode.ConstraintType.FOREIGN_KEY,
+                                 parserContext));
+
+         return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_TABLE_NODE,
+                                                   childTable,
+                                                   tableElementList,
+                                                   new Character(lockGranularity),
+                                                   new int[]{DDLStatementNode.DROP_TYPE},
+                                                   new int[]{StatementType.DROP_DEFAULT},
+                                                   parserContext);
+        
+    }
+}
+
+StatementNode
 alterStatement() throws StandardException :
 {
     StatementNode node;
@@ -12416,7 +12468,12 @@ alterStatement() throws StandardException :
     <SERVER> node = alterServerBody()
     {
         return node;
-    }  
+    } 
+|
+    <GROUP> 
+    {
+        return alterGroup();
+    }
 }
 
 StatementNode
