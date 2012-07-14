@@ -12470,9 +12470,9 @@ alterStatement() throws StandardException :
         return node;
     } 
 |
-    <GROUP> 
+    <GROUP> node = alterGroup()
     {
-        return alterGroup();
+        return node;
     }
 }
 
