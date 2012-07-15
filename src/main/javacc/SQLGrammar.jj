@@ -12425,7 +12425,7 @@ alterGroup() throws StandardException :
 
         tableElementList.addTableElement((TableElementNode)
             nodeFactory.getNode(NodeTypes.FK_CONSTRAINT_DEFINITION_NODE,
-                                 childTable,
+                                 null,
                                  parentTable,
                                  childColumns,
                                  parentColumns,
@@ -12441,6 +12441,7 @@ alterGroup() throws StandardException :
                                                   new int[]{0}, // not used
                                                   parserContext);
     }
+|
     <DROP> <TABLE> childTable = qualifiedName()
     {
         // This is the same as 
