@@ -58,6 +58,10 @@ public class RowsResultSetNode extends FromTable
         return rows;
     }
 
+    public void addRow(RowResultSetNode row) {
+        rows.add(row);
+    }
+
     public String statementToString() {
         return "VALUES";
     }
@@ -81,6 +85,7 @@ public class RowsResultSetNode extends FromTable
      */
 
     public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
         for (int index = 0; index < rows.size(); index++) {
             debugPrint(formatNodeString("[" + index + "]:", depth));
             RowResultSetNode row = rows.get(index);
