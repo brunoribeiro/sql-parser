@@ -73,6 +73,7 @@ public class RowsResultSetNode extends FromTable
         super.copyFrom(node);
 
         RowsResultSetNode other = (RowsResultSetNode)node;
+        rows = new ArrayList<RowResultSetNode>(other.rows.size());
         for (RowResultSetNode row : other.rows)
             rows.add((RowResultSetNode)getNodeFactory().copyNode(row, getParserContext()));
     }
