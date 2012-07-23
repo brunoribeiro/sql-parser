@@ -1605,6 +1605,51 @@ class SQLGrammar
         }
     }
 
+    boolean simpleLiteralInListFollows() {
+        int tkpos = 1;
+        switch (getToken(tkpos).kind) {
+        case SINGLEQUOTED_STRING:
+        case EXACT_NUMERIC:
+        case APPROXIMATE_NUMERIC:
+        case TRUE:
+        case FALSE:
+            break;
+        case DATE:
+        case TIME:
+        case TIMESTAMP:
+            tkpos++;
+            switch (getToken(tkpos).kind) {
+            case SINGLEQUOTED_STRING:
+                break;
+            default:
+                return false;
+            }
+            break;
+        case PLUS_SIGN:
+        case MINUS_SIGN:
+            tkpos++;
+            switch (getToken(tkpos).kind) {
+            case EXACT_NUMERIC:
+            case APPROXIMATE_NUMERIC:
+                break;
+            default:
+                return false;
+            }
+            break;
+        default:
+            return false;
+        }
+        tkpos++;
+        switch (getToken(tkpos).kind) {
+        case COMMA:
+        case RIGHT_PAREN:
+            break;
+        default:
+            return false;
+        }
+        return true;
+    }
+
     boolean mysqlIntervalFollows() {
         if (!hasFeature(SQLParserFeature.MYSQL_INTERVAL))
             return false;
@@ -8076,6 +8121,18 @@ rowValueConstructorElement(ResultColumnList resultColumns) throws StandardExcept
     ValueNode value;
 }
 {
+    (
+    LOOKAHEAD( { simpleLiteralInListFollows() } )
+    value = literal()
+    )
+    {
+        resultColumns.addResultColumn(
+            (ResultColumn)nodeFactory.getNode(NodeTypes.RESULT_COLUMN,
+                                              null,
+                                              value,
+                                              parserContext));
+    }
+|
     value = orExpression(null)
     {
         resultColumns.addResultColumn(
