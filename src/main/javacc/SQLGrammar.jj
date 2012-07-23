@@ -864,6 +864,7 @@ class SQLGrammar
         case IN:
         case LIKE:
         case BETWEEN:
+        case DUMMY:
             retval = true;
             break;
 
@@ -872,6 +873,7 @@ class SQLGrammar
             case IN:
             case LIKE:
             case BETWEEN:
+            case DUMMY:
                 retval = true;
             }
             break;
@@ -2154,6 +2156,7 @@ TOKEN [IGNORE_CASE] :
 | <DEFINER: "definer">
 | <DETERMINISTIC: "deterministic">
 | <DIV: "div">
+| <DUMMY: "dummy">
 | <DYNAMIC: "dynamic">
 | <EXTRACT: "extract">
 | <FORTRAN: "fortran">
@@ -5186,6 +5189,11 @@ remainingNegatablePredicate(ValueNode leftOperand) throws StandardException :
     ValueNode escapeValue = null;
 }
 {
+    <DUMMY> tree = rowCtor()
+    {
+        return tree;
+    }
+|
     <IN> tree = inPredicateValue(leftOperand)
     {
         return tree;
@@ -8216,6 +8224,54 @@ inElement(ValueNodeList inList) throws StandardException :
     valueNode = additiveExpression()
     {
         inList.addValueNode(valueNode);
+    }
+}
+
+
+ValueNode
+rowCtor() throws StandardException:
+{
+    ValueNodeList list = (ValueNodeList)nodeFactory.getNode(NodeTypes.VALUE_NODE_LIST,
+                                                            parserContext);
+}
+{
+    <LEFT_PAREN>
+    getRow(list)
+    <RIGHT_PAREN>
+    {
+        return (ValueNode)nodeFactory.getNode(NodeTypes.ROW_CTOR_NODE,
+                                              list,
+                                              parserContext);
+        
+    }
+}
+
+void
+getRow(ValueNodeList rowList) throws StandardException:
+{
+}
+{
+    rowElement(rowList)
+    ( <COMMA> rowElement(rowList) )*
+    {
+        return;
+    }
+}
+
+void
+rowElement(ValueNodeList list) throws StandardException:
+{   
+    ValueNode element = null;
+}
+{
+    LOOKAHEAD( {getToken(1).kind == LEFT_PAREN} )
+    element = rowCtor()
+    {
+        list.addValueNode(element);
+    }
+|
+    {
+        inElement(list);
     }
 }
 
@@ -13962,6 +14018,7 @@ nonReservedKeyword() :
 | tok = <DEFRAGMENT>
 | tok = <DIRTY>
 | tok = <DIV>
+| tok = <DUMMY>
 | tok = <DYNAMIC>
 | tok = <DATABASE>
 | tok = <DB2SQL>
