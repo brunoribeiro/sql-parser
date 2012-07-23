@@ -168,4 +168,24 @@ public class CreateSequenceNode extends DDLStatementNode
         return "CREATE SEQUENCE";
     }
 
+    public final long getInitialValue() {
+        return initialValue;
+    }
+
+    public final long getStepValue() {
+        return stepValue;
+    }
+
+    public final long getMaxValue() {
+        return maxValue;
+    }
+
+    public final long getMinValue() {
+        return minValue;
+    }
+
+    public final boolean isCycle() {
+        return cycle;
+    }
+
 }
