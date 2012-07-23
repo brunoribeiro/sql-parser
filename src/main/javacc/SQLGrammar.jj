@@ -547,6 +547,38 @@ class SQLGrammar
         return retval;
     }
 
+    private boolean leftParenAndSubqueryFollows()
+    {
+        boolean retval = false;
+        int i = 1;
+        if (getToken(i).kind != LEFT_PAREN)
+            return false;
+
+        for( ; true; ++i)
+        {
+            int tokKind = getToken(i).kind;
+            if (tokKind == LEFT_PAREN) {
+                // A subquery can start with an arbitrary number of left
+                // parentheses.
+                continue;
+            }
+            else if (tokKind == SELECT || tokKind == VALUES) {
+                // If the first token we find after all the left parentheses
+                // is SELECT or VALUES, it's a subquery.
+                retval = true;
+                break;
+            }
+            else {
+                // If the first token we find after all the left parentheses
+                // is neither SELECT nor VALUES, it's not a subquery.
+                break;
+            }
+        }
+        
+        return retval;
+            
+    }
+
     /**
      * Determine if we are seeing an offsetClause or the identifier OFFSET
      * (Derby does not make it a reserved word).    "n" must be an integer
@@ -8180,21 +8212,18 @@ inPredicateValue(ValueNode leftOperand) throws StandardException :
     int tokKind;
 }
 {
-    <LEFT_PAREN>
-    (
-        // This LOOKAHEAD is necessary because both a subquery and an
-        // inValueList can be nested arbitrarily deep in parentheses,
-        // so both can start with LEFT_PAREN. To disambiguate, we only
-        // consider it a subquery if the first token that comes after
-        // all the LEFT_PARENS is either a SELECT or a VALUES.
-        LOOKAHEAD( { subqueryFollows() } )
-        retval = tableSubquery(SubqueryNode.SubqueryType.IN, leftOperand)
-    |
-        retval = inValueList(leftOperand)
-    )
-    <RIGHT_PAREN>
+    LOOKAHEAD( {leftParenAndSubqueryFollows()} )
+    <LEFT_PAREN> retval = tableSubquery(SubqueryNode.SubqueryType.IN, leftOperand) <RIGHT_PAREN>
     {
         return retval;
+    }
+|
+    retval = rowCtor()
+    {
+        return (ValueNode)nodeFactory.getNode(NodeTypes.IN_LIST_OPERATOR_NODE,
+                                              leftOperand,
+                                              retval,
+                                              parserContext);
     }
 }
 
@@ -8274,6 +8303,7 @@ rowElement(ValueNodeList list) throws StandardException:
         inElement(list);
     }
 }
+
 
 SubqueryNode.SubqueryType
 quantifier(BinaryOperatorNode.OperatorType opType) throws StandardException :

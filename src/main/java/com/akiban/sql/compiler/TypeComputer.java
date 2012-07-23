@@ -412,7 +412,7 @@ public class TypeComputer implements Visitor
 
         boolean nullableResult = leftType.isNullable();
         
-        for (ValueNode rightOperand : node.getRightOperandList()) {
+        for (ValueNode rightOperand : node.getRightOperandList().getNodeList()) {
             DataTypeDescriptor rightType;
             if (isParameterOrUntypedNull(rightOperand)) {
                 rightType = leftType.getNullabilityType(true);

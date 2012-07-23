@@ -305,8 +305,8 @@ public class BooleanNormalizer implements Visitor
         case NodeTypes.IN_LIST_OPERATOR_NODE:
             if (underNotNode) {
                 InListOperatorNode inListOperatorNode = (InListOperatorNode)node;
-                ValueNode leftOperand = inListOperatorNode.getLeftOperand();
-                ValueNodeList rightOperandList = inListOperatorNode.getRightOperandList();
+                RowConstructorNode leftOperand = inListOperatorNode.getLeftOperand();
+                RowConstructorNode rightOperandList = inListOperatorNode.getRightOperandList();
                 /* We want to convert the IN List into = OR = ... as * described below. */
                 /* Convert:
                  *      leftO IN rightOList.elementAt(0) , rightOList.elementAt(1) ...
@@ -317,7 +317,7 @@ public class BooleanNormalizer implements Visitor
                  * for <>.
                  */
                 ValueNode result = null;
-                for (ValueNode rightOperand : rightOperandList) {
+                for (ValueNode rightOperand : rightOperandList.getNodeList()) {
                     BinaryComparisonOperatorNode rightBCO = (BinaryComparisonOperatorNode)
                         nodeFactory.getNode(NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE,
                                             leftOperand, rightOperand,

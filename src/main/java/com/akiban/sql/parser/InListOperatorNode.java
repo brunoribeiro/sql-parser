@@ -49,12 +49,14 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 /**
  * An InListOperatorNode represents an IN list.
  *
  */
 
-public final class InListOperatorNode extends BinaryListOperatorNode
+public final class InListOperatorNode extends ValueNode
 {
     /**
      * Initializer for a InListOperatorNode
@@ -67,6 +69,45 @@ public final class InListOperatorNode extends BinaryListOperatorNode
         init(leftOperand, rightOperandList, "IN", "in");
     }
 
+
+    protected String methodName;
+    /* operator used for error messages */
+    protected String operator;
+
+    protected RowConstructorNode leftOperand;
+    protected RowConstructorNode rightOperandList;
+
+    /**
+     * Initializer for a BinaryListOperatorNode
+     *
+     * @param leftOperand The left operand of the node
+     * @param rightOperandList The right operand list of the node
+     * @param operator String representation of operator
+     */
+
+    public void init(Object leftOperand, Object rightOperandList,
+                     Object operator, Object methodName) {
+        this.leftOperand = (RowConstructorNode)leftOperand;
+        this.rightOperandList = (RowConstructorNode)rightOperandList;
+        this.operator = (String)operator;
+        this.methodName = (String)methodName;
+    }
+
+    /**
+     * Fill this node with a deep copy of the given node.
+     */
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
+
+        BinaryListOperatorNode other = (BinaryListOperatorNode)node;
+        this.methodName = other.methodName;
+        this.operator = other.operator;
+        this.leftOperand = (RowConstructorNode)
+            getNodeFactory().copyNode(other.leftOperand, getParserContext());
+        this.rightOperandList = (RowConstructorNode)
+            getNodeFactory().copyNode(other.rightOperandList, getParserContext());
+    }
+
     /**
      * Convert this object to a String.  See comments in QueryTreeNode.java
      * for how this should be done for tree printing.
@@ -74,8 +115,117 @@ public final class InListOperatorNode extends BinaryListOperatorNode
      * @return This object as a String
      */
 
+    @Override
     public String toString() {
-        return super.toString();
+        return "operator: " + operator + "\n" +
+            "methodName: " + methodName + "\n" +
+            super.toString();
     }
 
+    /**
+     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
+     * how tree printing is supposed to work.
+     *
+     * @param depth The depth of this node in the tree
+     */
+
+    public void printSubNodes(int depth) {
+        super.printSubNodes(depth);
+
+        if (leftOperand != null) {
+            printLabel(depth, "leftOperand: ");
+            leftOperand.treePrint(depth + 1);
+        }
+
+        if (rightOperandList != null) {
+            printLabel(depth, "rightOperandList: ");
+            rightOperandList.treePrint(depth + 1);
+        }
+    }
+
+    /**
+     * Set the leftOperand to the specified ValueNode
+     *
+     * @param newLeftOperand The new leftOperand
+     */
+    public void setLeftOperand(RowConstructorNode newLeftOperand) {
+        leftOperand = newLeftOperand;
+    }
+
+    /**
+     * Get the leftOperand
+     *
+     * @return The current leftOperand.
+     */
+    public RowConstructorNode getLeftOperand() {
+        return leftOperand;
+    }
+
+    /**
+     * Set the rightOperandList to the specified ValueNodeList
+     *
+     * @param newRightOperandList The new rightOperandList
+     *
+     */
+    public void setRightOperandList(RowConstructorNode newRightOperandList) {
+        rightOperandList = newRightOperandList;
+    }
+
+    /**
+     * Get the rightOperandList
+     *
+     * @return The current rightOperandList.
+     */
+    public RowConstructorNode getRightOperandList() {
+        return rightOperandList;
+    }
+
+    /**
+     * Return whether or not this expression tree represents a constant expression.
+     *
+     * @return Whether or not this expression tree represents a constant expression.
+     */
+    public boolean isConstantExpression() {
+        return (leftOperand.isConstantExpression() &&
+                rightOperandList.isConstantExpression());
+    }
+
+    /**
+     * Accept the visitor for all visitable children of this node.
+     * 
+     * @param v the visitor
+     *
+     * @exception StandardException on error
+     */
+    void acceptChildren(Visitor v) throws StandardException {
+        super.acceptChildren(v);
+
+        if (leftOperand != null) {
+            leftOperand = (RowConstructorNode)leftOperand.accept(v);
+        }
+
+        if (rightOperandList != null) {
+            rightOperandList = (RowConstructorNode)rightOperandList.accept(v);
+        }
+    }
+                
+    /**
+     * @inheritDoc
+     */
+    protected boolean isEquivalent(ValueNode o) throws StandardException {
+        if (!isSameNodeType(o)) {
+            return false;
+        }
+        InListOperatorNode other = (InListOperatorNode)o;
+        if (!operator.equals(other.operator) || 
+            !leftOperand.isEquivalent(other.getLeftOperand())) {
+            return false;
+        }
+
+        if (!rightOperandList.isEquivalent(other.rightOperandList)) {
+            return false;
+        }
+
+        return true;
+    }
 }

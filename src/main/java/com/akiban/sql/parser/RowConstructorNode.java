@@ -48,4 +48,9 @@ public class RowConstructorNode extends ValueNode
     {
         return "{List contains: " + list.getList() + ", size: " + list.size() + "}";
     }
+    
+    public ValueNodeList getNodeList()
+    {
+        return list;
+    }
 }
