@@ -34,14 +34,7 @@ public class RowConstructorNode extends ValueNode
     @Override
     public void init(Object list)
     {
-//        //javax.swing.JOptionPane.showMessageDialog(null, "in list");
-//        ++c;
         this.list = (ValueNodeList)list;
-//        System.out.println("\n----------");
-//        System.out.println("CREATED " + c + "  times");
-//        System.out.println("size: + " + this.list.size() + "\n\n");
-//        System.out.println(this.list.list);
-////        System.out.println("\n----------\n");
     }
 
     @Override
