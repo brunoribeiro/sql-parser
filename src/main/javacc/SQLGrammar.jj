@@ -8121,10 +8121,8 @@ rowValueConstructorElement(ResultColumnList resultColumns) throws StandardExcept
     ValueNode value;
 }
 {
-    (
     LOOKAHEAD( { simpleLiteralInListFollows() } )
     value = literal()
-    )
     {
         resultColumns.addResultColumn(
             (ResultColumn)nodeFactory.getNode(NodeTypes.RESULT_COLUMN,
