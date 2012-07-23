@@ -691,6 +691,43 @@ class SQLGrammar
     }
 
     /**
+     * Checking nested tupples.
+     * Identical to rowValueConstructorListFollows() except this keeps the count
+     * of parens for later use (that is, to discard un-needed parens)
+     * 
+     * 
+     */
+    private boolean nestedTupplesFollow(int count[])
+    {
+        boolean ret = false;
+        if (getToken(1).kind == LEFT_PAREN)
+        {
+            count[0] = 1; // saw one left paren so far
+            
+            for (int i = 2; true; ++i)
+            {
+                int toKind = getToken(i).kind;
+                
+                // only looks for COMMA
+                // 
+                if (toKind == COMMA)
+                    ret = true;
+                
+                if (toKind == EOF)
+                    break;
+
+                if (toKind == LEFT_PAREN)
+                    ++count[0];
+                else if (toKind == RIGHT_PAREN)
+                    break;
+              }
+        }   
+        
+        return ret;
+    }
+
+
+    /**
      * Determine whether the next token is the beginning of a propertyList(). 
      * A properties list is the comment "--derby-properties" followed by a 
      * dot-separated list, followed by an =, followed by a value all on that 
@@ -5221,7 +5258,7 @@ remainingNegatablePredicate(ValueNode leftOperand) throws StandardException :
     ValueNode escapeValue = null;
 }
 {
-    <DUMMY> tree = rowCtor()
+    <DUMMY> tree = rowCtor(0)
     {
         return tree;
     }
@@ -8218,7 +8255,7 @@ inPredicateValue(ValueNode leftOperand) throws StandardException :
         return retval;
     }
 |
-    retval = rowCtor()
+    retval = rowCtor(0)
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.IN_LIST_OPERATOR_NODE,
                                               leftOperand,
@@ -8258,7 +8295,7 @@ inElement(ValueNodeList inList) throws StandardException :
 
 
 ValueNode
-rowCtor() throws StandardException:
+rowCtor(int count) throws StandardException:
 {
     ValueNodeList list = (ValueNodeList)nodeFactory.getNode(NodeTypes.VALUE_NODE_LIST,
                                                             parserContext);
@@ -8266,7 +8303,7 @@ rowCtor() throws StandardException:
 {
     <LEFT_PAREN>
     getRow(list)
-    <RIGHT_PAREN>
+    discardRightParen(count) <RIGHT_PAREN>
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.ROW_CTOR_NODE,
                                               list,
@@ -8288,13 +8325,38 @@ getRow(ValueNodeList rowList) throws StandardException:
 }
 
 void
+discardLeftParen(int count) throws StandardException:
+{
+}
+{
+    LOOKAHEAD( {count > 0 && getToken(1).kind  == LEFT_PAREN} )
+    <LEFT_PAREN>
+    {
+        discardLeftParen(count - 1);
+    }
+}
+
+void
+discardRightParen(int count) throws StandardException:
+{
+}
+{
+    LOOKAHEAD( {count >= 0 && getToken(1).kind  == RIGHT_PAREN} )
+    <RIGHT_PAREN>
+    {
+        discardRightParen(count - 1);
+    }
+}
+
+void
 rowElement(ValueNodeList list) throws StandardException:
 {   
     ValueNode element = null;
+    int count[] = new int[]{0};
 }
 {
-    LOOKAHEAD( {getToken(1).kind == LEFT_PAREN} )
-    element = rowCtor()
+    LOOKAHEAD( {nestedTupplesFollow(count)} )
+    discardLeftParen(count[0] - 1) element = rowCtor(count[0] - 1) // discard (count -1)  parens
     {
         list.addValueNode(element);
     }
