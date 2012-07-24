@@ -34,7 +34,7 @@ public class RowConstructorNode extends ValueNode
     @Override
     public void init(Object list)
     {
-        this.list = (ValueNodeList)list;
+        this.list = (ValueNodeList)list;       
     }
 
     @Override

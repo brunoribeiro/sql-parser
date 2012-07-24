@@ -34,7 +34,7 @@ public class RowCtorTest
     @Test
     public void test() throws StandardException
     {
-        String st = "SELECT 2 DUMMY (((23)), (3, 4))";
+        String st = "SELECT 2 DUMMY (1, ((2)), (((3, 5), 6), (7)))";
         SQLParser parser = new SQLParser();
         StatementNode node = parser.parseStatement(st);
     }

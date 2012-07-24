@@ -547,9 +547,15 @@ class SQLGrammar
         return retval;
     }
 
+    /**
+     * Check that an opening parenthese AND Subquery are the next tokens.
+     * 
+     * Identical to subqueryFollows(), but the function can't be used
+     * because we don't want to discard the left paren before hand.
+     * 
+     */
     private boolean leftParenAndSubqueryFollows()
     {
-        boolean retval = false;
         int i = 1;
         if (getToken(i).kind != LEFT_PAREN)
             return false;
@@ -557,26 +563,25 @@ class SQLGrammar
         for( ; true; ++i)
         {
             int tokKind = getToken(i).kind;
-            if (tokKind == LEFT_PAREN) {
+            if (tokKind == LEFT_PAREN) 
+            {
                 // A subquery can start with an arbitrary number of left
                 // parentheses.
                 continue;
             }
-            else if (tokKind == SELECT || tokKind == VALUES) {
+            else if (tokKind == SELECT || tokKind == VALUES)
+            {
                 // If the first token we find after all the left parentheses
                 // is SELECT or VALUES, it's a subquery.
-                retval = true;
-                break;
+                return true;
             }
-            else {
+            else 
+            {
                 // If the first token we find after all the left parentheses
                 // is neither SELECT nor VALUES, it's not a subquery.
-                break;
+                return false;
             }
         }
-        
-        return retval;
-            
     }
 
     /**
@@ -688,42 +693,6 @@ class SQLGrammar
         }
 
         return retval;
-    }
-
-    /**
-     * Checking nested tupples.
-     * Identical to rowValueConstructorListFollows() except this keeps the count
-     * of parens for later use (that is, to discard un-needed parens)
-     * 
-     * 
-     */
-    private boolean nestedTupplesFollow(int count[])
-    {
-        boolean ret = false;
-        if (getToken(1).kind == LEFT_PAREN)
-        {
-            count[0] = 1; // saw one left paren so far
-            
-            for (int i = 2; true; ++i)
-            {
-                int toKind = getToken(i).kind;
-                
-                // only looks for COMMA
-                // 
-                if (toKind == COMMA)
-                    ret = true;
-                
-                if (toKind == EOF)
-                    break;
-
-                if (toKind == LEFT_PAREN)
-                    ++count[0];
-                else if (toKind == RIGHT_PAREN)
-                    break;
-              }
-        }   
-        
-        return ret;
     }
 
 
@@ -5258,7 +5227,7 @@ remainingNegatablePredicate(ValueNode leftOperand) throws StandardException :
     ValueNode escapeValue = null;
 }
 {
-    <DUMMY> tree = rowCtor(0)
+    <DUMMY> tree = rowCtor()
     {
         return tree;
     }
@@ -8246,7 +8215,6 @@ ValueNode
 inPredicateValue(ValueNode leftOperand) throws StandardException :
 {
     ValueNode retval;
-    int tokKind;
 }
 {
     LOOKAHEAD( {leftParenAndSubqueryFollows()} )
@@ -8255,7 +8223,7 @@ inPredicateValue(ValueNode leftOperand) throws StandardException :
         return retval;
     }
 |
-    retval = rowCtor(0)
+    retval = rowCtor()
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.IN_LIST_OPERATOR_NODE,
                                               leftOperand,
@@ -8295,7 +8263,7 @@ inElement(ValueNodeList inList) throws StandardException :
 
 
 ValueNode
-rowCtor(int count) throws StandardException:
+rowCtor() throws StandardException:
 {
     ValueNodeList list = (ValueNodeList)nodeFactory.getNode(NodeTypes.VALUE_NODE_LIST,
                                                             parserContext);
@@ -8303,7 +8271,7 @@ rowCtor(int count) throws StandardException:
 {
     <LEFT_PAREN>
     getRow(list)
-    discardRightParen(count) <RIGHT_PAREN>
+    <RIGHT_PAREN>
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.ROW_CTOR_NODE,
                                               list,
@@ -8325,38 +8293,14 @@ getRow(ValueNodeList rowList) throws StandardException:
 }
 
 void
-discardLeftParen(int count) throws StandardException:
-{
-}
-{
-    LOOKAHEAD( {count > 0 && getToken(1).kind  == LEFT_PAREN} )
-    <LEFT_PAREN>
-    {
-        discardLeftParen(count - 1);
-    }
-}
-
-void
-discardRightParen(int count) throws StandardException:
-{
-}
-{
-    LOOKAHEAD( {count >= 0 && getToken(1).kind  == RIGHT_PAREN} )
-    <RIGHT_PAREN>
-    {
-        discardRightParen(count - 1);
-    }
-}
-
-void
 rowElement(ValueNodeList list) throws StandardException:
 {   
     ValueNode element = null;
     int count[] = new int[]{0};
 }
 {
-    LOOKAHEAD( {nestedTupplesFollow(count)} )
-    discardLeftParen(count[0] - 1) element = rowCtor(count[0] - 1) // discard (count -1)  parens
+    LOOKAHEAD( {rowValueConstructorListFollows()} )
+    element = rowCtor()
     {
         list.addValueNode(element);
     }
