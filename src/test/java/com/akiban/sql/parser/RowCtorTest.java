@@ -37,6 +37,7 @@ public class RowCtorTest
     @Test
     public void regularCase() throws StandardException
     {
+        System.out.println("regularCase");
         // smoke test
         // make sure it didn't break things that are working
         doTest("SELECT 3 IN (4,5,6)");
@@ -47,35 +48,44 @@ public class RowCtorTest
     @Test
     public void columnTest() throws StandardException
     {
+        System.out.println("columnTest");
         doTest("SELECT (2, 3, 4) IN ((5, 6, 7), (8, 9, 10))");
     }
 
     @Test
     public void mistmatchColumnTest() throws StandardException
     {
+        System.out.println("mismatchColumn");
         // This should still pass
         // It's not the parser's job to check the number of columns
         // should be handle in InExpression
+        //
+        // Could add a field called 'depth' to RowConstructorNode
+        // so some checking could be done here
+        // (ie., the left list MUST be one level deeper than the right one)
         doTest("SELECT (2, 3, 4) IN (4, 5, 6)");
     }
 
     @Test
     public void nestedRows() throws StandardException
     {
+        System.out.println("nested rows");
         doTest("SELECT ((2, 3), (4, 5)) in ((4, 5), (5, 7))");
     }
-    
+
     @Test
     public void nonNestedRowsWithParens() throws StandardException
     {
-        doTest("SELECT (((2)), 3) in ((4, ((5))))");
+        System.out.println("non nested rows");
+        doTest("SELECT 1  in ((4, ((5))))");
     }
 
     static void doTest(String st) throws StandardException
     {
         SQLParser parser = new SQLParser();
         StatementNode node = parser.parseStatement(st);
+        
+        System.out.println("\n\n----------\n");
     }
 }
-
 
