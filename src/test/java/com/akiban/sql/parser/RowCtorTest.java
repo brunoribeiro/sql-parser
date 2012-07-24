@@ -57,7 +57,13 @@ public class RowCtorTest
 //    }
         
     @Test
-    public void columnTest() throws StandardException
+    public void testWithTables() throws StandardException
+    {
+        doTest(" select (c1, c2) in ((1, 3), (c3, c4)) from t");
+    }
+
+    @Test
+    public void matchingColumn() throws StandardException
     {
         doTest("SELECT (2, 3, 4) IN ((5, 6, 7), (8, (9, 10, 11)))");
     }
