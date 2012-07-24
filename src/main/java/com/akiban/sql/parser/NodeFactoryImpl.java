@@ -613,6 +613,9 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.LEFT_FN_NODE:
             return NodeNames.LEFT_RIGHT_FUNC_OPERATOR_NODE_NAME;
 
+        case NodeTypes.ROWS_RESULT_SET_NODE:
+            return NodeNames.ROWS_RESULT_SET_NODE_NAME;
+
         default:
             throw new StandardException("Not implemented");
         }
