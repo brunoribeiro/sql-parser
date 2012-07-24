@@ -285,6 +285,8 @@ public interface NodeNames
 
     static final String ROW_RESULT_SET_NODE_NAME = "com.akiban.sql.parser.RowResultSetNode";
 
+    static final String ROWS_RESULT_SET_NODE_NAME = "com.akiban.sql.parser.RowsResultSetNode";
+
     static final String SAVEPOINT_NODE_NAME = "com.akiban.sql.parser.SavepointNode";
 
     static final String SCROLL_INSENSITIVE_RESULT_SET_NODE_NAME = "com.akiban.sql.parser.ScrollInsensitiveResultSetNode";

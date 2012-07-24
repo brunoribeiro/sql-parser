@@ -50,7 +50,7 @@
 package com.akiban.sql.parser;
 
 /**
- * A RowResultSetNode represents the result set for a VALUES clause.
+ * A RowResultSetNode represents the result set for a single row VALUES clause.
  *
  */
 

@@ -557,7 +557,7 @@ class SQLGrammar
     private boolean leftParenAndSubqueryFollows()
     {
         int i = 1;
-        if (getToken(i).kind != LEFT_PAREN)
+        if (getToken(i++).kind != LEFT_PAREN)
             return false;
 
         for( ; true; ++i)
@@ -8073,65 +8073,46 @@ rowValueConstructor(ResultSetNode leftRSN) throws StandardException :
 {
     ResultColumnList resultColumns = (ResultColumnList)nodeFactory.getNode(NodeTypes.RESULT_COLUMN_LIST,
                                                                            parserContext);
-    ResultSetNode newRSN;
 }
 {
+(
     // This LOOKAHEAD is required because a rowValueConstructorList is
     // nested in parentheses, and each element of the list can also be
     // nested in an arbitrary number of parentheses.
     LOOKAHEAD( { rowValueConstructorListFollows() } )
     <LEFT_PAREN> rowValueConstructorList(resultColumns) <RIGHT_PAREN>
-    {
-        /* If leftRSN is null, simply return the newRSN, else generate and
-         * return a UNION ALL above the 2 RSNs, after verifying that the size()
-         * of both RSNs RCLs is the same.
-         */
-        newRSN = (ResultSetNode)nodeFactory.getNode(NodeTypes.ROW_RESULT_SET_NODE,
-                                                    resultColumns,
-                                                    null,
-                                                    parserContext);
-        if (leftRSN != null) {
-            if (leftRSN.getResultColumns().size() !=
-                newRSN.getResultColumns().size()) {
-                throw new StandardException("Row value size is different");
-            }
-
-            newRSN = (ResultSetNode)nodeFactory.getNode(NodeTypes.UNION_NODE,
-                                                        leftRSN,
-                                                        newRSN,
-                                                        Boolean.TRUE,
-                                                        Boolean.TRUE,
-                                                        null,
-                                                        parserContext);
-        }
-        return newRSN;
-    }
 |
     rowValueConstructorElement(resultColumns)
+)
     {
-        /* If leftRSN is null, simply return the newRSN, else generate and
-         * return a UNION ALL above the 2 RSNs, after verifying that the size()
-         * of both RSNs RCLs is the same.
-         */
-        newRSN = (ResultSetNode)nodeFactory.getNode(NodeTypes.ROW_RESULT_SET_NODE,
-                                                    resultColumns,
-                                                    null,
-                                                    parserContext);
-        if (leftRSN != null) {
-            if (leftRSN.getResultColumns().size() !=
-                newRSN.getResultColumns().size()) {
-                throw new StandardException("Row value size is different");
-            }
+        /* If leftRSN is null, simply return the newRSN.
+        * Else verify thst the number of columns is the same in both RSNs' RCLs.
+        * If leftRSN is already a list, add to it.
+        * Else make a new list with both.
+        */
+        RowResultSetNode newRSN = (RowResultSetNode)
+            nodeFactory.getNode(NodeTypes.ROW_RESULT_SET_NODE,
+                                resultColumns,
+                                null,
+                                parserContext);
+        if (leftRSN == null)
+            return newRSN;
 
-            newRSN = (ResultSetNode)nodeFactory.getNode(NodeTypes.UNION_NODE,
-                                                        leftRSN,
-                                                        newRSN,
-                                                        Boolean.TRUE,
-                                                        Boolean.TRUE,
-                                                        null,
-                                                        parserContext);
+        if (leftRSN.getResultColumns().size() !=
+            newRSN.getResultColumns().size()) {
+            throw new StandardException("Row value size is different");
         }
-        return newRSN;
+
+        RowsResultSetNode rows;
+        if (leftRSN instanceof RowsResultSetNode)
+            rows = (RowsResultSetNode)leftRSN;
+        else
+            rows = (RowsResultSetNode)
+                nodeFactory.getNode(NodeTypes.ROWS_RESULT_SET_NODE,
+                                    leftRSN,
+                                    parserContext);
+        rows.addRow(newRSN);
+        return rows;
     }
 }
 

@@ -117,6 +117,8 @@ public class NodeToString
             return virtualColumnNode((VirtualColumnNode)node);
         case NodeTypes.ROW_RESULT_SET_NODE:
             return rowResultSetNode((RowResultSetNode)node);
+        case NodeTypes.ROWS_RESULT_SET_NODE:
+            return rowsResultSetNode((RowsResultSetNode)node);
         case NodeTypes.GROUP_BY_COLUMN:
             return groupByColumn((GroupByColumn)node);
         case NodeTypes.ORDER_BY_COLUMN:
@@ -481,6 +483,21 @@ public class NodeToString
         return "VALUES(" + toString(node.getResultColumns()) + ")";
     }
 
+    protected String rowsResultSetNode(RowsResultSetNode node) throws StandardException {
+        StringBuilder str = new StringBuilder("VALUES");
+        boolean first = true;
+        for (RowResultSetNode row : node.getRows()) {
+            if (first)
+                first = false;
+            else
+                str.append(", ");
+            str.append("(");
+            str.append(toString(row.getResultColumns()));
+            str.append(")");
+        }
+        return str.toString();
+    }
+
     protected String resultColumnList(ResultColumnList node) throws StandardException {
         return nodeList(node);
     }
@@ -560,28 +577,8 @@ public class NodeToString
     }
 
     protected String unionNode(UnionNode node) throws StandardException {
-        ResultSetNode right = node.getRightResultSet();
-        chainedValues:
-        if (right instanceof RowResultSetNode) {
-            StringBuilder str = new StringBuilder();
-            while (true) {
-                str.insert(0, ")");
-                str.insert(0, toString(((RowResultSetNode)right).getResultColumns()));
-                str.insert(0, ", (");
-                ResultSetNode left = node.getLeftResultSet();
-                if (left instanceof RowResultSetNode) {
-                    str.insert(0, toString(left));
-                    return str.toString();
-                }
-                if (!(left instanceof UnionNode))
-                    break chainedValues;
-                node = (UnionNode)left;
-                right = node.getRightResultSet();
-                if (!(right instanceof RowResultSetNode))
-                    break chainedValues;
-            }
-        }
-        return toString(node.getLeftResultSet()) + " UNION " + toString(right);
+        return toString(node.getLeftResultSet()) + " UNION " + 
+               toString(node.getRightResultSet());
     }
 
     protected String tableName(TableName node) throws StandardException {

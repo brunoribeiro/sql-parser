@@ -616,6 +616,9 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.ROW_CTOR_NODE:
             return NodeNames.ROW_CTOR_NODE_NAME;
 
+        case NodeTypes.ROWS_RESULT_SET_NODE:
+            return NodeNames.ROWS_RESULT_SET_NODE_NAME;
+
         default:
             throw new StandardException("Not implemented");
         }

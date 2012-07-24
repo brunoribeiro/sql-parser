@@ -217,8 +217,9 @@ public interface NodeTypes
     public static final int INTERSECT_OR_EXCEPT_NODE = 157;
     public static final int LEFT_FN_NODE = 158;
     public static final int RIGHT_FN_NODE = 159;
-    public static final int ROW_CTOR_NODE = 160;
-    // 161 - 182 available
+    public static final int ROWS_RESULT_SET_NODE = 160;
+    public static final int ROW_CTOR_NODE = 161;
+    // 162 - 182 available
     public static final int ALTER_SERVER_NODE = 183;
     public static final int TIMESTAMP_ADD_FN_NODE = 184;
     public static final int TIMESTAMP_DIFF_FN_NODE = 185;
