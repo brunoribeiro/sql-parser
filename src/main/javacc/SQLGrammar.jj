@@ -1613,6 +1613,8 @@ class SQLGrammar
         case APPROXIMATE_NUMERIC:
         case TRUE:
         case FALSE:
+        case NULL:
+        case HEX_STRING:
             break;
         case DATE:
         case TIME:
