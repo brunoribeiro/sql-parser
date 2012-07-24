@@ -8284,16 +8284,15 @@ rowElement(ValueNodeList list) throws StandardException:
     ValueNode element = null;
 }
 {
-    LOOKAHEAD( {rowValueConstructorListFollows()} )
-    element = rowCtor()
+    (
+        (LOOKAHEAD( {rowValueConstructorListFollows()} ) element = rowCtor())
+     |   
+        element = additiveExpression()
+    )
     {
         list.addValueNode(element);
     }
-|   
-    element = additiveExpression()
-    {
-        list.addValueNode(element);
-    }
+
 }
 
 
