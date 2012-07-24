@@ -5211,8 +5211,8 @@ remainingNonNegatablePredicate(ValueNode leftOperand) throws StandardException :
         )
         |
         (
-            leftOperand = rowCtor()
-            |
+//            leftOperand = rowCtor()
+  //          |
             leftOperand = additiveExpression(leftOperand, operator)
         )
     )
@@ -8252,9 +8252,9 @@ rowCtor() throws StandardException:
 {
     ValueNodeList list = (ValueNodeList)nodeFactory.getNode(NodeTypes.VALUE_NODE_LIST,
                                                             parserContext);
+    ValueNode element = null;
 }
 {
-    LOOKAHEAD( {getToken(1).kind == LEFT_PAREN} )
     <LEFT_PAREN>
     getRow(list)
     <RIGHT_PAREN>
@@ -8264,12 +8264,6 @@ rowCtor() throws StandardException:
                                               parserContext);
         
     }
-/*
-|
-    {
-        return additiveExpression();
-    }
-*/
 }
 
 void

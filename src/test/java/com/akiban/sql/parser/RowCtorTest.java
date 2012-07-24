@@ -31,12 +31,51 @@ import org.junit.Test;
 
 public class RowCtorTest
 {
+    // no parexception means "pass"
+    
+
     @Test
-    public void test() throws StandardException
+    public void regularCase() throws StandardException
     {
-        String st = "SELECT (1, 2, 3) IN ((4,5,6), (7, 8,9))";
+        // smoke test
+        // make sure it didn't break things that are working
+        doTest("SELECT 3 IN (4,5,6)");
         
+        
+    }
+    
+    @Test
+    public void columnTest() throws StandardException
+    {
+        doTest("SELECT (2, 3, 4) IN ((5, 6, 7), (8, 9, 10))");
+    }
+
+    @Test
+    public void mistmatchColumnTest() throws StandardException
+    {
+        // This should still pass
+        // It's not the parser's job to check the number of columns
+        // should be handle in InExpression
+        doTest("SELECT (2, 3, 4) IN (4, 5, 6)");
+    }
+
+    @Test
+    public void nestedRows() throws StandardException
+    {
+        doTest("SELECT ((2, 3), (4, 5)) in ((4, 5), (5, 7))");
+    }
+    
+    @Test
+    public void nonNestedRowsWithParens() throws StandardException
+    {
+        doTest("SELECT (((2)), 3) in ((4, ((5))))");
+    }
+
+    static void doTest(String st) throws StandardException
+    {
         SQLParser parser = new SQLParser();
         StatementNode node = parser.parseStatement(st);
     }
 }
+
+

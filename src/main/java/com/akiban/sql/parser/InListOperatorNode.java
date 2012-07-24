@@ -62,7 +62,8 @@ public final class InListOperatorNode extends ValueNode
      * @param leftOperand The left operand of the node
      * @param rightOperandList The right operand list of the node
      */
-    public void init(Object leftOperand, Object rightOperandList)
+    @Override
+    public void init(Object leftOperand, Object rightOperandList) throws StandardException
     {
         init(leftOperand, rightOperandList, "IN", "in");
     }
@@ -79,10 +80,26 @@ public final class InListOperatorNode extends ValueNode
      * @param rightOperandList The right operand list of the node
      * @param operator String representation of operator
      */
+    @Override
     public void init(Object leftOperand, Object rightOperandList,
-                     Object operator, Object methodName)
+                     Object operator, Object methodName) throws StandardException
     {
-        this.leftOperand = (RowConstructorNode) leftOperand;
+        if (leftOperand instanceof RowConstructorNode)
+            this.leftOperand = (RowConstructorNode) leftOperand;
+        else
+        {
+            // if left operand is not a RowConstructorNode
+            // but soemthing else, wrap it in a one-element RowConstructorNode (1 column)
+            ValueNodeList list = (ValueNodeList)getNodeFactory().getNode(NodeTypes.VALUE_NODE_LIST,
+                                                                 getParserContext());
+            list.addValueNode((ValueNode)leftOperand);
+            
+            this.leftOperand = (RowConstructorNode)
+                                        getNodeFactory().getNode(NodeTypes.ROW_CTOR_NODE,
+                                                                 list,
+                                                                 getParserContext());
+            
+        }
         this.rightOperandList = (RowConstructorNode) rightOperandList;
         this.operator = (String) operator;
         this.methodName = (String) methodName;
