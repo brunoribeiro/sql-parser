@@ -8289,9 +8289,10 @@ rowElement(ValueNodeList list) throws StandardException:
     {
         list.addValueNode(element);
     }
-|
+|   
+    element = additiveExpression()
     {
-        inElement(list);
+        list.addValueNode(element);
     }
 }
 
