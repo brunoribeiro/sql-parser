@@ -5132,9 +5132,11 @@ predicate() throws StandardException :
 }
 {
 (
-    value = additiveExpression() 
+     value = rowCtor()
 |
-    value = existsExpression()
+     value = additiveExpression() 
+|
+     value = existsExpression()
 )
     (
         // This LOOKAHEAD is necessary because remainingPredicate() can
@@ -5209,6 +5211,8 @@ remainingNonNegatablePredicate(ValueNode leftOperand) throws StandardException :
         )
         |
         (
+            leftOperand = rowCtor()
+            |
             leftOperand = additiveExpression(leftOperand, operator)
         )
     )
@@ -8250,6 +8254,7 @@ rowCtor() throws StandardException:
                                                             parserContext);
 }
 {
+    LOOKAHEAD( {getToken(1).kind == LEFT_PAREN} )
     <LEFT_PAREN>
     getRow(list)
     <RIGHT_PAREN>
@@ -8259,6 +8264,12 @@ rowCtor() throws StandardException:
                                               parserContext);
         
     }
+/*
+|
+    {
+        return additiveExpression();
+    }
+*/
 }
 
 void

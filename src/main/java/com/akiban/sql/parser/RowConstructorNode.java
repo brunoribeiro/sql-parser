@@ -29,12 +29,12 @@ import com.akiban.sql.StandardException;
 
 public class RowConstructorNode extends ValueNode
 {
-    public ValueNodeList list;
+    private ValueNodeList list;
 
     @Override
     public void init(Object list)
     {
-        this.list = (ValueNodeList)list;       
+        this.list = (ValueNodeList)list;
     }
 
     @Override

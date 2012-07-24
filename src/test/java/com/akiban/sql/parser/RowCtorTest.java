@@ -34,7 +34,8 @@ public class RowCtorTest
     @Test
     public void test() throws StandardException
     {
-        String st = "SELECT 2 DUMMY (1, ((2)), (((3, 5), 6), (7)))";
+        String st = "SELECT (1, 2, 3) IN ((4,5,6), (7, 8,9))";
+        
         SQLParser parser = new SQLParser();
         StatementNode node = parser.parseStatement(st);
     }
