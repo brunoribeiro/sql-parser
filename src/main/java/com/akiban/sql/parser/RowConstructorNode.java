@@ -46,7 +46,7 @@ public class RowConstructorNode extends ValueNode
     @Override
     public String toString()
     {
-        return "{List contains: " + list.getList() + ", size: " + list.size() + "}";
+        return "{List contains: \n" + list.getList() + "\n, size: " + list.size() + "}";
     }
     
     public ValueNodeList getNodeList()

@@ -5132,6 +5132,7 @@ predicate() throws StandardException :
 }
 {
 (
+     LOOKAHEAD( {rowValueConstructorListFollows()} )
      value = rowCtor()
 |
      value = additiveExpression() 
@@ -8252,7 +8253,6 @@ rowCtor() throws StandardException:
 {
     ValueNodeList list = (ValueNodeList)nodeFactory.getNode(NodeTypes.VALUE_NODE_LIST,
                                                             parserContext);
-    ValueNode element = null;
 }
 {
     <LEFT_PAREN>
@@ -8282,7 +8282,6 @@ void
 rowElement(ValueNodeList list) throws StandardException:
 {   
     ValueNode element = null;
-    int count[] = new int[]{0};
 }
 {
     LOOKAHEAD( {rowValueConstructorListFollows()} )
