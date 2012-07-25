@@ -37,10 +37,19 @@ public class RowConstructorNode extends ValueNode
         this.list = (ValueNodeList)list;
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
-    protected boolean isEquivalent(ValueNode other) throws StandardException
+    protected boolean isEquivalent(ValueNode o) throws StandardException
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (!isSameNodeType(o))
+        {
+            return false;
+        }
+        
+        RowConstructorNode other = (RowConstructorNode)o;
+        return this.list.isEquivalent(other.list);
     }
 
     @Override

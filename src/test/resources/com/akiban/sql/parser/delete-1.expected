@@ -19,25 +19,24 @@ resultSet:
 		methodName: in
 		type: null
 		leftOperand: 			
-			com.akiban.sql.parser.ColumnReference@2e958bb8
-			columnName: x
+			com.akiban.sql.parser.RowConstructorNode@2e558004
+			{List contains: 
+			[columnName: x
 			tableName: null
 			type: null
+			]
+			, size: 1}
 		rightOperandList: 			
-			com.akiban.sql.parser.ValueNodeList@5c07f4ec
-
-			[0]:			
-			com.akiban.sql.parser.NumericConstantNode@e60e128
-			value: 1
+			com.akiban.sql.parser.RowConstructorNode@6f479e5f
+			{List contains: 
+			[value: 1
 			type: INTEGER NOT NULL
-			[1]:			
-			com.akiban.sql.parser.NumericConstantNode@7a5e1077
-			value: 2
+			, value: 2
 			type: INTEGER NOT NULL
-			[2]:			
-			com.akiban.sql.parser.NumericConstantNode@358b3364
-			value: 3
+			, value: 3
 			type: INTEGER NOT NULL
+			]
+			, size: 3}
 targetTableName: 	
 	com.akiban.sql.parser.TableName@54
 	t
