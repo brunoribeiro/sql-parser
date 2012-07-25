@@ -3083,7 +3083,7 @@ deleteBody() throws StandardException :
 |
     <FROM> tableName = qualifiedName() 
     [ 
-        LOOKAHEAD( { (getToken(1).kind != EOF) && (getToken(1).kind != WHERE) && 
+        LOOKAHEAD( { (getToken(1).kind != EOF) && (getToken(1).kind != SEMICOLON) && (getToken(1).kind != WHERE) && 
                                      !derbyPropertiesListFollows() } )
         [ <AS> ] correlationName = identifier() 
     ]
