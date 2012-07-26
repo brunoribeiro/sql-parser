@@ -68,6 +68,11 @@ public class NextSequenceNode extends ValueNode
         this.sequenceName = (TableName)sequenceName;
     }
 
+    public TableName getSequenceName () {
+        return sequenceName;
+    }
+    
+    
     /**
      * Fill this node with a deep copy of the given node.
      */
@@ -95,4 +100,5 @@ public class NextSequenceNode extends ValueNode
         return false;
     }
 
+    
 }
