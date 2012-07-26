@@ -97,6 +97,8 @@ public class TypeComputer implements Visitor
         case NodeTypes.IS_NULL_NODE:
         case NodeTypes.IS_NOT_NULL_NODE:
             return new DataTypeDescriptor(TypeId.BOOLEAN_ID, false);
+        case NodeTypes.NEXT_SEQUENCE_NODE:
+            return new DataTypeDescriptor(TypeId.BIGINT_ID, false);
         default:
             // assert false;
             return null;
