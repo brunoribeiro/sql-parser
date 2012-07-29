@@ -37,8 +37,6 @@ package com.akiban.sql.parser;
 
 import com.akiban.sql.StandardException;
 
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -52,10 +50,8 @@ public class SQLParser implements SQLParserContext {
     private boolean returnParameterFlag;
     private Map printedObjectsMap;
     private int generatedColumnNameIndex;
-    
-    static final int LARGE_TOKEN_SIZE = 128;
 
-    private UCode_CharStream charStream = null;
+    private StringCharStream charStream = null;
     private SQLGrammarTokenManager tokenManager = null;
     private SQLGrammar parser = null;
 
@@ -193,12 +189,11 @@ public class SQLParser implements SQLParserContext {
 
     protected void reinit(String sqlText) throws StandardException {
         this.sqlText = sqlText;
-        Reader reader = new StringReader(sqlText);
         if (charStream == null) {
-            charStream = new UCode_CharStream(reader, 1, 1, LARGE_TOKEN_SIZE);
+            charStream = new StringCharStream(sqlText);
         }
         else {
-            charStream.ReInit(reader, 1, 1, LARGE_TOKEN_SIZE);
+            charStream.ReInit(sqlText);
         }
         if (tokenManager == null) {
             tokenManager = new SQLGrammarTokenManager(null, charStream);
