@@ -134,7 +134,7 @@ public class StringCharStream implements CharStream
     }
     @Override
     public int getEndColumn() {
-        return endColumn;       // Want inclusive.
+        return endColumn;
     }
 
     @Override
