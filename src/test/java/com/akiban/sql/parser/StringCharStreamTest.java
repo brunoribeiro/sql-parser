@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static junit.framework.Assert.*;
 
+import java.util.BitSet;
 import java.io.IOException;
 import java.io.StringReader;
 
@@ -75,6 +76,22 @@ public class StringCharStreamTest
         }
     }
 
+    @Test
+    public void testBackup() {
+        BitSet ns = new BitSet(STRING.length());
+        ns.set(0);
+        while (true) {
+            while (true) {
+                char c = read();
+                if (c == EOF) break;
+            }
+            int i = ns.nextClearBit(0);
+            if (i >= STRING.length()) break;
+            ns.set(i);
+            backup(i);
+        }
+    }
+
     protected char beginToken() {
         char c1, c2;
         try {
@@ -111,6 +128,12 @@ public class StringCharStreamTest
         assertEquals("readChar", c1, c2);
         compare();
         return c1;
+    }
+
+    protected void backup(int amount) {
+        s1.backup(amount);
+        s2.backup(amount);
+        compare();
     }
 
     protected void compare() {
