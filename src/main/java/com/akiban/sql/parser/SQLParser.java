@@ -55,7 +55,7 @@ public class SQLParser implements SQLParserContext {
     
     static final int LARGE_TOKEN_SIZE = 128;
 
-    private CharStream charStream = null;
+    private UCode_CharStream charStream = null;
     private SQLGrammarTokenManager tokenManager = null;
     private SQLGrammar parser = null;
 

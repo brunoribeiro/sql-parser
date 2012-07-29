@@ -156,23 +156,4 @@ public class StringCharStream implements CharStream
     public void Done() {
     }
 
-    @Override
-    public void ReInit(java.io.Reader dstream, int startline, int startcolumn, int buffersize) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void ReInit(java.io.Reader dstream, int startline, int startcolumn) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void ReInit(java.io.InputStream dstream, int startline, int startcolumn, int buffersize) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void ReInit(java.io.InputStream dstream, int startline, int startcolumn) {
-        throw new UnsupportedOperationException();
-    }
 }
