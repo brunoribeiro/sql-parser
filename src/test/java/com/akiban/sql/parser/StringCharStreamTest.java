@@ -65,7 +65,15 @@ public class StringCharStreamTest
     }
 
     @Test
-    public void testBeginToken() {
+    public void testBeginTokenAll() {
+        while (true) {
+            char c = beginToken();
+            if (c == EOF) break;
+        }
+    }
+
+    @Test
+    public void testBeginTokenSome() {
         char c = ' ';
         while (true) {
             if (" \t\r\n".indexOf(c) < 0)

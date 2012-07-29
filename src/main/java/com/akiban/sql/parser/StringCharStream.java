@@ -60,10 +60,24 @@ public class StringCharStream implements CharStream
     
     @Override
     public char BeginToken() throws java.io.IOException {
+        // TODO: This replicates a bug in the old stream: if EOF occurs on BeginToken(),
+        // getBeginColumn() will be the last real character on the last line. The error
+        // message actually looks better if it points after that to the end of the line.
+        // A more straightforward implementation that avoids that is:
+        /*
         beginIndex = currentIndex;
         beginLine = currentLine;
         beginColumn = currentColumn;
         return readChar();
+        */
+        if (currentIndex >= string.length())
+            throw EOF;
+
+        beginIndex = currentIndex;
+        char ch = advance();
+        beginLine = endLine;
+        beginColumn = endColumn;
+        return ch;
     }
 
     @Override
