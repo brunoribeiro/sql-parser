@@ -92,16 +92,18 @@ public class StringCharStream implements CharStream
         switch (ch) {
         case '\r':
             if ((currentIndex < string.length()) &&
-                (string.charAt(currentIndex) == '\n'))
+                (string.charAt(currentIndex) == '\n')) {
+                currentColumn++;
                 break;
+            }
             /* else falls through (bare CR) */
         case '\n':
             currentLine++;
             currentColumn = 1;
             break;
         case '\t':
-            currentColumn--;
-            currentColumn += (8 - (currentColumn & 7));
+            endColumn += (8 - (endColumn & 7));
+            currentColumn = endColumn + 1;
             break;
         default:
             currentColumn++;

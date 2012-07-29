@@ -40,7 +40,7 @@ public class StringCharStreamTest
     // Simplest test is comparing against existing JavaCC-inspired implementation.
 
     private CharStream s1, s2;
-    private static final String STRING = "abc xyz\n1\t2\t3\r\nxxx   yyy";
+    private static final String STRING = "abc xyz\n1\t2\t3\r\nxxx   yyy\rz";
     private static final char EOF = (char)0;
 
     @Before
@@ -63,6 +63,37 @@ public class StringCharStreamTest
         }
     }
 
+    @Test
+    public void testBeginToken() {
+        char c = ' ';
+        while (true) {
+            if (" \t\r\n".indexOf(c) < 0)
+                c = read();
+            else
+                c = beginToken();
+            if (c == EOF) break;
+        }
+    }
+
+    protected char beginToken() {
+        char c1, c2;
+        try {
+            c1 = s1.BeginToken();
+        }
+        catch (IOException ex) {
+            c1 = EOF;
+        }
+        try {
+            c2 = s2.BeginToken();
+        }
+        catch (IOException ex) {
+            c2 = EOF;
+        }
+        assertEquals("BeginToken", c1, c2);
+        compare();
+        return c1;
+    }
+
     protected char read() {
         char c1, c2;
         try {
@@ -78,22 +109,24 @@ public class StringCharStreamTest
             c2 = EOF;
         }
         assertEquals("readChar", c1, c2);
+        compare();
         return c1;
     }
 
     protected void compare() {
-        assertEquals("getColumn", s1.getColumn(), s2.getColumn());
-        assertEquals("getLine", s1.getLine(), s2.getLine());
-        assertEquals("getEndColumn", s1.getEndColumn(), s2.getEndColumn());
-        assertEquals("getEndLine", s1.getEndLine(), s2.getEndLine());
-        assertEquals("getBeginColumn", s1.getBeginColumn(), s2.getBeginColumn());
-        assertEquals("getBeginLine", s1.getBeginLine(), s2.getBeginLine());
-        assertEquals("GetImage", s1.GetImage(), s2.GetImage());
-        assertEquals("getBeginOffset", s1.getBeginOffset(), s2.getBeginOffset());
-        assertEquals("getEndOffset", s1.getEndOffset(), s2.getEndOffset());
-        int max = s1.getEndOffset() - s1.getBeginOffset() + 1;
-        for (int i = 0; i < max; i++)
-            assertEquals("GetSuffix("+i+")", new String(s1.GetSuffix(i)), new String(s2.GetSuffix(i)));
+        int offset = s1.getEndOffset();
+        assertEquals("getBeginOffset["+offset+"]", s1.getBeginOffset(), s2.getBeginOffset());
+        assertEquals("getEndOffset["+offset+"]", s1.getEndOffset(), s2.getEndOffset());
+        assertEquals("getColumn["+offset+"]", s1.getColumn(), s2.getColumn());
+        assertEquals("getLine["+offset+"]", s1.getLine(), s2.getLine());
+        assertEquals("getBeginColumn["+offset+"]", s1.getBeginColumn(), s2.getBeginColumn());
+        assertEquals("getBeginLine["+offset+"]", s1.getBeginLine(), s2.getBeginLine());
+        assertEquals("getEndColumn["+offset+"]", s1.getEndColumn(), s2.getEndColumn());
+        assertEquals("getEndLine["+offset+"]", s1.getEndLine(), s2.getEndLine());
+        assertEquals("GetImage["+offset+"]", s1.GetImage(), s2.GetImage());
+        int size = offset - s1.getBeginOffset() + 1;
+        for (int i = 0; i < size; i++)
+            assertEquals("GetSuffix["+offset+"]("+i+")", new String(s1.GetSuffix(i)), new String(s2.GetSuffix(i)));
     }
 
 }
