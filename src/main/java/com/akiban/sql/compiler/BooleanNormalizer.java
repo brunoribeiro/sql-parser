@@ -303,7 +303,6 @@ public class BooleanNormalizer implements Visitor
             }
             break;
         case NodeTypes.IN_LIST_OPERATOR_NODE:
-            javax.swing.JOptionPane.showMessageDialog(null, "in Boolean normaliser");
             InListOperatorNode inListOperatorNode = (InListOperatorNode)node;
                 RowConstructorNode leftOperandList = inListOperatorNode.getLeftOperand();
                 RowConstructorNode rightOperandList = inListOperatorNode.getRightOperandList();
