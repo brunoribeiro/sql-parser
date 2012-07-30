@@ -303,13 +303,13 @@ public class BooleanNormalizer implements Visitor
             }
             break;
         case NodeTypes.IN_LIST_OPERATOR_NODE:
-            if (underNotNode) {
-                InListOperatorNode inListOperatorNode = (InListOperatorNode)node;
-                RowConstructorNode leftOperand = inListOperatorNode.getLeftOperand();
+            javax.swing.JOptionPane.showMessageDialog(null, "in Boolean normaliser");
+            InListOperatorNode inListOperatorNode = (InListOperatorNode)node;
+                RowConstructorNode leftOperandList = inListOperatorNode.getLeftOperand();
                 RowConstructorNode rightOperandList = inListOperatorNode.getRightOperandList();
-                
+            if (underNotNode) {
                 // regular cases
-                if (leftOperand.getNodeList().size() == 1) 
+                if (leftOperandList.getNodeList().size() == 1) 
                 {
                     /* We want to convert the IN List into = OR = ... as * described below. */
                     /* Convert:
@@ -321,12 +321,13 @@ public class BooleanNormalizer implements Visitor
                      * for <>.
                      */
                     ValueNode result = null;
+                    ValueNode leftOperand = leftOperandList.getNodeList().get(0);
                     for (ValueNode rightOperand : rightOperandList.getNodeList()) {
                         if (rightOperand instanceof RowConstructorNode)
                             throw new IllegalArgumentException("Operand should have 1 column");
                         BinaryComparisonOperatorNode rightBCO = (BinaryComparisonOperatorNode)
                             nodeFactory.getNode(NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE,
-                                                leftOperand.getNodeList().get(0), rightOperand,
+                                                leftOperand, rightOperand,
                                                 parserContext);
                         if (result == null)
                             result = rightBCO;
@@ -341,8 +342,18 @@ public class BooleanNormalizer implements Visitor
                     return result;
                 }
                 else
-                    throw new UnsupportedOperationException("nested tuple not supported yet");
+                {
+                    ValueNode result = inWithNestedTuples(inListOperatorNode);
+                    return (ValueNode)nodeFactory.getNode(NodeTypes.NOT_NODE, 
+                                                          result,
+                                                          parserContext);
+                }
             }
+            else if (leftOperandList.listSize() != 1)
+            {
+                return inWithNestedTuples(inListOperatorNode);
+            }
+
             break;
         case NodeTypes.SUBQUERY_NODE:
             if (underNotNode) {
@@ -436,6 +447,74 @@ public class BooleanNormalizer implements Visitor
         return node;
     }
 
+    protected ValueNode getEqual(ValueNode left, ValueNode right) throws StandardException
+    {
+        if (left instanceof RowConstructorNode)
+        {
+            if (right instanceof RowConstructorNode)
+            {
+                ValueNodeList leftList = ((RowConstructorNode)left).getNodeList();
+                ValueNodeList rightList = ((RowConstructorNode)right).getNodeList();
+                
+                if (leftList.size() != rightList.size())
+                    throw new IllegalArgumentException("Mismatched column count in IN's operand, left: " 
+                                                       + leftList.size() + ", right: " + rightList.size());
+
+                ValueNode result = null;
+                for (int n = 0; n < leftList.size(); ++n)
+                {
+                    ValueNode equalNode = getEqual(leftList.get(n), rightList.get(n));
+                    
+                    if (result == null)
+                        result = equalNode;
+                    else
+                    {
+                        AndNode andNode = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
+                                                                       result, equalNode,
+                                                                       parserContext);
+                        result = andNode;
+                    }
+                }
+                return result;
+            }
+            else
+                throw new IllegalArgumentException("Mismatched column count in IN's operand");
+        }
+        else
+        {
+            if (right instanceof RowConstructorNode)
+                throw new IllegalArgumentException("Mismatched column count in IN's operands");
+           
+            return (ValueNode) nodeFactory.getNode(NodeTypes.BINARY_EQUALS_OPERATOR_NODE,
+                                                   left, right,
+                                                   parserContext);
+        }
+    }
+    protected ValueNode inWithNestedTuples(InListOperatorNode node) throws StandardException
+    {
+        RowConstructorNode leftList = node.getLeftOperand();
+        RowConstructorNode rightList = node.getRightOperandList();
+        
+        ValueNode result = null;
+        
+        for (ValueNode rightNode : rightList.getNodeList())
+        {
+            ValueNode equalNode = getEqual(leftList, rightNode);
+            
+            if (result == null)
+                result = equalNode;
+            else
+            {
+                OrNode orNode = (OrNode)nodeFactory.getNode(NodeTypes.OR_NODE,
+                                                            equalNode, result,
+                                                            parserContext);
+                result = orNode;
+            }
+        }
+
+        return result;                
+    }
+    
     protected ValueNode castToBoolean(ValueNode node) throws StandardException {
         if ((node.getType() == null) ||
             (node.getType().getTypeId().isBooleanTypeId()))

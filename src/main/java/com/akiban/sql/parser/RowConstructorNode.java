@@ -62,4 +62,9 @@ public class RowConstructorNode extends ValueNode
     {
         return list;
     }
+    
+    public int listSize()
+    {
+        return list.size();
+    }
 }

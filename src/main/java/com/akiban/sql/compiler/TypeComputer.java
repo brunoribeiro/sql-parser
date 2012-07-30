@@ -97,6 +97,8 @@ public class TypeComputer implements Visitor
         case NodeTypes.IS_NULL_NODE:
         case NodeTypes.IS_NOT_NULL_NODE:
             return new DataTypeDescriptor(TypeId.BOOLEAN_ID, false);
+        case NodeTypes.NEXT_SEQUENCE_NODE:
+            return new DataTypeDescriptor(TypeId.BIGINT_ID, false);
         default:
             // assert false;
             return null;
@@ -430,7 +432,11 @@ public class TypeComputer implements Visitor
             return new DataTypeDescriptor(TypeId.BOOLEAN_ID, nullableResult);
         }
         else
-            throw new UnsupportedOperationException("Nested tuples not supported yet");
+        {
+            //throw new UnsupportedOperationException("Nested tuples not supported yet");
+            // TODO:
+            return new DataTypeDescriptor(TypeId.BOOLEAN_ID, true);
+        }
     }
 
     protected DataTypeDescriptor subqueryNode(SubqueryNode node) throws StandardException {
