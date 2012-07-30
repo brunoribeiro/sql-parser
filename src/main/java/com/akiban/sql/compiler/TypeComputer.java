@@ -405,27 +405,32 @@ public class TypeComputer implements Visitor
     }
 
     protected DataTypeDescriptor inListOperatorNode(InListOperatorNode node) throws StandardException {
-        ValueNode leftOperand = node.getLeftOperand();
-        DataTypeDescriptor leftType = leftOperand.getType();
-        if (leftType == null)
-            return null;
-
-        boolean nullableResult = leftType.isNullable();
+        RowConstructorNode leftOperand = node.getLeftOperand();
         
-        for (ValueNode rightOperand : node.getRightOperandList().getNodeList()) {
-            DataTypeDescriptor rightType;
-            if (isParameterOrUntypedNull(rightOperand)) {
-                rightType = leftType.getNullabilityType(true);
-                rightOperand.setType(rightType);
-            }
-            else {
-                rightType = rightOperand.getType();
-            }
-            if ((rightType == null) || rightType.isNullable())
-                nullableResult = true;
-        }
+        if (leftOperand.getNodeList().size() == 1)
+        {
+            DataTypeDescriptor leftType = leftOperand.getNodeList().get(0).getType();
+            if (leftType == null)
+                return null;
 
-        return new DataTypeDescriptor(TypeId.BOOLEAN_ID, nullableResult);
+            boolean nullableResult = leftType.isNullable();
+
+            for (ValueNode rightOperand : node.getRightOperandList().getNodeList()) {
+                DataTypeDescriptor rightType;
+                if (isParameterOrUntypedNull(rightOperand)) {
+                    rightType = leftType.getNullabilityType(true);
+                    rightOperand.setType(rightType);
+                }
+                else {
+                    rightType = rightOperand.getType();
+                }
+                if ((rightType == null) || rightType.isNullable())
+                    nullableResult = true;
+            }
+            return new DataTypeDescriptor(TypeId.BOOLEAN_ID, nullableResult);
+        }
+        else
+            throw new UnsupportedOperationException("Nested tuples not supported yet");
     }
 
     protected DataTypeDescriptor subqueryNode(SubqueryNode node) throws StandardException {

@@ -307,32 +307,41 @@ public class BooleanNormalizer implements Visitor
                 InListOperatorNode inListOperatorNode = (InListOperatorNode)node;
                 RowConstructorNode leftOperand = inListOperatorNode.getLeftOperand();
                 RowConstructorNode rightOperandList = inListOperatorNode.getRightOperandList();
-                /* We want to convert the IN List into = OR = ... as * described below. */
-                /* Convert:
-                 *      leftO IN rightOList.elementAt(0) , rightOList.elementAt(1) ...
-                 * to:
-                 *      leftO <> rightOList.elementAt(0) AND leftO <> rightOList.elementAt(1) ...
-                 * NOTE - We do the conversion here since the single table clauses
-                 * can be pushed down and the optimizer may eventually have a filter factor
-                 * for <>.
-                 */
-                ValueNode result = null;
-                for (ValueNode rightOperand : rightOperandList.getNodeList()) {
-                    BinaryComparisonOperatorNode rightBCO = (BinaryComparisonOperatorNode)
-                        nodeFactory.getNode(NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE,
-                                            leftOperand, rightOperand,
-                                            parserContext);
-                    if (result == null)
-                        result = rightBCO;
-                    else {
-                        AndNode andNode = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
-                                                                       result, rightBCO,
-                                                                       parserContext);
-                        result = andNode;
+                
+                // regular cases
+                if (leftOperand.getNodeList().size() == 1) 
+                {
+                    /* We want to convert the IN List into = OR = ... as * described below. */
+                    /* Convert:
+                     *      leftO IN rightOList.elementAt(0) , rightOList.elementAt(1) ...
+                     * to:
+                     *      leftO <> rightOList.elementAt(0) AND leftO <> rightOList.elementAt(1) ...
+                     * NOTE - We do the conversion here since the single table clauses
+                     * can be pushed down and the optimizer may eventually have a filter factor
+                     * for <>.
+                     */
+                    ValueNode result = null;
+                    for (ValueNode rightOperand : rightOperandList.getNodeList()) {
+                        if (rightOperand instanceof RowConstructorNode)
+                            throw new IllegalArgumentException("Operand should have 1 column");
+                        BinaryComparisonOperatorNode rightBCO = (BinaryComparisonOperatorNode)
+                            nodeFactory.getNode(NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE,
+                                                leftOperand.getNodeList().get(0), rightOperand,
+                                                parserContext);
+                        if (result == null)
+                            result = rightBCO;
+                        else {
+                            AndNode andNode = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
+                                                                           result, rightBCO,
+                                                                           parserContext);
+                            result = andNode;
+                        }
                     }
+                    // TODO: Work out types.
+                    return result;
                 }
-                // TODO: Work out types.
-                return result;
+                else
+                    throw new UnsupportedOperationException("nested tuple not supported yet");
             }
             break;
         case NodeTypes.SUBQUERY_NODE:
