@@ -54,7 +54,7 @@ import com.akiban.sql.StandardException;
 import java.util.Properties;
 
 /**
- * A ConstraintDefintionNode is a class for all nodes that can represent
+ * A ConstraintDefinitionNode is a class for all nodes that can represent
  * constraint definitions.
  *
  */
@@ -155,6 +155,20 @@ public class ConstraintDefinitionNode extends TableElementNode
         return constraintType;
     }
 
+    /**
+     * Get the verify constraint type. Clarifies DROP actions.
+     *
+     * @return verify The verify constraint type.
+     */
+    public ConstraintType getVerifyType() {
+        return verifyType;
+    }
+
+    /**
+     * Get the column list
+     *
+     * @return columnList The column list.
+     */
     public ResultColumnList getColumnList() {
         return columnList;
     }
@@ -191,7 +205,8 @@ public class ConstraintDefinitionNode extends TableElementNode
         return "constraintName: " + 
             ( ( constraintName != null) ?
               constraintName.toString() : "null" ) + "\n" +
-            "constraintType: " + constraintType + "\n" + 
+            "constraintType: " + constraintType + "\n" +
+            (constraintType == ConstraintType.DROP ? "verifyType: " + verifyType + "\n" : "") +
             "properties: " +
             ((properties != null) ? properties.toString() : "null") + "\n" +
             super.toString();

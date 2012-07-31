@@ -12168,6 +12168,7 @@ referentialConstraintDefinition(TableName constraintName) throws StandardExcepti
     Token grouping = null;
 }
 {
+    // NB: GROUPING case must be kept in sync with alterGroup()
     [ LOOKAHEAD ( { groupConstructFollows(GROUPING) } )
       grouping = <GROUPING> ]
     <FOREIGN> <KEY> <LEFT_PAREN> columnNameList(fkRcl) <RIGHT_PAREN>
@@ -12456,7 +12457,8 @@ alterGroup() throws StandardException :
     <TO> parentTable = qualifiedName()
     [<LEFT_PAREN> parentColumns = tableColumnList() <RIGHT_PAREN>]
     {
-        // this is the same as
+        // NB: Must be kept in sync with referentialConstraintDefinition()
+        // Equivalent to this statement:
         // ALTER TABLE <child schema table name>
         //      ADD GROUPING FOREIGN KEY ( <column name> [ , ... n ] )
         //          REFERENCES <parent schema table name> [ ( <column name> [ , ... n ] ) ]
@@ -12482,20 +12484,17 @@ alterGroup() throws StandardException :
 |
     <DROP> <TABLE> childTable = qualifiedName()
     {
-        // This is the same as 
+        // NB: Must be kept in sync with dropTableConstraintDefinition()
+        // Equivalent to this statement:
         // ALTER TABLE <leaf schema table name> DROP GROUPING FOREIGN KEY
 
         tableElementList.addTableElement((TableElementNode)
-            nodeFactory.getNode(NodeTypes.CONSTRAINT_DEFINITION_NODE,
-                                 null,
-                                 ConstraintDefinitionNode.ConstraintType.DROP,
-                                 null,
-                                 null,
-                                 null,
-                                 null,
-                                 StatementType.DROP_DEFAULT,
-                                 ConstraintDefinitionNode.ConstraintType.FOREIGN_KEY,
-                                 parserContext));
+            nodeFactory.getNode(NodeTypes.FK_CONSTRAINT_DEFINITION_NODE,
+                                null,
+                                ConstraintDefinitionNode.ConstraintType.DROP,
+                                StatementType.DROP_DEFAULT,
+                                Boolean.TRUE,
+                                parserContext));
 
          return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_TABLE_NODE,
                                                    childTable,
@@ -12949,6 +12948,7 @@ TableElementNode
 dropTableConstraintDefinition() throws StandardException :
 {
     TableName constraintName = null;
+    Token grouping = null;
 }
 {
     LOOKAHEAD( { getToken(1).kind == CONSTRAINT } )
@@ -12976,22 +12976,20 @@ dropTableConstraintDefinition() throws StandardException :
                                                      null,
                                                      null,
                                                      StatementType.DROP_DEFAULT,
+                                                     ConstraintDefinitionNode.ConstraintType.PRIMARY_KEY,
                                                      parserContext);
     }
 |
+    // NB: GROUPING case needs to be kept in sync with alterGroup()!
     LOOKAHEAD( { (getToken(1).kind == FOREIGN) || 
                  (groupConstructFollows(GROUPING) && (getToken(2).kind == FOREIGN)) } )
-    [ <GROUPING> ] <FOREIGN> <KEY> [ constraintName = qualifiedName() ]
+    [ grouping = <GROUPING> ] <FOREIGN> <KEY> [ constraintName = qualifiedName() ]
     {
-        return (TableElementNode)nodeFactory.getNode(NodeTypes.CONSTRAINT_DEFINITION_NODE,
+        return (TableElementNode)nodeFactory.getNode(NodeTypes.FK_CONSTRAINT_DEFINITION_NODE,
                                                      constraintName,
                                                      ConstraintDefinitionNode.ConstraintType.DROP,
-                                                     null,
-                                                     null,
-                                                     null,
-                                                     null,
                                                      StatementType.DROP_DEFAULT,
-                                                     ConstraintDefinitionNode.ConstraintType.FOREIGN_KEY,
+                                                     (grouping == null) ? Boolean.FALSE : Boolean.TRUE,
                                                      parserContext);
     }
 |
