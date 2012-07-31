@@ -12949,6 +12949,7 @@ TableElementNode
 dropTableConstraintDefinition() throws StandardException :
 {
     TableName constraintName = null;
+    Token grouping = null;
 }
 {
     LOOKAHEAD( { getToken(1).kind == CONSTRAINT } )
@@ -12982,17 +12983,13 @@ dropTableConstraintDefinition() throws StandardException :
 |
     LOOKAHEAD( { (getToken(1).kind == FOREIGN) || 
                  (groupConstructFollows(GROUPING) && (getToken(2).kind == FOREIGN)) } )
-    [ <GROUPING> ] <FOREIGN> <KEY> [ constraintName = qualifiedName() ]
+    [ grouping = <GROUPING> ] <FOREIGN> <KEY> [ constraintName = qualifiedName() ]
     {
-        return (TableElementNode)nodeFactory.getNode(NodeTypes.CONSTRAINT_DEFINITION_NODE,
+        return (TableElementNode)nodeFactory.getNode(NodeTypes.FK_CONSTRAINT_DEFINITION_NODE,
                                                      constraintName,
                                                      ConstraintDefinitionNode.ConstraintType.DROP,
-                                                     null,
-                                                     null,
-                                                     null,
-                                                     null,
                                                      StatementType.DROP_DEFAULT,
-                                                     ConstraintDefinitionNode.ConstraintType.FOREIGN_KEY,
+                                                     (grouping == null) ? Boolean.FALSE : Boolean.TRUE,
                                                      parserContext);
     }
 |

@@ -64,6 +64,7 @@ public class FKConstraintDefinitionNode extends ConstraintDefinitionNode
     int refActionUpdateRule;    // referential action on update
     boolean grouping;
 
+    // For ADD
     public void init(Object constraintName, 
                      Object refTableName, 
                      Object fkRcl,
@@ -82,6 +83,22 @@ public class FKConstraintDefinitionNode extends ConstraintDefinitionNode
         this.refActionDeleteRule = ((int[])refActions)[0];
         this.refActionUpdateRule = ((int[])refActions)[1];
 
+        this.grouping = ((Boolean)grouping).booleanValue();
+    }
+
+    // For DROP
+    public void init(Object constraintName,
+                     Object constraintType,
+                     Object behavior,
+                     Object grouping) {
+        super.init(constraintName,
+                   constraintType,
+                   null,
+                   null,
+                   null,
+                   null,
+                   behavior,
+                   ConstraintType.FOREIGN_KEY);
         this.grouping = ((Boolean)grouping).booleanValue();
     }
 
