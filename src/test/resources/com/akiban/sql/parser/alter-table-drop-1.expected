@@ -18,6 +18,7 @@ tableElementList:
 	com.akiban.sql.parser.ConstraintDefinitionNode@787e0ef9
 	constraintName: gfk1
 	constraintType: DROP
+	verifyType: FOREIGN_KEY
 	properties: null
 	name: gfk1
 	elementType: AT_DROP_CONSTRAINT
