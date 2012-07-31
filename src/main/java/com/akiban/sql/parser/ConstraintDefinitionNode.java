@@ -54,7 +54,7 @@ import com.akiban.sql.StandardException;
 import java.util.Properties;
 
 /**
- * A ConstraintDefintionNode is a class for all nodes that can represent
+ * A ConstraintDefinitionNode is a class for all nodes that can represent
  * constraint definitions.
  *
  */

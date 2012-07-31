@@ -12976,6 +12976,7 @@ dropTableConstraintDefinition() throws StandardException :
                                                      null,
                                                      null,
                                                      StatementType.DROP_DEFAULT,
+                                                     ConstraintDefinitionNode.ConstraintType.PRIMARY_KEY,
                                                      parserContext);
     }
 |
