@@ -12738,7 +12738,7 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
 |
     <DROP>
     (
-        LOOKAHEAD ( {getToken(1).kind == INDEX} )
+        LOOKAHEAD ( {getToken(1).kind == INDEX || getToken(1).kind == KEY } )
         tableElement = dropIndex()
     |
         tableElement = dropColumnDefinition(behavior)
