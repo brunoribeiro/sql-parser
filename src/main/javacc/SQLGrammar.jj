@@ -12712,6 +12712,8 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
         tableElement = addColumnDefinition(tableElementList)
     |
         tableElement = tableConstraintDefinition()
+    |
+        tableElement = addIndex()
     )
     {
         if (tableElement instanceof ColumnDefinitionNode) {
@@ -12790,6 +12792,49 @@ dropIndex() throws StandardException :
                                                      null,      // element type (doesn't need to specify it here)
                                                      cond,      // existence 
                                                      parserContext);
+    }
+}
+
+TableElementNode
+addIndex() throws StandardException :
+{
+    boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
+
+    ExistenceCheck cond;
+    Boolean unique = Boolean.FALSE;
+    String indexName;
+    IndexColumnList indexColumnList = (IndexColumnList)
+                nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
+    JoinNode.JoinType joinType = null;
+    Properties properties = null;
+}
+{
+    
+    [unique = unique()]
+    <INDEX>
+    cond = createCondition()
+    indexName = identifier()
+     <LEFT_PAREN>
+    ( LOOKAHEAD ( { groupFormat } )
+      groupIndexColumnList(indexColumnList)
+    |
+      LOOKAHEAD ( { !groupFormat } )
+      indexColumnList(indexColumnList)
+    )
+    <RIGHT_PAREN>
+    [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
+      <USING> joinType = joinType() <JOIN> ]
+    [ properties = propertyList(false) <CHECK_PROPERTIES>]
+    {
+        
+        return (TableElementNode)nodeFactory.getNode(NodeTypes.AT_ADD_INDEX_NODE,
+                                                  cond,
+                                                  unique,
+                                                  indexName,
+                                                  indexColumnList,
+                                                  joinType,
+                                                  properties,
+                                                  parserContext);
     }
 }
 

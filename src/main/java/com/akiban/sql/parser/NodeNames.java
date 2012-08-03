@@ -78,6 +78,8 @@ public interface NodeNames
     static final String ALTER_TABLE_NODE_NAME = "com.akiban.sql.parser.AlterTableNode";
     
     static final String AT_DROP_INDEX_NODE_NAME = "com.akiban.sql.parser.AlterDropIndexNode";
+    
+    static final String AT_ADD_INDEX_NODE_NAME = "com.akiban.sql.parser.AlterAddIndexNode";
 
     static final String AND_NODE_NAME = "com.akiban.sql.parser.AndNode";
 
