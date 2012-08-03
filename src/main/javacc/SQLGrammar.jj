@@ -12808,6 +12808,7 @@ getLocation() throws StandardException :
     {
         return Location.IN_MEMORY;
     }
+|
     <BTREE>
     {
         return Location.BTREE;
