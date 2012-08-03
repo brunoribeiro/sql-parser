@@ -12709,11 +12709,11 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
 {
     <ADD>
     (
+        tableElement = addIndex()
+    |
         tableElement = addColumnDefinition(tableElementList)
     |
         tableElement = tableConstraintDefinition()
-    |
-        tableElement = addIndex()
     )
     {
         if (tableElement instanceof ColumnDefinitionNode) {
@@ -12737,11 +12737,11 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
 |
     <DROP>
     (
+        tableElement = dropIndex()
+    |
         tableElement = dropColumnDefinition(behavior)
     |
         tableElement = dropTableConstraintDefinition()
-    |
-        tableElement = dropIndex()
     )
     {
         changeType[0] = DDLStatementNode.DROP_TYPE;
