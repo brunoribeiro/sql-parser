@@ -1,0 +1,30 @@
+com.akiban.sql.parser.CreateTableNode@32ddb49a
+name: t1
+statementType: CREATE TABLE
+lockGranularity: R
+existenceCheck: NO_CONDITION
+tableElementList: 	
+	com.akiban.sql.parser.TableElementList@797c048c
+
+	[0]:	
+	com.akiban.sql.parser.ColumnDefinitionNode@3d0ec1a3
+	type: INTEGER
+	name: c1
+	elementType: null
+	[1]:	
+	com.akiban.sql.parser.ColumnDefinitionNode@13cad3a6
+	type: DOUBLE
+	name: c2
+	elementType: null
+	[2]:	
+	com.akiban.sql.parser.AddIndexConstraintDefinitionNode@690d4170
+	constraintName: null
+	constraintType: ADD_INDEX
+	properties: null
+	name: null
+	elementType: AT_DROP_CONSTRAINT
+	
+	indexName: indx1
+	indexColumnList: null
+	joinType: null
+	location: BTREE
