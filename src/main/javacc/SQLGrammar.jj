@@ -12590,137 +12590,6 @@ alterSessionID() throws StandardException:
     }
 }
 
-String
-indexName(TableName tableName) throws StandardException :
-{
-    String firstName;
-    String secondName = null;
-    String thirdName = null;
-}
-{
-// Allow index name to be specified with or without schema / table name
-// But only return the index name
-// The schema (and/or table name), if specified, has to match that of tableName's
-    firstName = identifierDeferCheckLength()
-    [
-        <PERIOD> secondName = identifierDeferCheckLength()
-        [
-            <PERIOD> thirdName = identifierDeferCheckLength()
-        ]
-    ]
-    {
-        String schemaName = null;
-        String tableName = null;
-        String indexName = null;
-        if (thirdName != null) // fully qualified name.
-        {
-            schemaName = firstName;
-            tableName = secondName;
-            indexName = thirdName;
-
-            if (schemaName != tableName.getSchemaName() || tableName != tableName.getTableName())
-                throw new StandardException("Cannot decide which table/schema to use"); 
-        }
-        else if (secondName != null)
-        {
-            schemaName = tableName.getSchemaName();
-            tableName = firstName;
-            indexName = secondName;
-            
-            if (tableName != tableName.getTableName())
-                throw new StandardException("Cannot decide which table to use");
-         }
-         else
-         {
-            schemaName = tableName.getSchemaName();
-            tableName = tableName.getTableName();
-            indexName = firstName;
-         }
-
-         return indexName;
-    }
-}
-
-
-
-StatementNode
-dropBody (TableName tableName) throws StandardException :
-{
-    String indexName;
-    ExistenceCheck cond;
-}
-{
-    (<INDEX> | <KEY>) cond = dropCondition() indexName = indexName(tableName)
-    {
-        return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_INDEX_NODE,
-                                                  tableName,
-                                                  indexName,
-                                                  cond,
-                                                  parserContext);
-    }
-}
-
-StatementNode
-createBody (TableName tableName) throws StandardException :
-{
-    Boolean unique = Boolean.FALSE;
-    Properties properties = null;
-    //TableName indexName;
-    //TableName tableName;
-    TableName indexTableName;
-    String indexName;
-    IndexColumnList indexColumnList = (IndexColumnList)
-                nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
-    boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
-    JoinNode.JoinType joinType = null;
-    ExistenceCheck cond;
-}
-{
-    [ unique = unique() ]
-    <INDEX>
-    cond = createCondition()
-    indexName = qualifiedName()
-    <LEFT_PAREN>
-    ( LOOKAHEAD ( { groupFormat } )
-      groupIndexColumnList(indexColumnList)
-    |
-      LOOKAHEAD ( { !groupFormat } )
-      indexColumnList(indexColumnList)
-    )
-    <RIGHT_PAREN>
-    [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
-      <USING> joinType = joinType() <JOIN> ]
-    [ properties = propertyList(false) <CHECK_PROPERTIES>]
-    {
-         
-        if (indexName.getSchemaName() == null) 
-        {
-            indexName.setSchemaName(tableName.getSchemaName());
-        }
-        else if (indexName.getTableName() == null) 
-        {
-            indexName.setTableName(indexName.getSchemaName());
-        }
-        else 
-        {
-            if (indexName.getSchemaName() != tableName.getSchemaName()
-                    || indexName.getTableName() != tableName.getTableName())
-               throw new StandardException("Cannot decide which table to use");
-        }
-
-        return (StatementNode)nodeFactory.getNode(NodeTypes.CREATE_INDEX_NODE,
-                                                  unique,
-                                                  null,
-                                                  indexName,
-                                                  tableName,
-                                                  indexColumnList,
-                                                  joinType,
-                                                  properties,
-                                                  cond,
-                                                  parserContext);
-    }
-}
-
 StatementNode
 alterTableBody(TableName tableName) throws StandardException :
 {
@@ -12734,15 +12603,6 @@ alterTableBody(TableName tableName) throws StandardException :
     String indexName = null;
 }
 {
-    <DROP> sn = dropBody(tableName)
-    {
-        return sn;
-    }
-|
-    <CREATE> sn = createBody(tableName)
-    {
-        return sn;
-    }
 //insert special key before compress so that only internal SP can know
     <COMPRESS>
     (
@@ -12834,46 +12694,6 @@ sequentialCompress(TableName tableName) throws StandardException :
     }
 }
 
-/*
-StatementNode
-alterTableRenameTableStatement(TableName tableName) throws StandardException :
-{
-    String newTableName;
-}
-{
-    <TO> newTableName = identifier()
-    {
-        return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
-                                                  tableName,
-                                                  null,
-                                                  newTableName,
-                                                  Boolean.TRUE,
-                                                  RenameNode.RenameType.TABLE,
-                                                  parserContext);
-    }
-}
-*/
-
-/*
-StatementNode
-alterTableRenameColumnStatement(TableName tableName) throws StandardException :
-{
-    String oldColumnName;
-    String newColumnName;
-}
-{
-    oldColumnName = identifier() <TO> newColumnName = identifier()
-    {
-        return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
-                                                  tableName,
-                                                  oldColumnName,
-                                                  newColumnName,
-                                                  Boolean.TRUE,
-                                                  RenameNode.RenameType.COLUMN,
-                                                  parserContext);
-    }
-}
-*/
 
 char
 alterTableAction(TableElementList tableElementList, int[] changeType, int[] behavior) 
@@ -12918,6 +12738,8 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
         tableElement = dropColumnDefinition(behavior)
     |
         tableElement = dropTableConstraintDefinition()
+    |
+        tableElement = dropIndex()
     )
     {
         changeType[0] = DDLStatementNode.DROP_TYPE;
@@ -12953,6 +12775,24 @@ dropColumnDefinition(int []behavior) throws StandardException :
                                                      parserContext);
     }
 }
+
+TableElementNode
+dropIndex() throws StandardException :
+{
+    String indexName;
+    ExistenceCheck cond;
+}
+{
+    (<INDEX> | <KEY>) cond = dropCondition() indexName = identifier()
+    {
+        return (TableElementNode)nodeFactory.getNode(NodeTypes.AT_DROP_INDEX_NODE,
+                                                     indexName, // name
+                                                     null,      // element type (doesn't need to specify it here)
+                                                     cond,      // existence 
+                                                     parserContext);
+    }
+}
+
 void
 dropBehavior(int[] behavior) :
 {
