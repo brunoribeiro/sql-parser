@@ -40,6 +40,7 @@ public class AlterAddIndexNode extends TableElementNode
     IndexColumnList indexColumnList;
     JoinType joinType ;
     Properties properties;
+    Location location;
     
     @Override
     public void init(Object cond,
@@ -47,7 +48,8 @@ public class AlterAddIndexNode extends TableElementNode
                      Object indexName,
                      Object indexColumnList,
                      Object joinType,
-                     Object properties)
+                     Object properties,
+                     Object location)
     {
         super.init(indexName, ElementType.AT_ADD_INDEX);
         
@@ -56,6 +58,7 @@ public class AlterAddIndexNode extends TableElementNode
         this.indexColumnList = (IndexColumnList) indexColumnList;
         this.joinType = (JoinType) joinType;
         this.properties = (Properties) properties;
+        this.location = (Location) location;
     }
     
     public String getIndexName()
@@ -77,6 +80,7 @@ public class AlterAddIndexNode extends TableElementNode
         this.indexColumnList = other.indexColumnList;
         this.joinType = other.joinType;
         this.properties = other.properties;
+        this.location = other.location;
     }
 
     @Override
@@ -87,7 +91,8 @@ public class AlterAddIndexNode extends TableElementNode
                 + "\nunique: "+ unique
                 + "\nindexColumnList: " + indexColumnList
                 + "\njoinType: " + joinType
-                + "\nproperties: " + properties;
+                + "\nproperties: " + properties
+                + "\nlocation: " + location;
     }
 
     public String statementToString()
@@ -118,5 +123,10 @@ public class AlterAddIndexNode extends TableElementNode
     public Properties getProperties()
     {
         return properties;
+    }
+    
+    public Location getLocation()
+    {
+        return location;
     }
 }
