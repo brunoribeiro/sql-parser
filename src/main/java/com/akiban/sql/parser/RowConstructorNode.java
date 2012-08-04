@@ -53,6 +53,31 @@ public class RowConstructorNode extends ValueNode
     }
 
     @Override
+    public void copyFrom(QueryTreeNode o) throws StandardException
+    {
+        super.copyFrom(o);
+        
+        RowConstructorNode other = (RowConstructorNode) o;
+        list.copyFrom(other.list);
+    }
+
+     /**
+     * Accept the visitor for all visitable children of this node.
+     * 
+     * @param v the visitor
+     *
+     * @exception StandardException on error
+     */
+    @Override
+    void acceptChildren(Visitor v) throws StandardException 
+    {
+        super.acceptChildren(v);
+
+        if (list != null)
+            list.accept(v);
+    }
+    
+    @Override
     public String toString()
     {
         return "{List contains: \n" + list.getList() + "\n, size: " + list.size() + "}";
