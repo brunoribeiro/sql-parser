@@ -8346,7 +8346,8 @@ rowElement(ValueNodeList list) throws StandardException:
 }
 {
     (
-        (LOOKAHEAD( {rowValueConstructorListFollows()} ) element = rowCtor())
+        (LOOKAHEAD( {rowValueConstructorListFollows()} )
+        element = rowCtor())
      |   
         element = additiveExpression()
     )
