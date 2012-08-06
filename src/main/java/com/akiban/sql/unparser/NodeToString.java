@@ -211,8 +211,8 @@ public class NodeToString
             return sqlToJavaValueNode((SQLToJavaValueNode)node);
         case NodeTypes.STATIC_METHOD_CALL_NODE:
             return methodCallNode((MethodCallNode)node);
-        case NodeTypes.Z_ORDER_FUNC_NODE:
-            return zorderFuncNode((ZOrderFuncNode)node);
+        case NodeTypes.SPECIAL_INDEX_FUNC_NODE:
+            return zorderFuncNode((SpecialIndexFuncNode)node);
         default:
             return "**UNKNOWN(" + node.getNodeType() +")**";
         }
@@ -883,7 +883,7 @@ public class NodeToString
         return node.statementToString() + " = '" + node.getValue() + "'";
     }
 
-    protected String zorderFuncNode (ZOrderFuncNode node)
+    protected String zorderFuncNode (SpecialIndexFuncNode node)
     {
         return node.getMethodName() + "(" 
                + node.getLatColumn().getColumnName() + ", "

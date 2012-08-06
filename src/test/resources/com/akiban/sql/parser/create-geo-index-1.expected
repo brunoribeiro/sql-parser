@@ -9,7 +9,7 @@ joinType: null
 properties: null
 existenceCheck: IF_NOT_EXISTS
 	
-	com.akiban.sql.parser.ZOrderFuncNode@2844916c
+	com.akiban.sql.parser.SpecialIndexFuncNode@2844916c
 	
 	methodName: Z_ORDER_LAT_LON
 	[0]:	

@@ -8806,10 +8806,10 @@ geoIndexDefFunc () throws StandardException :
     lon = getIndexColumn()
     <RIGHT_PAREN>
     {
-        return (ZOrderFuncNode)nodeFactory.getNode(NodeTypes.Z_ORDER_FUNC_NODE,
+        return (SpecialIndexFuncNode)nodeFactory.getNode(NodeTypes.SPECIAL_INDEX_FUNC_NODE,
                                                    lat,
                                                    lon,
-                                                   ZOrderFuncNode.FunctionType.Z_ORDER_LAT_LON,
+                                                   SpecialIndexFuncNode.FunctionType.Z_ORDER_LAT_LON,
                                                    parserContext);
     }
 }

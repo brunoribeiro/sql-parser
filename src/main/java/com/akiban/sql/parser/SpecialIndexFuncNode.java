@@ -28,7 +28,7 @@ package com.akiban.sql.parser;
 
 import com.akiban.sql.StandardException;
 
-public class ZOrderFuncNode extends IndexColumnList
+public class SpecialIndexFuncNode extends IndexColumnList
 {
     public static enum FunctionType
     {
@@ -51,7 +51,7 @@ public class ZOrderFuncNode extends IndexColumnList
     public void copyFrom(QueryTreeNode node) throws StandardException
     {
         super.copyFrom(node);
-        ZOrderFuncNode other = (ZOrderFuncNode) node;
+        SpecialIndexFuncNode other = (SpecialIndexFuncNode) node;
         this.methodName = other.methodName;
     }
 
