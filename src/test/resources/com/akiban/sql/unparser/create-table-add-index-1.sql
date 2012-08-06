@@ -1,0 +1,1 @@
+create table t1 (c1 int, c2 double, add index indx1 (c1 DESC) AS BTREE)

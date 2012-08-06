@@ -54,6 +54,7 @@ public class AddIndexConstraintDefinitionNode extends ConstraintDefinitionNode
                    ConstraintType.ADD_INDEX);
         
         this.indexName = (String) indexName;
+        this.indexColumnList = (IndexColumnList) indexColumnList;
         this.joinType = (JoinType) joinType;
         this.location = (StorageLocation) location;
     }

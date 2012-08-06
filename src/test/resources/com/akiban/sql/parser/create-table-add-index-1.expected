@@ -25,6 +25,6 @@ tableElementList:
 	elementType: AT_DROP_CONSTRAINT
 	
 	indexName: indx1
-	indexColumnList: null
+	indexColumnList: 
 	joinType: null
 	location: null

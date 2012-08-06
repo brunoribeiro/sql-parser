@@ -211,9 +211,25 @@ public class NodeToString
             return sqlToJavaValueNode((SQLToJavaValueNode)node);
         case NodeTypes.STATIC_METHOD_CALL_NODE:
             return methodCallNode((MethodCallNode)node);
+        case NodeTypes.ADD_INDEX_CONSTRAINT_NODE:
+            return indexConstraint((AddIndexConstraintDefinitionNode)node);
         default:
             return "**UNKNOWN(" + node.getNodeType() +")**";
         }
+    }
+
+    protected String indexConstraint(AddIndexConstraintDefinitionNode node) throws StandardException
+    {
+        StringBuilder builder = new StringBuilder("ADD INDEX (");
+       
+        builder.append(indexColumnList(node.getIndexColumnList()));
+        builder.append(")");
+        
+        StorageLocation loc = node.getLocation();
+        if (loc != null)
+            builder.append(loc);
+        
+        return builder.toString();
     }
 
     protected String createTableNode(CreateTableNode node) throws StandardException {
