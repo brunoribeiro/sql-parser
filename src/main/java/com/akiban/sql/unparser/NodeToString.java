@@ -292,6 +292,17 @@ public class NodeToString
             str.append("UNIQUE ");
         str.append("INDEX");
         str.append(" ");
+        
+        switch (node.getExistenceCheck())
+        {
+            case IF_EXISTS:
+                str.append("IF EXISTS ");
+                break;
+            case IF_NOT_EXISTS:
+                str.append("IF NOT EXISTS ");
+                break;  
+        }
+
         str.append(toString(node.getIndexName()));
         str.append(" ON ");
         str.append(node.getIndexTableName());
