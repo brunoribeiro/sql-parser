@@ -9893,6 +9893,7 @@ indexDefinition() throws StandardException :
     boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
     JoinNode.JoinType joinType = null;
     ExistenceCheck cond;
+    StorageLocation location = null;
 }
 {
     [ unique = unique() ] 
@@ -9911,6 +9912,7 @@ indexDefinition() throws StandardException :
     [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
       <USING> joinType = joinType() <JOIN> ]
     [ properties = propertyList(false) <CHECK_PROPERTIES>]
+    [ <AS> location = getLocation() ]
     {
         /* User allowed to specify schema name on table and index.
          * If no schema name specified for index, then it "inherits" 
@@ -9943,6 +9945,7 @@ indexDefinition() throws StandardException :
                                                   joinType,
                                                   properties,
                                                   cond,
+                                                  location,
                                                   parserContext);
     }
 }

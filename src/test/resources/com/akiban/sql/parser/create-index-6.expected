@@ -8,7 +8,7 @@ tableName: table1
 joinType: null
 properties: null
 existenceCheck: IF_NOT_EXISTS
-storageLocation: null
+storageLocation: BTREE
 	
 	com.akiban.sql.parser.IndexColumnList@1572e449
 

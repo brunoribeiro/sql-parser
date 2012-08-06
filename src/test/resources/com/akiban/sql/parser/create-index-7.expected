@@ -8,7 +8,7 @@ tableName: group_table
 joinType: LEFT_OUTER
 properties: null
 existenceCheck: NO_CONDITION
-storageLocation: null
+storageLocation: IN_MEMORY
 	
 	com.akiban.sql.parser.IndexColumnList@46e45076
 

@@ -40,7 +40,7 @@ public class AlterAddIndexNode extends TableElementNode
     IndexColumnList indexColumnList;
     JoinType joinType ;
     Properties properties;
-    StorageLocation location;
+    StorageLocation storageLocation;
     
     @Override
     public void init(Object cond,
@@ -58,7 +58,7 @@ public class AlterAddIndexNode extends TableElementNode
         this.indexColumnList = (IndexColumnList) indexColumnList;
         this.joinType = (JoinType) joinType;
         this.properties = (Properties) properties;
-        this.location = (StorageLocation) location;
+        this.storageLocation = (StorageLocation) location;
     }
     
     public String getIndexName()
@@ -80,7 +80,7 @@ public class AlterAddIndexNode extends TableElementNode
         this.indexColumnList = other.indexColumnList;
         this.joinType = other.joinType;
         this.properties = other.properties;
-        this.location = other.location;
+        this.storageLocation = other.storageLocation;
     }
 
     @Override
@@ -92,7 +92,7 @@ public class AlterAddIndexNode extends TableElementNode
                 + "\nindexColumnList: " + indexColumnList
                 + "\njoinType: " + joinType
                 + "\nproperties: " + properties
-                + "\nlocation: " + location;
+                + "\nlocation: " + storageLocation;
     }
 
     public String statementToString()
@@ -125,8 +125,8 @@ public class AlterAddIndexNode extends TableElementNode
         return properties;
     }
     
-    public StorageLocation getLocation()
+    public StorageLocation getStorageLocation()
     {
-        return location;
+        return storageLocation;
     }
 }
