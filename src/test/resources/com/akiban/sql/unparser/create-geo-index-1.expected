@@ -1,0 +1,1 @@
+CREATE INDEX idx1 ON table1(Z_ORDER_LAT_LON(c2, c1))
