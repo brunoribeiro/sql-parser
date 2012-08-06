@@ -2059,6 +2059,7 @@ TOKEN [IGNORE_CASE] :
 | <IF: "if">
 | <IMMEDIATE: "immediate">
 | <IN: "in">
+| <INDEX: "index">
 | <INDICATOR: "indicator">
 | <INITIALLY: "initially">
 | <INNER: "inner">
@@ -2346,7 +2347,6 @@ TOKEN [IGNORE_CASE] :
 | <HOUR_SECOND: "hour_second">
 | <IGNORE: "ignore">
 | <IN_MEMORY: "in_memory">
-| <INDEX: "index">
 | <INPLACE: "inplace">
 | <INTERRUPT: "interrupt">
 | <JAVA: "java">
@@ -12125,7 +12125,7 @@ addIndexConstraintDefinition(TableName constraintName) throws StandardException 
     StorageLocation location = null;
 }
 {
-    <ADD> <INDEX> indexName = identifier()
+    <INDEX> indexName = identifier()
     <LEFT_PAREN>
     ( LOOKAHEAD ( { groupFormat } )
       groupIndexColumnList(indexColumnList)
@@ -13913,6 +13913,7 @@ reservedKeyword() :
 | tok = <IDENTITY>
 | tok = <IMMEDIATE>
 | tok = <IN>
+| tok = <INDEX>
 | tok = <INDICATOR>
 | tok = <INITIALLY>
 | tok = <INNER>
@@ -14117,7 +14118,6 @@ nonReservedKeyword() :
 | tok = <IF>
 | tok = <IN_MEMORY>
 | tok = <INCREMENT>
-| tok = <INDEX>
 | tok = <INITIAL>
 | tok = <INPLACE>
 | tok = <INTERRUPT>

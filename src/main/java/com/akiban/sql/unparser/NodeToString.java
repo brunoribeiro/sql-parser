@@ -29,7 +29,6 @@ package com.akiban.sql.unparser;
 import com.akiban.sql.parser.*;
 
 import com.akiban.sql.StandardException;
-import com.akiban.sql.types.DataTypeDescriptor;
 
 public class NodeToString
 {
@@ -220,7 +219,7 @@ public class NodeToString
 
     protected String indexConstraint(AddIndexConstraintDefinitionNode node) throws StandardException
     {
-        StringBuilder builder = new StringBuilder("ADD INDEX ");
+        StringBuilder builder = new StringBuilder("INDEX ");
         
         String indexName = node.getIndexName();
         
