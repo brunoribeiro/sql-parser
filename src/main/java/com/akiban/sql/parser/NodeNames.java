@@ -369,6 +369,7 @@ public interface NodeNames
 
     static final String XML_UNARY_OPERATOR_NODE_NAME = "com.akiban.sql.parser.XMLUnaryOperatorNode";
 
+    static final String Z_ORDER_FUNC_NODE_NAME = "com.akiban.sql.parser.ZOrderFuncNode";
     // The names are in alphabetic order.
 
 }

@@ -1547,6 +1547,16 @@ class SQLGrammar
         }
     }
 
+    boolean geoIndexDefFuncFollows()
+    {
+        if (!hasFeature(SQLParserFeature.GEO_INDEX_DEF_FUNC))
+            return false;
+        
+        //TODO: might need to change this when we have more than
+        // one functions.
+        // For now, the only one expected here is: z_order_lat_lon
+        return  getToken(1).kind == Z_ORDER_LAT_LON;
+    }
     boolean parensFollow()
     {
         if (!hasFeature(SQLParserFeature.MYSQL_COLUMN_AS_FUNCS))
@@ -2171,6 +2181,7 @@ TOKEN [IGNORE_CASE] :
 | <WORK: "work">
 | <WRITE: "write">
 | <YEAR: "year">
+| <Z_ORDER_LAT_LON: "z_order_lat_lon">
 }
 
 /* This list should contain only and all SQL92 keywords that are
@@ -8781,6 +8792,46 @@ columnNameItem(ResultColumnList columnList) throws StandardException :
     }
 }
 
+IndexColumnList
+geoIndexDefFunc () throws StandardException :
+{
+    IndexColumn lat;
+    IndexColumn lon;
+}
+{
+    <Z_ORDER_LAT_LON>
+    <LEFT_PAREN>
+    lat = getIndexColumn()
+    <COMMA>
+    lon = getIndexColumn()
+    <RIGHT_PAREN>
+    {
+        return (ZOrderFuncNode)nodeFactory.getNode(NodeTypes.Z_ORDER_FUNC_NODE,
+                                                   lat,
+                                                   lon,
+                                                   ZOrderFuncNode.FunctionType.Z_ORDER_LAT_LON,
+                                                   parserContext);
+    }
+}
+
+IndexColumn
+getIndexColumn() throws StandardException :
+{
+    String columnName;
+    boolean asc = true;
+}
+{
+    columnName = identifier()
+    [ <ASC> | <DESC> {asc = false; } ]
+    {
+        return (IndexColumn) nodeFactory.getNode(NodeTypes.INDEX_COLUMN,
+                                                 columnName,
+                                                 asc ? Boolean.TRUE : Boolean.FALSE,
+                                                 parserContext);
+     }
+}
+
+
 void
 indexColumnList(IndexColumnList columnList) throws StandardException :
 {}
@@ -9899,7 +9950,10 @@ indexDefinition() throws StandardException :
     indexName = qualifiedName() 
     <ON> tableName = qualifiedName()
     <LEFT_PAREN>
-    ( LOOKAHEAD ( { groupFormat } )
+    ( LOOKAHEAD ( { geoIndexDefFuncFollows() } )
+      indexColumnList = geoIndexDefFunc()
+    |
+      LOOKAHEAD ( { groupFormat } )
       groupIndexColumnList(indexColumnList)
     |
       LOOKAHEAD ( { !groupFormat } )
@@ -13944,6 +13998,7 @@ reservedKeyword() :
 | tok = <XMLSERIALIZE>
 | tok = <XMLEXISTS>
 | tok = <XMLQUERY>
+| tok = <Z_ORDER_LAT_LON>
 )
     {
         // Remember whether last token was a delimited identifier
@@ -14225,6 +14280,7 @@ groupIndexColumnList(IndexColumnList columnList) throws StandardException :
     groupIndexColumnItem(columnList) 
     ( <COMMA> groupIndexColumnItem(columnList) )*
 }
+
 
 void
 groupIndexColumnItem(IndexColumnList columnList) throws StandardException :

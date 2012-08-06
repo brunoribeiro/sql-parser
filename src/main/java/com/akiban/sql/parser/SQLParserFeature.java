@@ -33,6 +33,7 @@ package com.akiban.sql.parser;
 
 public enum SQLParserFeature
 {
+    GEO_INDEX_DEF_FUNC,
     MYSQL_COLUMN_AS_FUNCS,
     MYSQL_LEFT_RIGHT_FUNC,
     DIV_OPERATOR, // integer division
