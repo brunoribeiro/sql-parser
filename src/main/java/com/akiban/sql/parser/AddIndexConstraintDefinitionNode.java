@@ -37,7 +37,7 @@ public class AddIndexConstraintDefinitionNode extends ConstraintDefinitionNode
     private String indexName;
     private IndexColumnList indexColumnList;
     private JoinType joinType;
-    private Location location;
+    private StorageLocation location;
     
     @Override
     public void init(Object tableName,
@@ -58,7 +58,7 @@ public class AddIndexConstraintDefinitionNode extends ConstraintDefinitionNode
         
         this.indexName = (String) indexName;
         this.joinType = (JoinType) joinType;
-        this.location = (Location) location;
+        this.location = (StorageLocation) location;
     }
     
     public String getIndexName()
@@ -76,7 +76,7 @@ public class AddIndexConstraintDefinitionNode extends ConstraintDefinitionNode
         return joinType;
     }
     
-    public Location getLocation()
+    public StorageLocation getLocation()
     {
         return location;
     }

@@ -27,4 +27,4 @@ tableElementList:
 	indexName: indx1
 	indexColumnList: null
 	joinType: null
-	location: IN_MEMORY
+	location: null

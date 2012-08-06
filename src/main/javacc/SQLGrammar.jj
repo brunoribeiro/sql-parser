@@ -12119,7 +12119,7 @@ addIndexConstraintDefinition(TableName constraintName) throws StandardException 
                 nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
     JoinNode.JoinType joinType = null;
     Properties properties = null;
-    Location location = Location.IN_MEMORY;
+    StorageLocation location = null;
 }
 {
     <ADD> <INDEX> indexName = identifier()
@@ -12844,19 +12844,19 @@ dropIndex() throws StandardException :
     }
 }
 
-Location
+StorageLocation
 getLocation() throws StandardException :
 {
 }
 {
     <IN_MEMORY>
     {
-        return Location.IN_MEMORY;
+        return StorageLocation.IN_MEMORY;
     }
 |
     <BTREE>
     {
-        return Location.BTREE;
+        return StorageLocation.BTREE;
     }
 }
 
@@ -12872,7 +12872,7 @@ addIndex() throws StandardException :
                 nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
     JoinNode.JoinType joinType = null;
     Properties properties = null;
-    Location location = Location.IN_MEMORY;
+    StorageLocation location = null;
 }
 {
     
