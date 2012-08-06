@@ -69,6 +69,7 @@ public class SQLParser implements SQLParserContext {
     private Set<SQLParserFeature> features = 
         EnumSet.of(SQLParserFeature.GROUPING,
                    SQLParserFeature.DIV_OPERATOR,
+                   SQLParserFeature.GEO_INDEX_DEF_FUNC,
                    SQLParserFeature.MYSQL_HINTS,
                    SQLParserFeature.MYSQL_INTERVAL,
                    SQLParserFeature.MYSQL_LEFT_RIGHT_FUNC,

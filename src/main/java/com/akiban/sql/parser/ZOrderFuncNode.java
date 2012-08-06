@@ -59,7 +59,7 @@ public class ZOrderFuncNode extends IndexColumnList
     public String toString()
     {
         return super.toString() + "\n" 
-                +  " methodName: " + methodName + "\n"
+                + "methodName: " + methodName + "\n"
                 ;
     }
  
