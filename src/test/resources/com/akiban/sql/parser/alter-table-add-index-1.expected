@@ -24,4 +24,4 @@ tableElementList:
 	indexColumnList: 
 	joinType: null
 	properties: null
-	location: IN_MEMORY
+	location: null
