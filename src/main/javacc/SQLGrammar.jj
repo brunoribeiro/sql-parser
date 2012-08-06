@@ -8818,17 +8818,15 @@ IndexColumn
 getIndexColumn() throws StandardException :
 {
     String columnName;
-    boolean asc = true;
 }
 {
     columnName = identifier()
-    [ <ASC> | <DESC> {asc = false; } ]
     {
         return (IndexColumn) nodeFactory.getNode(NodeTypes.INDEX_COLUMN,
                                                  columnName,
-                                                 asc ? Boolean.TRUE : Boolean.FALSE,
+                                                 Boolean.TRUE,
                                                  parserContext);
-     }
+    }
 }
 
 
