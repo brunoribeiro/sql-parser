@@ -220,14 +220,20 @@ public class NodeToString
 
     protected String indexConstraint(AddIndexConstraintDefinitionNode node) throws StandardException
     {
-        StringBuilder builder = new StringBuilder("ADD INDEX (");
-       
-        builder.append(indexColumnList(node.getIndexColumnList()));
-        builder.append(")");
+        StringBuilder builder = new StringBuilder("ADD INDEX ");
+        
+        String indexName = node.getIndexName();
+        
+        if (indexName != null)
+            builder.append(indexName).append(' ');
+        
+        builder.append('(')
+               .append(indexColumnList(node.getIndexColumnList()))
+               .append(')');
         
         StorageLocation loc = node.getLocation();
         if (loc != null)
-            builder.append(loc);
+            builder.append(" AS ").append(loc);
         
         return builder.toString();
     }
