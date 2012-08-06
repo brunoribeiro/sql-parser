@@ -56,9 +56,8 @@ public class RowConstructorNode extends ValueNode
     public void copyFrom(QueryTreeNode o) throws StandardException
     {
         super.copyFrom(o);
-        
-        RowConstructorNode other = (RowConstructorNode) o;
-        list.copyFrom(other.list);
+        list = (ValueNodeList)getNodeFactory().copyNode(((RowConstructorNode) o).list,
+                                                        getParserContext());
     }
 
      /**
