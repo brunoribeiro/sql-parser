@@ -885,8 +885,8 @@ public class NodeToString
 
     protected String zorderFuncNode (SpecialIndexFuncNode node)
     {
-        return node.getMethodName() + "(" 
-               + node.getLatColumn().getColumnName() + ", "
-               + node.getLonColumn().getColumnName() + ")";
+        return node.getFunctionType() + "(" 
+               + node.get(0).getColumnName() + ", "
+               + node.get(1).getColumnName() + ")";
     }
 }

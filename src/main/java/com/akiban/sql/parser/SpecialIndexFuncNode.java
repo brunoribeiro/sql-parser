@@ -35,16 +35,16 @@ public class SpecialIndexFuncNode extends IndexColumnList
         Z_ORDER_LAT_LON
         // ADD MORE AS NEEDED
     }
-    private FunctionType methodName;
+    private FunctionType functionType;
       
     @Override
-    public void init(Object lonColumnName,
-                     Object latColumnName,
-                     Object functionName)
+    public void init(Object arg1,
+                     Object arg2,
+                     Object functionType)
     {
-        add((IndexColumn) latColumnName);
-        add((IndexColumn) lonColumnName);
-        this.methodName = ((FunctionType)functionName);
+        add((IndexColumn) arg1);
+        add((IndexColumn) arg2);
+        this.functionType = ((FunctionType)functionType);
     }
     
     @Override
@@ -52,14 +52,14 @@ public class SpecialIndexFuncNode extends IndexColumnList
     {
         super.copyFrom(node);
         SpecialIndexFuncNode other = (SpecialIndexFuncNode) node;
-        this.methodName = other.methodName;
+        this.functionType = other.functionType;
     }
 
     @Override
     public String toString()
     {
         return super.toString() + "\n" 
-                + "methodName: " + methodName + "\n"
+                + "methodName: " + functionType + "\n"
                 ;
     }
  
@@ -69,18 +69,8 @@ public class SpecialIndexFuncNode extends IndexColumnList
         super.accept(v);
     }
 
-    public FunctionType getMethodName()
+    public FunctionType getFunctionType()
     {
-        return methodName;
-    }
- 
-    public IndexColumn getLatColumn()
-    {
-        return get(0);
-    }
-    
-    public IndexColumn getLonColumn()
-    {
-        return get(1);
+        return functionType;
     }
 }

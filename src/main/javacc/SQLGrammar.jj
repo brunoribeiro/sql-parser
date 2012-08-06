@@ -8795,20 +8795,20 @@ columnNameItem(ResultColumnList columnList) throws StandardException :
 IndexColumnList
 geoIndexDefFunc () throws StandardException :
 {
-    IndexColumn lat;
-    IndexColumn lon;
+    IndexColumn arg1;
+    IndexColumn arg2;
 }
 {
     <Z_ORDER_LAT_LON>
     <LEFT_PAREN>
-    lat = getIndexColumn()
+    arg1 = getIndexColumn()
     <COMMA>
-    lon = getIndexColumn()
+    arg2 = getIndexColumn()
     <RIGHT_PAREN>
     {
         return (SpecialIndexFuncNode)nodeFactory.getNode(NodeTypes.SPECIAL_INDEX_FUNC_NODE,
-                                                   lat,
-                                                   lon,
+                                                   arg1,
+                                                   arg2,
                                                    SpecialIndexFuncNode.FunctionType.Z_ORDER_LAT_LON,
                                                    parserContext);
     }

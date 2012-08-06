@@ -14,11 +14,11 @@ existenceCheck: IF_NOT_EXISTS
 	methodName: Z_ORDER_LAT_LON
 	[0]:	
 	com.akiban.sql.parser.IndexColumn@2da75e1b
-	columnName: c2
+	columnName: c1
 	tableName: null
 	ascending
 	[1]:	
 	com.akiban.sql.parser.IndexColumn@47135607
-	columnName: c1
+	columnName: c2
 	tableName: null
 	ascending
