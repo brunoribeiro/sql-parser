@@ -12091,6 +12091,11 @@ tableConstraint(TableName constraintName) throws StandardException :
     ConstraintDefinitionNode tcdn;
 }
 {
+    tcdn = addIndexConstraintDefinition(constraintName)
+    {
+        return tcdn;
+    }
+|
     tcdn = uniqueConstraintDefinition(constraintName) 
     {
         return tcdn;
@@ -12106,6 +12111,46 @@ tableConstraint(TableName constraintName) throws StandardException :
         return tcdn;
     }
 }
+
+ConstraintDefinitionNode
+addIndexConstraintDefinition(TableName constraintName) throws StandardException : 
+{
+    boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
+
+    String indexName;
+    IndexColumnList indexColumnList = (IndexColumnList)
+                nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
+    JoinNode.JoinType joinType = null;
+    Properties properties = null;
+    StorageLocation location = null;
+}
+{
+    <ADD> <INDEX> indexName = identifier()
+    <LEFT_PAREN>
+    ( LOOKAHEAD ( { groupFormat } )
+      groupIndexColumnList(indexColumnList)
+    |
+      LOOKAHEAD ( { !groupFormat } )
+      indexColumnList(indexColumnList)
+    )
+    <RIGHT_PAREN>
+    [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
+      <USING> joinType = joinType() <JOIN> ]
+    [ properties = propertyList(false) <CHECK_PROPERTIES>]
+    [ <AS> location = getLocation() ]
+    {
+        return (ConstraintDefinitionNode)nodeFactory.getNode(NodeTypes.ADD_INDEX_CONSTRAINT_NODE,
+                                                             constraintName,
+                                                             properties,
+                                                             indexColumnList,
+                                                             indexName,
+                                                             joinType,
+                                                             location,
+                                                             parserContext);
+    }
+    
+}
+
 
 ConstraintDefinitionNode
 uniqueConstraintDefinition(TableName constraintName) throws StandardException :
