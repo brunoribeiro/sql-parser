@@ -211,6 +211,8 @@ public class NodeToString
             return sqlToJavaValueNode((SQLToJavaValueNode)node);
         case NodeTypes.STATIC_METHOD_CALL_NODE:
             return methodCallNode((MethodCallNode)node);
+        case NodeTypes.SPECIAL_INDEX_FUNC_NODE:
+            return zorderFuncNode((SpecialIndexFuncNode)node);
         default:
             return "**UNKNOWN(" + node.getNodeType() +")**";
         }
@@ -290,6 +292,17 @@ public class NodeToString
             str.append("UNIQUE ");
         str.append("INDEX");
         str.append(" ");
+        
+        switch (node.getExistenceCheck())
+        {
+            case IF_EXISTS:
+                str.append("IF EXISTS ");
+                break;
+            case IF_NOT_EXISTS:
+                str.append("IF NOT EXISTS ");
+                break;  
+        }
+
         str.append(toString(node.getIndexName()));
         str.append(" ON ");
         str.append(node.getIndexTableName());
@@ -881,4 +894,10 @@ public class NodeToString
         return node.statementToString() + " = '" + node.getValue() + "'";
     }
 
+    protected String zorderFuncNode (SpecialIndexFuncNode node)
+    {
+        return node.getFunctionType() + "(" 
+               + node.get(0).getColumnName() + ", "
+               + node.get(1).getColumnName() + ")";
+    }
 }
