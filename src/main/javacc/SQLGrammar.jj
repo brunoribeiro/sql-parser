@@ -9937,8 +9937,7 @@ indexDefinition() throws StandardException :
     Properties properties = null;
     TableName indexName;
     TableName tableName;
-    IndexColumnList indexColumnList = (IndexColumnList)
-        nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
+    IndexColumnList indexColumnList = null;
     boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
     JoinNode.JoinType joinType = null;
     ExistenceCheck cond;
@@ -9955,10 +9954,10 @@ indexDefinition() throws StandardException :
       indexColumnList = geoIndexDefFunc()
     |
       LOOKAHEAD ( { groupFormat } )
-      groupIndexColumnList(indexColumnList)
+      groupIndexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
     |
       LOOKAHEAD ( { !groupFormat } )
-      indexColumnList(indexColumnList)
+      indexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
     )
     <RIGHT_PAREN>
     [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
@@ -12170,8 +12169,7 @@ addIndexConstraintDefinition(TableName constraintName) throws StandardException 
     boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
 
     String indexName;
-    IndexColumnList indexColumnList = (IndexColumnList)
-                nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
+    IndexColumnList indexColumnList = null;
     JoinNode.JoinType joinType = null;
     Properties properties = null;
     StorageLocation location = null;
@@ -12184,10 +12182,10 @@ addIndexConstraintDefinition(TableName constraintName) throws StandardException 
       indexColumnList = geoIndexDefFunc()
     |
       LOOKAHEAD ( { groupFormat } )
-      groupIndexColumnList(indexColumnList)
+      groupIndexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
     |
       LOOKAHEAD ( { !groupFormat } )
-      indexColumnList(indexColumnList)
+      indexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
     )
     <RIGHT_PAREN>
     [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
@@ -12927,8 +12925,7 @@ addIndex() throws StandardException :
     ExistenceCheck cond;
     Boolean unique = Boolean.FALSE;
     String indexName;
-    IndexColumnList indexColumnList = (IndexColumnList)
-                nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
+    IndexColumnList indexColumnList = null;
     JoinNode.JoinType joinType = null;
     Properties properties = null;
     StorageLocation location = null;
@@ -12944,10 +12941,10 @@ addIndex() throws StandardException :
       indexColumnList = geoIndexDefFunc()
     |
       LOOKAHEAD ( { groupFormat } )
-      groupIndexColumnList(indexColumnList)
+      groupIndexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
     |
       LOOKAHEAD ( { !groupFormat } )
-      indexColumnList(indexColumnList)
+      indexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
     )
     <RIGHT_PAREN>
     [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
