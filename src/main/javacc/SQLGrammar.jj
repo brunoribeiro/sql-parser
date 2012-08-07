@@ -12891,7 +12891,10 @@ addIndex() throws StandardException :
     cond = createCondition()
     indexName = identifier()
      <LEFT_PAREN>
-    ( LOOKAHEAD ( { groupFormat } )
+    ( LOOKAHEAD ( { geoIndexDefFuncFollows() } )
+      indexColumnList = geoIndexDefFunc()
+    |
+      LOOKAHEAD ( { groupFormat } )
       groupIndexColumnList(indexColumnList)
     |
       LOOKAHEAD ( { !groupFormat } )
