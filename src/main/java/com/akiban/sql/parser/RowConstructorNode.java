@@ -81,7 +81,7 @@ public class RowConstructorNode extends ValueNode
     {
         return "{List contains: \n" + list.getList() + "\n, size: " + list.size() + "}";
     }
-    
+
     public ValueNodeList getNodeList()
     {
         return list;

@@ -33,7 +33,6 @@ import com.akiban.sql.types.CharacterTypeAttributes;
 import com.akiban.sql.types.DataTypeDescriptor;
 import com.akiban.sql.types.TypeId;
 
-import java.util.*;
 
 /** Calculate types from schema information. */
 public class TypeComputer implements Visitor
@@ -433,10 +432,30 @@ public class TypeComputer implements Visitor
         }
         else
         {
+            boolean nullable = isNestedTupleNullable(leftOperand)
+                                || isNestedTupleNullable(node.getRightOperandList());
+            
             //throw new UnsupportedOperationException("Nested tuples not supported yet");
             // TODO:
-            return new DataTypeDescriptor(TypeId.BOOLEAN_ID, true);
+            return new DataTypeDescriptor(TypeId.BOOLEAN_ID, nullable);
         }
+    }
+    
+    protected boolean isNestedTupleNullable(RowConstructorNode row)
+    {
+        boolean ret = false;
+        
+        for (ValueNode node : row.getNodeList())
+        {
+            if (ret)
+                return ret;
+            
+            if (node instanceof RowConstructorNode)
+                ret |= isNestedTupleNullable((RowConstructorNode)node);
+            else
+                ret |= node.getType().isNullable();
+        }
+        return ret;
     }
 
     protected DataTypeDescriptor subqueryNode(SubqueryNode node) throws StandardException {
