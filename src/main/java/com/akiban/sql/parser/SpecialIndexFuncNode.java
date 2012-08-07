@@ -24,25 +24,53 @@
  * PREVAIL OVER ANY CONFLICTING TERMS OR CONDITIONS IN THIS AGREEMENT.
  */
 
-/** Features of the parser grammar. 
- * In particular, dialect-specific constructs that can be turned off for use with
- * ordinary databases.
- */
-
 package com.akiban.sql.parser;
 
-public enum SQLParserFeature
+import com.akiban.sql.StandardException;
+
+public class SpecialIndexFuncNode extends IndexColumnList
 {
-    GEO_INDEX_DEF_FUNC,
-    MYSQL_COLUMN_AS_FUNCS,
-    MYSQL_LEFT_RIGHT_FUNC,
-    DIV_OPERATOR, // integer division
-    GROUPING,
-    MYSQL_HINTS,
-    MYSQL_INTERVAL,
-    UNSIGNED,
-    INFIX_MOD,
-    INFIX_BIT_OPERATORS,
-    INFIX_LOGICAL_OPERATORS,
-    DOUBLE_QUOTED_STRING
+    public static enum FunctionType
+    {
+        Z_ORDER_LAT_LON
+        // ADD MORE AS NEEDED
+    }
+    private FunctionType functionType;
+      
+    @Override
+    public void init(Object arg1,
+                     Object arg2,
+                     Object functionType)
+    {
+        add((IndexColumn) arg1);
+        add((IndexColumn) arg2);
+        this.functionType = ((FunctionType)functionType);
+    }
+    
+    @Override
+    public void copyFrom(QueryTreeNode node) throws StandardException
+    {
+        super.copyFrom(node);
+        SpecialIndexFuncNode other = (SpecialIndexFuncNode) node;
+        this.functionType = other.functionType;
+    }
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + "\n" 
+                + "methodName: " + functionType + "\n"
+                ;
+    }
+ 
+    @Override
+    public void acceptChildren(Visitor v) throws StandardException
+    {
+        super.accept(v);
+    }
+
+    public FunctionType getFunctionType()
+    {
+        return functionType;
+    }
 }
