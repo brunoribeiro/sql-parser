@@ -2069,6 +2069,7 @@ TOKEN [IGNORE_CASE] :
 | <IF: "if">
 | <IMMEDIATE: "immediate">
 | <IN: "in">
+| <INDEX: "index">
 | <INDICATOR: "indicator">
 | <INITIALLY: "initially">
 | <INNER: "inner">
@@ -2357,7 +2358,6 @@ TOKEN [IGNORE_CASE] :
 | <HOUR_SECOND: "hour_second">
 | <IGNORE: "ignore">
 | <IN_MEMORY: "in_memory">
-| <INDEX: "index">
 | <INPLACE: "inplace">
 | <INTERRUPT: "interrupt">
 | <JAVA: "java">
@@ -12143,6 +12143,11 @@ tableConstraint(TableName constraintName) throws StandardException :
     ConstraintDefinitionNode tcdn;
 }
 {
+    tcdn = addIndexConstraintDefinition(constraintName)
+    {
+        return tcdn;
+    }
+|
     tcdn = uniqueConstraintDefinition(constraintName) 
     {
         return tcdn;
@@ -12158,6 +12163,46 @@ tableConstraint(TableName constraintName) throws StandardException :
         return tcdn;
     }
 }
+
+ConstraintDefinitionNode
+addIndexConstraintDefinition(TableName constraintName) throws StandardException : 
+{
+    boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
+
+    String indexName;
+    IndexColumnList indexColumnList = (IndexColumnList)
+                nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
+    JoinNode.JoinType joinType = null;
+    Properties properties = null;
+    StorageLocation location = null;
+}
+{
+    <INDEX> indexName = identifier()
+    <LEFT_PAREN>
+    ( LOOKAHEAD ( { groupFormat } )
+      groupIndexColumnList(indexColumnList)
+    |
+      LOOKAHEAD ( { !groupFormat } )
+      indexColumnList(indexColumnList)
+    )
+    <RIGHT_PAREN>
+    [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
+      <USING> joinType = joinType() <JOIN> ]
+    [ properties = propertyList(false) <CHECK_PROPERTIES>]
+    [ <AS> location = getLocation() ]
+    {
+        return (ConstraintDefinitionNode)nodeFactory.getNode(NodeTypes.ADD_INDEX_CONSTRAINT_NODE,
+                                                             constraintName,
+                                                             properties,
+                                                             indexColumnList,
+                                                             indexName,
+                                                             joinType,
+                                                             location,
+                                                             parserContext);
+    }
+    
+}
+
 
 ConstraintDefinitionNode
 uniqueConstraintDefinition(TableName constraintName) throws StandardException :
@@ -13920,6 +13965,7 @@ reservedKeyword() :
 | tok = <IDENTITY>
 | tok = <IMMEDIATE>
 | tok = <IN>
+| tok = <INDEX>
 | tok = <INDICATOR>
 | tok = <INITIALLY>
 | tok = <INNER>
@@ -14125,7 +14171,6 @@ nonReservedKeyword() :
 | tok = <IF>
 | tok = <IN_MEMORY>
 | tok = <INCREMENT>
-| tok = <INDEX>
 | tok = <INITIAL>
 | tok = <INPLACE>
 | tok = <INTERRUPT>
