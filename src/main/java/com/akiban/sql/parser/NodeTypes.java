@@ -219,7 +219,8 @@ public interface NodeTypes
     public static final int RIGHT_FN_NODE = 159;
     public static final int ROWS_RESULT_SET_NODE = 160;
     public static final int SPECIAL_INDEX_FUNC_NODE = 161;
-    // 162 - 182 available
+    public static final int DROP_GROUP_NODE = 162;
+    // 163 - 182 available
     public static final int ALTER_SERVER_NODE = 183;
     public static final int TIMESTAMP_ADD_FN_NODE = 184;
     public static final int TIMESTAMP_DIFF_FN_NODE = 185;

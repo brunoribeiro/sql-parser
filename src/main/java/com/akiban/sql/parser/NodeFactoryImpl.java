@@ -50,7 +50,6 @@
 package com.akiban.sql.parser;
 
 import com.akiban.sql.StandardException;
-import com.akiban.sql.types.AliasInfo;
 
 /**
     Create new parser AST nodes.
@@ -336,6 +335,9 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.DROP_VIEW_NODE:
             return NodeNames.DROP_VIEW_NODE_NAME;
 
+        case NodeTypes.DROP_GROUP_NODE:
+            return NodeNames.DROP_GROUP_NODE_NAME;
+            
         case NodeTypes.SUBQUERY_NODE:
             return NodeNames.SUBQUERY_NODE_NAME;
 
