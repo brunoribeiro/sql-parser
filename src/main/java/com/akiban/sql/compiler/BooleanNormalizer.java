@@ -303,52 +303,17 @@ public class BooleanNormalizer implements Visitor
             }
             break;
         case NodeTypes.IN_LIST_OPERATOR_NODE:
-            InListOperatorNode inListOperatorNode = (InListOperatorNode)node;
-                RowConstructorNode leftOperandList = inListOperatorNode.getLeftOperand();
-                RowConstructorNode rightOperandList = inListOperatorNode.getRightOperandList();
-            if (underNotNode) {
-                return inWithNestedTuples(inListOperatorNode);
-//                // regular cases
-//                if (leftOperandList.getNodeList().size() == 1) 
-//                {
-//                    /* We want to convert the IN List into = OR = ... as * described below. */
-//                    /* Convert:
-//                     *      leftO IN rightOList.elementAt(0) , rightOList.elementAt(1) ...
-//                     * to:
-//                     *      leftO <> rightOList.elementAt(0) AND leftO <> rightOList.elementAt(1) ...
-//                     * NOTE - We do the conversion here since the single table clauses
-//                     * can be pushed down and the optimizer may eventually have a filter factor
-//                     * for <>.
-//                     */
-//                    ValueNode result = null;
-//                    ValueNode leftOperand = leftOperandList.getNodeList().get(0);
-//                    for (ValueNode rightOperand : rightOperandList.getNodeList()) {
-//                        if (rightOperand instanceof RowConstructorNode)
-//                            throw new IllegalArgumentException("Operand should have 1 column");
-//                        BinaryComparisonOperatorNode rightBCO = (BinaryComparisonOperatorNode)
-//                            nodeFactory.getNode(NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE,
-//                                                leftOperand, rightOperand,
-//                                                parserContext);
-//                        if (result == null)
-//                            result = rightBCO;
-//                        else {
-//                            AndNode andNode = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
-//                                                                           result, rightBCO,
-//                                                                           parserContext);
-//                            result = andNode;
-//                        }
-//                    }
-//                    // TODO: Work out types.
-//                    return result;
-//                }
-//                else
-//                {
-//                    ValueNode result = inWithNestedTuples(inListOperatorNode);
-//                    return (ValueNode)nodeFactory.getNode(NodeTypes.NOT_NODE, 
-//                                                          result,
-//                                                          parserContext);
-//                }
-            }
+                /* We want to convert the IN List into = OR = ... as * described below. */
+                /* Convert:
+                 *      leftO IN rightOList.elementAt(0) , rightOList.elementAt(1) ...
+                 * to:
+                 *      leftO <> rightOList.elementAt(0) AND leftO <> rightOList.elementAt(1) ...
+                 * NOTE - We do the conversion here since the single table clauses
+                 * can be pushed down and the optimizer may eventually have a filter factor
+                 * for <>.
+                 */
+            if (underNotNode)
+                return inWithNestedTuples((InListOperatorNode)node);
 
             break;
         case NodeTypes.SUBQUERY_NODE:
