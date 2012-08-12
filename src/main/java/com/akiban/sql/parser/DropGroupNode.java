@@ -23,72 +23,50 @@
  * USE OF THE SOFTWARE, THE TERMS AND CONDITIONS OF SUCH OTHER AGREEMENT SHALL
  * PREVAIL OVER ANY CONFLICTING TERMS OR CONDITIONS IN THIS AGREEMENT.
  */
+
 package com.akiban.sql.parser;
 
 import com.akiban.sql.StandardException;
 
-public class RowConstructorNode extends ValueNode
-{
-    private ValueNodeList list;
+public class DropGroupNode extends DDLStatementNode {
 
-    @Override
-    public void init(Object list)
-    {
-        this.list = (ValueNodeList)list;
+    private ExistenceCheck existenceCheck;
+
+    public void init(Object dropObjectName, Object ec)
+            throws StandardException {
+        initAndCheck(dropObjectName);
+        this.existenceCheck = (ExistenceCheck)ec;
     }
 
     /**
-     * @inheritDoc
+     * Fill this node with a deep copy of the given node.
      */
-    @Override
-    protected boolean isEquivalent(ValueNode o) throws StandardException
+    public void copyFrom(QueryTreeNode node) throws StandardException {
+        super.copyFrom(node);
+
+        DropGroupNode other = (DropGroupNode)node;
+        this.existenceCheck = other.existenceCheck;
+    }
+
+    public ExistenceCheck getExistenceCheck()
     {
-        if (!isSameNodeType(o))
-        {
-            return false;
-        }
-        
-        RowConstructorNode other = (RowConstructorNode)o;
-        return this.list.isEquivalent(other.list);
+        return existenceCheck;
     }
 
     @Override
-    public void copyFrom(QueryTreeNode o) throws StandardException
-    {
-        super.copyFrom(o);
-        list = (ValueNodeList)getNodeFactory().copyNode(((RowConstructorNode) o).list,
-                                                        getParserContext());
+    public String statementToString() {
+        return "DROP GROUP";
     }
 
-     /**
-     * Accept the visitor for all visitable children of this node.
-     * 
-     * @param v the visitor
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
      *
-     * @exception StandardException on error
+     * @return This object as a String
      */
-    @Override
-    void acceptChildren(Visitor v) throws StandardException 
-    {
-        super.acceptChildren(v);
-
-        if (list != null)
-            list.accept(v);
-    }
-    
-    @Override
-    public String toString()
-    {
-        return list.toString();
+    public String toString() {
+        return super.toString() +
+           "existenceCheck: " + existenceCheck + "\n";
     }
 
-    public ValueNodeList getNodeList()
-    {
-        return list;
-    }
-    
-    public int listSize()
-    {
-        return list.size();
-    }
 }

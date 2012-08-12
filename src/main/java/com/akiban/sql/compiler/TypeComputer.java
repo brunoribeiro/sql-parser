@@ -435,8 +435,6 @@ public class TypeComputer implements Visitor
             boolean nullable = isNestedTupleNullable(leftOperand)
                                 || isNestedTupleNullable(node.getRightOperandList());
             
-            //throw new UnsupportedOperationException("Nested tuples not supported yet");
-            // TODO:
             return new DataTypeDescriptor(TypeId.BOOLEAN_ID, nullable);
         }
     }
@@ -453,7 +451,9 @@ public class TypeComputer implements Visitor
             if (node instanceof RowConstructorNode)
                 ret |= isNestedTupleNullable((RowConstructorNode)node);
             else
+            {
                 ret |= node.getType().isNullable();
+            }
         }
         return ret;
     }

@@ -307,50 +307,47 @@ public class BooleanNormalizer implements Visitor
                 RowConstructorNode leftOperandList = inListOperatorNode.getLeftOperand();
                 RowConstructorNode rightOperandList = inListOperatorNode.getRightOperandList();
             if (underNotNode) {
-                // regular cases
-                if (leftOperandList.getNodeList().size() == 1) 
-                {
-                    /* We want to convert the IN List into = OR = ... as * described below. */
-                    /* Convert:
-                     *      leftO IN rightOList.elementAt(0) , rightOList.elementAt(1) ...
-                     * to:
-                     *      leftO <> rightOList.elementAt(0) AND leftO <> rightOList.elementAt(1) ...
-                     * NOTE - We do the conversion here since the single table clauses
-                     * can be pushed down and the optimizer may eventually have a filter factor
-                     * for <>.
-                     */
-                    ValueNode result = null;
-                    ValueNode leftOperand = leftOperandList.getNodeList().get(0);
-                    for (ValueNode rightOperand : rightOperandList.getNodeList()) {
-                        if (rightOperand instanceof RowConstructorNode)
-                            throw new IllegalArgumentException("Operand should have 1 column");
-                        BinaryComparisonOperatorNode rightBCO = (BinaryComparisonOperatorNode)
-                            nodeFactory.getNode(NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE,
-                                                leftOperand, rightOperand,
-                                                parserContext);
-                        if (result == null)
-                            result = rightBCO;
-                        else {
-                            AndNode andNode = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
-                                                                           result, rightBCO,
-                                                                           parserContext);
-                            result = andNode;
-                        }
-                    }
-                    // TODO: Work out types.
-                    return result;
-                }
-                else
-                {
-                    ValueNode result = inWithNestedTuples(inListOperatorNode);
-                    return (ValueNode)nodeFactory.getNode(NodeTypes.NOT_NODE, 
-                                                          result,
-                                                          parserContext);
-                }
-            }
-            else if (leftOperandList.listSize() != 1)
-            {
                 return inWithNestedTuples(inListOperatorNode);
+//                // regular cases
+//                if (leftOperandList.getNodeList().size() == 1) 
+//                {
+//                    /* We want to convert the IN List into = OR = ... as * described below. */
+//                    /* Convert:
+//                     *      leftO IN rightOList.elementAt(0) , rightOList.elementAt(1) ...
+//                     * to:
+//                     *      leftO <> rightOList.elementAt(0) AND leftO <> rightOList.elementAt(1) ...
+//                     * NOTE - We do the conversion here since the single table clauses
+//                     * can be pushed down and the optimizer may eventually have a filter factor
+//                     * for <>.
+//                     */
+//                    ValueNode result = null;
+//                    ValueNode leftOperand = leftOperandList.getNodeList().get(0);
+//                    for (ValueNode rightOperand : rightOperandList.getNodeList()) {
+//                        if (rightOperand instanceof RowConstructorNode)
+//                            throw new IllegalArgumentException("Operand should have 1 column");
+//                        BinaryComparisonOperatorNode rightBCO = (BinaryComparisonOperatorNode)
+//                            nodeFactory.getNode(NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE,
+//                                                leftOperand, rightOperand,
+//                                                parserContext);
+//                        if (result == null)
+//                            result = rightBCO;
+//                        else {
+//                            AndNode andNode = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
+//                                                                           result, rightBCO,
+//                                                                           parserContext);
+//                            result = andNode;
+//                        }
+//                    }
+//                    // TODO: Work out types.
+//                    return result;
+//                }
+//                else
+//                {
+//                    ValueNode result = inWithNestedTuples(inListOperatorNode);
+//                    return (ValueNode)nodeFactory.getNode(NodeTypes.NOT_NODE, 
+//                                                          result,
+//                                                          parserContext);
+//                }
             }
 
             break;
@@ -446,7 +443,7 @@ public class BooleanNormalizer implements Visitor
         return node;
     }
 
-    protected ValueNode getEqual(ValueNode left, ValueNode right) throws StandardException
+    protected ValueNode getNotEqual(ValueNode left, ValueNode right) throws StandardException
     {
         if (left instanceof RowConstructorNode)
         {
@@ -462,16 +459,16 @@ public class BooleanNormalizer implements Visitor
                 ValueNode result = null;
                 for (int n = 0; n < leftList.size(); ++n)
                 {
-                    ValueNode equalNode = getEqual(leftList.get(n), rightList.get(n));
+                    ValueNode equalNode = getNotEqual(leftList.get(n), rightList.get(n));
                     
                     if (result == null)
                         result = equalNode;
                     else
                     {
-                        AndNode andNode = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
+                        OrNode orNode = (OrNode)nodeFactory.getNode(NodeTypes.OR_NODE,
                                                                        result, equalNode,
                                                                        parserContext);
-                        result = andNode;
+                        result = orNode;
                     }
                 }
                 return result;
@@ -484,7 +481,7 @@ public class BooleanNormalizer implements Visitor
             if (right instanceof RowConstructorNode)
                 throw new IllegalArgumentException("Mismatched column count in IN's operands");
            
-            return (ValueNode) nodeFactory.getNode(NodeTypes.BINARY_EQUALS_OPERATOR_NODE,
+            return (ValueNode) nodeFactory.getNode(NodeTypes.BINARY_NOT_EQUALS_OPERATOR_NODE,
                                                    left, right,
                                                    parserContext);
         }
@@ -498,13 +495,13 @@ public class BooleanNormalizer implements Visitor
         
         for (ValueNode rightNode : rightList.getNodeList())
         {
-            ValueNode equalNode = getEqual(leftList, rightNode);
+            ValueNode equalNode = getNotEqual(leftList, rightNode);
             
             if (result == null)
                 result = equalNode;
             else
             {
-                OrNode orNode = (OrNode)nodeFactory.getNode(NodeTypes.OR_NODE,
+                AndNode orNode = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
                                                             equalNode, result,
                                                             parserContext);
                 result = orNode;
