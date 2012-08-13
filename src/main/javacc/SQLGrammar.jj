@@ -12144,7 +12144,7 @@ tableConstraint(TableName constraintName) throws StandardException :
     ConstraintDefinitionNode tcdn;
 }
 {
-    tcdn = addIndexConstraintDefinition(constraintName)
+    tcdn = indexConstraintDefinition(constraintName)
     {
         return tcdn;
     }
@@ -12166,18 +12166,18 @@ tableConstraint(TableName constraintName) throws StandardException :
 }
 
 ConstraintDefinitionNode
-addIndexConstraintDefinition(TableName constraintName) throws StandardException : 
+indexConstraintDefinition(TableName constraintName) throws StandardException : 
 {
     boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
 
-    String indexName;
+    String indexName = null;
     IndexColumnList indexColumnList = null;
     JoinNode.JoinType joinType = null;
     Properties properties = null;
     StorageLocation location = null;
 }
 {
-    <INDEX> indexName = identifier()
+    <INDEX> [indexName = identifier()]
     <LEFT_PAREN>
     ( 
       LOOKAHEAD ( { geoIndexDefFuncFollows() } )
@@ -12192,8 +12192,8 @@ addIndexConstraintDefinition(TableName constraintName) throws StandardException 
     <RIGHT_PAREN>
     [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
       <USING> joinType = joinType() <JOIN> ]
-    [ properties = propertyList(false) <CHECK_PROPERTIES>]
     [ <AS> location = getLocation() ]
+    [ properties = propertyList(false) <CHECK_PROPERTIES>]
     {
         return (ConstraintDefinitionNode)nodeFactory.getNode(NodeTypes.ADD_INDEX_CONSTRAINT_NODE,
                                                              constraintName,
