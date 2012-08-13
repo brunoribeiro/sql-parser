@@ -160,6 +160,7 @@
                         <exclude>**/*.jj</exclude>
                         <exclude>**/*.features</exclude>
                         <exclude>.bzrignore</exclude>
+                        <exclude>.idea/**</exclude>
                         <exclude>LICENSE.txt</exclude>
                     </excludes>
                     <mapping>

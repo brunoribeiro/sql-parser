@@ -156,6 +156,8 @@ public interface NodeNames
     static final String DROP_ALIAS_NODE_NAME = "com.akiban.sql.parser.DropAliasNode";
 
     static final String DROP_INDEX_NODE_NAME = "com.akiban.sql.parser.DropIndexNode";
+    
+    static final String DROP_GROUP_NODE_NAME = "com.akiban.sql.parser.DropGroupNode";
 
     static final String DROP_ROLE_NODE_NAME = "com.akiban.sql.parser.DropRoleNode";
 

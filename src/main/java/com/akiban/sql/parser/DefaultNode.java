@@ -105,7 +105,7 @@ public  class DefaultNode extends ValueNode
      *
      * @return The query tree for the default.
      */
-    ValueNode getDefaultTree() {
+    public ValueNode getDefaultTree() {
         return defaultTree;
     }
 
