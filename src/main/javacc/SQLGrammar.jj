@@ -3010,6 +3010,8 @@ dropStatements() throws StandardException :
     statementNode = dropRoleStatement() 
 |
     statementNode = dropSequenceStatement()
+|
+    statementNode = dropGroupStatement()
 )
     {
         return statementNode;
@@ -13252,6 +13254,22 @@ dropViewStatement() throws StandardException :
                                                   viewName,
                                                   cond,
                                                   parserContext);
+    }
+}
+
+StatementNode
+dropGroupStatement() throws StandardException :
+{
+    TableName groupName;
+    ExistenceCheck cond;
+}
+{
+    <GROUP> cond = dropCondition() groupName = qualifiedName()
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_GROUP_NODE,
+                                                   groupName,
+                                                   cond,
+                                                   parserContext);
     }
 }
 
