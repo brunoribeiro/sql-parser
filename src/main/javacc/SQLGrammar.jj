@@ -2332,6 +2332,7 @@ TOKEN [IGNORE_CASE] :
 { /* Additional non-SQL92 non-reserved keywords */
   <AFTER: "after">
 | <BEFORE: "before">
+| <BTREE: "btree">
 | <CLASS: "class">
 | <COMPRESS: "compress">
 | <CONTENT: "content">
@@ -2355,6 +2356,7 @@ TOKEN [IGNORE_CASE] :
 | <HOUR_MINUTE: "hour_minute">
 | <HOUR_SECOND: "hour_second">
 | <IGNORE: "ignore">
+| <IN_MEMORY: "in_memory">
 | <INDEX: "index">
 | <INPLACE: "inplace">
 | <INTERRUPT: "interrupt">
@@ -9942,6 +9944,7 @@ indexDefinition() throws StandardException :
     boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
     JoinNode.JoinType joinType = null;
     ExistenceCheck cond;
+    StorageLocation location = null;
 }
 {
     [ unique = unique() ] 
@@ -9963,6 +9966,7 @@ indexDefinition() throws StandardException :
     [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
       <USING> joinType = joinType() <JOIN> ]
     [ properties = propertyList(false) <CHECK_PROPERTIES>]
+    [ <AS> location = getLocation() ]
     {
         /* User allowed to specify schema name on table and index.
          * If no schema name specified for index, then it "inherits" 
@@ -9995,6 +9999,7 @@ indexDefinition() throws StandardException :
                                                   joinType,
                                                   properties,
                                                   cond,
+                                                  location,
                                                   parserContext);
     }
 }
@@ -12643,6 +12648,7 @@ alterSessionID() throws StandardException:
                                               parserContext); 
     }
 }
+
 StatementNode
 alterTableBody(TableName tableName) throws StandardException :
 {
@@ -12747,46 +12753,6 @@ sequentialCompress(TableName tableName) throws StandardException :
     }
 }
 
-/*
-StatementNode
-alterTableRenameTableStatement(TableName tableName) throws StandardException :
-{
-    String newTableName;
-}
-{
-    <TO> newTableName = identifier()
-    {
-        return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
-                                                  tableName,
-                                                  null,
-                                                  newTableName,
-                                                  Boolean.TRUE,
-                                                  RenameNode.RenameType.TABLE,
-                                                  parserContext);
-    }
-}
-*/
-
-/*
-StatementNode
-alterTableRenameColumnStatement(TableName tableName) throws StandardException :
-{
-    String oldColumnName;
-    String newColumnName;
-}
-{
-    oldColumnName = identifier() <TO> newColumnName = identifier()
-    {
-        return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
-                                                  tableName,
-                                                  oldColumnName,
-                                                  newColumnName,
-                                                  Boolean.TRUE,
-                                                  RenameNode.RenameType.COLUMN,
-                                                  parserContext);
-    }
-}
-*/
 
 char
 alterTableAction(TableElementList tableElementList, int[] changeType, int[] behavior) 
@@ -12802,6 +12768,9 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
 {
     <ADD>
     (
+        LOOKAHEAD ( {getToken(1).kind == UNIQUE && getToken(2).kind == INDEX || getToken(1).kind == INDEX} )
+        tableElement = addIndex()
+    |
         tableElement = addColumnDefinition(tableElementList)
     |
         tableElement = tableConstraintDefinition()
@@ -12828,6 +12797,9 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
 |
     <DROP>
     (
+        LOOKAHEAD ( {getToken(1).kind == INDEX || getToken(1).kind == KEY } )
+        tableElement = dropIndex()
+    |
         tableElement = dropColumnDefinition(behavior)
     |
         tableElement = dropTableConstraintDefinition()
@@ -12866,6 +12838,89 @@ dropColumnDefinition(int []behavior) throws StandardException :
                                                      parserContext);
     }
 }
+
+TableElementNode
+dropIndex() throws StandardException :
+{
+    String indexName;
+    ExistenceCheck cond;
+}
+{
+    (<INDEX> | <KEY>) cond = dropCondition() indexName = identifier()
+    {
+        return (TableElementNode)nodeFactory.getNode(NodeTypes.AT_DROP_INDEX_NODE,
+                                                     indexName, // name
+                                                     null,      // element type (doesn't need to specify it here)
+                                                     cond,      // existence 
+                                                     parserContext);
+    }
+}
+
+StorageLocation
+getLocation() throws StandardException :
+{
+}
+{
+    <IN_MEMORY>
+    {
+        return StorageLocation.IN_MEMORY;
+    }
+|
+    <BTREE>
+    {
+        return StorageLocation.BTREE;
+    }
+}
+
+TableElementNode
+addIndex() throws StandardException :
+{
+    boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
+
+    ExistenceCheck cond;
+    Boolean unique = Boolean.FALSE;
+    String indexName;
+    IndexColumnList indexColumnList = (IndexColumnList)
+                nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
+    JoinNode.JoinType joinType = null;
+    Properties properties = null;
+    StorageLocation location = null;
+}
+{
+    
+    [unique = unique()]
+    <INDEX>
+    cond = createCondition()
+    indexName = identifier()
+     <LEFT_PAREN>
+    ( LOOKAHEAD ( { geoIndexDefFuncFollows() } )
+      indexColumnList = geoIndexDefFunc()
+    |
+      LOOKAHEAD ( { groupFormat } )
+      groupIndexColumnList(indexColumnList)
+    |
+      LOOKAHEAD ( { !groupFormat } )
+      indexColumnList(indexColumnList)
+    )
+    <RIGHT_PAREN>
+    [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
+      <USING> joinType = joinType() <JOIN> ]
+    [ properties = propertyList(false) <CHECK_PROPERTIES>]
+    [ <AS> location = getLocation() ]
+    {
+        
+        return (TableElementNode)nodeFactory.getNode(NodeTypes.AT_ADD_INDEX_NODE,
+                                                  cond,
+                                                  unique,
+                                                  indexName,
+                                                  indexColumnList,
+                                                  joinType,
+                                                  properties,
+                                                  location,
+                                                  parserContext);
+    }
+}
+
 void
 dropBehavior(int[] behavior) :
 {
@@ -14041,6 +14096,7 @@ nonReservedKeyword() :
 | tok = <BEFORE>
 | tok = <BINARY>
 | tok = <BLOB>
+| tok = <BTREE>
 | tok = <C>
 | tok = <CALLED>
 | tok = <CHARACTERISTICS>
@@ -14088,6 +14144,7 @@ nonReservedKeyword() :
 | tok = <IDENTITY_VAL_LOCAL>
 | tok = <IGNORE>
 | tok = <IF>
+| tok = <IN_MEMORY>
 | tok = <INCREMENT>
 | tok = <INDEX>
 | tok = <INITIAL>

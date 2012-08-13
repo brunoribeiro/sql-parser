@@ -63,7 +63,7 @@ public class TableElementNode extends QueryTreeNode
     public static enum ElementType {
         AT_UNKNOWN, AT_ADD_FOREIGN_KEY_CONSTRAINT, AT_ADD_PRIMARY_KEY_CONSTRAINT,
         AT_ADD_UNIQUE_CONSTRAINT, AT_ADD_CHECK_CONSTRAINT, AT_DROP_CONSTRAINT,
-        AT_MODIFY_COLUMN, AT_DROP_COLUMN
+        AT_MODIFY_COLUMN, AT_DROP_COLUMN, AT_DROP_INDEX, AT_ADD_INDEX
     }
 
     String name;

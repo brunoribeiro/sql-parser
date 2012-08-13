@@ -71,7 +71,8 @@ public class CreateIndexNode extends DDLStatementNode
     JoinType joinType;
     Properties properties;
     ExistenceCheck existenceCheck;
-
+    StorageLocation storageLocation;
+    
     /**
      * Initializer for a CreateIndexNode
      *
@@ -92,7 +93,8 @@ public class CreateIndexNode extends DDLStatementNode
                      Object columnList,
                      Object joinType,
                      Object properties,
-                     Object existenceCheck) 
+                     Object existenceCheck,
+                     Object storageLocation) 
             throws StandardException {
         initAndCheck(indexName);
         this.unique = ((Boolean)unique).booleanValue();
@@ -103,6 +105,7 @@ public class CreateIndexNode extends DDLStatementNode
         this.joinType = (JoinType)joinType;
         this.properties = (Properties)properties;
         this.existenceCheck = (ExistenceCheck)existenceCheck;
+        this.storageLocation = (StorageLocation) storageLocation;
     }
 
     /**
@@ -123,6 +126,7 @@ public class CreateIndexNode extends DDLStatementNode
         this.joinType = other.joinType;
         this.properties = other.properties; // TODO: Clone?
         this.existenceCheck = other.existenceCheck;
+        this.storageLocation = other.storageLocation;
     }
 
     /**
@@ -140,7 +144,8 @@ public class CreateIndexNode extends DDLStatementNode
             "tableName: " + tableName + "\n" +
             "joinType: " + joinType + "\n" +
             "properties: " + properties + "\n" +
-            "existenceCheck: " + existenceCheck + "\n";
+            "existenceCheck: " + existenceCheck + "\n" +
+            "storageLocation: " + storageLocation + "\n";
     }
 
     public void printSubNodes(int depth) {
@@ -177,5 +182,10 @@ public class CreateIndexNode extends DDLStatementNode
     public ExistenceCheck getExistenceCheck()
     {
         return existenceCheck;
+    }
+    
+    public StorageLocation getStorageLocation()
+    {
+        return storageLocation;
     }
 }
