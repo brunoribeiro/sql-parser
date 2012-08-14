@@ -19,7 +19,7 @@ tableElementList:
 	[2]:	
 	com.akiban.sql.parser.AddIndexConstraintDefinitionNode@67b99628
 	constraintName: null
-	constraintType: ADD_INDEX
+	constraintType: INDEX
 	properties: null
 	name: null
 	elementType: AT_DROP_CONSTRAINT

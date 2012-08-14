@@ -45,13 +45,13 @@ public class AddIndexConstraintDefinitionNode extends ConstraintDefinitionNode
                      Object location)
     {
         super.init(tableName,
-                   ConstraintType.ADD_INDEX,
+                   ConstraintType.INDEX,
                    properties,
                    null, // column list? don't need. Use indexColumnList instead
                    null, // constrainText ? 
                    null, // conditionCheck ?
                    StatementType.UNKNOWN, // behaviour? 
-                   ConstraintType.ADD_INDEX);
+                   ConstraintType.INDEX);
         
         this.indexName = (String) indexName;
         this.indexColumnList = (IndexColumnList) indexColumnList;
