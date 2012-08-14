@@ -9762,15 +9762,17 @@ StatementNode
 dropSequenceStatement() throws StandardException :
 {
     TableName sequenceName;
+    ExistenceCheck cond;
 }
 {
     /*
      * DROP SEQUENCE <sequencename> RESTRICT
      */
-    <SEQUENCE> sequenceName = qualifiedName() <RESTRICT>
+    <SEQUENCE> cond = dropCondition() sequenceName = qualifiedName() <RESTRICT>
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_SEQUENCE_NODE,
                                                   sequenceName,
+                                                  cond,
                                                   parserContext);
     }
 }
