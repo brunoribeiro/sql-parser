@@ -58,16 +58,23 @@ import com.akiban.sql.StandardException;
 public class DropSequenceNode extends DDLStatementNode 
 {
     private TableName dropItem;
-
+    private ExistenceCheck existenceCheck;
+    
     /**
      * Initializer for a DropSequenceNode
      *
      * @param dropSequenceName The name of the sequence being dropped
      * @throws StandardException
      */
-    public void init(Object dropSequenceName) throws StandardException {
+    public void init(Object dropSequenceName, Object ec) throws StandardException {
         dropItem = (TableName)dropSequenceName;
         initAndCheck(dropItem);
+        this.existenceCheck = (ExistenceCheck)ec;
+    }
+
+    public ExistenceCheck getExistenceCheck()
+    {
+        return existenceCheck;
     }
 
     /**
@@ -85,4 +92,8 @@ public class DropSequenceNode extends DDLStatementNode
         return "DROP SEQUENCE ".concat(dropItem.getTableName());
     }
 
+    public String toString() {
+        return super.toString() + 
+                "existenceCheck: " + existenceCheck + "\n";
+    }
 }
