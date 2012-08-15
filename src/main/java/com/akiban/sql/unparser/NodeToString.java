@@ -212,14 +212,14 @@ public class NodeToString
             return methodCallNode((MethodCallNode)node);
         case NodeTypes.SPECIAL_INDEX_FUNC_NODE:
             return zorderFuncNode((SpecialIndexFuncNode)node);
-        case NodeTypes.ADD_INDEX_CONSTRAINT_NODE:
-            return indexConstraint((AddIndexConstraintDefinitionNode)node);
+        case NodeTypes.INDEX_CONSTRAINT_NODE:
+            return indexConstraint((IndexConstraintDefinitionNode)node);
         default:
             return "**UNKNOWN(" + node.getNodeType() +")**";
         }
     }
 
-    protected String indexConstraint(AddIndexConstraintDefinitionNode node) throws StandardException
+    protected String indexConstraint(IndexConstraintDefinitionNode node) throws StandardException
     {
         StringBuilder builder = new StringBuilder("INDEX ");
         

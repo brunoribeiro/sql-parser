@@ -221,7 +221,7 @@ public interface NodeTypes
     public static final int SPECIAL_INDEX_FUNC_NODE = 161;
     public static final int AT_DROP_INDEX_NODE = 162;
     public static final int AT_ADD_INDEX_NODE = 163;
-    public static final int ADD_INDEX_CONSTRAINT_NODE = 164;
+    public static final int INDEX_CONSTRAINT_NODE = 164;
     public static final int DROP_GROUP_NODE = 165;
     // 166 - 182 available
     public static final int ALTER_SERVER_NODE = 183;

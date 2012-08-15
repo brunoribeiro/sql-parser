@@ -12195,7 +12195,7 @@ indexConstraintDefinition(TableName constraintName) throws StandardException :
     [ <AS> location = getLocation() ]
     [ properties = propertyList(false) <CHECK_PROPERTIES>]
     {
-        return (ConstraintDefinitionNode)nodeFactory.getNode(NodeTypes.ADD_INDEX_CONSTRAINT_NODE,
+        return (ConstraintDefinitionNode)nodeFactory.getNode(NodeTypes.INDEX_CONSTRAINT_NODE,
                                                              constraintName,
                                                              properties,
                                                              indexColumnList,

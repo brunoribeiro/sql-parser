@@ -17,7 +17,7 @@ tableElementList:
 	name: c2
 	elementType: null
 	[2]:	
-	com.akiban.sql.parser.AddIndexConstraintDefinitionNode@f151bf2
+	com.akiban.sql.parser.IndexConstraintDefinitionNode@f151bf2
 	constraintName: null
 	constraintType: INDEX
 	properties: null

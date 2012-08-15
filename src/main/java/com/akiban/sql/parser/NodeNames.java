@@ -71,7 +71,7 @@ public interface NodeNames
 
     static final String AGGREGATE_WINDOW_FUNCTION_NAME = "com.akiban.sql.parser.AggregateWindowFunctionNode";
 
-    static final String ADD_INDEX_CONSTRAINT_NAME = "com.akiban.sql.parser.AddIndexConstraintDefinitionNode";
+    static final String INDEX_CONSTRAINT_NAME = "com.akiban.sql.parser.IndexConstraintDefinitionNode";
 
     static final String ALL_RESULT_COLUMN_NAME = "com.akiban.sql.parser.AllResultColumn";
 
