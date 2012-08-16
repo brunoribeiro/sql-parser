@@ -6493,6 +6493,11 @@ valueExpressionPrimary() throws StandardException :
     {
         return value;
     }
+|
+    value = currentValueExpression()
+    {
+        return value;
+    }
 }
 
 ValueNode
@@ -9370,6 +9375,26 @@ nextValueExpression() throws StandardException :
                                                    parserContext);
 
         return nextValue;
+    } 
+}
+
+/**
+ * Current value from a sequence object
+ */
+ValueNode
+currentValueExpression() throws StandardException :
+{
+    ValueNode currentValue;
+    TableName sequenceName;
+}
+{
+    <CURRENT> <VALUE> <FOR> sequenceName = qualifiedName()
+    {
+        currentValue = (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_SEQUENCE_NODE,
+                                                      sequenceName,
+                                                      parserContext);
+
+        return currentValue;
     } 
 }
 
