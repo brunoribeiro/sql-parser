@@ -596,6 +596,9 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.NEXT_SEQUENCE_NODE:
             return NodeNames.NEXT_SEQUENCE_NODE_NAME;
 
+        case NodeTypes.CURRENT_SEQUENCE_NODE:
+            return NodeNames.CURRENT_SEQUENCE_NODE_NAME;
+
         case NodeTypes.EXPLAIN_STATEMENT_NODE:
             return NodeNames.EXPLAIN_STATEMENT_NODE_NAME;
 

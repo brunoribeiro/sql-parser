@@ -274,6 +274,7 @@ public interface NodeTypes
     public static final int CREATE_SEQUENCE_NODE = 224;
     public static final int DROP_SEQUENCE_NODE = 225;
     public static final int NEXT_SEQUENCE_NODE = 231;
+    public static final int CURRENT_SEQUENCE_NODE = 232;
 
     // Windowing
     public static final int AGGREGATE_WINDOW_FUNCTION_NODE = 226;
@@ -283,7 +284,7 @@ public interface NodeTypes
     public static final int WINDOW_RESULTSET_NODE = 230;
 
     // Final value in set, keep up to date!
-    public static final int FINAL_VALUE = NEXT_SEQUENCE_NODE;
+    public static final int FINAL_VALUE = CURRENT_SEQUENCE_NODE;
 
     /**
      * Extensions to this interface can use nodetypes > MAX_NODE_TYPE with out fear of collision

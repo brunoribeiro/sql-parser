@@ -247,6 +247,8 @@ public interface NodeNames
 
     static final String NEXT_SEQUENCE_NODE_NAME = "com.akiban.sql.parser.NextSequenceNode";
 
+    static final String CURRENT_SEQUENCE_NODE_NAME = "com.akiban.sql.parser.CurrentSequenceNode";
+
     static final String NON_STATIC_METHOD_CALL_NODE_NAME = "com.akiban.sql.parser.NonStaticMethodCallNode";
 
     static final String NOP_STATEMENT_NODE_NAME = "com.akiban.sql.parser.NOPStatementNode";

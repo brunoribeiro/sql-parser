@@ -6493,6 +6493,11 @@ valueExpressionPrimary() throws StandardException :
     {
         return value;
     }
+|
+    value = currentValueExpression()
+    {
+        return value;
+    }
 }
 
 ValueNode
@@ -9370,6 +9375,27 @@ nextValueExpression() throws StandardException :
                                                    parserContext);
 
         return nextValue;
+    } 
+}
+
+/**
+ * Current value from a sequence object
+ */
+ValueNode
+currentValueExpression() throws StandardException :
+{
+    ValueNode sequenceValue;
+    TableName sequenceName;
+}
+{
+    LOOKAHEAD( { getToken(1).kind == CURRENT && getToken(2).kind == VALUE && getToken(3).kind == FOR } )
+    <CURRENT> <VALUE> <FOR> sequenceName = qualifiedName()
+    {
+        sequenceValue = (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_SEQUENCE_NODE,
+                                                       sequenceName,
+                                                       parserContext);
+
+        return sequenceValue;
     } 
 }
 
