@@ -627,6 +627,9 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.SPECIAL_INDEX_FUNC_NODE:
             return NodeNames.SPECIAL_INDEX_FUNC_NODE_NAME;
 
+        case NodeTypes.INDEX_CONSTRAINT_NODE:
+            return NodeNames.INDEX_CONSTRAINT_NAME;
+
         default:
             throw new StandardException("Not implemented");
         }
