@@ -12173,7 +12173,6 @@ indexConstraintDefinition(TableName constraintName) throws StandardException :
     String indexName = null;
     IndexColumnList indexColumnList = null;
     JoinNode.JoinType joinType = null;
-    Properties properties = null;
     StorageLocation location = null;
 }
 {
@@ -12193,11 +12192,10 @@ indexConstraintDefinition(TableName constraintName) throws StandardException :
     [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
       <USING> joinType = joinType() <JOIN> ]
     [ <AS> location = getLocation() ]
-    [ properties = propertyList(false) <CHECK_PROPERTIES>]
     {
         return (ConstraintDefinitionNode)nodeFactory.getNode(NodeTypes.INDEX_CONSTRAINT_NODE,
                                                              constraintName,
-                                                             properties,
+                                                             null,
                                                              indexColumnList,
                                                              indexName,
                                                              joinType,
