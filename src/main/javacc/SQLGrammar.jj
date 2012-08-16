@@ -12195,7 +12195,6 @@ indexConstraintDefinition(TableName constraintName) throws StandardException :
     {
         return (ConstraintDefinitionNode)nodeFactory.getNode(NodeTypes.INDEX_CONSTRAINT_NODE,
                                                              constraintName,
-                                                             null,
                                                              indexColumnList,
                                                              indexName,
                                                              joinType,

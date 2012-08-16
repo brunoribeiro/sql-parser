@@ -38,7 +38,6 @@ public class IndexConstraintDefinitionNode extends ConstraintDefinitionNode
     
     @Override
     public void init(Object tableName,
-                     Object properties,
                      Object indexColumnList,
                      Object indexName,
                      Object joinType,
@@ -46,7 +45,7 @@ public class IndexConstraintDefinitionNode extends ConstraintDefinitionNode
     {
         super.init(tableName,
                    ConstraintType.INDEX,
-                   properties,
+                   null, // properties : don't need
                    null, // column list? don't need. Use indexColumnList instead
                    null, // constrainText ? 
                    null, // conditionCheck ?
