@@ -30,11 +30,13 @@ import com.akiban.sql.StandardException;
 public class RowConstructorNode extends ValueNode
 {
     private ValueNodeList list;
-
+    private int depth; // max depth
+    
     @Override
-    public void init(Object list)
+    public void init(Object list, Object count)
     {
         this.list = (ValueNodeList)list;
+        depth = ((int[])count)[0];
     }
 
     /**
@@ -49,15 +51,17 @@ public class RowConstructorNode extends ValueNode
         }
         
         RowConstructorNode other = (RowConstructorNode)o;
-        return this.list.isEquivalent(other.list);
+        return list.isEquivalent(other.list) && depth == other.depth;
     }
 
     @Override
     public void copyFrom(QueryTreeNode o) throws StandardException
     {
         super.copyFrom(o);
-        list = (ValueNodeList)getNodeFactory().copyNode(((RowConstructorNode) o).list,
+        RowConstructorNode other = (RowConstructorNode) o;
+        list = (ValueNodeList)getNodeFactory().copyNode(other.list,
                                                         getParserContext());
+        depth = other.depth;
     }
 
      /**
@@ -79,7 +83,12 @@ public class RowConstructorNode extends ValueNode
     @Override
     public String toString()
     {
-        return list.toString();
+        return list.toString() + "depth: " + depth + "\n";
+    }
+
+    public int getDepth()
+    {
+        return depth;
     }
 
     public ValueNodeList getNodeList()

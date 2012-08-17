@@ -81,6 +81,7 @@ public final class InListOperatorNode extends ValueNode
             this.leftOperand = (RowConstructorNode)
                                         getNodeFactory().getNode(NodeTypes.ROW_CTOR_NODE,
                                                                  list,
+                                                                 new int[]{0},
                                                                  getParserContext());
             
         }

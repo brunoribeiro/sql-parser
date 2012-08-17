@@ -5197,7 +5197,7 @@ predicate() throws StandardException :
 {
 (
      LOOKAHEAD( {rowValueConstructorListFollows()} )
-     value = rowCtor()
+     value = rowCtor(new int[] {0})
 |
      value = additiveExpression() 
 |
@@ -5296,7 +5296,7 @@ remainingNegatablePredicate(ValueNode leftOperand) throws StandardException :
     ValueNode escapeValue = null;
 }
 {
-    <DUMMY> tree = rowCtor()
+    <DUMMY> tree = rowCtor(new int[]{0})
     {
         return tree;
     }
@@ -8275,6 +8275,7 @@ ValueNode
 inPredicateValue(ValueNode leftOperand) throws StandardException :
 {
     ValueNode retval;
+    int count[] = new int[]{0};
 }
 {
     LOOKAHEAD( {leftParenAndSubqueryFollows()} )
@@ -8283,7 +8284,7 @@ inPredicateValue(ValueNode leftOperand) throws StandardException :
         return retval;
     }
 |
-    retval = rowCtor()
+    retval = rowCtor(count)
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.IN_LIST_OPERATOR_NODE,
                                               leftOperand,
@@ -8323,49 +8324,54 @@ inElement(ValueNodeList inList) throws StandardException :
 
 
 ValueNode
-rowCtor() throws StandardException:
+rowCtor(int count[]) throws StandardException:
 {
     ValueNodeList list = (ValueNodeList)nodeFactory.getNode(NodeTypes.VALUE_NODE_LIST,
                                                             parserContext);
 }
 {
     <LEFT_PAREN>
-    getRow(list)
+    getRow(list, count)
     <RIGHT_PAREN>
     {
+        ++count[0];
         return (ValueNode)nodeFactory.getNode(NodeTypes.ROW_CTOR_NODE,
                                               list,
+                                              new int[]{count[0]},
                                               parserContext);
         
     }
 }
 
 void
-getRow(ValueNodeList rowList) throws StandardException:
+getRow(ValueNodeList rowList, int count[]) throws StandardException:
 {
+    int max = count[0];
 }
 {
-    rowElement(rowList)
-    ( <COMMA> rowElement(rowList) )*
+    max = rowElement(rowList, new int[]{count[0]}, max)
+    ( <COMMA> max = rowElement(rowList, new int[]{count[0]}, max) )*
     {
+        count[0] = max;
         return;
     }
 }
 
-void
-rowElement(ValueNodeList list) throws StandardException:
+int
+rowElement(ValueNodeList list, int count[], int max) throws StandardException:
 {   
     ValueNode element = null;
 }
 {
     (
         (LOOKAHEAD( {rowValueConstructorListFollows()} )
-        element = rowCtor())
+        element = rowCtor(count))
      |   
         element = additiveExpression()
     )
     {
         list.addValueNode(element);
+        return max >= count[0] ? max : count[0];
     }
 
 }
