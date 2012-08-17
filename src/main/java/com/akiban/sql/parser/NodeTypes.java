@@ -218,10 +218,13 @@ public interface NodeTypes
     public static final int LEFT_FN_NODE = 158;
     public static final int RIGHT_FN_NODE = 159;
     public static final int ROWS_RESULT_SET_NODE = 160;
-    public static final int ROW_CTOR_NODE = 161;
-    public static final int SPECIAL_INDEX_FUNC_NODE = 162;
-    public static final int DROP_GROUP_NODE = 163;
-    // 164 - 182 available
+    public static final int SPECIAL_INDEX_FUNC_NODE = 161;
+    public static final int AT_DROP_INDEX_NODE = 162;
+    public static final int AT_ADD_INDEX_NODE = 163;
+    public static final int INDEX_CONSTRAINT_NODE = 164;
+    public static final int DROP_GROUP_NODE = 165;
+    public static final int ROW_CTOR_NODE = 166;
+    // 167 - 182 available
     public static final int ALTER_SERVER_NODE = 183;
     public static final int TIMESTAMP_ADD_FN_NODE = 184;
     public static final int TIMESTAMP_DIFF_FN_NODE = 185;
@@ -272,6 +275,7 @@ public interface NodeTypes
     public static final int CREATE_SEQUENCE_NODE = 224;
     public static final int DROP_SEQUENCE_NODE = 225;
     public static final int NEXT_SEQUENCE_NODE = 231;
+    public static final int CURRENT_SEQUENCE_NODE = 232;
 
     // Windowing
     public static final int AGGREGATE_WINDOW_FUNCTION_NODE = 226;
@@ -281,7 +285,7 @@ public interface NodeTypes
     public static final int WINDOW_RESULTSET_NODE = 230;
 
     // Final value in set, keep up to date!
-    public static final int FINAL_VALUE = NEXT_SEQUENCE_NODE;
+    public static final int FINAL_VALUE = CURRENT_SEQUENCE_NODE;
 
     /**
      * Extensions to this interface can use nodetypes > MAX_NODE_TYPE with out fear of collision

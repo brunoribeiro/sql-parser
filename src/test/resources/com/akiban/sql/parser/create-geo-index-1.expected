@@ -8,6 +8,7 @@ tableName: table1
 joinType: null
 properties: null
 existenceCheck: IF_NOT_EXISTS
+storageLocation: null
 	
 	com.akiban.sql.parser.SpecialIndexFuncNode@2844916c
 	

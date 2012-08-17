@@ -8,6 +8,7 @@ tableName: table2
 joinType: null
 properties: null
 existenceCheck: NO_CONDITION
+storageLocation: null
 	
 	com.akiban.sql.parser.IndexColumnList@557ce4e7
 

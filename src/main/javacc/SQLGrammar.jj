@@ -2113,6 +2113,7 @@ TOKEN [IGNORE_CASE] :
 | <IF: "if">
 | <IMMEDIATE: "immediate">
 | <IN: "in">
+| <INDEX: "index">
 | <INDICATOR: "indicator">
 | <INITIALLY: "initially">
 | <INNER: "inner">
@@ -2377,6 +2378,7 @@ TOKEN [IGNORE_CASE] :
 { /* Additional non-SQL92 non-reserved keywords */
   <AFTER: "after">
 | <BEFORE: "before">
+| <BTREE: "btree">
 | <CLASS: "class">
 | <COMPRESS: "compress">
 | <CONTENT: "content">
@@ -2400,7 +2402,7 @@ TOKEN [IGNORE_CASE] :
 | <HOUR_MINUTE: "hour_minute">
 | <HOUR_SECOND: "hour_second">
 | <IGNORE: "ignore">
-| <INDEX: "index">
+| <IN_MEMORY: "in_memory">
 | <INPLACE: "inplace">
 | <INTERRUPT: "interrupt">
 | <JAVA: "java">
@@ -6546,6 +6548,11 @@ valueExpressionPrimary() throws StandardException :
     {
         return value;
     }
+|
+    value = currentValueExpression()
+    {
+        return value;
+    }
 }
 
 ValueNode
@@ -9478,6 +9485,27 @@ nextValueExpression() throws StandardException :
     } 
 }
 
+/**
+ * Current value from a sequence object
+ */
+ValueNode
+currentValueExpression() throws StandardException :
+{
+    ValueNode sequenceValue;
+    TableName sequenceName;
+}
+{
+    LOOKAHEAD( { getToken(1).kind == CURRENT && getToken(2).kind == VALUE && getToken(3).kind == FOR } )
+    <CURRENT> <VALUE> <FOR> sequenceName = qualifiedName()
+    {
+        sequenceValue = (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_SEQUENCE_NODE,
+                                                       sequenceName,
+                                                       parserContext);
+
+        return sequenceValue;
+    } 
+}
+
 int
 charOrVarchar() :
 {}
@@ -9867,15 +9895,17 @@ StatementNode
 dropSequenceStatement() throws StandardException :
 {
     TableName sequenceName;
+    ExistenceCheck cond;
 }
 {
     /*
      * DROP SEQUENCE <sequencename> RESTRICT
      */
-    <SEQUENCE> sequenceName = qualifiedName() <RESTRICT>
+    <SEQUENCE> cond = dropCondition() sequenceName = qualifiedName() <RESTRICT>
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.DROP_SEQUENCE_NODE,
                                                   sequenceName,
+                                                  cond,
                                                   parserContext);
     }
 }
@@ -10044,11 +10074,11 @@ indexDefinition() throws StandardException :
     Properties properties = null;
     TableName indexName;
     TableName tableName;
-    IndexColumnList indexColumnList = (IndexColumnList)
-        nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext);
+    IndexColumnList indexColumnList = null;
     boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
     JoinNode.JoinType joinType = null;
     ExistenceCheck cond;
+    StorageLocation location = null;
 }
 {
     [ unique = unique() ] 
@@ -10061,15 +10091,16 @@ indexDefinition() throws StandardException :
       indexColumnList = geoIndexDefFunc()
     |
       LOOKAHEAD ( { groupFormat } )
-      groupIndexColumnList(indexColumnList)
+      groupIndexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
     |
       LOOKAHEAD ( { !groupFormat } )
-      indexColumnList(indexColumnList)
+      indexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
     )
     <RIGHT_PAREN>
     [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
       <USING> joinType = joinType() <JOIN> ]
     [ properties = propertyList(false) <CHECK_PROPERTIES>]
+    [ <AS> location = getLocation() ]
     {
         /* User allowed to specify schema name on table and index.
          * If no schema name specified for index, then it "inherits" 
@@ -10102,6 +10133,7 @@ indexDefinition() throws StandardException :
                                                   joinType,
                                                   properties,
                                                   cond,
+                                                  location,
                                                   parserContext);
     }
 }
@@ -12247,6 +12279,11 @@ tableConstraint(TableName constraintName) throws StandardException :
     ConstraintDefinitionNode tcdn;
 }
 {
+    tcdn = indexConstraintDefinition(constraintName)
+    {
+        return tcdn;
+    }
+|
     tcdn = uniqueConstraintDefinition(constraintName) 
     {
         return tcdn;
@@ -12262,6 +12299,46 @@ tableConstraint(TableName constraintName) throws StandardException :
         return tcdn;
     }
 }
+
+ConstraintDefinitionNode
+indexConstraintDefinition(TableName constraintName) throws StandardException : 
+{
+    boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
+
+    String indexName = null;
+    IndexColumnList indexColumnList = null;
+    JoinNode.JoinType joinType = null;
+    StorageLocation location = null;
+}
+{
+    <INDEX> [indexName = identifier()]
+    <LEFT_PAREN>
+    ( 
+      LOOKAHEAD ( { geoIndexDefFuncFollows() } )
+      indexColumnList = geoIndexDefFunc()
+    |
+      LOOKAHEAD ( { groupFormat } )
+      groupIndexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
+    |
+      LOOKAHEAD ( { !groupFormat } )
+      indexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
+    )
+    <RIGHT_PAREN>
+    [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
+      <USING> joinType = joinType() <JOIN> ]
+    [ <AS> location = getLocation() ]
+    {
+        return (ConstraintDefinitionNode)nodeFactory.getNode(NodeTypes.INDEX_CONSTRAINT_NODE,
+                                                             constraintName,
+                                                             indexColumnList,
+                                                             indexName,
+                                                             joinType,
+                                                             location,
+                                                             parserContext);
+    }
+    
+}
+
 
 ConstraintDefinitionNode
 uniqueConstraintDefinition(TableName constraintName) throws StandardException :
@@ -12750,6 +12827,7 @@ alterSessionID() throws StandardException:
                                               parserContext); 
     }
 }
+
 StatementNode
 alterTableBody(TableName tableName) throws StandardException :
 {
@@ -12854,46 +12932,6 @@ sequentialCompress(TableName tableName) throws StandardException :
     }
 }
 
-/*
-StatementNode
-alterTableRenameTableStatement(TableName tableName) throws StandardException :
-{
-    String newTableName;
-}
-{
-    <TO> newTableName = identifier()
-    {
-        return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
-                                                  tableName,
-                                                  null,
-                                                  newTableName,
-                                                  Boolean.TRUE,
-                                                  RenameNode.RenameType.TABLE,
-                                                  parserContext);
-    }
-}
-*/
-
-/*
-StatementNode
-alterTableRenameColumnStatement(TableName tableName) throws StandardException :
-{
-    String oldColumnName;
-    String newColumnName;
-}
-{
-    oldColumnName = identifier() <TO> newColumnName = identifier()
-    {
-        return (StatementNode)nodeFactory.getNode(NodeTypes.RENAME_NODE,
-                                                  tableName,
-                                                  oldColumnName,
-                                                  newColumnName,
-                                                  Boolean.TRUE,
-                                                  RenameNode.RenameType.COLUMN,
-                                                  parserContext);
-    }
-}
-*/
 
 char
 alterTableAction(TableElementList tableElementList, int[] changeType, int[] behavior) 
@@ -12909,6 +12947,9 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
 {
     <ADD>
     (
+        LOOKAHEAD ( {getToken(1).kind == UNIQUE && getToken(2).kind == INDEX || getToken(1).kind == INDEX} )
+        tableElement = addIndex()
+    |
         tableElement = addColumnDefinition(tableElementList)
     |
         tableElement = tableConstraintDefinition()
@@ -12935,6 +12976,9 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
 |
     <DROP>
     (
+        LOOKAHEAD ( {getToken(1).kind == INDEX || getToken(1).kind == KEY } )
+        tableElement = dropIndex()
+    |
         tableElement = dropColumnDefinition(behavior)
     |
         tableElement = dropTableConstraintDefinition()
@@ -12973,6 +13017,88 @@ dropColumnDefinition(int []behavior) throws StandardException :
                                                      parserContext);
     }
 }
+
+TableElementNode
+dropIndex() throws StandardException :
+{
+    String indexName;
+    ExistenceCheck cond;
+}
+{
+    (<INDEX> | <KEY>) cond = dropCondition() indexName = identifier()
+    {
+        return (TableElementNode)nodeFactory.getNode(NodeTypes.AT_DROP_INDEX_NODE,
+                                                     indexName, // name
+                                                     null,      // element type (doesn't need to specify it here)
+                                                     cond,      // existence 
+                                                     parserContext);
+    }
+}
+
+StorageLocation
+getLocation() throws StandardException :
+{
+}
+{
+    <IN_MEMORY>
+    {
+        return StorageLocation.IN_MEMORY;
+    }
+|
+    <BTREE>
+    {
+        return StorageLocation.BTREE;
+    }
+}
+
+TableElementNode
+addIndex() throws StandardException :
+{
+    boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
+
+    ExistenceCheck cond;
+    Boolean unique = Boolean.FALSE;
+    String indexName;
+    IndexColumnList indexColumnList = null;
+    JoinNode.JoinType joinType = null;
+    Properties properties = null;
+    StorageLocation location = null;
+}
+{
+    
+    [unique = unique()]
+    <INDEX>
+    cond = createCondition()
+    indexName = identifier()
+     <LEFT_PAREN>
+    ( LOOKAHEAD ( { geoIndexDefFuncFollows() } )
+      indexColumnList = geoIndexDefFunc()
+    |
+      LOOKAHEAD ( { groupFormat } )
+      groupIndexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
+    |
+      LOOKAHEAD ( { !groupFormat } )
+      indexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
+    )
+    <RIGHT_PAREN>
+    [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
+      <USING> joinType = joinType() <JOIN> ]
+    [ properties = propertyList(false) <CHECK_PROPERTIES>]
+    [ <AS> location = getLocation() ]
+    {
+        
+        return (TableElementNode)nodeFactory.getNode(NodeTypes.AT_ADD_INDEX_NODE,
+                                                  cond,
+                                                  unique,
+                                                  indexName,
+                                                  indexColumnList,
+                                                  joinType,
+                                                  properties,
+                                                  location,
+                                                  parserContext);
+    }
+}
+
 void
 dropBehavior(int[] behavior) :
 {
@@ -13993,6 +14119,7 @@ reservedKeyword() :
 | tok = <IDENTITY>
 | tok = <IMMEDIATE>
 | tok = <IN>
+| tok = <INDEX>
 | tok = <INDICATOR>
 | tok = <INITIALLY>
 | tok = <INNER>
@@ -14148,6 +14275,7 @@ nonReservedKeyword() :
 | tok = <BEFORE>
 | tok = <BINARY>
 | tok = <BLOB>
+| tok = <BTREE>
 | tok = <C>
 | tok = <CALLED>
 | tok = <CHARACTERISTICS>
@@ -14196,8 +14324,8 @@ nonReservedKeyword() :
 | tok = <IDENTITY_VAL_LOCAL>
 | tok = <IGNORE>
 | tok = <IF>
+| tok = <IN_MEMORY>
 | tok = <INCREMENT>
-| tok = <INDEX>
 | tok = <INITIAL>
 | tok = <INPLACE>
 | tok = <INTERRUPT>

@@ -596,6 +596,9 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.NEXT_SEQUENCE_NODE:
             return NodeNames.NEXT_SEQUENCE_NODE_NAME;
 
+        case NodeTypes.CURRENT_SEQUENCE_NODE:
+            return NodeNames.CURRENT_SEQUENCE_NODE_NAME;
+
         case NodeTypes.EXPLAIN_STATEMENT_NODE:
             return NodeNames.EXPLAIN_STATEMENT_NODE_NAME;
 
@@ -620,9 +623,18 @@ public final class NodeFactoryImpl extends NodeFactory
 
         case NodeTypes.ROWS_RESULT_SET_NODE:
             return NodeNames.ROWS_RESULT_SET_NODE_NAME;
+            
+        case NodeTypes.AT_DROP_INDEX_NODE:
+            return NodeNames.AT_DROP_INDEX_NODE_NAME;
+            
+        case NodeTypes.AT_ADD_INDEX_NODE:
+            return NodeNames.AT_ADD_INDEX_NODE_NAME;
 
         case NodeTypes.SPECIAL_INDEX_FUNC_NODE:
             return NodeNames.SPECIAL_INDEX_FUNC_NODE_NAME;
+
+        case NodeTypes.INDEX_CONSTRAINT_NODE:
+            return NodeNames.INDEX_CONSTRAINT_NAME;
 
         default:
             throw new StandardException("Not implemented");

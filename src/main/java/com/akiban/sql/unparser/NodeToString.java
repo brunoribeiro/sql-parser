@@ -29,7 +29,6 @@ package com.akiban.sql.unparser;
 import com.akiban.sql.parser.*;
 
 import com.akiban.sql.StandardException;
-import com.akiban.sql.types.DataTypeDescriptor;
 
 public class NodeToString
 {
@@ -215,9 +214,31 @@ public class NodeToString
             return methodCallNode((MethodCallNode)node);
         case NodeTypes.SPECIAL_INDEX_FUNC_NODE:
             return zorderFuncNode((SpecialIndexFuncNode)node);
+        case NodeTypes.INDEX_CONSTRAINT_NODE:
+            return indexConstraint((IndexConstraintDefinitionNode)node);
         default:
             return "**UNKNOWN(" + node.getNodeType() +")**";
         }
+    }
+
+    protected String indexConstraint(IndexConstraintDefinitionNode node) throws StandardException
+    {
+        StringBuilder builder = new StringBuilder("INDEX ");
+        
+        String indexName = node.getIndexName();
+        
+        if (indexName != null)
+            builder.append(indexName).append(' ');
+        
+        builder.append('(')
+               .append(indexColumnList(node.getIndexColumnList()))
+               .append(')');
+        
+        StorageLocation loc = node.getLocation();
+        if (loc != null)
+            builder.append(" AS ").append(loc);
+        
+        return builder.toString();
     }
 
     protected String createTableNode(CreateTableNode node) throws StandardException {

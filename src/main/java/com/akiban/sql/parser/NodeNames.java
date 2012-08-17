@@ -71,11 +71,17 @@ public interface NodeNames
 
     static final String AGGREGATE_WINDOW_FUNCTION_NAME = "com.akiban.sql.parser.AggregateWindowFunctionNode";
 
+    static final String INDEX_CONSTRAINT_NAME = "com.akiban.sql.parser.IndexConstraintDefinitionNode";
+
     static final String ALL_RESULT_COLUMN_NAME = "com.akiban.sql.parser.AllResultColumn";
 
     static final String ALTER_SERVER_NODE_NAME = "com.akiban.sql.parser.AlterServerNode";
     
     static final String ALTER_TABLE_NODE_NAME = "com.akiban.sql.parser.AlterTableNode";
+    
+    static final String AT_DROP_INDEX_NODE_NAME = "com.akiban.sql.parser.AlterDropIndexNode";
+    
+    static final String AT_ADD_INDEX_NODE_NAME = "com.akiban.sql.parser.AlterAddIndexNode";
 
     static final String AND_NODE_NAME = "com.akiban.sql.parser.AndNode";
 
@@ -242,6 +248,8 @@ public interface NodeNames
     static final String NEW_INVOCATION_NODE_NAME = "com.akiban.sql.parser.NewInvocationNode";
 
     static final String NEXT_SEQUENCE_NODE_NAME = "com.akiban.sql.parser.NextSequenceNode";
+
+    static final String CURRENT_SEQUENCE_NODE_NAME = "com.akiban.sql.parser.CurrentSequenceNode";
 
     static final String NON_STATIC_METHOD_CALL_NODE_NAME = "com.akiban.sql.parser.NonStaticMethodCallNode";
 

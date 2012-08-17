@@ -28,7 +28,7 @@
 
 /*
 
-   Derby - Class org.apache.derby.impl.sql.compile.DropSequenceNode
+   Derby - Class org.apache.derby.impl.sql.compile.CurrentSequenceNode
 
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
@@ -52,48 +52,53 @@ package com.akiban.sql.parser;
 import com.akiban.sql.StandardException;
 
 /**
- * A DropSequenceNode    represents a DROP SEQUENCE statement.
+ * A class that represents a value obtained from a Sequence using 'CURRENT VALUE'
  */
-
-public class DropSequenceNode extends DDLStatementNode 
+public class CurrentSequenceNode extends ValueNode 
 {
-    private TableName dropItem;
-    private ExistenceCheck existenceCheck;
-    
+    private TableName sequenceName;
+
     /**
-     * Initializer for a DropSequenceNode
+     * Initializer for a CurrentSequenceNode
      *
-     * @param dropSequenceName The name of the sequence being dropped
-     * @throws StandardException
+     * @param sequenceName The name of the sequence being called
+     * @throws StandardException Thrown on error
      */
-    public void init(Object dropSequenceName, Object ec) throws StandardException {
-        dropItem = (TableName)dropSequenceName;
-        initAndCheck(dropItem);
-        this.existenceCheck = (ExistenceCheck)ec;
+    public void init(Object sequenceName) throws StandardException {
+        this.sequenceName = (TableName)sequenceName;
     }
 
-    public ExistenceCheck getExistenceCheck()
-    {
-        return existenceCheck;
+    public TableName getSequenceName () {
+        return sequenceName;
     }
-
+    
+    
     /**
      * Fill this node with a deep copy of the given node.
      */
     public void copyFrom(QueryTreeNode node) throws StandardException {
         super.copyFrom(node);
 
-        DropSequenceNode other = (DropSequenceNode)node;
-        this.dropItem = (TableName)getNodeFactory().copyNode(other.dropItem,
-                                                             getParserContext());
+        CurrentSequenceNode other = (CurrentSequenceNode)node;
+        this.sequenceName = (TableName)getNodeFactory().copyNode(other.sequenceName,
+                                                                 getParserContext());
     }
 
-    public String statementToString() {
-        return "DROP SEQUENCE ".concat(dropItem.getTableName());
-    }
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
 
     public String toString() {
-        return super.toString() + 
-                "existenceCheck: " + existenceCheck + "\n";
+        return super.toString() +
+         "Sequence: " + sequenceName;
     }
+
+    protected boolean isEquivalent(ValueNode other) throws StandardException {
+        return false;
+    }
+
+    
 }

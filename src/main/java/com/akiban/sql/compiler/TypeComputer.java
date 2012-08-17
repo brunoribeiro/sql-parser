@@ -98,6 +98,8 @@ public class TypeComputer implements Visitor
             return new DataTypeDescriptor(TypeId.BOOLEAN_ID, false);
         case NodeTypes.NEXT_SEQUENCE_NODE:
             return new DataTypeDescriptor(TypeId.BIGINT_ID, false);
+        case NodeTypes.CURRENT_SEQUENCE_NODE:
+            return new DataTypeDescriptor(TypeId.BIGINT_ID, false);
         default:
             // assert false;
             return null;
