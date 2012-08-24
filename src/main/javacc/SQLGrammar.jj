@@ -337,6 +337,7 @@ class SQLGrammar
         case AVG:
         case MIN:
         case SUM:
+        case GROUP_CONCAT:
             // This is a built-in aggregate
             retval = true;
             break;
@@ -1211,6 +1212,9 @@ class SQLGrammar
             retval = "COUNT";
             break;
 
+        case GROUP_CONCAT:
+            retval = "GROUP_CONCAT";
+            break;
         default:
             assert false : "Unexpected token type in aggName: " + token.kind;
             break;
@@ -1241,6 +1245,9 @@ class SQLGrammar
             retval = "CountAggregateDefinition";
             break;
 
+        case GROUP_CONCAT:
+            retval = "GroupConcatAggregateDefinition";
+            break;
         default:
             assert false : "Unexpected token type in aggClass: " + token.kind;
             break;
@@ -2063,6 +2070,7 @@ TOKEN [IGNORE_CASE] :
 | <GOTO: "goto">
 | <GRANT: "grant">
 | <GROUP: "group">
+| <GROUP_CONCAT: "group_concat">
 | <HAVING: "having">
 | <HOUR: "hour">
 | <IDENTITY: "identity">
@@ -9314,6 +9322,7 @@ builtInAggregateType() throws StandardException :
 }
 {
     (
+        retval = <GROUP_CONCAT> |
         retval = <MAX> |
         retval = <AVG> |
         retval = <MIN> |
@@ -14007,6 +14016,7 @@ reservedKeyword() :
 | tok = <GOTO>
 | tok = <GRANT>
 | tok = <GROUP>
+| tok = <GROUP_CONCAT>
 | tok = <HAVING>
 | tok = <HOUR>
 | tok = <IDENTITY>

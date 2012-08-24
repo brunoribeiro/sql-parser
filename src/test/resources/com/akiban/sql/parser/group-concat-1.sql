@@ -1,0 +1,1 @@
+SELECT GROUP_CONCAT(c) from t
