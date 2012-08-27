@@ -153,6 +153,8 @@ public class NodeToString
             return likeEscapeOperatorNode((LikeEscapeOperatorNode)node);
         case NodeTypes.IN_LIST_OPERATOR_NODE:
             return inListOperatorNode((InListOperatorNode)node);
+        case NodeTypes.ROW_CTOR_NODE:
+            return rowCtorNode((RowConstructorNode)node);
         case NodeTypes.BETWEEN_OPERATOR_NODE:
             return betweenOperatorNode((BetweenOperatorNode)node);
         case NodeTypes.CONDITIONAL_NODE:
@@ -915,6 +917,40 @@ public class NodeToString
         return node.statementToString() + " = '" + node.getValue() + "'";
     }
 
+    protected String rowCtorNode(RowConstructorNode row) throws StandardException
+    {
+        ValueNodeList list = row.getNodeList();
+        
+        switch(list.size())
+        {
+            case 0:
+                return "EMPTY";
+            case 1:
+                QueryTreeNode node = list.get(0);
+                if (!(node instanceof RowConstructorNode))
+                    return toString(node);
+        }
+        
+        StringBuilder bd = new StringBuilder();
+        for (QueryTreeNode node : list )
+        {
+            doPrint(node, bd);
+            bd.append(", ");
+        }
+
+        return bd.substring(0, bd.length() -2); // delete the last (<COMMA> <SPACE>)
+    }
+    
+     
+    
+    protected void doPrint(QueryTreeNode node, StringBuilder bd) throws StandardException
+    {
+        if (node instanceof RowConstructorNode)
+            bd.append(rowCtorNode((RowConstructorNode)node));
+        else
+            bd.append(toString(node));
+    }
+    
     protected String zorderFuncNode (SpecialIndexFuncNode node)
     {
         return node.getFunctionType() + "(" 

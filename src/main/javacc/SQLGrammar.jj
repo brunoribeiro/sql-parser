@@ -548,6 +548,43 @@ class SQLGrammar
     }
 
     /**
+     * Check that an opening parenthese AND Subquery are the next tokens.
+     * 
+     * Identical to subqueryFollows(), but the function can't be used
+     * because we don't want to discard the left paren before hand.
+     * 
+     */
+    private boolean leftParenAndSubqueryFollows()
+    {
+        int i = 1;
+        if (getToken(i++).kind != LEFT_PAREN)
+            return false;
+
+        for( ; true; ++i)
+        {
+            int tokKind = getToken(i).kind;
+            if (tokKind == LEFT_PAREN) 
+            {
+                // A subquery can start with an arbitrary number of left
+                // parentheses.
+                continue;
+            }
+            else if (tokKind == SELECT || tokKind == VALUES)
+            {
+                // If the first token we find after all the left parentheses
+                // is SELECT or VALUES, it's a subquery.
+                return true;
+            }
+            else 
+            {
+                // If the first token we find after all the left parentheses
+                // is neither SELECT nor VALUES, it's not a subquery.
+                return false;
+            }
+        }
+    }
+
+    /**
      * Determine if we are seeing an offsetClause or the identifier OFFSET
      * (Derby does not make it a reserved word).    "n" must be an integer
      * literal or a dynamic parameter specification.
@@ -626,6 +663,10 @@ class SQLGrammar
                     break;
                 }
 
+                // (SELECT ... ) shouldn't be considered a row-constructor
+                if (tokKind == SELECT)
+                    return false;
+
                 // There must be a COMMA at nesting level 1 (i.e. outside of
                 // the first expression) for it to be a rowValueConstructorList
                 if (nesting == 1 && tokKind == COMMA) {
@@ -657,6 +698,7 @@ class SQLGrammar
 
         return retval;
     }
+
 
     /**
      * Determine whether the next token is the beginning of a propertyList(). 
@@ -864,6 +906,7 @@ class SQLGrammar
         case IN:
         case LIKE:
         case BETWEEN:
+        case DUMMY:
             retval = true;
             break;
 
@@ -872,6 +915,7 @@ class SQLGrammar
             case IN:
             case LIKE:
             case BETWEEN:
+            case DUMMY:
                 retval = true;
             }
             break;
@@ -2213,6 +2257,7 @@ TOKEN [IGNORE_CASE] :
 | <DEFINER: "definer">
 | <DETERMINISTIC: "deterministic">
 | <DIV: "div">
+| <DUMMY: "dummy">
 | <DYNAMIC: "dynamic">
 | <EXTRACT: "extract">
 | <FORTRAN: "fortran">
@@ -5153,9 +5198,12 @@ predicate() throws StandardException :
 }
 {
 (
-    value = additiveExpression() 
+     LOOKAHEAD( {rowValueConstructorListFollows()} )
+     value = rowCtor(new int[] {0})
 |
-    value = existsExpression()
+     value = additiveExpression() 
+|
+     value = existsExpression()
 )
     (
         // This LOOKAHEAD is necessary because remainingPredicate() can
@@ -5230,6 +5278,8 @@ remainingNonNegatablePredicate(ValueNode leftOperand) throws StandardException :
         )
         |
         (
+//            leftOperand = rowCtor()
+  //          |
             leftOperand = additiveExpression(leftOperand, operator)
         )
     )
@@ -5248,6 +5298,11 @@ remainingNegatablePredicate(ValueNode leftOperand) throws StandardException :
     ValueNode escapeValue = null;
 }
 {
+    <DUMMY> tree = rowCtor(new int[]{0})
+    {
+        return tree;
+    }
+|
     <IN> tree = inPredicateValue(leftOperand)
     {
         return tree;
@@ -8227,24 +8282,21 @@ ValueNode
 inPredicateValue(ValueNode leftOperand) throws StandardException :
 {
     ValueNode retval;
-    int tokKind;
+    int count[] = new int[]{0};
 }
 {
-    <LEFT_PAREN>
-    (
-        // This LOOKAHEAD is necessary because both a subquery and an
-        // inValueList can be nested arbitrarily deep in parentheses,
-        // so both can start with LEFT_PAREN. To disambiguate, we only
-        // consider it a subquery if the first token that comes after
-        // all the LEFT_PARENS is either a SELECT or a VALUES.
-        LOOKAHEAD( { subqueryFollows() } )
-        retval = tableSubquery(SubqueryNode.SubqueryType.IN, leftOperand)
-    |
-        retval = inValueList(leftOperand)
-    )
-    <RIGHT_PAREN>
+    LOOKAHEAD( {leftParenAndSubqueryFollows()} )
+    <LEFT_PAREN> retval = tableSubquery(SubqueryNode.SubqueryType.IN, leftOperand) <RIGHT_PAREN>
     {
         return retval;
+    }
+|
+    retval = rowCtor(count)
+    {
+        return (ValueNode)nodeFactory.getNode(NodeTypes.IN_LIST_OPERATOR_NODE,
+                                              leftOperand,
+                                              retval,
+                                              parserContext);
     }
 }
 
@@ -8276,6 +8328,61 @@ inElement(ValueNodeList inList) throws StandardException :
         inList.addValueNode(valueNode);
     }
 }
+
+
+ValueNode
+rowCtor(int count[]) throws StandardException:
+{
+    ValueNodeList list = (ValueNodeList)nodeFactory.getNode(NodeTypes.VALUE_NODE_LIST,
+                                                            parserContext);
+}
+{
+    <LEFT_PAREN>
+    getRow(list, count)
+    <RIGHT_PAREN>
+    {
+        ++count[0];
+        return (ValueNode)nodeFactory.getNode(NodeTypes.ROW_CTOR_NODE,
+                                              list,
+                                              new int[]{count[0]},
+                                              parserContext);
+        
+    }
+}
+
+void
+getRow(ValueNodeList rowList, int count[]) throws StandardException:
+{
+    int max = count[0];
+}
+{
+    max = rowElement(rowList, new int[]{count[0]}, max)
+    ( <COMMA> max = rowElement(rowList, new int[]{count[0]}, max) )*
+    {
+        count[0] = max;
+        return;
+    }
+}
+
+int
+rowElement(ValueNodeList list, int count[], int max) throws StandardException:
+{   
+    ValueNode element = null;
+}
+{
+    (
+        (LOOKAHEAD( {rowValueConstructorListFollows()} )
+        element = rowCtor(count))
+     |   
+        element = additiveExpression()
+    )
+    {
+        list.addValueNode(element);
+        return max >= count[0] ? max : count[0];
+    }
+
+}
+
 
 SubqueryNode.SubqueryType
 quantifier(BinaryOperatorNode.OperatorType opType) throws StandardException :
@@ -14197,6 +14304,7 @@ nonReservedKeyword() :
 | tok = <DEFRAGMENT>
 | tok = <DIRTY>
 | tok = <DIV>
+| tok = <DUMMY>
 | tok = <DYNAMIC>
 | tok = <DATABASE>
 | tok = <DB2SQL>
