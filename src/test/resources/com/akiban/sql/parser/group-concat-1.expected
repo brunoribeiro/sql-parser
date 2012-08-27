@@ -1,36 +1,42 @@
-com.akiban.sql.parser.CursorNode@3ff39e73
+com.akiban.sql.parser.CursorNode@4de77a3e
 name: null
 updateMode: UNSPECIFIED
 statementType: SELECT
 resultSet: 	
-	com.akiban.sql.parser.SelectNode@1327b0d2
+	com.akiban.sql.parser.SelectNode@180aa467
 	isDistinct: false
 	resultColumns: 		
-		com.akiban.sql.parser.ResultColumnList@12c9b4d1
+		com.akiban.sql.parser.ResultColumnList@62af7285
 
 		[0]:		
-		com.akiban.sql.parser.ResultColumn@787e0ef9
+		com.akiban.sql.parser.ResultColumn@6c87ac60
 		exposedName: null
 		name: null
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
-			com.akiban.sql.parser.AggregateNode@1c093b3c
+			com.akiban.sql.parser.GroupConcatNode@3f460a4a
 			aggregateName: GROUP_CONCAT
 			operator: null
 			methodName: null
 			type: null
+			
+			separator: value: x
+			type: CHAR(1) NOT NULL
+			
+			orderyByList: null
 			operand: 				
-				com.akiban.sql.parser.ColumnReference@220fee85
-				columnName: c
-				tableName: null
+				com.akiban.sql.parser.JavaToSQLValueNode@f4da0ba
 				type: null
+				javaNode: 					
+					com.akiban.sql.parser.NewInvocationNode@31731b2f
+					methodName: <init>
 	fromList: 		
-		com.akiban.sql.parser.FromList@43f46f3b
+		com.akiban.sql.parser.FromList@7bfdc405
 
 		[0]:		
-		com.akiban.sql.parser.FromBaseTable@64b2ad57
+		com.akiban.sql.parser.FromBaseTable@515063db
 		tableName: t
 		updateOrDelete: null
 		null

@@ -338,6 +338,9 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.DROP_GROUP_NODE:
             return NodeNames.DROP_GROUP_NODE_NAME;
             
+        case NodeTypes.GROUP_CONCAT_NODE:
+            return NodeNames.GROUP_CONCAT_NODE_NAME;
+
         case NodeTypes.SUBQUERY_NODE:
             return NodeNames.SUBQUERY_NODE_NAME;
 

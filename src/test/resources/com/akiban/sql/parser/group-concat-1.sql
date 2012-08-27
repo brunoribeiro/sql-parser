@@ -1,1 +1,1 @@
-SELECT GROUP_CONCAT(c) from t
+SELECT GROUP_CONCAT(c1, c2, c3 SEPARATOR 'x') from t

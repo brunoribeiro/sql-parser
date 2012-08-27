@@ -223,7 +223,8 @@ public interface NodeTypes
     public static final int AT_ADD_INDEX_NODE = 163;
     public static final int INDEX_CONSTRAINT_NODE = 164;
     public static final int DROP_GROUP_NODE = 165;
-    // 166 - 182 available
+    public static final int GROUP_CONCAT_NODE = 166;
+    // 167 - 182 available
     public static final int ALTER_SERVER_NODE = 183;
     public static final int TIMESTAMP_ADD_FN_NODE = 184;
     public static final int TIMESTAMP_DIFF_FN_NODE = 185;
