@@ -9330,8 +9330,10 @@ concatColumns() throws StandardException :
         {
             newNode = nodeFactory.getNode(NodeTypes.NEW_INVOCATION_NODE,
                                           "concat",
-                                          parameterList,
+                                          paramList,
                                           lastTokenDelimitedIdentifier,
+                                          null,
+                                          null,
                                           parserContext);
             
             return (ValueNode)nodeFactory.getNode(NodeTypes.JAVA_TO_SQL_VALUE_NODE,

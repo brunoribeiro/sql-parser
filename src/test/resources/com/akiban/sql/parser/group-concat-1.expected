@@ -1,22 +1,22 @@
-com.akiban.sql.parser.CursorNode@4de77a3e
+com.akiban.sql.parser.CursorNode@10c66375
 name: null
 updateMode: UNSPECIFIED
 statementType: SELECT
 resultSet: 	
-	com.akiban.sql.parser.SelectNode@180aa467
+	com.akiban.sql.parser.SelectNode@50ab9eed
 	isDistinct: false
 	resultColumns: 		
-		com.akiban.sql.parser.ResultColumnList@62af7285
+		com.akiban.sql.parser.ResultColumnList@334f02fb
 
 		[0]:		
-		com.akiban.sql.parser.ResultColumn@6c87ac60
+		com.akiban.sql.parser.ResultColumn@84cc70e
 		exposedName: null
 		name: null
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
-			com.akiban.sql.parser.GroupConcatNode@3f460a4a
+			com.akiban.sql.parser.GroupConcatNode@68a06c63
 			aggregateName: GROUP_CONCAT
 			operator: null
 			methodName: null
@@ -27,16 +27,40 @@ resultSet:
 			
 			orderyByList: null
 			operand: 				
-				com.akiban.sql.parser.JavaToSQLValueNode@f4da0ba
+				com.akiban.sql.parser.JavaToSQLValueNode@7c2c0d3e
 				type: null
 				javaNode: 					
-					com.akiban.sql.parser.NewInvocationNode@31731b2f
-					methodName: <init>
+					com.akiban.sql.parser.NewInvocationNode@3019a122
+					methodName: concat
+					methodParms[0] :						
+						com.akiban.sql.parser.SQLToJavaValueNode@62a1d7d9
+
+						value: 							
+							com.akiban.sql.parser.ColumnReference@6f621a25
+							columnName: c1
+							tableName: null
+							type: null
+					methodParms[1] :						
+						com.akiban.sql.parser.SQLToJavaValueNode@11a2ac44
+
+						value: 							
+							com.akiban.sql.parser.ColumnReference@4edbad67
+							columnName: c2
+							tableName: null
+							type: null
+					methodParms[2] :						
+						com.akiban.sql.parser.SQLToJavaValueNode@38556da3
+
+						value: 							
+							com.akiban.sql.parser.ColumnReference@70910539
+							columnName: c3
+							tableName: null
+							type: null
 	fromList: 		
-		com.akiban.sql.parser.FromList@7bfdc405
+		com.akiban.sql.parser.FromList@40ee1aeb
 
 		[0]:		
-		com.akiban.sql.parser.FromBaseTable@515063db
+		com.akiban.sql.parser.FromBaseTable@50295b9a
 		tableName: t
 		updateOrDelete: null
 		null
