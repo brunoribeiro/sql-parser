@@ -9322,21 +9322,24 @@ concatColumns() throws StandardException :
 {
     colsList(paramList)
     {
-        if (paramList.size() == 1)
-            return paramList.get(0);
-        else
+        switch(paramList.size())
         {
-            newNode = nodeFactory.getNode(NodeTypes.NEW_INVOCATION_NODE,
-                                          "concat",
-                                          paramList,
-                                          lastTokenDelimitedIdentifier,
-                                          null,
-                                          null,
-                                          parserContext);
-            
-            return (ValueNode)nodeFactory.getNode(NodeTypes.JAVA_TO_SQL_VALUE_NODE,
-                                                           newNode,
-                                                           parserContext);
+            case 0:
+                throw new StandardException("GROUP_CONCAT must have at least one argument");
+            case 1:
+                return paramList.get(0);
+            default:
+                newNode = nodeFactory.getNode(NodeTypes.NEW_INVOCATION_NODE,
+                                              "concat",
+                                              paramList,
+                                              lastTokenDelimitedIdentifier,
+                                              null,
+                                              null,
+                                              parserContext);
+
+                return (ValueNode)nodeFactory.getNode(NodeTypes.JAVA_TO_SQL_VALUE_NODE,
+                                                               newNode,
+                                                               parserContext);
         }
     }
 }
