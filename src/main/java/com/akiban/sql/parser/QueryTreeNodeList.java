@@ -71,6 +71,11 @@ public abstract class QueryTreeNodeList<N extends QueryTreeNode>
         return list.size();
     }
 
+    protected List<N> getList()
+    {
+        return list;
+    }
+
     public final boolean isEmpty() {
         return list.isEmpty();
     }
@@ -159,5 +164,4 @@ public abstract class QueryTreeNodeList<N extends QueryTreeNode>
             set(index, (N)get(index).accept(v));
         }
     }
-
 }

@@ -1,43 +1,29 @@
-com.akiban.sql.parser.DeleteNode@303020ad
+com.akiban.sql.parser.DeleteNode@29b6c909
 statementType: DELETE
 resultSet: 	
-	com.akiban.sql.parser.SelectNode@27b15692
+	com.akiban.sql.parser.SelectNode@1f488344
 	isDistinct: false
 	fromList: 		
-		com.akiban.sql.parser.FromList@6baa9f99
+		com.akiban.sql.parser.FromList@51a1f567
 
 		[0]:		
-		com.akiban.sql.parser.FromBaseTable@ed42d08
+		com.akiban.sql.parser.FromBaseTable@5ff6670f
 		tableName: t
 		updateOrDelete: DELETE
 		null
 		correlation Name: null
 		null
 	whereClause: 		
-		com.akiban.sql.parser.InListOperatorNode@bd86fd3
+		com.akiban.sql.parser.InListOperatorNode@29e83b01
 		operator: IN
 		methodName: in
 		type: null
 		leftOperand: 			
-			com.akiban.sql.parser.ColumnReference@2e958bb8
-			columnName: x
-			tableName: null
-			type: null
+			com.akiban.sql.parser.RowConstructorNode@4d79d425
+			depth: 0
 		rightOperandList: 			
-			com.akiban.sql.parser.ValueNodeList@5c07f4ec
-
-			[0]:			
-			com.akiban.sql.parser.NumericConstantNode@e60e128
-			value: 1
-			type: INTEGER NOT NULL
-			[1]:			
-			com.akiban.sql.parser.NumericConstantNode@7a5e1077
-			value: 2
-			type: INTEGER NOT NULL
-			[2]:			
-			com.akiban.sql.parser.NumericConstantNode@358b3364
-			value: 3
-			type: INTEGER NOT NULL
+			com.akiban.sql.parser.RowConstructorNode@7956f0df
+			depth: 1
 targetTableName: 	
-	com.akiban.sql.parser.TableName@54
+	com.akiban.sql.parser.TableName@74
 	t

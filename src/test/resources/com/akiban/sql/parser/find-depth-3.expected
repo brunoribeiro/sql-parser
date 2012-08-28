@@ -1,0 +1,30 @@
+com.akiban.sql.parser.CursorNode@6b4bd192
+name: null
+updateMode: UNSPECIFIED
+statementType: SELECT
+resultSet: 	
+	com.akiban.sql.parser.SelectNode@3eabff46
+	isDistinct: false
+	resultColumns: 		
+		com.akiban.sql.parser.ResultColumnList@e046ccf
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@44839139
+		exposedName: null
+		name: null
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.InListOperatorNode@19b35853
+			operator: IN
+			methodName: in
+			type: null
+			leftOperand: 				
+				com.akiban.sql.parser.RowConstructorNode@4d6bbe53
+				depth: 2
+			rightOperandList: 				
+				com.akiban.sql.parser.RowConstructorNode@5c9c62da
+				depth: 3
+	fromList: 		
+		com.akiban.sql.parser.FromList@1f1e05b6
