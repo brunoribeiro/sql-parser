@@ -9407,7 +9407,6 @@ builtInAggregateType() throws StandardException :
 }
 {
     (
-        retval = <GROUP_CONCAT> |
         retval = <MAX> |
         retval = <AVG> |
         retval = <MIN> |
