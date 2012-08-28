@@ -9282,13 +9282,11 @@ groupConcatExpression() throws StandardException :
     boolean distinct = false;
     ValueNode value;
     OrderByList orderCols = null;
-    CharConstantNode sep = (CharConstantNode)nodeFactory.getNode(NodeTypes.CHAR_CONSTANT_NODE,
-                                                                 ",",
-                                                                 parserContext);
+    String sep = ",";
 }
 {
-/*
 
+/*
 GROUP_CONCAT([DISTINCT] expr [,expr ...]
              [ORDER BY {unsigned_integer | col_name | expr}
                  [ASC | DESC] [,col_name ...]]
@@ -9298,7 +9296,7 @@ GROUP_CONCAT([DISTINCT] expr [,expr ...]
     [ distinct = setQuantifier() ] 
     value = concatColumns()
     [ orderCols = orderByClause() ]
-    [ <SEPARATOR> sep = stringLiteral() ]
+    [ <SEPARATOR> sep = getStringLiteral() ]
     <RIGHT_PAREN>
     {
 
@@ -11413,6 +11411,21 @@ string() throws StandardException :
 CharConstantNode
 stringLiteral() throws StandardException :
 {
+    String st;
+}
+{
+    st = getStringLiteral()
+    {
+        return (CharConstantNode)nodeFactory.getNode(NodeTypes.CHAR_CONSTANT_NODE,
+                                                    st,
+                                                    parserContext);
+    }                                            
+                                                
+}
+
+String
+getStringLiteral() throws StandardException :
+{
     Token tok;
     String string;
 }
@@ -11431,9 +11444,7 @@ stringLiteral() throws StandardException :
     }
 )
     {
-        return (CharConstantNode)nodeFactory.getNode(NodeTypes.CHAR_CONSTANT_NODE,
-                                                     string,
-                                                     parserContext);
+        return string;
     }
 }
 

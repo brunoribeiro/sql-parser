@@ -1,66 +1,64 @@
-com.akiban.sql.parser.CursorNode@10c66375
+com.akiban.sql.parser.CursorNode@1ffb3754
 name: null
 updateMode: UNSPECIFIED
 statementType: SELECT
 resultSet: 	
-	com.akiban.sql.parser.SelectNode@50ab9eed
+	com.akiban.sql.parser.SelectNode@25ed7c33
 	isDistinct: false
 	resultColumns: 		
-		com.akiban.sql.parser.ResultColumnList@334f02fb
+		com.akiban.sql.parser.ResultColumnList@a750bb9
 
 		[0]:		
-		com.akiban.sql.parser.ResultColumn@84cc70e
+		com.akiban.sql.parser.ResultColumn@a54a40c
 		exposedName: null
 		name: null
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
-			com.akiban.sql.parser.GroupConcatNode@68a06c63
+			com.akiban.sql.parser.GroupConcatNode@3ade1520
 			aggregateName: GROUP_CONCAT
 			operator: null
 			methodName: null
 			type: null
 			
-			separator: value: x
-			type: CHAR(1) NOT NULL
-			
+			separator: x
 			orderyByList: null
 			operand: 				
-				com.akiban.sql.parser.JavaToSQLValueNode@7c2c0d3e
+				com.akiban.sql.parser.JavaToSQLValueNode@4a3d0611
 				type: null
 				javaNode: 					
-					com.akiban.sql.parser.NewInvocationNode@3019a122
+					com.akiban.sql.parser.NewInvocationNode@6c596c2a
 					methodName: concat
 					methodParms[0] :						
-						com.akiban.sql.parser.SQLToJavaValueNode@62a1d7d9
+						com.akiban.sql.parser.SQLToJavaValueNode@62cc70f8
 
 						value: 							
-							com.akiban.sql.parser.ColumnReference@6f621a25
+							com.akiban.sql.parser.ColumnReference@5c0cdc74
 							columnName: c1
 							tableName: null
 							type: null
 					methodParms[1] :						
-						com.akiban.sql.parser.SQLToJavaValueNode@11a2ac44
+						com.akiban.sql.parser.SQLToJavaValueNode@505d72e2
 
 						value: 							
-							com.akiban.sql.parser.ColumnReference@4edbad67
+							com.akiban.sql.parser.ColumnReference@27217ca6
 							columnName: c2
 							tableName: null
 							type: null
 					methodParms[2] :						
-						com.akiban.sql.parser.SQLToJavaValueNode@38556da3
+						com.akiban.sql.parser.SQLToJavaValueNode@77e8a5c
 
 						value: 							
-							com.akiban.sql.parser.ColumnReference@70910539
+							com.akiban.sql.parser.ColumnReference@4ada1dc
 							columnName: c3
 							tableName: null
 							type: null
 	fromList: 		
-		com.akiban.sql.parser.FromList@40ee1aeb
+		com.akiban.sql.parser.FromList@235d74ea
 
 		[0]:		
-		com.akiban.sql.parser.FromBaseTable@50295b9a
+		com.akiban.sql.parser.FromBaseTable@4ca6c0c9
 		tableName: t
 		updateOrDelete: null
 		null

@@ -30,7 +30,7 @@ import com.akiban.sql.StandardException;
 
 public class GroupConcatNode extends AggregateNode
 {
-    private CharConstantNode sep;
+    private String sep;
     private OrderByList orderCols;
     
     @Override
@@ -48,7 +48,7 @@ public class GroupConcatNode extends AggregateNode
                   aggName);
         
         this.orderCols = (OrderByList) orderCols;
-        this.sep = (CharConstantNode) sep;
+        this.sep = (String) sep;
     }
     
     @Override
@@ -70,7 +70,7 @@ public class GroupConcatNode extends AggregateNode
                 
     }
     
-    public CharConstantNode getSeparator()
+    public String getSeparator()
     {
         return sep;
     }
