@@ -8045,6 +8045,7 @@ insertColumnsAndSource(QueryTreeNode targetTable) throws StandardException :
     ResultColumnList columnList = null;
     OrderByList orderCols = null;
     ValueNode[] offsetAndFetchFirst = new ValueNode[2];
+    ResultColumnList returningList = null;
 }
 {
     [
@@ -8060,6 +8061,7 @@ insertColumnsAndSource(QueryTreeNode targetTable) throws StandardException :
     queryExpression = queryExpression(null, NO_SET_OP)
     [ orderCols = orderByClause() ]
     ( offsetOrFetchFirstClause(offsetAndFetchFirst) )*
+    [ <RETURNING> returningList = selectList()] 
     {
         if (orderCols != null && isTableValueConstructor(queryExpression)) {
             // Not allowed by the standard since this is a <contextually typed

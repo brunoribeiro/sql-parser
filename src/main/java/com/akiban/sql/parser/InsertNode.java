@@ -82,6 +82,7 @@ public final class InsertNode extends DMLModStatementNode
     private OrderByList orderByList;
     private ValueNode offset;
     private ValueNode fetchFirst;
+    private ResultColumnList returningColumnList;
 
     /**
      * Initializer for an InsertNode.
