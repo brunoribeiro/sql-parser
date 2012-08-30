@@ -1,0 +1,47 @@
+com.akiban.sql.parser.InsertNode@31884174
+null
+statementType: INSERT
+resultSet: 	
+	com.akiban.sql.parser.RowResultSetNode@68814013
+	correlation Name: null
+	null
+	resultColumns: 		
+		com.akiban.sql.parser.ResultColumnList@7d95d4fe
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@77d2b01b
+		exposedName: null
+		name: null
+		tableName: null
+		isDefaultColumn: true
+		type: null
+		expression: 			
+			com.akiban.sql.parser.DefaultNode@2927fa12
+			columnName: null
+			defaultText: null
+			type: null
+		[1]:		
+		com.akiban.sql.parser.ResultColumn@7f92c8d9
+		exposedName: null
+		name: null
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.CharConstantNode@7dc05ffd
+			value: fred
+			type: CHAR(4) NOT NULL
+targetTableName: 	
+	com.akiban.sql.parser.TableName@e3d
+	t1
+returningList: 	
+	com.akiban.sql.parser.ResultColumnList@60de1b8a
+
+	[0]:	
+	com.akiban.sql.parser.AllResultColumn@15e232b5
+	tableName: null
+	exposedName: null
+	name: null
+	tableName: null
+	isDefaultColumn: false
+	type: null

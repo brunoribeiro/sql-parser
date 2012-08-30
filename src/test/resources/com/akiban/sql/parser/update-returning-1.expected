@@ -1,0 +1,67 @@
+com.akiban.sql.parser.UpdateNode@73c6641
+t1
+statementType: UPDATE
+resultSet: 	
+	com.akiban.sql.parser.SelectNode@e5d391d
+	isDistinct: false
+	resultColumns: 		
+		com.akiban.sql.parser.ResultColumnList@a50a649
+
+		[0]:		
+		com.akiban.sql.parser.ResultColumn@34d507e9
+		exposedName: id
+		name: id
+		tableName: null
+		isDefaultColumn: false
+		type: null
+		expression: 			
+			com.akiban.sql.parser.NextSequenceNode@dfa6d18
+			type: null
+			Sequence: sequence1
+		reference: 			
+			com.akiban.sql.parser.ColumnReference@341049d3
+			columnName: id
+			tableName: null
+			type: null
+	fromList: 		
+		com.akiban.sql.parser.FromList@195ed659
+
+		[0]:		
+		com.akiban.sql.parser.FromBaseTable@214a7a12
+		tableName: t1
+		updateOrDelete: UPDATE
+		null
+		correlation Name: null
+		null
+	whereClause: 		
+		com.akiban.sql.parser.BinaryRelationalOperatorNode@209444d1
+		operator: =
+		methodName: equals
+		type: null
+		leftOperand: 			
+			com.akiban.sql.parser.ColumnReference@6632060c
+			columnName: name
+			tableName: null
+			type: null
+		rightOperand: 			
+			com.akiban.sql.parser.CharConstantNode@5e2b323e
+			value: fred
+			type: CHAR(4) NOT NULL
+targetTableName: 	
+	com.akiban.sql.parser.TableName@e3d
+	t1
+returningList: 	
+	com.akiban.sql.parser.ResultColumnList@65efb4be
+
+	[0]:	
+	com.akiban.sql.parser.ResultColumn@5c435a3a
+	exposedName: id
+	name: id
+	tableName: null
+	isDefaultColumn: false
+	type: null
+	expression: 		
+		com.akiban.sql.parser.ColumnReference@49d8c528
+		columnName: id
+		tableName: null
+		type: null

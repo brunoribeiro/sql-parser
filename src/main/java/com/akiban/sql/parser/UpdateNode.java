@@ -60,6 +60,7 @@ package com.akiban.sql.parser;
 
 public final class UpdateNode extends DMLModStatementNode
 {
+    private ResultColumnList returningColumnList;
 
     /**
      * Initializer for an UpdateNode.
@@ -70,9 +71,11 @@ public final class UpdateNode extends DMLModStatementNode
      */
 
     public void init(Object targetTableName,
-                     Object resultSet) {
+                     Object resultSet,
+                     Object returningList) {
         super.init(resultSet);
         this.targetTableName = (TableName)targetTableName;
+        this.returningColumnList = (ResultColumnList)returningList;
     }
 
     /**
@@ -90,6 +93,11 @@ public final class UpdateNode extends DMLModStatementNode
     public String statementToString() {
         return "UPDATE";
     }
+    
+    public ResultColumnList returningList() {
+        return this.returningColumnList;
+    }
+ 
 
     /**
      * Prints the sub-nodes of this object.  See QueryTreeNode.java for
@@ -100,6 +108,11 @@ public final class UpdateNode extends DMLModStatementNode
 
     public void printSubNodes(int depth) {
         super.printSubNodes(depth);
+
+        if (returningColumnList != null) {
+            printLabel(depth, "returningList: ");
+            returningColumnList.treePrint(depth+1);
+        }
     }
 
     /**

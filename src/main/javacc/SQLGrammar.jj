@@ -1299,7 +1299,8 @@ class SQLGrammar
      * @exception StandardException
      */
     StatementNode getDeleteNode(FromTable fromTable, TableName tableName,
-                                ValueNode whereClause)
+                                ValueNode whereClause,
+                                ResultColumnList returningList)
             throws StandardException {
         FromList fromList = (FromList)nodeFactory.getNode(NodeTypes.FROM_LIST,
                                                           parserContext);
@@ -1319,6 +1320,7 @@ class SQLGrammar
         StatementNode retval = (StatementNode)nodeFactory.getNode(NodeTypes.DELETE_NODE,
                                                                   tableName,
                                                                   resultSet,
+                                                                  returningList,
                                                                   parserContext);
 
         return retval;
@@ -1330,7 +1332,8 @@ class SQLGrammar
      * @exception StandardException
      */
     StatementNode getUpdateNode(FromTable fromTable, TableName tableName,
-                                ResultColumnList setClause, ValueNode whereClause)
+                                ResultColumnList setClause, ValueNode whereClause, 
+                                ResultColumnList returningList)
             throws StandardException {
         FromList fromList = (FromList)nodeFactory.getNode(NodeTypes.FROM_LIST,
                                                           parserContext);
@@ -1351,6 +1354,7 @@ class SQLGrammar
             (StatementNode)nodeFactory.getNode(NodeTypes.UPDATE_NODE,
                                                tableName,
                                                resultSet,
+                                               returningList,
                                                parserContext);
 
         return retval;
@@ -2352,6 +2356,7 @@ TOKEN [IGNORE_CASE] :
 | <LTRIM: "ltrim">
 | <NONE: "none">
 | <OVER: "over">
+| <RETURNING: "returning">
 | <ROLE: "role">
 | <ROWNUMBER: "row_number">
 | <RTRIM: "rtrim">
@@ -2436,7 +2441,6 @@ TOKEN [IGNORE_CASE] :
 | <RESET: "reset">
 | <RESULT: "result">
 | <RETAIN: "retain">
-| <RETURNING: "returning">
 | <RR: "rr">
 | <RS: "rs">
 | <SECOND_MICROSECOND: "second_microsecond">
@@ -3172,6 +3176,7 @@ deleteBody() throws StandardException :
     QueryTreeNode retval;
     Properties targetProperties = null;
     Token whereToken = null;
+    ResultColumnList returningList = null;
 }
 {
     LOOKAHEAD( { fromNewInvocationFollows() } )
@@ -3185,7 +3190,7 @@ deleteBody() throws StandardException :
                                                    (Properties)null,
                                                    parserContext); 
 
-        return getDeleteNode(fromTable, tableName, whereClause);
+        return getDeleteNode(fromTable, tableName, whereClause, returningList);
     }
 |
     <FROM> tableName = qualifiedName() 
@@ -3205,6 +3210,7 @@ deleteBody() throws StandardException :
             whereClause = whereClause(whereToken)
         )
     ]
+    [ <RETURNING> returningList = selectList() ]
     {
         /* Fabricate a ResultSetNode (SelectNode) under the DeleteNode.
          * For a searched delete, The FromList is simply the table that we
@@ -3227,7 +3233,7 @@ deleteBody() throws StandardException :
             ((FromBaseTable)fromTable).setTableProperties(targetProperties);
         }
 
-        return getDeleteNode(fromTable, tableName, whereClause);
+        return getDeleteNode(fromTable, tableName, whereClause, returningList);
     }
 }
 
@@ -3359,6 +3365,7 @@ updateBody() throws StandardException :
     FromTable fromTable = null;
     Properties targetProperties = null;
     Token whereToken = null;
+    ResultColumnList returningList = null;
 }
 {
     LOOKAHEAD( { newInvocationFollows(1) } ) 
@@ -3373,7 +3380,7 @@ updateBody() throws StandardException :
                                                    (Properties)null,
                                                    parserContext); 
 
-        return getUpdateNode(fromTable, tableName, columnList, whereClause);
+        return getUpdateNode(fromTable, tableName, columnList, whereClause, returningList);
     }
 |
     tableName = qualifiedName()
@@ -3391,6 +3398,7 @@ updateBody() throws StandardException :
             fromTable = currentOfClause(correlationName)
         )
     ]
+    [ <RETURNING> returningList = selectList() ]
     {
         /* Fabricate a ResultSetNode (SelectNode) under the UpdateNode.
          * For a searched update,
@@ -3412,7 +3420,7 @@ updateBody() throws StandardException :
         if (targetProperties != null) {
             ((FromBaseTable)fromTable).setTableProperties(targetProperties);
         }
-        return getUpdateNode(fromTable, tableName, columnList, whereClause);
+        return getUpdateNode(fromTable, tableName, columnList, whereClause, returningList);
     }
 }
 
@@ -8061,7 +8069,7 @@ insertColumnsAndSource(QueryTreeNode targetTable) throws StandardException :
     queryExpression = queryExpression(null, NO_SET_OP)
     [ orderCols = orderByClause() ]
     ( offsetOrFetchFirstClause(offsetAndFetchFirst) )*
-    [ <RETURNING> returningList = selectList()] 
+    [ <RETURNING> returningList = selectList() ] 
     {
         if (orderCols != null && isTableValueConstructor(queryExpression)) {
             // Not allowed by the standard since this is a <contextually typed
@@ -8075,7 +8083,7 @@ insertColumnsAndSource(QueryTreeNode targetTable) throws StandardException :
         if ((offsetAndFetchFirst[0] != null || offsetAndFetchFirst[1] != null) &&
                 isTableValueConstructor(queryExpression)) {
             throw new StandardException("Not allowed: " + 
-                                                                    ((offsetAndFetchFirst[0] != null) ? "OFFSET" : "FETCH"));
+                                         ((offsetAndFetchFirst[0] != null) ? "OFFSET" : "FETCH"));
         }
 
         return (StatementNode)nodeFactory.getNode(NodeTypes.INSERT_NODE,
@@ -8086,6 +8094,7 @@ insertColumnsAndSource(QueryTreeNode targetTable) throws StandardException :
                                                   orderCols,
                                                   offsetAndFetchFirst[0],
                                                   offsetAndFetchFirst[1],
+                                                  returningList,
                                                   parserContext);
     }
     /* RESOLVE: Ignoring default values for now
@@ -14185,6 +14194,7 @@ reservedKeyword() :
 | tok = <REFERENCES>
 | tok = <RELATIVE>
 | tok = <RESTRICT>
+| tok = <RETURNING>
 | tok = <REVOKE>
 | tok = <RIGHT>
 | tok = <ROLLBACK>
@@ -14392,7 +14402,6 @@ nonReservedKeyword() :
 | tok = <RESTART>
 | tok = <RESULT>
 | tok = <RETAIN>
-| tok = <RETURNING>
 | tok = <RETURNS>
 | tok = <ROLE>
 | tok = <ROLLUP>

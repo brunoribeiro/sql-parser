@@ -1,4 +1,5 @@
 com.akiban.sql.parser.DeleteNode@29b6c909
+t
 statementType: DELETE
 resultSet: 	
 	com.akiban.sql.parser.SelectNode@1f488344
