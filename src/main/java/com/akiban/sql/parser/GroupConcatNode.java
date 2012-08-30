@@ -58,9 +58,32 @@ public class GroupConcatNode extends AggregateNode
         
         GroupConcatNode other = (GroupConcatNode) node;
         this.sep = other.sep;
-        this.orderCols = other.orderCols;
+        this.orderCols = (OrderByList) getNodeFactory().copyNode(other.orderCols,
+                                                   getParserContext());
     }
     
+    @Override
+    void acceptChildren(Visitor v) throws StandardException
+    {
+        super.accept(v);
+        orderCols.accept(v);
+    }
+
+     /**
+     * @inheritDoc
+     */
+    @Override
+    protected boolean isEquivalent(ValueNode o) throws StandardException
+    {
+        if (!isSameNodeType(o))
+            return false;
+        
+        GroupConcatNode other = (GroupConcatNode) o;
+        
+        return  this.sep.equals(other.sep)
+             && this.orderCols.equals(other.orderCols);
+    }
+
     @Override
     public String toString()
     {

@@ -9456,8 +9456,8 @@ colsList(List<ValueNode> parameterList) throws StandardException :
 {}
 {
     
-    [ methodParameter(parameterList)
-    ( <COMMA> methodParameter(parameterList) )* ]
+    methodParameter(parameterList)
+    [( <COMMA> methodParameter(parameterList) )* ]
     
 }
 
