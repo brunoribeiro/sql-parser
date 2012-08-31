@@ -65,9 +65,10 @@ public class GroupConcatNode extends AggregateNode
     @Override
     void acceptChildren(Visitor v) throws StandardException
     {
-        super.accept(v);
+        super.acceptChildren(v);
+        
         if (orderCols != null)
-            orderCols.accept(v);
+            orderCols.acceptChildren(v);
     }
 
      /**
