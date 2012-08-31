@@ -1,131 +1,130 @@
-com.akiban.sql.parser.InsertNode@250d593e
-null
+com.akiban.sql.parser.InsertNode@4090c06f
 statementType: INSERT
 resultSet: 	
-	com.akiban.sql.parser.RowResultSetNode@f5e0873
+	com.akiban.sql.parser.RowResultSetNode@5f49d886
 	correlation Name: null
 	null
 	resultColumns: 		
-		com.akiban.sql.parser.ResultColumnList@667cbde6
+		com.akiban.sql.parser.ResultColumnList@69267649
 
 		[0]:		
-		com.akiban.sql.parser.ResultColumn@7977b9b
+		com.akiban.sql.parser.ResultColumn@5c1fe88d
 		exposedName: null
 		name: null
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
-			com.akiban.sql.parser.NextSequenceNode@6a340101
+			com.akiban.sql.parser.NextSequenceNode@32dcb03b
 			type: null
 			Sequence: sequence_1
 		[1]:		
-		com.akiban.sql.parser.ResultColumn@7c2e1f1f
+		com.akiban.sql.parser.ResultColumn@36b60b93
 		exposedName: null
 		name: null
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
-			com.akiban.sql.parser.CharConstantNode@37fd6bea
+			com.akiban.sql.parser.CharConstantNode@69b1fbf4
 			value: fred
 			type: CHAR(4) NOT NULL
 		[2]:		
-		com.akiban.sql.parser.ResultColumn@5eb7ec5d
+		com.akiban.sql.parser.ResultColumn@24148662
 		exposedName: null
 		name: null
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
-			com.akiban.sql.parser.CharConstantNode@7cfefe3f
+			com.akiban.sql.parser.CharConstantNode@3f829e6f
 			value: last
 			type: CHAR(4) NOT NULL
 targetTableName: 	
 	com.akiban.sql.parser.TableName@74
 	t
-targetColumnList: 	
-	com.akiban.sql.parser.ResultColumnList@48e61a35
+returningList: 	
+	com.akiban.sql.parser.ResultColumnList@186fa9fc
 
 	[0]:	
-	com.akiban.sql.parser.ResultColumn@7ac2b2f6
+	com.akiban.sql.parser.ResultColumn@4b00ebec
+	exposedName: null
+	name: null
+	tableName: null
+	isDefaultColumn: false
+	type: null
+	expression: 		
+		com.akiban.sql.parser.BinaryArithmeticOperatorNode@2980f96c
+		operator: +
+		methodName: plus
+		type: null
+		leftOperand: 			
+			com.akiban.sql.parser.ColumnReference@527736bd
+			columnName: id
+			tableName: null
+			type: null
+		rightOperand: 			
+			com.akiban.sql.parser.NumericConstantNode@10aadc97
+			value: 1000
+			type: INTEGER NOT NULL
+	[1]:	
+	com.akiban.sql.parser.ResultColumn@4178460d
+	exposedName: null
+	name: null
+	tableName: null
+	isDefaultColumn: false
+	type: null
+	expression: 		
+		com.akiban.sql.parser.ConcatenationOperatorNode@3f3f210f
+		operator: ||
+		methodName: concatenate
+		type: null
+		leftOperand: 			
+			com.akiban.sql.parser.ColumnReference@49938039
+			columnName: name
+			tableName: null
+			type: null
+		rightOperand: 			
+			com.akiban.sql.parser.ColumnReference@72c743eb
+			columnName: last_value
+			tableName: null
+			type: null
+targetColumnList: 	
+	com.akiban.sql.parser.ResultColumnList@783c342b
+
+	[0]:	
+	com.akiban.sql.parser.ResultColumn@388530b8
 	exposedName: id
 	name: id
 	tableName: null
 	isDefaultColumn: false
 	type: null
 	reference: 		
-		com.akiban.sql.parser.ColumnReference@4737371
+		com.akiban.sql.parser.ColumnReference@30419d05
 		columnName: id
 		tableName: null
 		type: null
 	[1]:	
-	com.akiban.sql.parser.ResultColumn@37a001ff
+	com.akiban.sql.parser.ResultColumn@23abcc03
 	exposedName: name
 	name: name
 	tableName: null
 	isDefaultColumn: false
 	type: null
 	reference: 		
-		com.akiban.sql.parser.ColumnReference@69e328e0
+		com.akiban.sql.parser.ColumnReference@63deeb40
 		columnName: name
 		tableName: null
 		type: null
 	[2]:	
-	com.akiban.sql.parser.ResultColumn@4090c06f
+	com.akiban.sql.parser.ResultColumn@4026e9f9
 	exposedName: last_value
 	name: last_value
 	tableName: null
 	isDefaultColumn: false
 	type: null
 	reference: 		
-		com.akiban.sql.parser.ColumnReference@5f49d886
+		com.akiban.sql.parser.ColumnReference@3acafb56
 		columnName: last_value
 		tableName: null
 		type: null
-returningList: 	
-	com.akiban.sql.parser.ResultColumnList@69267649
-
-	[0]:	
-	com.akiban.sql.parser.ResultColumn@5c1fe88d
-	exposedName: null
-	name: null
-	tableName: null
-	isDefaultColumn: false
-	type: null
-	expression: 		
-		com.akiban.sql.parser.BinaryArithmeticOperatorNode@32dcb03b
-		operator: +
-		methodName: plus
-		type: null
-		leftOperand: 			
-			com.akiban.sql.parser.ColumnReference@36b60b93
-			columnName: id
-			tableName: null
-			type: null
-		rightOperand: 			
-			com.akiban.sql.parser.NumericConstantNode@69b1fbf4
-			value: 1000
-			type: INTEGER NOT NULL
-	[1]:	
-	com.akiban.sql.parser.ResultColumn@24148662
-	exposedName: null
-	name: null
-	tableName: null
-	isDefaultColumn: false
-	type: null
-	expression: 		
-		com.akiban.sql.parser.ConcatenationOperatorNode@3f829e6f
-		operator: ||
-		methodName: concatenate
-		type: null
-		leftOperand: 			
-			com.akiban.sql.parser.ColumnReference@186fa9fc
-			columnName: name
-			tableName: null
-			type: null
-		rightOperand: 			
-			com.akiban.sql.parser.ColumnReference@4b00ebec
-			columnName: last_value
-			tableName: null
-			type: null

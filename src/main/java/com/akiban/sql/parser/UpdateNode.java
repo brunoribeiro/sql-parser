@@ -60,7 +60,6 @@ package com.akiban.sql.parser;
 
 public final class UpdateNode extends DMLModStatementNode
 {
-    private ResultColumnList returningColumnList;
 
     /**
      * Initializer for an UpdateNode.
@@ -78,43 +77,10 @@ public final class UpdateNode extends DMLModStatementNode
         this.returningColumnList = (ResultColumnList)returningList;
     }
 
-    /**
-     * Convert this object to a String.  See comments in QueryTreeNode.java
-     * for how this should be done for tree printing.
-     *
-     * @return This object as a String
-     */
-
-    public String toString() {
-        return targetTableName.toString() + "\n" +
-            super.toString();
-    }
-
     public String statementToString() {
         return "UPDATE";
     }
     
-    public ResultColumnList returningList() {
-        return this.returningColumnList;
-    }
- 
-
-    /**
-     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-     * how tree printing is supposed to work.
-     *
-     * @param depth The depth of this node in the tree
-     */
-
-    public void printSubNodes(int depth) {
-        super.printSubNodes(depth);
-
-        if (returningColumnList != null) {
-            printLabel(depth, "returningList: ");
-            returningColumnList.treePrint(depth+1);
-        }
-    }
-
     /**
      * Return the type of statement, something from
      * StatementType.

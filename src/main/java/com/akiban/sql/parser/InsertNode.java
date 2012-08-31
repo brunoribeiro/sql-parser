@@ -82,7 +82,6 @@ public final class InsertNode extends DMLModStatementNode
     private OrderByList orderByList;
     private ValueNode offset;
     private ValueNode fetchFirst;
-    private ResultColumnList returningColumnList;
 
     /**
      * Initializer for an InsertNode.
@@ -144,18 +143,6 @@ public final class InsertNode extends DMLModStatementNode
             getNodeFactory().copyNode(other.fetchFirst, getParserContext());
     }
 
-    /**
-     * Convert this object to a String.  See comments in QueryTreeNode.java
-     * for how this should be done for tree printing.
-     *
-     * @return This object as a String
-     */
-
-    public String toString() {
-        return targetProperties + "\n"
-            + super.toString();
-    }
-
     public String statementToString() {
         return "INSERT";
     }
@@ -180,11 +167,6 @@ public final class InsertNode extends DMLModStatementNode
             orderByList.treePrint(depth + 1);
         }
         
-        if (returningColumnList != null) {
-            printLabel(depth, "returningList: ");
-            returningColumnList.treePrint(depth+1);
-        }
-
         /* RESOLVE - need to print out targetTableDescriptor */
     }
 

@@ -61,6 +61,7 @@ public abstract class DMLModStatementNode extends DMLStatementNode
 {
     protected FromVTI targetVTI;
     protected TableName targetTableName;
+    protected ResultColumnList returningColumnList;
     private int statementType;
 
     /**
@@ -99,6 +100,9 @@ public abstract class DMLModStatementNode extends DMLStatementNode
         this.targetTableName = (TableName)getNodeFactory().copyNode(other.targetTableName,
                                                                     getParserContext());
         this.statementType = other.statementType;
+        
+        this.returningColumnList = (ResultColumnList)getNodeFactory()
+                .copyNode(other.returningColumnList, getParserContext());
     }
 
     void setTarget(QueryTreeNode targetName) {
@@ -125,6 +129,10 @@ public abstract class DMLModStatementNode extends DMLStatementNode
         return targetTableName;
     }
 
+    public ResultColumnList returningList() {
+        return this.returningColumnList;
+    }
+
     /**
      * Prints the sub-nodes of this object.  See QueryTreeNode.java for
      * how tree printing is supposed to work.
@@ -137,6 +145,11 @@ public abstract class DMLModStatementNode extends DMLStatementNode
 
         printLabel(depth, "targetTableName: ");
         targetTableName.treePrint(depth + 1);
+
+        if (returningColumnList != null) {
+            printLabel(depth, "returningList: ");
+            returningColumnList.treePrint(depth+1);
+        }
     }
 
     /**
@@ -153,5 +166,4 @@ public abstract class DMLModStatementNode extends DMLStatementNode
             targetTableName.accept(v);
         }
     }
-
 }

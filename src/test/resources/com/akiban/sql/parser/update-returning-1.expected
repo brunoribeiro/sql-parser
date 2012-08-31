@@ -1,5 +1,4 @@
 com.akiban.sql.parser.UpdateNode@73c6641
-t1
 statementType: UPDATE
 resultSet: 	
 	com.akiban.sql.parser.SelectNode@e5d391d

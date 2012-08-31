@@ -1,101 +1,100 @@
 com.akiban.sql.parser.InsertNode@7632efa7
-null
 statementType: INSERT
 resultSet: 	
-	com.akiban.sql.parser.RowResultSetNode@a13f991
+	com.akiban.sql.parser.RowResultSetNode@6825c828
 	correlation Name: null
 	null
 	resultColumns: 		
-		com.akiban.sql.parser.ResultColumnList@2565a3c2
+		com.akiban.sql.parser.ResultColumnList@877ef83
 
 		[0]:		
-		com.akiban.sql.parser.ResultColumn@33e228bc
+		com.akiban.sql.parser.ResultColumn@7a0d85cc
 		exposedName: null
 		name: null
 		tableName: null
 		isDefaultColumn: true
 		type: null
 		expression: 			
-			com.akiban.sql.parser.DefaultNode@44e06940
+			com.akiban.sql.parser.DefaultNode@dcb52ae
 			columnName: null
 			defaultText: null
 			type: null
 		[1]:		
-		com.akiban.sql.parser.ResultColumn@691e0c13
+		com.akiban.sql.parser.ResultColumn@1fa12495
 		exposedName: null
 		name: null
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
-			com.akiban.sql.parser.CharConstantNode@33aae94f
+			com.akiban.sql.parser.CharConstantNode@c68c26c
 			value: fred
 			type: CHAR(4) NOT NULL
 		[2]:		
-		com.akiban.sql.parser.ResultColumn@19bb5c09
+		com.akiban.sql.parser.ResultColumn@31b446d1
 		exposedName: null
 		name: null
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
-			com.akiban.sql.parser.CharConstantNode@5b976011
+			com.akiban.sql.parser.CharConstantNode@32955cd5
 			value: last
 			type: CHAR(4) NOT NULL
 targetTableName: 	
 	com.akiban.sql.parser.TableName@e3d
 	t1
-targetColumnList: 	
-	com.akiban.sql.parser.ResultColumnList@2f242b11
-
-	[0]:	
-	com.akiban.sql.parser.ResultColumn@6f878144
-	exposedName: id
-	name: id
-	tableName: null
-	isDefaultColumn: false
-	type: null
-	reference: 		
-		com.akiban.sql.parser.ColumnReference@2937d090
-		columnName: id
-		tableName: null
-		type: null
-	[1]:	
-	com.akiban.sql.parser.ResultColumn@f5db314
-	exposedName: name
-	name: name
-	tableName: null
-	isDefaultColumn: false
-	type: null
-	reference: 		
-		com.akiban.sql.parser.ColumnReference@5097eded
-		columnName: name
-		tableName: null
-		type: null
-	[2]:	
-	com.akiban.sql.parser.ResultColumn@26858bf1
-	exposedName: last_value
-	name: last_value
-	tableName: null
-	isDefaultColumn: false
-	type: null
-	reference: 		
-		com.akiban.sql.parser.ColumnReference@9a68ef9
-		columnName: last_value
-		tableName: null
-		type: null
 returningList: 	
-	com.akiban.sql.parser.ResultColumnList@15f48262
+	com.akiban.sql.parser.ResultColumnList@6c01bde4
 
 	[0]:	
-	com.akiban.sql.parser.ResultColumn@679bfb30
+	com.akiban.sql.parser.ResultColumn@6659fb21
 	exposedName: id
 	name: id
 	tableName: null
 	isDefaultColumn: false
 	type: null
 	expression: 		
-		com.akiban.sql.parser.ColumnReference@31884174
+		com.akiban.sql.parser.ColumnReference@1d766806
 		columnName: id
+		tableName: null
+		type: null
+targetColumnList: 	
+	com.akiban.sql.parser.ResultColumnList@48a77106
+
+	[0]:	
+	com.akiban.sql.parser.ResultColumn@68ed662d
+	exposedName: id
+	name: id
+	tableName: null
+	isDefaultColumn: false
+	type: null
+	reference: 		
+		com.akiban.sql.parser.ColumnReference@39cf4a2c
+		columnName: id
+		tableName: null
+		type: null
+	[1]:	
+	com.akiban.sql.parser.ResultColumn@580eac5a
+	exposedName: name
+	name: name
+	tableName: null
+	isDefaultColumn: false
+	type: null
+	reference: 		
+		com.akiban.sql.parser.ColumnReference@2b5575e0
+		columnName: name
+		tableName: null
+		type: null
+	[2]:	
+	com.akiban.sql.parser.ResultColumn@77addb59
+	exposedName: last_value
+	name: last_value
+	tableName: null
+	isDefaultColumn: false
+	type: null
+	reference: 		
+		com.akiban.sql.parser.ColumnReference@371bed71
+		columnName: last_value
 		tableName: null
 		type: null
