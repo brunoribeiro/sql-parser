@@ -129,7 +129,7 @@ public abstract class DMLModStatementNode extends DMLStatementNode
         return targetTableName;
     }
 
-    public ResultColumnList returningList() {
+    public ResultColumnList getReturningList() {
         return this.returningColumnList;
     }
 

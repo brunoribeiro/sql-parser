@@ -220,9 +220,6 @@ public final class InsertNode extends DMLModStatementNode
         return fetchFirst;
     }
 
-    public ResultColumnList returningList() {
-        return this.returningColumnList;
-    }
     /**
      * Accept the visitor for all visitable children of this node.
      * 
