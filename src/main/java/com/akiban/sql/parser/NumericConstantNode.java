@@ -130,7 +130,7 @@ public final class NumericConstantNode extends ConstantNode
                 int length = image.length();
                 int idx = image.indexOf('.');
                 precision = length;
-                if (!Character.isDigit(image.charAt(0)))
+                if (!Character.isDigit(image.charAt(0)) && (idx != 0))
                     precision--;                    // Has a sign.
                 if (idx < 0)
                     scal = 0;
