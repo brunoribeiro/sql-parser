@@ -337,6 +337,7 @@ class SQLGrammar
         case AVG:
         case MIN:
         case SUM:
+        case GROUP_CONCAT:
             // This is a built-in aggregate
             retval = true;
             break;
@@ -1255,6 +1256,9 @@ class SQLGrammar
             retval = "COUNT";
             break;
 
+        case GROUP_CONCAT:
+            retval = "GROUP_CONCAT";
+            break;
         default:
             assert false : "Unexpected token type in aggName: " + token.kind;
             break;
@@ -1285,6 +1289,9 @@ class SQLGrammar
             retval = "CountAggregateDefinition";
             break;
 
+        case GROUP_CONCAT:
+            retval = "GroupConcatAggregateDefinition";
+            break;
         default:
             assert false : "Unexpected token type in aggClass: " + token.kind;
             break;
@@ -2107,6 +2114,7 @@ TOKEN [IGNORE_CASE] :
 | <GOTO: "goto">
 | <GRANT: "grant">
 | <GROUP: "group">
+| <GROUP_CONCAT: "group_concat">
 | <HAVING: "having">
 | <HOUR: "hour">
 | <IDENTITY: "identity">
@@ -2303,6 +2311,7 @@ TOKEN [IGNORE_CASE] :
 | <SAVEPOINT: "savepoint">
 | <SCALE: "scale">
 | <SECURITY: "security">
+| <SEPARATOR: "separator">
 | <SERIALIZABLE: "serializable">
 | <SQL_TSI_FRAC_SECOND: "sql_tsi_frac_second">
 | <SQL_TSI_SECOND: "sql_tsi_second">
@@ -9317,6 +9326,12 @@ windowOrAggregateFunctionNode() throws StandardException :
         return winOrAgg;
     }
 |
+    <GROUP_CONCAT>
+    winOrAgg = groupConcatExpression()
+    {
+        return winOrAgg;
+    }
+|
     winOrAgg = generalAggregate() 
     [ window = overClause() ]
     {
@@ -9366,6 +9381,84 @@ overClause() throws StandardException :
                                                    parserContext);
     }
  )
+}
+
+ValueNode
+groupConcatExpression() throws StandardException :
+{
+    boolean distinct = false;
+    ValueNode value;
+    OrderByList orderCols = null;
+    String sep = ",";
+}
+{
+
+/*
+GROUP_CONCAT([DISTINCT] expr [,expr ...]
+             [ORDER BY {unsigned_integer | col_name | expr}
+                 [ASC | DESC] [,col_name ...]]
+             [SEPARATOR str_val])
+*/
+    <LEFT_PAREN>
+    [ distinct = setQuantifier() ] 
+    value = concatColumns()
+    [ orderCols = orderByClause() ]
+    [ <SEPARATOR> sep = getStringLiteral() ]
+    <RIGHT_PAREN>
+    {
+
+
+        return (ValueNode)nodeFactory.getNode(NodeTypes.GROUP_CONCAT_NODE,
+                                              value,
+                                              "GroupConcatDefinitionNode",
+                                              distinct ? Boolean.TRUE : Boolean.FALSE,
+                                              "GROUP_CONCAT",
+                                              orderCols,
+                                              sep,
+                                              parserContext);
+
+    }
+}
+
+ValueNode
+concatColumns() throws StandardException :
+{
+    QueryTreeNode newNode;
+    List<ValueNode> paramList= new ArrayList<ValueNode>();
+}
+{
+    colsList(paramList)
+    {
+        switch(paramList.size())
+        {
+            case 0:
+                throw new StandardException("GROUP_CONCAT must have at least one argument");
+            case 1:
+                return paramList.get(0);
+            default:
+                newNode = nodeFactory.getNode(NodeTypes.NEW_INVOCATION_NODE,
+                                              "concat",
+                                              paramList,
+                                              lastTokenDelimitedIdentifier,
+                                              null,
+                                              null,
+                                              parserContext);
+
+                return (ValueNode)nodeFactory.getNode(NodeTypes.JAVA_TO_SQL_VALUE_NODE,
+                                                               newNode,
+                                                               parserContext);
+        }
+    }
+}
+
+void
+colsList(List<ValueNode> parameterList) throws StandardException :
+{}
+{
+    
+    methodParameter(parameterList)
+    ( <COMMA> methodParameter(parameterList) )*
+    
 }
 
 ValueNode
@@ -11427,6 +11520,21 @@ string() throws StandardException :
 CharConstantNode
 stringLiteral() throws StandardException :
 {
+    String st;
+}
+{
+    st = getStringLiteral()
+    {
+        return (CharConstantNode)nodeFactory.getNode(NodeTypes.CHAR_CONSTANT_NODE,
+                                                    st,
+                                                    parserContext);
+    }                                            
+                                                
+}
+
+String
+getStringLiteral() throws StandardException :
+{
     Token tok;
     String string;
 }
@@ -11445,9 +11553,7 @@ stringLiteral() throws StandardException :
     }
 )
     {
-        return (CharConstantNode)nodeFactory.getNode(NodeTypes.CHAR_CONSTANT_NODE,
-                                                     string,
-                                                     parserContext);
+        return string;
     }
 }
 
@@ -14114,6 +14220,7 @@ reservedKeyword() :
 | tok = <GOTO>
 | tok = <GRANT>
 | tok = <GROUP>
+| tok = <GROUP_CONCAT>
 | tok = <HAVING>
 | tok = <HOUR>
 | tok = <IDENTITY>
@@ -14403,6 +14510,7 @@ nonReservedKeyword() :
 | tok = <SAVEPOINT>
 | tok = <SECOND_MICROSECOND>
 | tok = <SECURITY>
+| tok = <SEPARATOR>
 | tok = <SERVER>
 | tok = <SEQUENCE>
 | tok = <SEQUENTIAL>

@@ -100,6 +100,8 @@ public class NodeToString
             return unionNode((UnionNode)node);
         case NodeTypes.GROUP_BY_LIST:
             return groupByList((GroupByList)node);
+        case NodeTypes.GROUP_CONCAT_NODE:
+            return groupConcat((GroupConcatNode)node);
         case NodeTypes.ORDER_BY_LIST:
             return orderByList((OrderByList)node);
         case NodeTypes.VALUE_NODE_LIST:
@@ -956,5 +958,20 @@ public class NodeToString
         return node.getFunctionType() + "(" 
                + node.get(0).getColumnName() + ", "
                + node.get(1).getColumnName() + ")";
+    }
+    
+    protected String groupConcat(GroupConcatNode node) throws StandardException
+    {
+        StringBuilder ret = new StringBuilder("GROUP_CONCAT(");
+        
+        ret.append(node.getOperand());
+        
+        OrderByList orderBy = node.getOrderBy();
+        if (orderBy != null)
+            ret.append(this.toString(orderBy));
+        
+        // i
+        ret.append("SEPARATOR \'").append(node.getSeparator()).append("\')");
+        return ret.toString();
     }
 }

@@ -90,6 +90,7 @@ public class TypeComputer implements Visitor
         case NodeTypes.COALESCE_FUNCTION_NODE:
             return coalesceFunctionNode((CoalesceFunctionNode)node);
         case NodeTypes.AGGREGATE_NODE:
+        case NodeTypes.GROUP_CONCAT_NODE:
             return aggregateNode((AggregateNode)node);
         case NodeTypes.CONCATENATION_OPERATOR_NODE:
             return concatenationOperatorNode((ConcatenationOperatorNode)node);

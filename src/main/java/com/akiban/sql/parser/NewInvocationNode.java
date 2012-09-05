@@ -128,6 +128,20 @@ public class NewInvocationNode extends MethodCallNode
     this.delimitedIdentifier = ((Boolean)delimitedIdentifier).booleanValue();
   }
 
+  @Override
+  public void init (Object methodName,
+                   Object params,
+                   Object delimitedIdentifier,
+                   Object nothing1,
+                   Object nothing2) throws StandardException
+  {
+       super.init((String)methodName);
+        addParms((List<ValueNode>)params);
+
+    // TODO: Need to handle tableDescriptor being null, which it always is in this case.
+
+    this.delimitedIdentifier = ((Boolean)delimitedIdentifier).booleanValue();
+  }
   /**
    * Fill this node with a deep copy of the given node.
    */

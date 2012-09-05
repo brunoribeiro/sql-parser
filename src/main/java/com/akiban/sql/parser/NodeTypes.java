@@ -224,7 +224,8 @@ public interface NodeTypes
     public static final int INDEX_CONSTRAINT_NODE = 164;
     public static final int DROP_GROUP_NODE = 165;
     public static final int ROW_CTOR_NODE = 166;
-    // 167 - 182 available
+    public static final int GROUP_CONCAT_NODE = 167;
+    // 168 - 182 available
     public static final int ALTER_SERVER_NODE = 183;
     public static final int TIMESTAMP_ADD_FN_NODE = 184;
     public static final int TIMESTAMP_DIFF_FN_NODE = 185;
