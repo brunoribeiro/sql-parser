@@ -1,5 +1,4 @@
 com.akiban.sql.parser.InsertNode@67d225a7
-null
 statementType: INSERT
 resultSet: 	
 	com.akiban.sql.parser.SelectNode@15a62c31

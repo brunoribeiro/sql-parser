@@ -70,38 +70,17 @@ public final class UpdateNode extends DMLModStatementNode
      */
 
     public void init(Object targetTableName,
-                     Object resultSet) {
+                     Object resultSet,
+                     Object returningList) {
         super.init(resultSet);
         this.targetTableName = (TableName)targetTableName;
-    }
-
-    /**
-     * Convert this object to a String.  See comments in QueryTreeNode.java
-     * for how this should be done for tree printing.
-     *
-     * @return This object as a String
-     */
-
-    public String toString() {
-        return targetTableName.toString() + "\n" +
-            super.toString();
+        this.returningColumnList = (ResultColumnList)returningList;
     }
 
     public String statementToString() {
         return "UPDATE";
     }
-
-    /**
-     * Prints the sub-nodes of this object.  See QueryTreeNode.java for
-     * how tree printing is supposed to work.
-     *
-     * @param depth The depth of this node in the tree
-     */
-
-    public void printSubNodes(int depth) {
-        super.printSubNodes(depth);
-    }
-
+    
     /**
      * Return the type of statement, something from
      * StatementType.

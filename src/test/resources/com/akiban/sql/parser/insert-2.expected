@@ -1,58 +1,57 @@
 com.akiban.sql.parser.InsertNode@3abc8e1e
-null
 statementType: INSERT
 resultSet: 	
-	com.akiban.sql.parser.SelectNode@311671b2
+	com.akiban.sql.parser.SelectNode@3f829e6f
 	isDistinct: false
 	resultColumns: 		
-		com.akiban.sql.parser.ResultColumnList@3882764b
+		com.akiban.sql.parser.ResultColumnList@186fa9fc
 
 		[0]:		
-		com.akiban.sql.parser.ResultColumn@7d2452e8
+		com.akiban.sql.parser.ResultColumn@4b00ebec
 		exposedName: x
 		name: x
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
-			com.akiban.sql.parser.ColumnReference@5bbf3d87
+			com.akiban.sql.parser.ColumnReference@2980f96c
 			columnName: x
 			tableName: null
 			type: null
 		[1]:		
-		com.akiban.sql.parser.ResultColumn@6860991f
+		com.akiban.sql.parser.ResultColumn@527736bd
 		exposedName: y
 		name: y
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
-			com.akiban.sql.parser.ColumnReference@1de4f7c2
+			com.akiban.sql.parser.ColumnReference@10aadc97
 			columnName: y
 			tableName: null
 			type: null
 		[2]:		
-		com.akiban.sql.parser.ResultColumn@2345f0e3
+		com.akiban.sql.parser.ResultColumn@4178460d
 		exposedName: z
 		name: z
 		tableName: null
 		isDefaultColumn: false
 		type: null
 		expression: 			
-			com.akiban.sql.parser.ColumnReference@44c9d92c
+			com.akiban.sql.parser.ColumnReference@3f3f210f
 			columnName: z
 			tableName: null
 			type: null
 	fromList: 		
-		com.akiban.sql.parser.FromList@1fd0fafc
+		com.akiban.sql.parser.FromList@49938039
 
 		[0]:		
-		com.akiban.sql.parser.FromBaseTable@510dc6b5
+		com.akiban.sql.parser.FromBaseTable@72c743eb
 		tableName: t
 		updateOrDelete: null
 		null
 		correlation Name: null
 		null
 targetTableName: 	
-	com.akiban.sql.parser.TableName@a5d
+	com.akiban.sql.parser.TableName@e3d
 	t1

@@ -61,7 +61,6 @@ package com.akiban.sql.parser;
 
 public class DeleteNode extends DMLModStatementNode
 {
-
     /**
      * Initializer for a DeleteNode.
      *
@@ -71,9 +70,11 @@ public class DeleteNode extends DMLModStatementNode
      */
 
     public void init(Object targetTableName,
-                     Object queryExpression) {
+                     Object queryExpression, 
+                     Object returningList) {
         super.init(queryExpression);
         this.targetTableName = (TableName)targetTableName;
+        this.returningColumnList = (ResultColumnList)returningList;
     }
 
     public String statementToString() {
@@ -89,5 +90,4 @@ public class DeleteNode extends DMLModStatementNode
     protected final int getStatementType() {
         return StatementType.DELETE;
     }
-
 }

@@ -105,7 +105,8 @@ public final class InsertNode extends DMLModStatementNode
                      Object targetProperties,
                      Object orderByList,
                      Object offset,
-                     Object fetchFirst) {
+                     Object fetchFirst,
+                     Object returningList) {
         /* statementType gets set in super() before we've validated
          * any properties, so we've kludged the code to get the
          * right statementType for a bulk insert replace.
@@ -118,6 +119,7 @@ public final class InsertNode extends DMLModStatementNode
         this.orderByList = (OrderByList)orderByList;
         this.offset = (ValueNode)offset;
         this.fetchFirst = (ValueNode)fetchFirst;
+        this.returningColumnList = (ResultColumnList)returningList;
 
         /* Remember that the query expression is the source to an INSERT */
         getResultSetNode().setInsertSource();
@@ -139,18 +141,6 @@ public final class InsertNode extends DMLModStatementNode
             getNodeFactory().copyNode(other.offset, getParserContext());
         this.fetchFirst = (ValueNode)
             getNodeFactory().copyNode(other.fetchFirst, getParserContext());
-    }
-
-    /**
-     * Convert this object to a String.  See comments in QueryTreeNode.java
-     * for how this should be done for tree printing.
-     *
-     * @return This object as a String
-     */
-
-    public String toString() {
-        return targetProperties + "\n"
-            + super.toString();
     }
 
     public String statementToString() {
@@ -176,7 +166,7 @@ public final class InsertNode extends DMLModStatementNode
             printLabel(depth, "orderByList: ");
             orderByList.treePrint(depth + 1);
         }
-
+        
         /* RESOLVE - need to print out targetTableDescriptor */
     }
 
