@@ -165,5 +165,8 @@ public abstract class DMLModStatementNode extends DMLStatementNode
         if (targetTableName != null) {
             targetTableName.accept(v);
         }
+        if (returningColumnList != null) {
+            returningColumnList.accept(v);
+        }
     }
 }
