@@ -455,21 +455,25 @@ public class BooleanNormalizer implements Visitor
     {
         RowConstructorNode leftList = node.getLeftOperand();
         RowConstructorNode rightList = node.getRightOperandList();
-        
         ValueNode result = null;
         
+        boolean nested = leftList.getDepth() >  0;
+        ValueNode left = leftList.getNodeList().get(0);
         for (ValueNode rightNode : rightList.getNodeList())
         {
-            ValueNode equalNode = getNotEqual(leftList, rightNode);
+            ValueNode equalNode = getNotEqual(nested
+                                                    ? leftList
+                                                    : left
+                                              , rightNode);
             
             if (result == null)
                 result = equalNode;
             else
             {
-                AndNode orNode = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
+                AndNode andNode = (AndNode)nodeFactory.getNode(NodeTypes.AND_NODE,
                                                             equalNode, result,
                                                             parserContext);
-                result = orNode;
+                result = andNode;
             }
         }
 
