@@ -58,6 +58,7 @@ public final class InListOperatorNode extends ValueNode
 {
     protected RowConstructorNode leftOperand;
     protected RowConstructorNode rightOperandList;
+    protected boolean negated;
     
     /**
      * Initializer for a InListOperatorNode
@@ -110,7 +111,7 @@ public final class InListOperatorNode extends ValueNode
     @Override
     public String toString()
     {
-        return "operator: IN\n"
+        return "operator: " + (negated ? "NOT " : "") + "IN\n"
                + "methodName: in\n"
                + super.toString();
     }
@@ -230,4 +231,14 @@ public final class InListOperatorNode extends ValueNode
 
         return true;
     }
+
+    public boolean isNegated() {
+        return negated;
+    }
+
+    public void setNegated(boolean negated) {
+        this.negated = negated;
+    }
+
+
 }

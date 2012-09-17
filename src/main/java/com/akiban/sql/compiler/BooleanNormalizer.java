@@ -58,6 +58,8 @@ import com.akiban.sql.types.TypeId;
 /** Perform normalization such as CNF on boolean expressions. */
 public class BooleanNormalizer implements Visitor
 {
+    public static final int NOT_IN_AND_LIMIT = 100;
+
     SQLParserContext parserContext;
     NodeFactory nodeFactory;
     public BooleanNormalizer(SQLParserContext parserContext) {
@@ -451,10 +453,15 @@ public class BooleanNormalizer implements Visitor
                                                    parserContext);
         }
     }
+
     protected ValueNode inWithNestedTuples(InListOperatorNode node) throws StandardException
     {
-        RowConstructorNode leftList = node.getLeftOperand();
         RowConstructorNode rightList = node.getRightOperandList();
+        if (rightList.getNodeList().size() > NOT_IN_AND_LIMIT) {
+            node.setNegated(true);
+            return node;
+        }
+        RowConstructorNode leftList = node.getLeftOperand();
         ValueNode result = null;
         
         boolean nested = leftList.getDepth() >  0;
