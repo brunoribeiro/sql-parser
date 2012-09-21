@@ -724,7 +724,8 @@ public class NodeToString
 
     protected String inListOperatorNode(InListOperatorNode node) throws StandardException {
         return maybeParens(node.getLeftOperand()) +
-            " IN (" + toString(node.getRightOperandList()) + ")";
+            " " + (node.isNegated() ? "NOT IN" : "IN") + 
+            " (" + toString(node.getRightOperandList()) + ")";
     }
 
     protected String valueNodeList(ValueNodeList node) throws StandardException {
