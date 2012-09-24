@@ -1,0 +1,29 @@
+com.akiban.sql.parser.DeleteNode@2d8941f7
+statementType: DELETE
+resultSet: 	
+	com.akiban.sql.parser.SelectNode@e49d67c
+	isDistinct: false
+	fromList: 		
+		com.akiban.sql.parser.FromList@11a06e38
+
+		[0]:		
+		com.akiban.sql.parser.FromBaseTable@3ba42792
+		tableName: t1
+		updateOrDelete: DELETE
+		null
+		correlation Name: null
+		null
+targetTableName: 	
+	com.akiban.sql.parser.TableName@e3d
+	t1
+returningList: 	
+	com.akiban.sql.parser.ResultColumnList@162200d5
+
+	[0]:	
+	com.akiban.sql.parser.AllResultColumn@1264ab4d
+	tableName: null
+	exposedName: null
+	name: null
+	tableName: null
+	isDefaultColumn: false
+	type: null
