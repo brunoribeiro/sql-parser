@@ -484,7 +484,7 @@ public class TypeComputer implements Visitor
             throws StandardException {
         if (node.getAggregateName().equals("COUNT") ||
             node.getAggregateName().equals("COUNT(*)"))
-            return new DataTypeDescriptor(TypeId.INTEGER_ID, false);
+            return new DataTypeDescriptor(TypeId.BIGINT_ID, false);
 
         ValueNode operand = node.getOperand();
         if ((operand == null) ||
