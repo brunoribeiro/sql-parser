@@ -1641,7 +1641,7 @@ public class TypeId
         long rprec = (long)rightType.getPrecision();
         long val;
 
-        assert (formatId != FormatIds.DECIMAL_TYPE_ID);
+        assert (formatId == FormatIds.DECIMAL_TYPE_ID) : formatId;
 
         /*
         ** Take the maximum left of decimal digits plus the scale.
