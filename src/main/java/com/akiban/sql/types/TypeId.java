@@ -1664,7 +1664,7 @@ public class TypeId
      */
     public int getScale(DataTypeDescriptor leftType,
                         DataTypeDescriptor rightType) {
-        assert (formatId != FormatIds.DECIMAL_TYPE_ID);
+        assert (formatId == FormatIds.DECIMAL_TYPE_ID) : formatId;
 
         /*
         ** Retain greatest scale
