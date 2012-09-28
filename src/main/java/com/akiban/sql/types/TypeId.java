@@ -79,19 +79,19 @@ public class TypeId
      */
     public static final int LONGINT_PRECISION = 19;
     public static final int LONGINT_SCALE = 0;
-    public static final int LONGINT_MAXWIDTH = 8;
+    public static final int LONGINT_MAXWIDTH = 20;
 
     public static final int INT_PRECISION = 10;
     public static final int INT_SCALE = 0;
-    public static final int INT_MAXWIDTH = 4;
+    public static final int INT_MAXWIDTH = 11;
 
     public static final int SMALLINT_PRECISION = 5;
     public static final int SMALLINT_SCALE = 0;
-    public static final int SMALLINT_MAXWIDTH = 2;
+    public static final int SMALLINT_MAXWIDTH = 6;
 
     public static final int TINYINT_PRECISION = 3;
     public static final int TINYINT_SCALE = 0;
-    public static final int TINYINT_MAXWIDTH = 1;
+    public static final int TINYINT_MAXWIDTH = 4;
 
     // precision in number of bits 
     public static final int DOUBLE_PRECISION = 52;
@@ -99,7 +99,7 @@ public class TypeId
     // in decimal digits, rather than number of bits, so need a separate constant.
     public static final int DOUBLE_PRECISION_IN_DIGITS = 15;
     public static final int DOUBLE_SCALE = 0;
-    public static final int DOUBLE_MAXWIDTH = 8;
+    public static final int DOUBLE_MAXWIDTH = 17;
 
     // precision in number of bits 
     public static final int REAL_PRECISION = 23;
@@ -107,7 +107,7 @@ public class TypeId
     // in decimal digits, rather than number of bits, so need a separate constant.
     public static final int REAL_PRECISION_IN_DIGITS = 7;
     public static final int REAL_SCALE = 0;
-    public static final int REAL_MAXWIDTH = 4;
+    public static final int REAL_MAXWIDTH = 9;
 
     public static final int DECIMAL_PRECISION = 31;
     public static final int DECIMAL_SCALE = 31;
@@ -116,7 +116,7 @@ public class TypeId
     public static final int DEFAULT_DECIMAL_PRECISION = 5;
     public static final int DEFAULT_DECIMAL_SCALE = 0;
 
-    public static final int BOOLEAN_MAXWIDTH = 1;
+    public static final int BOOLEAN_MAXWIDTH = 5; // false
 
     public static final int CHAR_MAXWIDTH = 254;
     public static final int VARCHAR_MAXWIDTH = 32672;
