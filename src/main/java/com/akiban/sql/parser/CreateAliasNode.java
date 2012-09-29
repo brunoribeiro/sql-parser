@@ -77,17 +77,18 @@ public class CreateAliasNode extends DDLStatementNode
     public static final int NULL_ON_NULL_INPUT = DETERMINISTIC + 1;
     public static final int RETURN_TYPE = NULL_ON_NULL_INPUT + 1;
     public static final int ROUTINE_SECURITY_DEFINER = RETURN_TYPE + 1;
+    public static final int INLINE_DEFINITION = ROUTINE_SECURITY_DEFINER + 1;
 
     // Keep ROUTINE_ELEMENT_COUNT last (determines set cardinality).
     // Note: Remember to also update the map ROUTINE_CLAUSE_NAMES in
     // SQLGrammar.jj when elements are added.
-    public static final int ROUTINE_ELEMENT_COUNT = ROUTINE_SECURITY_DEFINER + 1;
+    public static final int ROUTINE_ELEMENT_COUNT = INLINE_DEFINITION + 1;
 
     private String javaClassName;
     private String methodName;
     private AliasInfo.Type aliasType; 
-    private boolean delimitedIdentifier;
     private AliasInfo aliasInfo;
+    private String definition;
 
     /**
      * Initializer for a CreateAliasNode
@@ -96,9 +97,6 @@ public class CreateAliasNode extends DDLStatementNode
      * @param targetObject Target name
      * @param methodName The method name
      * @param aliasType The alias type
-     * @param delimitedIdentifier Whether or not to treat the class name
-     *              as a delimited identifier if trying to
-     *              resolve it as a class alias
      *
      * @exception StandardException Thrown on error
      */
@@ -106,8 +104,7 @@ public class CreateAliasNode extends DDLStatementNode
                      Object targetObject,
                      Object methodName,
                      Object aliasSpecificInfo,
-                     Object aliasType,
-                     Object delimitedIdentifier) 
+                     Object aliasType) 
             throws StandardException {
         TableName qn = (TableName)aliasName;
         this.aliasType = (AliasInfo.Type)aliasType;
@@ -125,10 +122,6 @@ public class CreateAliasNode extends DDLStatementNode
         case PROCEDURE:
         case FUNCTION:
             {
-                this.javaClassName = (String)targetObject;
-                this.methodName = (String)methodName;
-                this.delimitedIdentifier = ((Boolean)delimitedIdentifier).booleanValue();
-
                 //routineElements contains the description of the procedure.
                 // 
                 // 0 - Object[] 3 element array for parameters
@@ -193,14 +186,34 @@ public class CreateAliasNode extends DDLStatementNode
                 boolean calledOnNullInput = (calledOnNullInputO == null) ? false : calledOnNullInputO.booleanValue();
 
                 DataTypeDescriptor returnType = (DataTypeDescriptor)routineElements[RETURN_TYPE];
+
+                String language = (String)routineElements[LANGUAGE];
+                RoutineAliasInfo.ParameterStyle pstyle = (RoutineAliasInfo.ParameterStyle)routineElements[PARAMETER_STYLE];
+                if (pstyle == null) {
+                    pstyle = language.equalsIgnoreCase("JAVA") ? RoutineAliasInfo.ParameterStyle.JAVA : RoutineAliasInfo.ParameterStyle.ENVIRONMENT;
+                }
+                
+                this.definition = (String)routineElements[INLINE_DEFINITION];
+                if (this.definition == null) {
+                    switch (pstyle) {
+                    case JAVA:
+                    case DERBY_JDBC_RESULT_SET:
+                        this.javaClassName = (String)targetObject;
+                        this.methodName = (String)methodName;
+                        break;
+                    case AKIBAN_LOADABLE_PLAN:
+                        this.javaClassName = (String)targetObject + "." + (String)methodName;
+                        break;
+                    }
+                }
                 aliasInfo = new RoutineAliasInfo(this.methodName,
                                                  paramCount,
                                                  names,
                                                  types,
                                                  modes,
                                                  drs,
-                                                 (String)routineElements[LANGUAGE],
-                                                 (RoutineAliasInfo.ParameterStyle)routineElements[PARAMETER_STYLE],
+                                                 language,
+                                                 pstyle,
                                                  sqlAllowed,
                                                  isDeterministic,
                                                  definersRights,
@@ -233,16 +246,33 @@ public class CreateAliasNode extends DDLStatementNode
         return methodName;
     }
 
-    private AliasInfo.Type getAliasType() {
+    public AliasInfo.Type getAliasType() {
         return aliasType;
     }
 
-    private boolean isDelimitedIdentifier() {
-        return delimitedIdentifier;
+    public AliasInfo getAliasInfo() {
+        return aliasInfo;
     }
 
-    private AliasInfo getAliasInfo () {
-        return aliasInfo;
+    public String getDefinition() {
+        return definition;
+    }
+
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+
+    public String toString() {
+        return "aliasType: " + aliasType + "\n" +
+            "aliasInfo: " + aliasInfo + "\n" +
+            ((definition != null) ? 
+             ("definition: " + definition + "\n") :
+             ("javaClassName: " + javaClassName + "\n" +
+             "methodName: " + methodName + "\n")) +
+            super.toString();
     }
 
     /**
@@ -254,8 +284,8 @@ public class CreateAliasNode extends DDLStatementNode
         CreateAliasNode other = (CreateAliasNode)node;
         this.javaClassName = other.javaClassName;
         this.methodName = other.methodName;
+        this.definition = other.definition;
         this.aliasType = other.aliasType; 
-        this.delimitedIdentifier = other.delimitedIdentifier;
         this.aliasInfo = other.aliasInfo; // TODO: Clone?
     }
 

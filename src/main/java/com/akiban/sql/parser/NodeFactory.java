@@ -616,7 +616,6 @@ public abstract class NodeFactory
                                             Object targetName,
                                             Object aliasSpecificInfo,
                                             AliasInfo.Type aliasType,
-                                            Boolean delimitedIdentifier,
                                             SQLParserContext pc)
             throws StandardException {
         int nodeType;
@@ -628,23 +627,25 @@ public abstract class NodeFactory
 
         if ((aliasType != AliasInfo.Type.SYNONYM) &&
             (aliasType != AliasInfo.Type.UDT)) {
-            int lastPeriod;
             String fullStaticMethodName = (String)targetName;
-            int paren = fullStaticMethodName.indexOf('(');
-            if (paren == -1) {
-                // not a Java signature - split based on last period
-                lastPeriod = fullStaticMethodName.lastIndexOf('.');
-            } 
-            else {
-                // a Java signature - split on last period before the '('
-                lastPeriod = fullStaticMethodName.substring(0, paren).lastIndexOf('.');
+            if (fullStaticMethodName != null) {
+                int lastPeriod;
+                int paren = fullStaticMethodName.indexOf('(');
+                if (paren == -1) {
+                    // not a Java signature - split based on last period
+                    lastPeriod = fullStaticMethodName.lastIndexOf('.');
+                } 
+                else {
+                    // a Java signature - split on last period before the '('
+                    lastPeriod = fullStaticMethodName.substring(0, paren).lastIndexOf('.');
+                }
+                if (lastPeriod == -1 || lastPeriod == fullStaticMethodName.length()-1) {
+                    throw new StandardException("Invalid static method: " + fullStaticMethodName);
+                }
+                String javaClassName = fullStaticMethodName.substring(0, lastPeriod);
+                methodName = fullStaticMethodName.substring(lastPeriod + 1);
+                targetName = javaClassName;
             }
-            if (lastPeriod == -1 || lastPeriod == fullStaticMethodName.length()-1) {
-                throw new StandardException("Invalid static method: " + fullStaticMethodName);
-            }
-            String javaClassName = fullStaticMethodName.substring(0, lastPeriod);
-            methodName = fullStaticMethodName.substring(lastPeriod + 1);
-            targetName = javaClassName;
         }
 
         return getNode(nodeType,
@@ -653,7 +654,6 @@ public abstract class NodeFactory
                        methodName,
                        aliasSpecificInfo,
                        aliasType,
-                       delimitedIdentifier,
                        pc);
     }
 

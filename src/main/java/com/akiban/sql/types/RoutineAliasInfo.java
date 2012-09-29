@@ -77,7 +77,7 @@ public class RoutineAliasInfo extends MethodAliasInfo
    }
 
     public static enum ParameterStyle {
-        JAVA, DERBY_JDBC_RESULT_SET, AKIBAN_LOADABLE_PLAN
+        JAVA, DERBY_JDBC_RESULT_SET, AKIBAN_LOADABLE_PLAN, ENVIRONMENT
     }
 
     private int parameterCount;
@@ -239,12 +239,11 @@ public class RoutineAliasInfo extends MethodAliasInfo
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer(100);
-        sb.append(getMethodName());
+        StringBuffer sb = new StringBuffer();
         sb.append('(');
         for (int i = 0; i < parameterCount; i++) {
             if (i != 0)
-                sb.append(',');
+                sb.append(", ");
 
             if (returnType == null) {
                 // This is a PROCEDURE.  We only want to print the
@@ -276,9 +275,10 @@ public class RoutineAliasInfo extends MethodAliasInfo
         }
 
         if (definersRights) { 
-            sb.append(" EXTERNAL SECURITY DEFINER "); 
+            sb.append(" EXTERNAL SECURITY DEFINER"); 
         }
 
+        sb.append(" ");
         sb.append(sqlAllowed.getSQL());
         if ((returnType == null) &&
             (dynamicResultSets != 0)) {

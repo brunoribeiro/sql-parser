@@ -110,18 +110,8 @@ class SQLGrammar
         "DETERMINISTIC",
         "ON NULL INPUT",
         "RETURN TYPE",
-        "EXTERNAL SECURITY" 
-    };
-    /* Clauses required for Java routines. 
-         Numbers correspond to CreateAliasNode constants / offsets in ROUTINE_CLAUSE_NAMES.
-         3 - "LANGUAGE"
-         4 - "EXTERNAL NAME"
-         5 - "PARAMETER STYLE"
-    */
-    private static final int[] JAVA_ROUTINE_CLAUSES = {
-        CreateAliasNode.LANGUAGE,
-        CreateAliasNode.EXTERNAL_NAME,
-        CreateAliasNode.PARAMETER_STYLE
+        "EXTERNAL SECURITY",
+        "AS",
     };
 
     /* Possible clauses to CREATE TEMPORARY TABLE. */
@@ -241,11 +231,26 @@ class SQLGrammar
      * Check to see if the required claues have been added to a
      * procedure or function defintion.
      *   
-     * @param required int array of require clauses
-     * @param    clauses the array of declared clauses.
+     * @param clauses the array of declared clauses.
     */
-    private void checkRequiredRoutineClause(int[] required, Object[] clauses)
+    private void checkRequiredRoutineClause(Object[] clauses)
             throws StandardException {
+        String language = (String)clauses[CreateAliasNode.LANGUAGE];
+        if (language == null) {
+            throw new StandardException("Missing required " + ROUTINE_CLAUSE_NAMES[CreateAliasNode.LANGUAGE]);
+        }
+        int[] required;
+        if (language.equalsIgnoreCase("JAVA")) {
+            required = new int[] {  
+                CreateAliasNode.PARAMETER_STYLE, 
+                CreateAliasNode.EXTERNAL_NAME
+            };
+        }
+        else {
+            required = new int[] {  
+                CreateAliasNode.INLINE_DEFINITION
+            };
+        }
         for (int i = 0; i < required.length; i++) {
             int re = required[i];
             if (clauses[re] == null) {
@@ -1397,17 +1402,13 @@ class SQLGrammar
      * @param fullStaticMethodName The full path/method name
      * @param aliasSpecificInfo Information specific to the type of alias being created.
      * @param aliasType The type of alias to create
-     * @param delimitedIdentifier Whether or not to treat the class name
-     *              as a delimited identifier if trying to
-     *              resolve it as a class alias.
      *
      * @return A CreateAliasNode matching the given parameters
      *
      * @exception StandardException Thrown on error
      */
     StatementNode getCreateAliasNode(Object aliasName, String fullStaticMethodName,
-                                     Object aliasSpecificInfo, AliasInfo.Type aliasType,
-                                     Boolean delimitedIdentifier)
+                                     Object aliasSpecificInfo, AliasInfo.Type aliasType)
             throws StandardException {
 
         StatementNode aliasNode = (StatementNode)
@@ -1415,7 +1416,6 @@ class SQLGrammar
                                            fullStaticMethodName,
                                            aliasSpecificInfo,
                                            aliasType,
-                                           delimitedIdentifier,
                                            parserContext);
 
         return aliasNode;
@@ -10283,13 +10283,12 @@ procedureDefinition() throws StandardException :
     procedureElements[0] = procedureParameterList()
     ( routineElement(true, false, procedureElements) ) +
     {
-        checkRequiredRoutineClause(JAVA_ROUTINE_CLAUSES, procedureElements);
+        checkRequiredRoutineClause(procedureElements);
 
         return getCreateAliasNode(procedureName,
                                   (String)procedureElements[CreateAliasNode.EXTERNAL_NAME],
                                   procedureElements,
-                                  AliasInfo.Type.PROCEDURE,
-                                  Boolean.FALSE);
+                                  AliasInfo.Type.PROCEDURE);
     }
 }
 
@@ -10346,6 +10345,11 @@ routineElement(boolean isProcedure, boolean isTableFunction, Object[] routineEle
     <PARAMETER> <STYLE> clauseValue = parameterStyle( isTableFunction ) 
     {
         clausePosition = CreateAliasNode.PARAMETER_STYLE; 
+    }
+|
+    <AS> clauseValue = string()
+    {
+        clausePosition = CreateAliasNode.INLINE_DEFINITION; 
     }
 |
     <NO> <SQL>
@@ -10554,13 +10558,12 @@ functionDefinition() throws StandardException :
     ( routineElement(false, returnType.isRowMultiSet(), functionElements) )+
     {
         functionElements[CreateAliasNode.RETURN_TYPE] = returnType;
-        checkRequiredRoutineClause(JAVA_ROUTINE_CLAUSES, functionElements);
+        checkRequiredRoutineClause(functionElements);
                 
         return getCreateAliasNode(functionName,
                                   (String)functionElements[CreateAliasNode.EXTERNAL_NAME],
                                   functionElements,
-                                  AliasInfo.Type.FUNCTION,
-                                  Boolean.FALSE);
+                                  AliasInfo.Type.FUNCTION);
     }
 }
 
@@ -10675,8 +10678,7 @@ udtDefinition() throws StandardException :
         return getCreateAliasNode(udtName,
                                   externalName,
                                   null,
-                                  AliasInfo.Type.UDT,
-                                  Boolean.FALSE);
+                                  AliasInfo.Type.UDT);
     }
 }
 
@@ -10817,7 +10819,6 @@ synonymDefinition() throws StandardException :
                                                              targetName,
                                                              null,
                                                              AliasInfo.Type.SYNONYM,
-                                                             Boolean.FALSE,
                                                              parserContext);
     }
 }

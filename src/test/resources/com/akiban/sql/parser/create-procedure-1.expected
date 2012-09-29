@@ -1,0 +1,7 @@
+com.akiban.sql.parser.CreateAliasNode@77925ae
+aliasType: PROCEDURE
+aliasInfo: (IN x INTEGER, OUT y DOUBLE) LANGUAGE java PARAMETER STYLE JAVA MODIFIES SQL DATA
+javaClassName: com.akiban.ProcTest
+methodName: fooBar
+name: test.foo_bar
+statementType: CREATE PROCEDURE
