@@ -190,7 +190,7 @@ public class CreateAliasNode extends DDLStatementNode
                 String language = (String)routineElements[LANGUAGE];
                 RoutineAliasInfo.ParameterStyle pstyle = (RoutineAliasInfo.ParameterStyle)routineElements[PARAMETER_STYLE];
                 if (pstyle == null) {
-                    pstyle = language.equalsIgnoreCase("JAVA") ? RoutineAliasInfo.ParameterStyle.JAVA : RoutineAliasInfo.ParameterStyle.ENVIRONMENT;
+                    pstyle = language.equalsIgnoreCase("JAVA") ? RoutineAliasInfo.ParameterStyle.JAVA : RoutineAliasInfo.ParameterStyle.DEFAULT;
                 }
                 
                 this.definition = (String)routineElements[INLINE_DEFINITION];

@@ -71,6 +71,8 @@ public class NodeToString
             return indexColumnList((IndexColumnList)node);
         case NodeTypes.INDEX_COLUMN:
             return indexColumn((IndexColumn)node);
+        case NodeTypes.CREATE_ALIAS_NODE:
+            return createAliasNode((CreateAliasNode)node);
         case NodeTypes.RENAME_NODE:
             return renameNode((RenameNode)node);
         case NodeTypes.CURSOR_NODE:
@@ -350,6 +352,33 @@ public class NodeToString
         str.append(node.getColumnName());
         if (!node.isAscending())
             str.append(" DESC");
+        return str.toString();
+    }
+
+    protected String createAliasNode(CreateAliasNode node) throws StandardException {
+        StringBuilder str = new StringBuilder(node.statementToString());
+        str.append(' ');
+        str.append(toString(node.getObjectName()));
+        switch (node.getAliasType()) {
+        case PROCEDURE:
+        case FUNCTION:
+            str.append(node.getAliasInfo());
+            if (node.getDefinition() != null) {
+                str.append(" AS '");
+                str.append(node.getDefinition().replace("'", "''"));
+                str.append('\'');
+            }
+            else {
+                str.append(" EXTERNAL NAME '");
+                str.append(node.getJavaClassName());
+                if (node.getMethodName() != null) {
+                    str.append('.');
+                    str.append(node.getMethodName());
+                }
+                str.append('\'');
+            }
+            break;
+        }
         return str.toString();
     }
 
