@@ -365,7 +365,14 @@ public class NodeToString
             str.append(node.getAliasInfo());
             if (node.getDefinition() != null) {
                 str.append(" AS '");
-                str.append(node.getDefinition().replace("'", "''"));
+                if (node.getDefinition().indexOf('\n') >= 0) {
+                    str.append("$$");
+                    str.append(node.getDefinition());
+                    str.append("$$");
+                }
+                else {
+                    str.append(node.getDefinition().replace("'", "''"));
+                }
                 str.append('\'');
             }
             else {

@@ -2819,6 +2819,21 @@ MORE :
     "\""> : DEFAULT
 }
 
+MORE :
+{
+  "$$" : IN_DOUBLEDOLLAR_STRING
+}
+
+<IN_DOUBLEDOLLAR_STRING> TOKEN :
+{
+  <DOUBLEDOLLAR_STRING: "$$"> : DEFAULT
+}
+
+<IN_DOUBLEDOLLAR_STRING> MORE :
+{
+  <~[]>
+}
+
 TOKEN :
 { /* Literals */
   <EXACT_NUMERIC: ( <UINT> ( "." ( <UINT> )? )? | "." <UINT> )>
@@ -11537,6 +11552,13 @@ string() throws StandardException :
         parserContext.checkStringLiteralLengthLimit(tok.image);
         /* Trim off the leading and trailing ', and compress all '' to ' */
         return trimAndCompressQuotes(tok.image, DOUBLEQUOTES, true);
+    }
+|
+    tok = <DOUBLEDOLLAR_STRING>
+    {
+        parserContext.checkStringLiteralLengthLimit(tok.image);
+        /* Trim off the leading and trailing $$ */
+        return tok.image.substring(2, tok.image.length()-2);
     }
 }
 
