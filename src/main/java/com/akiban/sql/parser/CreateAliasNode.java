@@ -80,14 +80,13 @@ public class CreateAliasNode extends DDLStatementNode
 
     // Keep ROUTINE_ELEMENT_COUNT last (determines set cardinality).
     // Note: Remember to also update the map ROUTINE_CLAUSE_NAMES in
-    // sqlgrammar.jj when elements are added.
+    // SQLGrammar.jj when elements are added.
     public static final int ROUTINE_ELEMENT_COUNT = ROUTINE_SECURITY_DEFINER + 1;
 
     private String javaClassName;
     private String methodName;
-    private char aliasType; 
+    private AliasInfo.Type aliasType; 
     private boolean delimitedIdentifier;
-
     private AliasInfo aliasInfo;
 
     /**
@@ -111,20 +110,20 @@ public class CreateAliasNode extends DDLStatementNode
                      Object delimitedIdentifier) 
             throws StandardException {
         TableName qn = (TableName)aliasName;
-        this.aliasType = ((Character)aliasType).charValue();
+        this.aliasType = (AliasInfo.Type)aliasType;
 
         initAndCheck(qn);
 
         switch (this.aliasType) {
-        case AliasInfo.ALIAS_TYPE_UDT_AS_CHAR:
+        case UDT:
             this.javaClassName = (String)targetObject;
             aliasInfo = new UDTAliasInfo();
 
             implicitCreateSchema = true;
             break;
                                 
-        case AliasInfo.ALIAS_TYPE_PROCEDURE_AS_CHAR:
-        case AliasInfo.ALIAS_TYPE_FUNCTION_AS_CHAR:
+        case PROCEDURE:
+        case FUNCTION:
             {
                 this.javaClassName = (String)targetObject;
                 this.methodName = (String)methodName;
@@ -135,10 +134,10 @@ public class CreateAliasNode extends DDLStatementNode
                 // 0 - Object[] 3 element array for parameters
                 // 1 - TableName - specific name
                 // 2 - Integer - dynamic result set count
-                // 3 - String language (always java) - ignore
+                // 3 - String language
                 // 4 - String external name (also passed directly to create alias node - ignore
-                // 5 - Integer parameter style 
-                // 6 - Short - SQL control
+                // 5 - ParameterStyle parameter style 
+                // 6 - SQLAllowed - SQL control
                 // 7 - Boolean - whether the routine is DETERMINISTIC
                 // 8 - Boolean - CALLED ON NULL INPUT (always TRUE for procedures)
                 // 9 - DataTypeDescriptor - return type (always NULL for procedures)
@@ -179,28 +178,19 @@ public class CreateAliasNode extends DDLStatementNode
                 Integer drso = (Integer)routineElements[DYNAMIC_RESULT_SET_COUNT];
                 int drs = drso == null ? 0 : drso.intValue();
 
-                short sqlAllowed;
-                Short sqlAllowedObject = (Short)routineElements[SQL_CONTROL];
-                if (sqlAllowedObject != null)
-                    sqlAllowed = sqlAllowedObject.shortValue();
-                else
-                    sqlAllowed = (this.aliasType == AliasInfo.ALIAS_TYPE_PROCEDURE_AS_CHAR ?
-                                  RoutineAliasInfo.MODIFIES_SQL_DATA : RoutineAliasInfo.READS_SQL_DATA);
+                RoutineAliasInfo.SQLAllowed sqlAllowed = (RoutineAliasInfo.SQLAllowed)routineElements[SQL_CONTROL];
+                if (sqlAllowed == null)
+                    sqlAllowed = (this.aliasType == AliasInfo.Type.PROCEDURE ?
+                                  RoutineAliasInfo.SQLAllowed.MODIFIES_SQL_DATA : RoutineAliasInfo.SQLAllowed.READS_SQL_DATA);
 
                 Boolean isDeterministicO = (Boolean)routineElements[DETERMINISTIC];
                 boolean isDeterministic = (isDeterministicO == null) ? false : isDeterministicO.booleanValue();
 
                 Boolean definersRightsO = (Boolean)routineElements[ROUTINE_SECURITY_DEFINER];
-                boolean definersRights  =
-                    (definersRightsO == null) ? false :
-                    definersRightsO.booleanValue();
+                boolean definersRights  = (definersRightsO == null) ? false : definersRightsO.booleanValue();
 
                 Boolean calledOnNullInputO = (Boolean)routineElements[NULL_ON_NULL_INPUT];
-                boolean calledOnNullInput;
-                if (calledOnNullInputO == null)
-                    calledOnNullInput = true;
-                else
-                    calledOnNullInput = calledOnNullInputO.booleanValue();
+                boolean calledOnNullInput = (calledOnNullInputO == null) ? false : calledOnNullInputO.booleanValue();
 
                 DataTypeDescriptor returnType = (DataTypeDescriptor)routineElements[RETURN_TYPE];
                 aliasInfo = new RoutineAliasInfo(this.methodName,
@@ -209,8 +199,8 @@ public class CreateAliasNode extends DDLStatementNode
                                                  types,
                                                  modes,
                                                  drs,
-                                                 // parameter style:
-                                                 ((Short)routineElements[PARAMETER_STYLE]).shortValue(),
+                                                 (String)routineElements[LANGUAGE],
+                                                 (RoutineAliasInfo.ParameterStyle)routineElements[PARAMETER_STYLE],
                                                  sqlAllowed,
                                                  isDeterministic,
                                                  definersRights,
@@ -221,7 +211,7 @@ public class CreateAliasNode extends DDLStatementNode
             }
             break;
 
-        case AliasInfo.ALIAS_TYPE_SYNONYM_AS_CHAR:
+        case SYNONYM:
             String targetSchema = null;
             implicitCreateSchema = true;
             TableName t = (TableName)targetObject;
@@ -233,6 +223,26 @@ public class CreateAliasNode extends DDLStatementNode
         default:
             assert false : "Unexpected value for aliasType " + aliasType;
         }
+    }
+
+    public String getJavaClassName() {
+        return javaClassName;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    private AliasInfo.Type getAliasType() {
+        return aliasType;
+    }
+
+    private boolean isDelimitedIdentifier() {
+        return delimitedIdentifier;
+    }
+
+    private AliasInfo getAliasInfo () {
+        return aliasInfo;
     }
 
     /**
@@ -251,11 +261,11 @@ public class CreateAliasNode extends DDLStatementNode
 
     public String statementToString() {
         switch (this.aliasType) {
-        case AliasInfo.ALIAS_TYPE_UDT_AS_CHAR:
+        case UDT:
             return "CREATE TYPE";
-        case AliasInfo.ALIAS_TYPE_PROCEDURE_AS_CHAR:
+        case PROCEDURE:
             return "CREATE PROCEDURE";
-        case AliasInfo.ALIAS_TYPE_SYNONYM_AS_CHAR:
+        case SYNONYM:
             return "CREATE SYNONYM";
         default:
             return "CREATE FUNCTION";

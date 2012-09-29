@@ -615,7 +615,7 @@ public abstract class NodeFactory
     public QueryTreeNode getCreateAliasNode(Object aliasName,
                                             Object targetName,
                                             Object aliasSpecificInfo,
-                                            char aliasType,
+                                            AliasInfo.Type aliasType,
                                             Boolean delimitedIdentifier,
                                             SQLParserContext pc)
             throws StandardException {
@@ -626,8 +626,8 @@ public abstract class NodeFactory
 
         nodeType = NodeTypes.CREATE_ALIAS_NODE;
 
-        if ((aliasType != AliasInfo.ALIAS_TYPE_SYNONYM_AS_CHAR) &&
-            (aliasType != AliasInfo.ALIAS_TYPE_UDT_AS_CHAR)) {
+        if ((aliasType != AliasInfo.Type.SYNONYM) &&
+            (aliasType != AliasInfo.Type.UDT)) {
             int lastPeriod;
             String fullStaticMethodName = (String)targetName;
             int paren = fullStaticMethodName.indexOf('(');
@@ -652,7 +652,7 @@ public abstract class NodeFactory
                        targetName,
                        methodName,
                        aliasSpecificInfo,
-                       new Character(aliasType),
+                       aliasType,
                        delimitedIdentifier,
                        pc);
     }
