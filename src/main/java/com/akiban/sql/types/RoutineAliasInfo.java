@@ -253,8 +253,10 @@ public class RoutineAliasInfo extends MethodAliasInfo
                 sb.append(parameterMode(parameterModes[i]));
                 sb.append(' ');
             }
-            sb.append(parameterNames[i]);
-            sb.append(' ');
+            if (parameterNames[i] != null) {
+                sb.append(parameterNames[i]);
+                sb.append(' ');
+            }
             sb.append(parameterTypes[i].getSQLstring());
         }
         sb.append(')');

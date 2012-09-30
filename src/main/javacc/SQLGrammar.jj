@@ -10508,7 +10508,7 @@ void
 procedureParameterDefinition(List[] list) throws StandardException :
 {
     DataTypeDescriptor typeDescriptor;
-    String parameterName = "";
+    String parameterName = null;
     Integer inout;
 }
 {
