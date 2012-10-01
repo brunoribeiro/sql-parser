@@ -67,32 +67,28 @@ public class BooleanConstantNode extends ConstantNode
      * @exception StandardException
      */
     public void init(Object arg1) throws StandardException {
-        /*
-        ** RESOLVE: The length is fixed at 1, even for nulls.
-        ** Is that OK?
-        */
-
         if (arg1 == null) {
             /* Fill in the type information in the parent ValueNode */
             super.init(TypeId.BOOLEAN_ID,
                        Boolean.TRUE,
-                       1);
+                       4);
 
             setValue(null);
         }
         else if (arg1 instanceof Boolean) {
+            booleanValue = ((Boolean)arg1).booleanValue();
+
             /* Fill in the type information in the parent ValueNode */
             super.init(TypeId.BOOLEAN_ID,
                        Boolean.FALSE,
-                       1);
+                       booleanValue ? 4 : 5);
 
-            booleanValue = ((Boolean)arg1).booleanValue();
             super.setValue(arg1);
         }
         else {
             super.init(arg1,
                        Boolean.TRUE,
-                       0);
+                       TypeId.BOOLEAN_MAXWIDTH);
             unknownValue = true;
         }
     }
