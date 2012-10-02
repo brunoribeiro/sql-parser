@@ -453,6 +453,8 @@ public class TypeComputer implements Visitor
             
             if (node instanceof RowConstructorNode)
                 ret |= isNestedTupleNullable((RowConstructorNode)node);
+            else if (node.getType() == null)
+                ret = true;
             else
             {
                 ret |= node.getType().isNullable();
@@ -462,9 +464,13 @@ public class TypeComputer implements Visitor
     }
 
     protected DataTypeDescriptor subqueryNode(SubqueryNode node) throws StandardException {
-        if (node.getSubqueryType() == SubqueryNode.SubqueryType.EXPRESSION)
-            return node.getResultSet().getResultColumns().get(0)
-                .getType().getNullabilityType(true);
+        if (node.getSubqueryType() == SubqueryNode.SubqueryType.EXPRESSION) {
+            DataTypeDescriptor col1Type = node.getResultSet().getResultColumns().get(0).getType();
+            if (col1Type == null)
+                return null;
+            else
+                return col1Type.getNullabilityType(true);
+        }
         else
             return new DataTypeDescriptor(TypeId.BOOLEAN_ID, true);
     }
