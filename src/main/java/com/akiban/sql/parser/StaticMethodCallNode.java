@@ -121,6 +121,10 @@ public class StaticMethodCallNode extends MethodCallNode
         this.javaClassName = (String)javaClassName;
     }
 
+    public TableName getProcedureName() {
+        return procedureName;
+    }
+
     /**
      * Fill this node with a deep copy of the given node.
      */

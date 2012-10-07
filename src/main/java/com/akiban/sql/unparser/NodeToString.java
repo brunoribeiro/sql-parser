@@ -215,7 +215,9 @@ public class NodeToString
         case NodeTypes.SQL_TO_JAVA_VALUE_NODE:
             return sqlToJavaValueNode((SQLToJavaValueNode)node);
         case NodeTypes.STATIC_METHOD_CALL_NODE:
-            return methodCallNode((MethodCallNode)node);
+            return staticMethodCallNode((StaticMethodCallNode)node);
+        case NodeTypes.CALL_STATEMENT_NODE:
+            return callStatementNode((CallStatementNode)node);
         case NodeTypes.SPECIAL_INDEX_FUNC_NODE:
             return zorderFuncNode((SpecialIndexFuncNode)node);
         case NodeTypes.INDEX_CONSTRAINT_NODE:
@@ -914,9 +916,13 @@ public class NodeToString
         return toString(node.getSQLValueNode());
     }
 
-    protected String methodCallNode(MethodCallNode node)
+    protected String staticMethodCallNode(StaticMethodCallNode node)
             throws StandardException {
-        StringBuilder str = new StringBuilder(node.getMethodName());
+        StringBuilder str = new StringBuilder();
+        if (node.getProcedureName() != null)
+            str.append(toString(node.getProcedureName()));
+        else
+            str.append(node.getMethodName());
         str.append("(");
         JavaValueNode[] params = node.getMethodParameters();
         for (int i = 0; i < params.length; i++) {
@@ -925,6 +931,10 @@ public class NodeToString
         }
         str.append(")");
         return str.toString();
+    }
+
+    protected String callStatementNode(CallStatementNode node) throws StandardException {
+        return "CALL " + javaToSQLValueNode(node.methodCall());
     }
 
     protected String qualifiedDDLNode(DDLStatementNode node) throws StandardException {
