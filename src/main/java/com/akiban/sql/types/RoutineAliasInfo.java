@@ -74,7 +74,7 @@ public class RoutineAliasInfo extends MethodAliasInfo
         public String getSQL() {
             return sql;
         }
-   }
+    }
 
     public static enum ParameterStyle {
         JAVA, DERBY_JDBC_RESULT_SET, AKIBAN_LOADABLE_PLAN, DEFAULT
