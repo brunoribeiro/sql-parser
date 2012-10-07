@@ -282,8 +282,10 @@ public class RoutineAliasInfo extends MethodAliasInfo
             sb.append(" EXTERNAL SECURITY DEFINER"); 
         }
 
-        sb.append(" ");
-        sb.append(sqlAllowed.getSQL());
+        if (sqlAllowed != null) {
+            sb.append(" ");
+            sb.append(sqlAllowed.getSQL());
+        }
         if ((returnType == null) &&
             (dynamicResultSets != 0)) {
             // Only print dynamic result sets if this is a PROCEDURE

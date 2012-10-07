@@ -172,9 +172,6 @@ public class CreateAliasNode extends DDLStatementNode
                 int drs = drso == null ? 0 : drso.intValue();
 
                 RoutineAliasInfo.SQLAllowed sqlAllowed = (RoutineAliasInfo.SQLAllowed)routineElements[SQL_CONTROL];
-                if (sqlAllowed == null)
-                    sqlAllowed = (this.aliasType == AliasInfo.Type.PROCEDURE ?
-                                  RoutineAliasInfo.SQLAllowed.MODIFIES_SQL_DATA : RoutineAliasInfo.SQLAllowed.READS_SQL_DATA);
 
                 Boolean isDeterministicO = (Boolean)routineElements[DETERMINISTIC];
                 boolean isDeterministic = (isDeterministicO == null) ? false : isDeterministicO.booleanValue();

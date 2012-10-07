@@ -1,6 +1,6 @@
 com.akiban.sql.parser.CreateAliasNode@114beb40
 aliasType: PROCEDURE
-aliasInfo: () LANGUAGE java PARAMETER STYLE AKIBAN_LOADABLE_PLAN MODIFIES SQL DATA
+aliasInfo: () LANGUAGE java PARAMETER STYLE AKIBAN_LOADABLE_PLAN
 javaClassName: com.akiban.PlanTest
 methodName: null
 name: test.foo_baz
