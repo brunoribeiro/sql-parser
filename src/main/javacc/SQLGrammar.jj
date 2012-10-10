@@ -110,18 +110,8 @@ class SQLGrammar
         "DETERMINISTIC",
         "ON NULL INPUT",
         "RETURN TYPE",
-        "EXTERNAL SECURITY" 
-    };
-    /* Clauses required for Java routines. 
-         Numbers correspond to CreateAliasNode constants / offsets in ROUTINE_CLAUSE_NAMES.
-         3 - "LANGUAGE"
-         4 - "EXTERNAL NAME"
-         5 - "PARAMETER STYLE"
-    */
-    private static final int[] JAVA_ROUTINE_CLAUSES = {
-        CreateAliasNode.LANGUAGE,
-        CreateAliasNode.EXTERNAL_NAME,
-        CreateAliasNode.PARAMETER_STYLE
+        "EXTERNAL SECURITY",
+        "AS",
     };
 
     /* Possible clauses to CREATE TEMPORARY TABLE. */
@@ -241,11 +231,26 @@ class SQLGrammar
      * Check to see if the required claues have been added to a
      * procedure or function defintion.
      *   
-     * @param required int array of require clauses
-     * @param    clauses the array of declared clauses.
+     * @param clauses the array of declared clauses.
     */
-    private void checkRequiredRoutineClause(int[] required, Object[] clauses)
+    private void checkRequiredRoutineClause(Object[] clauses)
             throws StandardException {
+        String language = (String)clauses[CreateAliasNode.LANGUAGE];
+        if (language == null) {
+            throw new StandardException("Missing required " + ROUTINE_CLAUSE_NAMES[CreateAliasNode.LANGUAGE]);
+        }
+        int[] required;
+        if (language.equalsIgnoreCase("JAVA")) {
+            required = new int[] {  
+                CreateAliasNode.PARAMETER_STYLE, 
+                CreateAliasNode.EXTERNAL_NAME
+            };
+        }
+        else {
+            required = new int[] {  
+                CreateAliasNode.INLINE_DEFINITION
+            };
+        }
         for (int i = 0; i < required.length; i++) {
             int re = required[i];
             if (clauses[re] == null) {
@@ -1397,17 +1402,13 @@ class SQLGrammar
      * @param fullStaticMethodName The full path/method name
      * @param aliasSpecificInfo Information specific to the type of alias being created.
      * @param aliasType The type of alias to create
-     * @param delimitedIdentifier Whether or not to treat the class name
-     *              as a delimited identifier if trying to
-     *              resolve it as a class alias.
      *
      * @return A CreateAliasNode matching the given parameters
      *
      * @exception StandardException Thrown on error
      */
     StatementNode getCreateAliasNode(Object aliasName, String fullStaticMethodName,
-                                     Object aliasSpecificInfo, char aliasType,
-                                     Boolean delimitedIdentifier)
+                                     Object aliasSpecificInfo, AliasInfo.Type aliasType)
             throws StandardException {
 
         StatementNode aliasNode = (StatementNode)
@@ -1415,18 +1416,17 @@ class SQLGrammar
                                            fullStaticMethodName,
                                            aliasSpecificInfo,
                                            aliasType,
-                                           delimitedIdentifier,
                                            parserContext);
 
         return aliasNode;
     }
 
     /** Create a node for the drop alias/procedure call. */
-    StatementNode dropAliasNode(Object aliasName, char type) throws StandardException {
+    StatementNode dropAliasNode(Object aliasName, AliasInfo.Type type) throws StandardException {
 
         StatementNode stmt = (StatementNode)nodeFactory.getNode(NodeTypes.DROP_ALIAS_NODE,
                                                                 aliasName,
-                                                                new Character(type),
+                                                                type,
                                                                 parserContext);
 
         return stmt;
@@ -2391,6 +2391,7 @@ TOKEN [IGNORE_CASE] :
 TOKEN [IGNORE_CASE] :
 { /* Additional non-SQL92 non-reserved keywords */
   <AFTER: "after">
+| <AKIBAN_LOADABLE_PLAN: "akiban_loadable_plan">
 | <BEFORE: "before">
 | <BTREE: "btree">
 | <CLASS: "class">
@@ -2816,6 +2817,21 @@ MORE :
       (~["\"", "\\"])
     ) +
     "\""> : DEFAULT
+}
+
+MORE :
+{
+  "$$" : IN_DOUBLEDOLLAR_STRING
+}
+
+<IN_DOUBLEDOLLAR_STRING> TOKEN :
+{
+  <DOUBLEDOLLAR_STRING: "$$"> : DEFAULT
+}
+
+<IN_DOUBLEDOLLAR_STRING> MORE :
+{
+  <~[]>
 }
 
 TOKEN :
@@ -10282,13 +10298,12 @@ procedureDefinition() throws StandardException :
     procedureElements[0] = procedureParameterList()
     ( routineElement(true, false, procedureElements) ) +
     {
-        checkRequiredRoutineClause(JAVA_ROUTINE_CLAUSES, procedureElements);
+        checkRequiredRoutineClause(procedureElements);
 
         return getCreateAliasNode(procedureName,
                                   (String)procedureElements[CreateAliasNode.EXTERNAL_NAME],
                                   procedureElements,
-                                  AliasInfo.ALIAS_TYPE_PROCEDURE_AS_CHAR,
-                                  Boolean.FALSE);
+                                  AliasInfo.Type.PROCEDURE);
     }
 }
 
@@ -10316,7 +10331,7 @@ routineElement(boolean isProcedure, boolean isTableFunction, Object[] routineEle
         clausePosition = CreateAliasNode.DYNAMIC_RESULT_SET_COUNT;
     }
 |
-    <LANGUAGE>  <JAVA> { clauseValue = "JAVA"; clausePosition = CreateAliasNode.LANGUAGE; }
+    <LANGUAGE> clauseValue = identifier() { clausePosition = CreateAliasNode.LANGUAGE; }
 |
     <DETERMINISTIC>
     {
@@ -10347,21 +10362,26 @@ routineElement(boolean isProcedure, boolean isTableFunction, Object[] routineEle
         clausePosition = CreateAliasNode.PARAMETER_STYLE; 
     }
 |
+    <AS> clauseValue = string()
+    {
+        clausePosition = CreateAliasNode.INLINE_DEFINITION; 
+    }
+|
     <NO> <SQL>
     {
-        clauseValue = RoutineAliasInfo.NO_SQL;
+        clauseValue = RoutineAliasInfo.SQLAllowed.NO_SQL;
         clausePosition = CreateAliasNode.SQL_CONTROL; 
     }
 |    
     <CONTAINS> <SQL>
     { 
-        clauseValue = RoutineAliasInfo.CONTAINS_SQL;
+        clauseValue = RoutineAliasInfo.SQLAllowed.CONTAINS_SQL;
         clausePosition = CreateAliasNode.SQL_CONTROL; 
     }
 |    
     <READS> <SQL> <DATA>
     {
-        clauseValue = RoutineAliasInfo.READS_SQL_DATA;
+        clauseValue = RoutineAliasInfo.SQLAllowed.READS_SQL_DATA;
         clausePosition = CreateAliasNode.SQL_CONTROL; 
     }
 |    
@@ -10369,7 +10389,7 @@ routineElement(boolean isProcedure, boolean isTableFunction, Object[] routineEle
     {
         if (!isProcedure)
             throw new StandardException("Only allowed on procedure: MODIFIES SQL DATA");
-        clauseValue = RoutineAliasInfo.MODIFIES_SQL_DATA;
+        clauseValue = RoutineAliasInfo.SQLAllowed.MODIFIES_SQL_DATA;
         clausePosition = CreateAliasNode.SQL_CONTROL;
     }
 |       
@@ -10436,7 +10456,7 @@ routineSecurityClause() throws StandardException :
     }
 }
 
-Short
+RoutineAliasInfo.ParameterStyle
 parameterStyle(boolean isTableFunction) throws StandardException :
 {}
 {
@@ -10445,7 +10465,7 @@ parameterStyle(boolean isTableFunction) throws StandardException :
         if (isTableFunction) {
             throw new StandardException("Parameter style DERBY_JDBC_RESULT_SET is required for table function");
         }
-        return RoutineAliasInfo.PS_JAVA;
+        return RoutineAliasInfo.ParameterStyle.JAVA;
     }
 |
     <DERBY_JDBC_RESULT_SET>
@@ -10453,7 +10473,15 @@ parameterStyle(boolean isTableFunction) throws StandardException :
         if (!isTableFunction) { 
             throw new StandardException("Parameter style DERBY_JDBC_RESULT_SET can only be used with table function");
         }
-        return RoutineAliasInfo.PS_DERBY_JDBC_RESULT_SET;
+        return RoutineAliasInfo.ParameterStyle.DERBY_JDBC_RESULT_SET;
+    }
+|
+    <AKIBAN_LOADABLE_PLAN>
+    {
+        if (isTableFunction) {
+            throw new StandardException("Parameter style DERBY_JDBC_RESULT_SET is required for table function");
+        }
+        return RoutineAliasInfo.ParameterStyle.AKIBAN_LOADABLE_PLAN;
     }
 }
 
@@ -10480,7 +10508,7 @@ void
 procedureParameterDefinition(List[] list) throws StandardException :
 {
     DataTypeDescriptor typeDescriptor;
-    String parameterName = "";
+    String parameterName = null;
     Integer inout;
 }
 {
@@ -10545,13 +10573,12 @@ functionDefinition() throws StandardException :
     ( routineElement(false, returnType.isRowMultiSet(), functionElements) )+
     {
         functionElements[CreateAliasNode.RETURN_TYPE] = returnType;
-        checkRequiredRoutineClause(JAVA_ROUTINE_CLAUSES, functionElements);
+        checkRequiredRoutineClause(functionElements);
                 
         return getCreateAliasNode(functionName,
                                   (String)functionElements[CreateAliasNode.EXTERNAL_NAME],
                                   functionElements,
-                                  AliasInfo.ALIAS_TYPE_FUNCTION_AS_CHAR,
-                                  Boolean.FALSE);
+                                  AliasInfo.Type.FUNCTION);
     }
 }
 
@@ -10666,8 +10693,7 @@ udtDefinition() throws StandardException :
         return getCreateAliasNode(udtName,
                                   externalName,
                                   null,
-                                  AliasInfo.ALIAS_TYPE_UDT_AS_CHAR,
-                                  Boolean.FALSE);
+                                  AliasInfo.Type.UDT);
     }
 }
 
@@ -10807,8 +10833,7 @@ synonymDefinition() throws StandardException :
         return (StatementNode)nodeFactory.getCreateAliasNode(synonymName,
                                                              targetName,
                                                              null,
-                                                             AliasInfo.ALIAS_TYPE_SYNONYM_AS_CHAR,
-                                                             Boolean.FALSE,
+                                                             AliasInfo.Type.SYNONYM,
                                                              parserContext);
     }
 }
@@ -11527,6 +11552,13 @@ string() throws StandardException :
         parserContext.checkStringLiteralLengthLimit(tok.image);
         /* Trim off the leading and trailing ', and compress all '' to ' */
         return trimAndCompressQuotes(tok.image, DOUBLEQUOTES, true);
+    }
+|
+    tok = <DOUBLEDOLLAR_STRING>
+    {
+        parserContext.checkStringLiteralLengthLimit(tok.image);
+        /* Trim off the leading and trailing $$ */
+        return tok.image.substring(2, tok.image.length()-2);
     }
 }
 
@@ -13473,22 +13505,22 @@ dropAliasStatement() throws StandardException :
 {
     <PROCEDURE> aliasName = qualifiedName() 
     {
-        return dropAliasNode(aliasName, AliasInfo.ALIAS_TYPE_PROCEDURE_AS_CHAR);
+        return dropAliasNode(aliasName, AliasInfo.Type.PROCEDURE);
     }    
 |        
     <FUNCTION> aliasName = qualifiedName() 
     {
-        return dropAliasNode(aliasName, AliasInfo.ALIAS_TYPE_FUNCTION_AS_CHAR);
+        return dropAliasNode(aliasName, AliasInfo.Type.FUNCTION);
     }    
 |    
     <SYNONYM> aliasName = qualifiedName()
     {
-        return dropAliasNode(aliasName, AliasInfo.ALIAS_TYPE_SYNONYM_AS_CHAR);
+        return dropAliasNode(aliasName, AliasInfo.Type.SYNONYM);
     }
 |    
     <TYPE> aliasName = qualifiedName() <RESTRICT>
     {
-        return dropAliasNode(aliasName, AliasInfo.ALIAS_TYPE_UDT_AS_CHAR);
+        return dropAliasNode(aliasName, AliasInfo.Type.UDT);
     }
 }
 
@@ -14392,6 +14424,7 @@ nonReservedKeyword() :
 | tok = <ABSVAL>    
 | tok = <ACTION>
 | tok = <AFTER>
+| tok = <AKIBAN_LOADABLE_PLAN>
 | tok = <ALWAYS>
 | tok = <BEFORE>
 | tok = <BINARY>

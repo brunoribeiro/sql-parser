@@ -59,7 +59,7 @@ import com.akiban.sql.types.AliasInfo;
 
 public class DropAliasNode extends DDLStatementNode
 {
-    private char aliasType;
+    private AliasInfo.Type aliasType;
 
     /**
      * Initializer for a DropAliasNode
@@ -72,7 +72,7 @@ public class DropAliasNode extends DDLStatementNode
     public void init(Object dropAliasName, Object aliasType) throws StandardException {
         TableName dropItem = (TableName)dropAliasName;
         initAndCheck(dropItem);
-        this.aliasType = ((Character)aliasType).charValue();
+        this.aliasType = (AliasInfo.Type)aliasType;
     }
 
     /**
@@ -85,28 +85,28 @@ public class DropAliasNode extends DDLStatementNode
         this.aliasType = other.aliasType;
     }
 
-    public char getAliasType() { 
+    public AliasInfo.Type getAliasType() { 
         return aliasType; 
     }
 
     public String statementToString() {
-        return "DROP ".concat(aliasTypeName(aliasType));
+        return "DROP " + aliasTypeName(aliasType);
     }
 
     /* returns the alias type name given the alias char type */
-    private static String aliasTypeName(char actualType) {
+    private static String aliasTypeName(AliasInfo.Type type) {
         String typeName = null;
-        switch (actualType) {
-        case AliasInfo.ALIAS_TYPE_PROCEDURE_AS_CHAR:
+        switch (type) {
+        case PROCEDURE:
             typeName = "PROCEDURE";
             break;
-        case AliasInfo.ALIAS_TYPE_FUNCTION_AS_CHAR:
+        case FUNCTION:
             typeName = "FUNCTION";
             break;
-        case AliasInfo.ALIAS_TYPE_SYNONYM_AS_CHAR:
+        case SYNONYM:
             typeName = "SYNONYM";
             break;
-        case AliasInfo.ALIAS_TYPE_UDT_AS_CHAR:
+        case UDT:
             typeName = "TYPE";
             break;
         }

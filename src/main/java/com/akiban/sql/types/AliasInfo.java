@@ -65,12 +65,7 @@ package com.akiban.sql.types;
  */
 public interface AliasInfo
 {
-    // TODO: Just make an enum and have done with it.
-
-    public static final char ALIAS_TYPE_UDT_AS_CHAR = 'A';
-    public static final char ALIAS_TYPE_PROCEDURE_AS_CHAR = 'P';
-    public static final char ALIAS_TYPE_FUNCTION_AS_CHAR = 'F';
-    public static final char ALIAS_TYPE_SYNONYM_AS_CHAR = 'S';
+    public enum Type { UDT, PROCEDURE, FUNCTION, SYNONYM };
 
     /**
      * Get the name of the static method that the alias 

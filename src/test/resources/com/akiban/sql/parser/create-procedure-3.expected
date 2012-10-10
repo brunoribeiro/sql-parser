@@ -1,0 +1,6 @@
+com.akiban.sql.parser.CreateAliasNode@258b678c
+aliasType: PROCEDURE
+aliasInfo: (IN x INTEGER, OUT y DOUBLE) LANGUAGE javascript
+definition: y = x;
+name: test.foo_too
+statementType: CREATE PROCEDURE

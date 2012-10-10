@@ -71,6 +71,8 @@ public class NodeToString
             return indexColumnList((IndexColumnList)node);
         case NodeTypes.INDEX_COLUMN:
             return indexColumn((IndexColumn)node);
+        case NodeTypes.CREATE_ALIAS_NODE:
+            return createAliasNode((CreateAliasNode)node);
         case NodeTypes.RENAME_NODE:
             return renameNode((RenameNode)node);
         case NodeTypes.CURSOR_NODE:
@@ -213,7 +215,9 @@ public class NodeToString
         case NodeTypes.SQL_TO_JAVA_VALUE_NODE:
             return sqlToJavaValueNode((SQLToJavaValueNode)node);
         case NodeTypes.STATIC_METHOD_CALL_NODE:
-            return methodCallNode((MethodCallNode)node);
+            return staticMethodCallNode((StaticMethodCallNode)node);
+        case NodeTypes.CALL_STATEMENT_NODE:
+            return callStatementNode((CallStatementNode)node);
         case NodeTypes.SPECIAL_INDEX_FUNC_NODE:
             return zorderFuncNode((SpecialIndexFuncNode)node);
         case NodeTypes.INDEX_CONSTRAINT_NODE:
@@ -350,6 +354,40 @@ public class NodeToString
         str.append(node.getColumnName());
         if (!node.isAscending())
             str.append(" DESC");
+        return str.toString();
+    }
+
+    protected String createAliasNode(CreateAliasNode node) throws StandardException {
+        StringBuilder str = new StringBuilder(node.statementToString());
+        str.append(' ');
+        str.append(toString(node.getObjectName()));
+        switch (node.getAliasType()) {
+        case PROCEDURE:
+        case FUNCTION:
+            str.append(node.getAliasInfo());
+            if (node.getDefinition() != null) {
+                str.append(" AS '");
+                if (node.getDefinition().indexOf('\n') >= 0) {
+                    str.append("$$");
+                    str.append(node.getDefinition());
+                    str.append("$$");
+                }
+                else {
+                    str.append(node.getDefinition().replace("'", "''"));
+                }
+                str.append('\'');
+            }
+            else {
+                str.append(" EXTERNAL NAME '");
+                str.append(node.getJavaClassName());
+                if (node.getMethodName() != null) {
+                    str.append('.');
+                    str.append(node.getMethodName());
+                }
+                str.append('\'');
+            }
+            break;
+        }
         return str.toString();
     }
 
@@ -878,9 +916,13 @@ public class NodeToString
         return toString(node.getSQLValueNode());
     }
 
-    protected String methodCallNode(MethodCallNode node)
+    protected String staticMethodCallNode(StaticMethodCallNode node)
             throws StandardException {
-        StringBuilder str = new StringBuilder(node.getMethodName());
+        StringBuilder str = new StringBuilder();
+        if (node.getProcedureName() != null)
+            str.append(toString(node.getProcedureName()));
+        else
+            str.append(node.getMethodName());
         str.append("(");
         JavaValueNode[] params = node.getMethodParameters();
         for (int i = 0; i < params.length; i++) {
@@ -889,6 +931,10 @@ public class NodeToString
         }
         str.append(")");
         return str.toString();
+    }
+
+    protected String callStatementNode(CallStatementNode node) throws StandardException {
+        return "CALL " + javaToSQLValueNode(node.methodCall());
     }
 
     protected String qualifiedDDLNode(DDLStatementNode node) throws StandardException {

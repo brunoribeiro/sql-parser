@@ -59,30 +59,26 @@ import com.akiban.sql.types.DataTypeDescriptor;
  */
 public class RoutineAliasInfo extends MethodAliasInfo
 {
-    // TODO: enum
+    public static enum SQLAllowed {
+        MODIFIES_SQL_DATA("MODIFIES SQL DATA"),
+        READS_SQL_DATA("READS SQL DATA"), 
+        CONTAINS_SQL("CONTAINS SQL"), 
+        NO_SQL("NO SQL");
 
-    private static final String[] SQL_CONTROL = {
-        "MODIFIES SQL DATA", "READS SQL DATA", "CONTAINS SQL", "NO SQL"
-    };
-    public static final short MODIFIES_SQL_DATA = 0;
-    public static final short READS_SQL_DATA = 1;
-    public static final short CONTAINS_SQL = 2;
-    public static final short NO_SQL = 3;
+        private String sql;
 
-    // TODO: Another enum 
+        private SQLAllowed(String sql) {
+            this.sql = sql;
+        }
 
-    /** PARAMETER STYLE JAVA */
-    public static final short PS_JAVA = 0;
+        public String getSQL() {
+            return sql;
+        }
+    }
 
-    /** PARAMETER STYLE DERBY_JDBC_RESULT_SET */
-    public static final short PS_DERBY_JDBC_RESULT_SET = PS_JAVA + 1;
-
-    /** Masks for the sqlOptions field */
-    private static final short SQL_ALLOWED_MASK = (short) 0xF;
-    private static final short DETERMINISTIC_MASK = (short) 0x10;
-
-    /** Mask for the SECURITY INVOKER/DEFINER field */
-    private static final short SECURITY_DEFINER_MASK = (short) 0x20;
+    public static enum ParameterStyle {
+        JAVA, DERBY_JDBC_RESULT_SET, AKIBAN_LOADABLE_PLAN, DEFAULT
+    }
 
     private int parameterCount;
 
@@ -100,79 +96,51 @@ public class RoutineAliasInfo extends MethodAliasInfo
     private String[] parameterNames;
 
     /**
-         IN, OUT, INOUT
-    */
+     * ParameterMetaData.parameterModeXxx: IN, OUT, INOUT
+     */
     private int[] parameterModes;
 
     private int dynamicResultSets;
 
     /**
-         Return type for functions. Null for procedures.
-    */
+     * Return type for functions. Null for procedures.
+     */
     private DataTypeDescriptor returnType;
 
-    /**
-         Parameter style - always PS_JAVA at the moment.
-    */
-    private short parameterStyle;
+    private String language;
+
+    private ParameterStyle parameterStyle;
+
+    private SQLAllowed sqlAllowed;
+
+    private boolean deterministic;
+
+    private boolean definersRights;
 
     /**
-         This field contains several pieces of information:
-
-         bits 0-3        sqlAllowed = MODIFIES_SQL_DATA, READS_SQL_DATA,CONTAINS_SQL, or NO_SQL
-
-         bit 4               on if function is DETERMINISTIC, off otherwise
-         bit 5               on if running with definer's right, off otherwise
-    */
-    private short   sqlOptions;
-
-    /**
-         SQL Specific name (future)
-    */
+     * SQL Specific name (future)
+     */
     private String specificName;
 
     /**
-         True if the routine is called on null input.
-         (always true for procedures).
-    */
+     * True if the routine is called on null input.
+     * (always true for procedures).
+     */
     private boolean calledOnNullInput;
 
-    // What type of alias is this: PROCEDURE or FUNCTION?
-    private transient char aliasType;
-
     /**
-         Create a RoutineAliasInfo for an internal PROCEDURE.
-    */
-    public RoutineAliasInfo(String methodName, int parameterCount, String[] parameterNames,
-                            DataTypeDescriptor[] parameterTypes, int[] parameterModes, 
-                            int dynamicResultSets, short parameterStyle, short sqlAllowed,
-                            boolean isDeterministic) {
-        this(methodName,
-                 parameterCount,
-                 parameterNames,
-                 parameterTypes,
-                 parameterModes,
-                 dynamicResultSets,
-                 parameterStyle,
-                 sqlAllowed,
-                 isDeterministic,
-                 false /* definersRights */,
-                 true,
-                 (DataTypeDescriptor)null);
-    }
-
-    /**
-         Create a RoutineAliasInfo for a PROCEDURE or FUNCTION
-    */
+     * Create a RoutineAliasInfo for a PROCEDURE or FUNCTION
+     */
     public RoutineAliasInfo(String methodName,
                             int parameterCount,
                             String[] parameterNames,
                             DataTypeDescriptor[] parameterTypes,
                             int[] parameterModes,
                             int dynamicResultSets,
-                            short parameterStyle,
-                            short sqlAllowed,
-                            boolean isDeterministic,
+                            String language,
+                            ParameterStyle parameterStyle,
+                            SQLAllowed sqlAllowed,
+                            boolean deterministic,
                             boolean definersRights,
                             boolean calledOnNullInput,
                             DataTypeDescriptor returnType) {
@@ -183,20 +151,13 @@ public class RoutineAliasInfo extends MethodAliasInfo
         this.parameterTypes = parameterTypes;
         this.parameterModes = parameterModes;
         this.dynamicResultSets = dynamicResultSets;
+        this.language = language;
         this.parameterStyle = parameterStyle;
-        this.sqlOptions = (short)(sqlAllowed & SQL_ALLOWED_MASK);
-
-        if (isDeterministic) { 
-            this.sqlOptions = (short)(sqlOptions | DETERMINISTIC_MASK);
-        }
-
-        if (definersRights) {
-            this.sqlOptions = (short)(sqlOptions | SECURITY_DEFINER_MASK);
-        }
-
+        this.sqlAllowed = sqlAllowed;
+        this.deterministic = deterministic;
+        this.definersRights = definersRights;
         this.calledOnNullInput = calledOnNullInput;
         this.returnType = returnType;
-
     }
 
     public int getParameterCount() {
@@ -229,22 +190,26 @@ public class RoutineAliasInfo extends MethodAliasInfo
         return dynamicResultSets;
     }
 
-    public short getParameterStyle() {
+    public String getLanguage() {
+        return language;
+    }
+
+    public ParameterStyle getParameterStyle() {
         return parameterStyle;
     }
 
-    public short getSQLAllowed() {
-        return (short) (sqlOptions & SQL_ALLOWED_MASK);
+    public SQLAllowed getSQLAllowed() {
+        return sqlAllowed;
     }
 
     public boolean isDeterministic()
     {
-        return ( (sqlOptions & DETERMINISTIC_MASK) != 0 );
+        return deterministic;
     }
 
     public boolean hasDefinersRights()
     {
-        return ( (sqlOptions & SECURITY_DEFINER_MASK) != 0 );
+        return definersRights;
     }
 
     public boolean calledOnNullInput() {
@@ -253,6 +218,10 @@ public class RoutineAliasInfo extends MethodAliasInfo
 
     public DataTypeDescriptor getReturnType() {
         return returnType;
+    }
+
+    public boolean isFunction() {
+        return (returnType != null);
     }
 
     public boolean isTableFunction() {
@@ -265,33 +234,29 @@ public class RoutineAliasInfo extends MethodAliasInfo
     }
 
     /**
-     * Get this alias info as a string.  NOTE: The "ALIASINFO" column
-     * in the SYSALIASES table will return the result of this method
-     * on a ResultSet.getString() call.  That said, since the dblook
-     * utility uses ResultSet.getString() to retrieve ALIASINFO and
-     * to generate the DDL, THIS METHOD MUST RETURN A STRING THAT
-     * IS SYNTACTICALLY VALID, or else the DDL generated by dblook
-     * will be incorrect.
+     * Get this alias info as a string.  
+     * This method must return a string that is syntactically valid.
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer(100);
-        sb.append(getMethodName());
+        StringBuffer sb = new StringBuffer();
         sb.append('(');
         for (int i = 0; i < parameterCount; i++) {
             if (i != 0)
-                sb.append(',');
+                sb.append(", ");
 
             if (returnType == null) {
                 // This is a PROCEDURE.  We only want to print the
                 // parameter mode (ex. "IN", "OUT", "INOUT") for procedures--
                 // we don't do it for functions since use of the "IN" keyword
                 // is not part of the FUNCTION syntax.
-                sb.append(RoutineAliasInfo.parameterMode(parameterModes[i]));
+                sb.append(parameterMode(parameterModes[i]));
                 sb.append(' ');
             }
-            sb.append(parameterNames[i]);
-            sb.append(' ');
+            if (parameterNames[i] != null) {
+                sb.append(parameterNames[i]);
+                sb.append(' ');
+            }
             sb.append(parameterTypes[i].getSQLstring());
         }
         sb.append(')');
@@ -301,26 +266,26 @@ public class RoutineAliasInfo extends MethodAliasInfo
             sb.append(" RETURNS " + returnType.getSQLstring());
         }
 
-        sb.append(" LANGUAGE JAVA PARAMETER STYLE " );
+        sb.append(" LANGUAGE ");
+        sb.append(language);
 
-        switch (parameterStyle) {
-        case PS_JAVA:        
-            sb.append("JAVA "); 
-            break;
-        case PS_DERBY_JDBC_RESULT_SET:      
-            sb.append("DERBY_JDBC_RESULT_SET "); 
-            break;
+        if (parameterStyle != ParameterStyle.DEFAULT) {
+            sb.append(" PARAMETER STYLE " );
+            sb.append(parameterStyle.name());
         }
                 
-        if (isDeterministic()) { 
+        if (deterministic) { 
             sb.append(" DETERMINISTIC "); 
         }
 
-        if (hasDefinersRights()) { 
-            sb.append(" EXTERNAL SECURITY DEFINER "); 
+        if (definersRights) { 
+            sb.append(" EXTERNAL SECURITY DEFINER"); 
         }
 
-        sb.append(RoutineAliasInfo.SQL_CONTROL[getSQLAllowed()]);
+        if (sqlAllowed != null) {
+            sb.append(" ");
+            sb.append(sqlAllowed.getSQL());
+        }
         if ((returnType == null) &&
             (dynamicResultSets != 0)) {
             // Only print dynamic result sets if this is a PROCEDURE
