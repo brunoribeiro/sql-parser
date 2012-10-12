@@ -32,6 +32,8 @@ tableElementList:
 	indexName: indx1
 	indexColumnList: 
 	methodName: Z_ORDER_LAT_LON
+	firstArg: 0
+	lastArg: 1
 	
 	joinType: null
 	location: null

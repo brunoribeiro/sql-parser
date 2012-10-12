@@ -1602,16 +1602,6 @@ class SQLGrammar
         }
     }
 
-    boolean geoIndexDefFuncFollows()
-    {
-        if (!hasFeature(SQLParserFeature.GEO_INDEX_DEF_FUNC))
-            return false;
-        
-        //TODO: might need to change this when we have more than
-        // one functions.
-        // For now, the only one expected here is: z_order_lat_lon
-        return  getToken(1).kind == Z_ORDER_LAT_LON;
-    }
     boolean parensFollow()
     {
         if (!hasFeature(SQLParserFeature.MYSQL_COLUMN_AS_FUNCS))
@@ -8946,28 +8936,6 @@ columnNameItem(ResultColumnList columnList) throws StandardException :
     }
 }
 
-IndexColumnList
-geoIndexDefFunc () throws StandardException :
-{
-    IndexColumn arg1;
-    IndexColumn arg2;
-}
-{
-    <Z_ORDER_LAT_LON>
-    <LEFT_PAREN>
-    arg1 = getIndexColumn()
-    <COMMA>
-    arg2 = getIndexColumn()
-    <RIGHT_PAREN>
-    {
-        return (SpecialIndexFuncNode)nodeFactory.getNode(NodeTypes.SPECIAL_INDEX_FUNC_NODE,
-                                                   arg1,
-                                                   arg2,
-                                                   SpecialIndexFuncNode.FunctionType.Z_ORDER_LAT_LON,
-                                                   parserContext);
-    }
-}
-
 IndexColumn
 getIndexColumn() throws StandardException :
 {
@@ -8985,27 +8953,76 @@ getIndexColumn() throws StandardException :
 
 
 void
-indexColumnList(IndexColumnList columnList) throws StandardException :
+indexItemList(IndexColumnList columnList) throws StandardException :
 {}
 {
-    indexColumnItem(columnList) 
-    ( <COMMA> indexColumnItem(columnList) )*
+    indexItem(columnList) 
+    ( <COMMA> indexItem(columnList) )*
 }
 
-void
-indexColumnItem(IndexColumnList columnList) throws StandardException :
+void indexItem(IndexColumnList columnList) throws StandardException :
 {
     String columnName;
     boolean asc = true;
 }
 {
+    (
+      <Z_ORDER_LAT_LON>
+      <LEFT_PAREN>
+      columnName = identifier()
+      {
+          int latPosition = columnList.size();
+          IndexColumn lat = (IndexColumn)
+              nodeFactory.getNode(NodeTypes.INDEX_COLUMN,
+                                  columnName,
+                                  Boolean.FALSE,
+                                  parserContext);
+          columnList.add(lat);
+      }
+      <COMMA>
+      columnName = identifier()
+      {
+          IndexColumn lon = (IndexColumn)
+              nodeFactory.getNode(NodeTypes.INDEX_COLUMN,
+                                  columnName,
+                                  Boolean.FALSE,
+                                  parserContext);
+          columnList.add(lon);
+      }
+      <RIGHT_PAREN>
+      {
+          columnList.applyFunction(IndexColumnList.FunctionType.Z_ORDER_LAT_LON,
+                                   latPosition,
+                                   2);
+      }
+    )
+    |
+    (
+      columnName = identifier() 
+      [ <ASC> | <DESC> { asc = false; } ]
+      {
+          IndexColumn indexColumn = (IndexColumn)
+              nodeFactory.getNode(NodeTypes.INDEX_COLUMN,
+                                  columnName,
+                                  asc ? Boolean.TRUE : Boolean.FALSE,
+                                  parserContext);
+          columnList.add(indexColumn);
+    }
+    )
+}
+
+void
+indexUnorderedColumnItem(IndexColumnList columnList) throws StandardException :
+{
+    String columnName;
+}
+{
     columnName = identifier() 
-    [ <ASC> | <DESC> { asc = false; } ]
     {
         IndexColumn indexColumn = (IndexColumn)
             nodeFactory.getNode(NodeTypes.INDEX_COLUMN,
                                 columnName,
-                                asc ? Boolean.TRUE : Boolean.FALSE,
+                                Boolean.TRUE,
                                 parserContext);
         columnList.add(indexColumn);
     }
@@ -10209,14 +10226,12 @@ indexDefinition() throws StandardException :
     indexName = qualifiedName() 
     <ON> tableName = qualifiedName()
     <LEFT_PAREN>
-    ( LOOKAHEAD ( { geoIndexDefFuncFollows() } )
-      indexColumnList = geoIndexDefFunc()
-    |
+    (
       LOOKAHEAD ( { groupFormat } )
-      groupIndexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
+      groupIndexItemList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
     |
       LOOKAHEAD ( { !groupFormat } )
-      indexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
+      indexItemList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
     )
     <RIGHT_PAREN>
     [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
@@ -12465,14 +12480,11 @@ indexConstraintDefinition(TableName constraintName) throws StandardException :
     <INDEX> [indexName = identifier()]
     <LEFT_PAREN>
     ( 
-      LOOKAHEAD ( { geoIndexDefFuncFollows() } )
-      indexColumnList = geoIndexDefFunc()
-    |
       LOOKAHEAD ( { groupFormat } )
-      groupIndexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
+      groupIndexItemList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
     |
       LOOKAHEAD ( { !groupFormat } )
-      indexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
+      indexItemList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
     )
     <RIGHT_PAREN>
     [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
@@ -13222,14 +13234,11 @@ addIndex() throws StandardException :
     cond = createCondition()
     indexName = identifier()
      <LEFT_PAREN>
-    ( LOOKAHEAD ( { geoIndexDefFuncFollows() } )
-      indexColumnList = geoIndexDefFunc()
-    |
-      LOOKAHEAD ( { groupFormat } )
-      groupIndexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
+    ( LOOKAHEAD ( { groupFormat } )
+      groupIndexItemList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
     |
       LOOKAHEAD ( { !groupFormat } )
-      indexColumnList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
+      indexItemList(indexColumnList = (IndexColumnList)nodeFactory.getNode(NodeTypes.INDEX_COLUMN_LIST, parserContext))
     )
     <RIGHT_PAREN>
     [ LOOKAHEAD ( { groupFormat && getToken(1).kind == USING } )
@@ -14680,13 +14689,38 @@ caseSensitiveIdentifier() :
 }
 
 void
-groupIndexColumnList(IndexColumnList columnList) throws StandardException :
+groupIndexItemList(IndexColumnList columnList) throws StandardException :
 {}
 {
-    groupIndexColumnItem(columnList) 
-    ( <COMMA> groupIndexColumnItem(columnList) )*
+    groupIndexItem(columnList) 
+    ( <COMMA> groupIndexItem(columnList) )*
+    { columnList.validateIndexFeatures(); }
 }
 
+void groupIndexItem(IndexColumnList columnList) throws StandardException :
+{
+    int latPosition;
+}
+{
+    (
+      // Use indexUnorderedColumnItem() not groupIndexColumnItem() because spatial group indexes
+      // are not yet supported.
+      <Z_ORDER_LAT_LON>
+      <LEFT_PAREN>
+      { latPosition = columnList.size(); }
+      indexUnorderedColumnItem(columnList)
+      <COMMA>
+      indexUnorderedColumnItem(columnList)
+      <RIGHT_PAREN>
+      {
+          columnList.applyFunction(IndexColumnList.FunctionType.Z_ORDER_LAT_LON,
+                                   latPosition,
+                                   2);
+      }
+    )
+    |
+      groupIndexColumnItem(columnList)
+}
 
 void
 groupIndexColumnItem(IndexColumnList columnList) throws StandardException :

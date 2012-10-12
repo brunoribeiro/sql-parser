@@ -23,6 +23,8 @@ tableElementList:
 	unique: true
 	indexColumnList: 
 	methodName: Z_ORDER_LAT_LON
+	firstArg: 0
+	lastArg: 1
 	
 	joinType: null
 	properties: null

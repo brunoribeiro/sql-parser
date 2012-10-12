@@ -218,8 +218,6 @@ public class NodeToString
             return staticMethodCallNode((StaticMethodCallNode)node);
         case NodeTypes.CALL_STATEMENT_NODE:
             return callStatementNode((CallStatementNode)node);
-        case NodeTypes.SPECIAL_INDEX_FUNC_NODE:
-            return zorderFuncNode((SpecialIndexFuncNode)node);
         case NodeTypes.INDEX_CONSTRAINT_NODE:
             return indexConstraint((IndexConstraintDefinitionNode)node);
         default:
@@ -342,7 +340,26 @@ public class NodeToString
     }
 
     protected String indexColumnList(IndexColumnList node) throws StandardException {
-        return nodeList(node);
+
+        StringBuilder buffer = new StringBuilder();
+        int firstFunctionArg = node.firstFunctionArg();
+        int lastFunctionArg = node.lastFunctionArg();
+        int arg = 0;
+        while (arg < node.size()) {
+            if (arg > 0) {
+                buffer.append(", ");
+            }
+            if (arg == firstFunctionArg) {
+                buffer.append(node.functionType());
+                buffer.append('(');
+            }
+            buffer.append(toString(node.get(arg)));
+            if (arg == lastFunctionArg) {
+                buffer.append(')');
+            }
+            arg++;
+        }
+        return buffer.toString();
     }
 
     protected String indexColumn(IndexColumn node) throws StandardException {
@@ -998,13 +1015,6 @@ public class NodeToString
             bd.append(rowCtorNode((RowConstructorNode)node));
         else
             bd.append(toString(node));
-    }
-    
-    protected String zorderFuncNode (SpecialIndexFuncNode node)
-    {
-        return node.getFunctionType() + "(" 
-               + node.get(0).getColumnName() + ", "
-               + node.get(1).getColumnName() + ")";
     }
     
     protected String groupConcat(GroupConcatNode node) throws StandardException
