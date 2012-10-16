@@ -471,6 +471,10 @@ public class NodeToString
             str.append(" ");
             str.append(toString(node.getOrderByList()));
         }
+        if (node.getReturningList() != null) {
+            str.append(" RETURNING ");
+            str.append(toString(node.getReturningList()));
+        }
         return str.toString();
     }
 
@@ -494,6 +498,10 @@ public class NodeToString
             str.append(" WHERE ");
             str.append(toString(snode.getWhereClause()));
         }
+        if (unode.getReturningList() != null) {
+            str.append(" RETURNING ");
+            str.append(toString(unode.getReturningList()));
+        }
         return str.toString();
     }
 
@@ -505,6 +513,10 @@ public class NodeToString
         if (snode.getWhereClause() != null) {
             str.append(" WHERE ");
             str.append(toString(snode.getWhereClause()));
+        }
+        if (dnode.getReturningList() != null) {
+            str.append(" RETURNING ");
+            str.append(toString(dnode.getReturningList()));
         }
         return str.toString();
     }
