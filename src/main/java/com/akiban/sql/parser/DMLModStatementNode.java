@@ -133,6 +133,10 @@ public abstract class DMLModStatementNode extends DMLStatementNode
         return this.returningColumnList;
     }
 
+    public void setReturningList(ResultColumnList returningColumnList) {
+        this.returningColumnList = returningColumnList;
+    }
+
     /**
      * Prints the sub-nodes of this object.  See QueryTreeNode.java for
      * how tree printing is supposed to work.
