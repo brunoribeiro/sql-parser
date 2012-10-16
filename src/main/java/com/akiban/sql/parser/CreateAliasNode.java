@@ -185,24 +185,12 @@ public class CreateAliasNode extends DDLStatementNode
                 DataTypeDescriptor returnType = (DataTypeDescriptor)routineElements[RETURN_TYPE];
 
                 String language = (String)routineElements[LANGUAGE];
-                RoutineAliasInfo.ParameterStyle pstyle = (RoutineAliasInfo.ParameterStyle)routineElements[PARAMETER_STYLE];
-                if (pstyle == null) {
-                    pstyle = language.equalsIgnoreCase("JAVA") ? RoutineAliasInfo.ParameterStyle.JAVA : RoutineAliasInfo.ParameterStyle.DEFAULT;
-                }
+                String pstyle = (String)routineElements[PARAMETER_STYLE];
                 
                 this.definition = (String)routineElements[INLINE_DEFINITION];
-                if (this.definition == null) {
-                    switch (pstyle) {
-                    case JAVA:
-                    case DERBY_JDBC_RESULT_SET:
-                        this.javaClassName = (String)targetObject;
-                        this.methodName = (String)methodName;
-                        break;
-                    case AKIBAN_LOADABLE_PLAN:
-                        this.javaClassName = (String)targetObject + "." + (String)methodName;
-                        break;
-                    }
-                }
+                this.javaClassName = (String)targetObject;
+                this.methodName = (String)methodName;
+
                 aliasInfo = new RoutineAliasInfo(this.methodName,
                                                  paramCount,
                                                  names,

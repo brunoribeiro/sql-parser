@@ -76,10 +76,6 @@ public class RoutineAliasInfo extends MethodAliasInfo
         }
     }
 
-    public static enum ParameterStyle {
-        JAVA, DERBY_JDBC_RESULT_SET, AKIBAN_LOADABLE_PLAN, DEFAULT
-    }
-
     private int parameterCount;
 
     /**
@@ -109,7 +105,7 @@ public class RoutineAliasInfo extends MethodAliasInfo
 
     private String language;
 
-    private ParameterStyle parameterStyle;
+    private String parameterStyle;
 
     private SQLAllowed sqlAllowed;
 
@@ -138,7 +134,7 @@ public class RoutineAliasInfo extends MethodAliasInfo
                             int[] parameterModes,
                             int dynamicResultSets,
                             String language,
-                            ParameterStyle parameterStyle,
+                            String parameterStyle,
                             SQLAllowed sqlAllowed,
                             boolean deterministic,
                             boolean definersRights,
@@ -194,7 +190,7 @@ public class RoutineAliasInfo extends MethodAliasInfo
         return language;
     }
 
-    public ParameterStyle getParameterStyle() {
+    public String getParameterStyle() {
         return parameterStyle;
     }
 
@@ -269,9 +265,9 @@ public class RoutineAliasInfo extends MethodAliasInfo
         sb.append(" LANGUAGE ");
         sb.append(language);
 
-        if (parameterStyle != ParameterStyle.DEFAULT) {
+        if (parameterStyle != null) {
             sb.append(" PARAMETER STYLE " );
-            sb.append(parameterStyle.name());
+            sb.append(parameterStyle);
         }
                 
         if (deterministic) { 

@@ -248,7 +248,6 @@ class SQLGrammar
         }
         else {
             required = new int[] {  
-                CreateAliasNode.INLINE_DEFINITION
             };
         }
         for (int i = 0; i < required.length; i++) {
@@ -2391,7 +2390,6 @@ TOKEN [IGNORE_CASE] :
 TOKEN [IGNORE_CASE] :
 { /* Additional non-SQL92 non-reserved keywords */
   <AFTER: "after">
-| <AKIBAN_LOADABLE_PLAN: "akiban_loadable_plan">
 | <BEFORE: "before">
 | <BTREE: "btree">
 | <CLASS: "class">
@@ -2405,7 +2403,6 @@ TOKEN [IGNORE_CASE] :
 | <DAY_SECOND: "day_second">
 | <DB2SQL: "db2sql">
 | <DEFRAGMENT: "defragment">
-| <DERBY_JDBC_RESULT_SET: "derby_jdbc_result_set">
 | <DIRTY: "dirty">
 | <DOCUMENT: "document">
 | <EACH: "each">
@@ -10357,7 +10354,7 @@ routineElement(boolean isProcedure, boolean isTableFunction, Object[] routineEle
     }
     )
 |
-    <PARAMETER> <STYLE> clauseValue = parameterStyle( isTableFunction ) 
+    <PARAMETER> <STYLE> clauseValue = identifier()
     {
         clausePosition = CreateAliasNode.PARAMETER_STYLE; 
     }
@@ -10453,35 +10450,6 @@ routineSecurityClause() throws StandardException :
 )
     {
         return result;
-    }
-}
-
-RoutineAliasInfo.ParameterStyle
-parameterStyle(boolean isTableFunction) throws StandardException :
-{}
-{
-    <JAVA>
-    {
-        if (isTableFunction) {
-            throw new StandardException("Parameter style DERBY_JDBC_RESULT_SET is required for table function");
-        }
-        return RoutineAliasInfo.ParameterStyle.JAVA;
-    }
-|
-    <DERBY_JDBC_RESULT_SET>
-    {
-        if (!isTableFunction) { 
-            throw new StandardException("Parameter style DERBY_JDBC_RESULT_SET can only be used with table function");
-        }
-        return RoutineAliasInfo.ParameterStyle.DERBY_JDBC_RESULT_SET;
-    }
-|
-    <AKIBAN_LOADABLE_PLAN>
-    {
-        if (isTableFunction) {
-            throw new StandardException("Parameter style DERBY_JDBC_RESULT_SET is required for table function");
-        }
-        return RoutineAliasInfo.ParameterStyle.AKIBAN_LOADABLE_PLAN;
     }
 }
 
@@ -14424,7 +14392,6 @@ nonReservedKeyword() :
 | tok = <ABSVAL>    
 | tok = <ACTION>
 | tok = <AFTER>
-| tok = <AKIBAN_LOADABLE_PLAN>
 | tok = <ALWAYS>
 | tok = <BEFORE>
 | tok = <BINARY>
@@ -14462,7 +14429,6 @@ nonReservedKeyword() :
 | tok = <DYNAMIC>
 | tok = <DATABASE>
 | tok = <DB2SQL>
-| tok = <DERBY_JDBC_RESULT_SET>
 | tok = <DOCUMENT>
 | tok = <EACH>
 | tok = <EMPTY>
