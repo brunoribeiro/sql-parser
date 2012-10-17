@@ -60,19 +60,6 @@ public class IndexColumnList extends QueryTreeNodeList<IndexColumn>
         public final int nArguments;
     }
 
-    public void validateIndexFeatures() throws StandardException
-    {
-        // Spatial indexes and group indexes are incompatible for now.
-        if (functionApplication != null) {
-            for (IndexColumn indexColumn : getList()) {
-                if (indexColumn.isPartOfGroupIndex()) {
-                    throw new StandardException(String.format("Group index defintion cannot include %s",
-                                                              functionType()));
-                }
-            }
-        }
-    }
-
     public void applyFunction(Object functionType,
                               int firstArgumentPosition,
                               int nArguments) throws StandardException

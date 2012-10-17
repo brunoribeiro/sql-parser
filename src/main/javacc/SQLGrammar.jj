@@ -14694,7 +14694,6 @@ groupIndexItemList(IndexColumnList columnList) throws StandardException :
 {
     groupIndexItem(columnList) 
     ( <COMMA> groupIndexItem(columnList) )*
-    { columnList.validateIndexFeatures(); }
 }
 
 void groupIndexItem(IndexColumnList columnList) throws StandardException :
