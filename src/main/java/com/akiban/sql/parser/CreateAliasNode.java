@@ -231,6 +231,15 @@ public class CreateAliasNode extends DDLStatementNode
         return methodName;
     }
 
+    public String getExternalName() {
+        if (javaClassName == null)
+            return methodName;
+        else if (methodName == null)
+            return javaClassName;
+        else
+            return javaClassName + "." + methodName;
+    }
+
     public AliasInfo.Type getAliasType() {
         return aliasType;
     }
