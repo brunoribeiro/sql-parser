@@ -99,6 +99,10 @@ public class IndexColumn extends QueryTreeNode
         return columnName;
     }
 
+    public boolean isPartOfGroupIndex() {
+        return tableName != null;
+    }
+
     /**
      * @return true if ascending, false if descending
      */

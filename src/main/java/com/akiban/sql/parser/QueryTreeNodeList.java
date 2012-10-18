@@ -84,7 +84,7 @@ public abstract class QueryTreeNodeList<N extends QueryTreeNode>
         return list.get(index);
     }
 
-    public final void add(N n) {
+    public void add(N n) {
         list.add(n);
     }
 
