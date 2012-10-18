@@ -218,7 +218,7 @@ public interface NodeTypes
     public static final int LEFT_FN_NODE = 158;
     public static final int RIGHT_FN_NODE = 159;
     public static final int ROWS_RESULT_SET_NODE = 160;
-    public static final int SPECIAL_INDEX_FUNC_NODE = 161;
+    // UNUSED public static final int SPECIAL_INDEX_FUNC_NODE = 161;
     public static final int AT_DROP_INDEX_NODE = 162;
     public static final int AT_ADD_INDEX_NODE = 163;
     public static final int INDEX_CONSTRAINT_NODE = 164;
