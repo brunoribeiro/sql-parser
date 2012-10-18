@@ -248,6 +248,8 @@ class SQLGrammar
         }
         else {
             required = new int[] {  
+                CreateAliasNode.PARAMETER_STYLE, 
+                CreateAliasNode.INLINE_DEFINITION
             };
         }
         for (int i = 0; i < required.length; i++) {
@@ -10328,7 +10330,7 @@ routineElement(boolean isProcedure, boolean isTableFunction, Object[] routineEle
         clausePosition = CreateAliasNode.DYNAMIC_RESULT_SET_COUNT;
     }
 |
-    <LANGUAGE> clauseValue = identifier() { clausePosition = CreateAliasNode.LANGUAGE; }
+    <LANGUAGE> clauseValue = routineLanguage() { clausePosition = CreateAliasNode.LANGUAGE; }
 |
     <DETERMINISTIC>
     {
@@ -10354,7 +10356,7 @@ routineElement(boolean isProcedure, boolean isTableFunction, Object[] routineEle
     }
     )
 |
-    <PARAMETER> <STYLE> clauseValue = identifier()
+    <PARAMETER> <STYLE> clauseValue = parameterStyle()
     {
         clausePosition = CreateAliasNode.PARAMETER_STYLE; 
     }
@@ -10450,6 +10452,41 @@ routineSecurityClause() throws StandardException :
 )
     {
         return result;
+    }
+}
+
+String
+routineLanguage() throws StandardException :
+{
+    String ident;
+    Token token;
+}
+{
+(
+    ident = identifier()
+|       
+    token = <SQL>
+    { 
+        ident = token.image;
+    }
+)
+    {
+        return ident;
+    }
+}
+
+String
+parameterStyle() throws StandardException :
+{
+    String ident;
+    Token token;
+}
+{
+(
+    ident = identifier()
+)
+    {
+        return ident;
     }
 }
 
