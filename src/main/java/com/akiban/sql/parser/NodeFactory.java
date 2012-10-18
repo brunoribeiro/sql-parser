@@ -618,12 +618,8 @@ public abstract class NodeFactory
                                             AliasInfo.Type aliasType,
                                             SQLParserContext pc)
             throws StandardException {
-        int nodeType;
+        int nodeType = NodeTypes.CREATE_ALIAS_NODE;
         String methodName = null;
-        String targetMethodName = null;
-        String targetClassName = null;
-
-        nodeType = NodeTypes.CREATE_ALIAS_NODE;
 
         if ((aliasType != AliasInfo.Type.SYNONYM) &&
             (aliasType != AliasInfo.Type.UDT)) {
@@ -639,12 +635,10 @@ public abstract class NodeFactory
                     // a Java signature - split on last period before the '('
                     lastPeriod = fullStaticMethodName.substring(0, paren).lastIndexOf('.');
                 }
-                if (lastPeriod == -1 || lastPeriod == fullStaticMethodName.length()-1) {
-                    throw new StandardException("Invalid static method: " + fullStaticMethodName);
+                if (lastPeriod != -1 && lastPeriod != fullStaticMethodName.length()-1) {
+                    targetName = fullStaticMethodName.substring(0, lastPeriod);
+                    methodName = fullStaticMethodName.substring(lastPeriod + 1);
                 }
-                String javaClassName = fullStaticMethodName.substring(0, lastPeriod);
-                methodName = fullStaticMethodName.substring(lastPeriod + 1);
-                targetName = javaClassName;
             }
         }
 
