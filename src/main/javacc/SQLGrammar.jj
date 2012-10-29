@@ -13109,7 +13109,7 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
     TableElementNode    tableElement;
     DataTypeDescriptor  typeDescriptor;
     Token tok = null;
-    String columnName;
+    String name;
     long[] autoIncrementInfo = new long[4];
 }
 {
@@ -13134,8 +13134,8 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
         return lockGranularity;
     }
 |
-    <ALTER> [ <COLUMN> ] columnName = identifier() 
-    tableElement = columnAlterClause(columnName)
+    <ALTER> [ <COLUMN> ] name = identifier() 
+    tableElement = columnAlterClause(name)
     {
         changeType[0] = DDLStatementNode.MODIFY_TYPE;
         tableElementList.addTableElement(tableElement);
@@ -13153,6 +13153,16 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
     )
     {
         changeType[0] = DDLStatementNode.DROP_TYPE;
+        tableElementList.addTableElement(tableElement);
+        return lockGranularity;
+    }
+|
+    <RENAME> [<TO> | <AS>] name = identifier()
+    {
+        changeType[0] = DDLStatementNode.MODIFY_TYPE;
+        tableElement = (TableElementNode)nodeFactory.getNode(NodeTypes.AT_RENAME_NODE,
+                                                             name,
+                                                             parserContext);
         tableElementList.addTableElement(tableElement);
         return lockGranularity;
     }
@@ -13197,7 +13207,6 @@ dropIndex() throws StandardException :
     {
         return (TableElementNode)nodeFactory.getNode(NodeTypes.AT_DROP_INDEX_NODE,
                                                      indexName, // name
-                                                     null,      // element type (doesn't need to specify it here)
                                                      cond,      // existence 
                                                      parserContext);
     }
