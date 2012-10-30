@@ -636,6 +636,8 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.INDEX_CONSTRAINT_NODE:
             return NodeNames.INDEX_CONSTRAINT_NAME;
 
+        case NodeTypes.AT_RENAME_NODE:
+            return NodeNames.AT_RENAME_NODE_NAME;
         default:
             throw new StandardException("Not implemented");
         }
