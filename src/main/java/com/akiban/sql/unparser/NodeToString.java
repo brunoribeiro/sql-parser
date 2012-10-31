@@ -336,6 +336,10 @@ public class NodeToString
         str.append("(");
         str.append(toString(node.getColumnList()));
         str.append(")");
+        if (node.getJoinType() != null) {
+            str.append(String.format(" USING %s JOIN",
+                                     node.getJoinType() == JoinNode.JoinType.LEFT_OUTER ? "LEFT" : "RIGHT"));
+        }
         return str.toString();
     }
 

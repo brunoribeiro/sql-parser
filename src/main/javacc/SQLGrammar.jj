@@ -14714,14 +14714,12 @@ void groupIndexItem(IndexColumnList columnList) throws StandardException :
 }
 {
     (
-      // Use indexUnorderedColumnItem() not groupIndexColumnItem() because spatial group indexes
-      // are not yet supported.
       <Z_ORDER_LAT_LON>
       <LEFT_PAREN>
       { latPosition = columnList.size(); }
-      indexUnorderedColumnItem(columnList)
+      unorderedGroupIndexColumnItem(columnList)
       <COMMA>
-      indexUnorderedColumnItem(columnList)
+      unorderedGroupIndexColumnItem(columnList)
       <RIGHT_PAREN>
       {
           columnList.applyFunction(IndexColumnList.FunctionType.Z_ORDER_LAT_LON,
@@ -14736,10 +14734,47 @@ void groupIndexItem(IndexColumnList columnList) throws StandardException :
 void
 groupIndexColumnItem(IndexColumnList columnList) throws StandardException :
 {
+    boolean asc = true;
+    ColumnReference groupIndexColumnName;
+}
+{
+    groupIndexColumnName = groupIndexColumnName(columnList)
+    [ <ASC> | <DESC> { asc = false; } ]
+    {
+        IndexColumn indexColumn = (IndexColumn)
+            nodeFactory.getNode(NodeTypes.INDEX_COLUMN,
+                                groupIndexColumnName.getTableNameNode(),
+                                groupIndexColumnName.getColumnName(),
+                                asc ? Boolean.TRUE : Boolean.FALSE,
+                                parserContext);
+        columnList.add(indexColumn);
+    }
+}
+
+void
+unorderedGroupIndexColumnItem(IndexColumnList columnList) throws StandardException :
+{
+    ColumnReference groupIndexColumnName;
+}
+{
+    groupIndexColumnName = groupIndexColumnName(columnList)
+    {
+        IndexColumn indexColumn = (IndexColumn)
+            nodeFactory.getNode(NodeTypes.INDEX_COLUMN,
+                                groupIndexColumnName.getTableNameNode(),
+                                groupIndexColumnName.getColumnName(),
+                                Boolean.TRUE,
+                                parserContext);
+        columnList.add(indexColumn);
+    }
+}
+
+ColumnReference
+groupIndexColumnName(IndexColumnList columnList) throws StandardException :
+{
     String firstName;
     String secondName = null;
     String thirdName = null;
-    boolean asc = true;
 }
 {
     firstName = identifierDeferCheckLength()
@@ -14749,7 +14784,6 @@ groupIndexColumnItem(IndexColumnList columnList) throws StandardException :
       [ LOOKAHEAD( { getToken(1).kind == PERIOD } )
         <PERIOD>
         thirdName = identifierDeferCheckLength() ] ]
-    [ <ASC> | <DESC> { asc = false; } ]
     {
         if (secondName == null) {
             thirdName = firstName;
@@ -14773,13 +14807,11 @@ groupIndexColumnItem(IndexColumnList columnList) throws StandardException :
                                                        new Integer(nextToLastIdentifierToken.beginOffset),
                                                        new Integer(nextToLastIdentifierToken.endOffset),
                                                        parserContext);
-        IndexColumn indexColumn = (IndexColumn)
-            nodeFactory.getNode(NodeTypes.INDEX_COLUMN,
-                                tableName,
-                                thirdName,
-                                asc ? Boolean.TRUE : Boolean.FALSE,
-                                parserContext);
-        columnList.add(indexColumn);
+        return (ColumnReference)nodeFactory.getNode(NodeTypes.COLUMN_REFERENCE,
+                                                    thirdName,
+                                                    tableName,
+                                                    new Integer(lastIdentifierToken.beginOffset),
+                                                    new Integer(lastIdentifierToken.endOffset),
+                                                    parserContext);
     }
 }
-
