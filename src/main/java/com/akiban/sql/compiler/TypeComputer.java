@@ -26,6 +26,7 @@
 
 package com.akiban.sql.compiler;
 
+import com.akiban.sql.IncomparableException;
 import com.akiban.sql.parser.*;
 
 import com.akiban.sql.StandardException;
@@ -345,7 +346,7 @@ public class TypeComputer implements Visitor
             boolean cmp = leftOperand.getType().comparable(rightOperand.getType(),
                                                            forEquals);
             if (!cmp) {
-                throw new StandardException("Types not comparable: " + leftOperand.getType().getTypeName() +
+                throw new IncomparableException("Types not comparable: " + leftOperand.getType().getTypeName() +
                                             " and " + rightOperand.getType().getTypeName());
             }
         }
