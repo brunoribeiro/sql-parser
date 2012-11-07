@@ -1,119 +1,188 @@
-END USER LICENSE AGREEMENT (“EULA”)
+http://www.eclipse.org/legal/epl-v10.html
 
-READ THIS AGREEMENT CAREFULLY (date: 9/13/2011): http://www.akiban.com/licensing/20110913
+Eclipse Public License - v 1.0
 
-BY INSTALLING OR USING ALL OR ANY PORTION OF THE SOFTWARE, YOU ARE ACCEPTING ALL OF THE TERMS AND CONDITIONS OF THIS AGREEMENT. YOU AGREE THAT THIS AGREEMENT IS ENFORCEABLE LIKE ANY WRITTEN AGREEMENT SIGNED BY YOU.
+THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC
+LICENSE ("AGREEMENT"). ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM
+CONSTITUTES RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT.
 
-IF YOU HAVE PAID A LICENSE FEE FOR USE OF THE SOFTWARE AND DO NOT AGREE TO THESE TERMS, YOU MAY RETURN THE SOFTWARE FOR A FULL REFUND PROVIDED YOU (A) DO NOT USE THE SOFTWARE AND (B) RETURN THE SOFTWARE WITHIN THIRTY (30) DAYS OF YOUR INITIAL PURCHASE.
+1. DEFINITIONS
 
-IF YOU WISH TO USE THE SOFTWARE AS AN EMPLOYEE, CONTRACTOR, OR AGENT OF A CORPORATION, PARTNERSHIP OR SIMILAR ENTITY, THEN YOU MUST BE AUTHORIZED TO SIGN FOR AND BIND THE ENTITY IN ORDER TO ACCEPT THE TERMS OF THIS AGREEMENT. THE LICENSES GRANTED UNDER THIS AGREEMENT ARE EXPRESSLY CONDITIONED UPON ACCEPTANCE BY SUCH AUTHORIZED PERSONNEL.
+"Contribution" means:
 
-IF YOU HAVE ENTERED INTO A SEPARATE WRITTEN LICENSE AGREEMENT WITH AKIBAN FOR USE OF THE SOFTWARE, THE TERMS AND CONDITIONS OF SUCH OTHER AGREEMENT SHALL PREVAIL OVER ANY CONFLICTING TERMS OR CONDITIONS IN THIS AGREEMENT.
+a) in the case of the initial Contributor, the initial code and documentation
+distributed under this Agreement, and b) in the case of each subsequent
+Contributor: i) changes to the Program, and ii) additions to the Program; where
+such changes and/or additions to the Program originate from and are distributed
+by that particular Contributor. A Contribution 'originates' from a Contributor
+if it was added to the Program by such Contributor itself or anyone acting on
+such Contributor's behalf. Contributions do not include additions to the Program
+which: (i) are separate modules of software distributed in conjunction with the
+Program under their own license agreement, and (ii) are not derivative works of
+the Program. "Contributor" means any person or entity that distributes the
+Program.
 
-This End User License Agreement (“Agreement”) is between Akiban Technologies, Inc., located at 560 Harrison Avenue, Suite 411, Boston, MA 02118 (“Akiban”) and the customer (individual or entity) that has downloaded or otherwise procured the licensed Software (as defined below) for use as an end user (“you”). This Agreement covers any Software and supporting technical documentation provided with the Software (“Documentation”).
+"Licensed Patents" mean patent claims licensable by a Contributor which are
+necessarily infringed by the use or sale of its Contribution alone or when
+combined with the Program.
 
-1.	DEFINITIONS.
+"Program" means the Contributions distributed in accordance with this Agreement.
 
-Effective Date: means the earlier of the date you sign an Order Form or the date on which the Software is first made available to you.
+"Recipient" means anyone who receives the Program under this Agreement,
+including all Contributors.
 
-Order Form: means any order on Akiban’s standard order form which is executed by Akiban and you and which references this Agreement. Each Order Form which references this Agreement shall be deemed a part of this Agreement. This Agreement is binding on you whether or not you executed an Order Form with Akiban.
+2. GRANT OF RIGHTS
 
-Software: means the Akiban software product(s) provided in connection with this Agreement in object code form (or as otherwise specified in any related Order Form). “Software” shall also include any releases provided to or purchased by you under any separate support and maintenance agreement you may enter into with Akiban. Unless otherwise noted, the Software and Documentation are referred to collectively herein as “Software”.
+a) Subject to the terms of this Agreement, each Contributor hereby grants
+Recipient a non-exclusive, worldwide, royalty-free copyright license to
+reproduce, prepare derivative works of, publicly display, publicly perform,
+distribute and sublicense the Contribution of such Contributor, if any, and such
+derivative works, in source code and object code form. b) Subject to the terms
+of this Agreement, each Contributor hereby grants Recipient a non-exclusive,
+worldwide, royalty-free patent license under Licensed Patents to make, use,
+sell, offer to sell, import and otherwise transfer the Contribution of such
+Contributor, if any, in source code and object code form. This patent license
+shall apply to the combination of the Contribution and the Program if, at the
+time the Contribution is added by the Contributor, such addition of the
+Contribution causes such combination to be covered by the Licensed Patents. The
+patent license shall not apply to any other combinations which include the
+Contribution. No hardware per se is licensed hereunder. c) Recipient understands
+that although each Contributor grants the licenses to its Contributions set
+forth herein, no assurances are provided by any Contributor that the Program
+does not infringe the patent or other intellectual property rights of any other
+entity. Each Contributor disclaims any liability to Recipient for claims brought
+by any other entity based on infringement of intellectual property rights or
+otherwise. As a condition to exercising the rights and licenses granted
+hereunder, each Recipient hereby assumes sole responsibility to secure any other
+intellectual property rights needed, if any. For example, if a third party
+patent license is required to allow Recipient to distribute the Program, it is
+Recipient's responsibility to acquire that license before distributing the
+Program. d) Each Contributor represents that to its knowledge it has sufficient
+copyright rights in its Contribution, if any, to grant the copyright license set
+forth in this Agreement. 3. REQUIREMENTS
 
-Subscription: means a subscription to use the Software and receive support and maintenance services.
+A Contributor may choose to distribute the Program in object code form under its
+own license agreement, provided that:
 
-Subscription Term: means the term of a Subscription designated in the applicable Order Form.
+a) it complies with the terms and conditions of this Agreement; and b) its
+license agreement: i) effectively disclaims on behalf of all Contributors all
+warranties and conditions, express and implied, including warranties or
+conditions of title and non-infringement, and implied warranties or conditions
+of merchantability and fitness for a particular purpose; ii) effectively
+excludes on behalf of all Contributors all liability for damages, including
+direct, indirect, special, incidental and consequential damages, such as lost
+profits; iii) states that any provisions which differ from this Agreement are
+offered by that Contributor alone and not by any other party; and iv) states
+that source code for the Program is available from such Contributor, and informs
+licensees how to obtain it in a reasonable manner on or through a medium
+customarily used for software exchange. When the Program is made available in
+source code form:
 
-2.	LICENSE.
+a) it must be made available under this Agreement; and b) a copy of this
+Agreement must be included with each copy of the Program. Contributors may not
+remove or alter any copyright notices contained within the Program.
 
-2.1	Grant of License. Subject to all of the terms and conditions of this Agreement, during the Subscription Term, Akiban grants you a non-transferable, non-sublicensable, non-exclusive license to use the Software, but only in accordance with (i) the Documentation, (ii) this Agreement and (iii) any term, server or other restrictions set forth in the applicable Order Form or otherwise specified upon purchase. If you have not executed a separate Order Form with Akiban and paid the applicable license fee for use of the Software, then you are granted only an evaluation license in accordance with Section 2.2 immediately below.
+Each Contributor must identify itself as the originator of its Contribution, if
+any, in a manner that reasonably allows subsequent Recipients to identify the
+originator of the Contribution.
 
-2.2	Evaluation License. Notwithstanding the foregoing, if you select to download the Software on an evaluation basis, you will be authorized to access and use the Software only for a limited evaluation period of thirty (30) days, beginning on the day that you first receive the Software (the “Evaluation Period”). Unless you pay the applicable license fee for the Software (and Akiban issues you a license key in exchange), the Software may become inoperable and, in any event, your right to use the Software automatically expires at the end of the Evaluation Period. If you pay the applicable license fee for the Software, your right to use the Software on the number of computers for which you have paid the applicable license fee will continue for the term of the license you have purchased, subject to the terms of this Agreement. Your license to use the Software during the Evaluation Period is limited to using the Software internally at your designated evaluation site, solely to test the Software in an evaluation environment. Any other use of the Software during the Evaluation Period is expressly prohibited.
+4. COMMERCIAL DISTRIBUTION
 
-2.3	Installation and Copies. Akiban shall deliver the Software and Documentation by disk or other media or make it available for download in electronic form. Akiban shall also provide you with electronic passwords or other enabling mechanisms if necessary to permit the licensed usage of the Software. All subscriptions shall commence, and delivery shall be deemed to occur, as of the Effective Date (or, if later, such date on which the Software and license keys are first made available to you). If you are an individual, you may copy and install the Software on a single computer. If you are a corporation, partnership, or other entity, you may copy and install on your computers for use only by your employees the number of copies of the Software for which you have paid the applicable license fee. You may also make a reasonable number of copies of the Software for back-up and archival purposes.
+Commercial distributors of software may accept certain responsibilities with
+respect to end users, business partners and the like. While this license is
+intended to facilitate the commercial use of the Program, the Contributor who
+includes the Program in a commercial product offering should do so in a manner
+which does not create potential liability for other Contributors. Therefore, if
+a Contributor includes the Program in a commercial product offering, such
+Contributor ("Commercial Contributor") hereby agrees to defend and indemnify
+every other Contributor ("Indemnified Contributor") against any losses, damages
+and costs (collectively "Losses") arising from claims, lawsuits and other legal
+actions brought by a third party against the Indemnified Contributor to the
+extent caused by the acts or omissions of such Commercial Contributor in
+connection with its distribution of the Program in a commercial product
+offering. The obligations in this section do not apply to any claims or Losses
+relating to any actual or alleged intellectual property infringement. In order
+to qualify, an Indemnified Contributor must: a) promptly notify the Commercial
+Contributor in writing of such claim, and b) allow the Commercial Contributor to
+control, and cooperate with the Commercial Contributor in, the defense and any
+related settlement negotiations. The Indemnified Contributor may participate in
+any such claim at its own expense.
 
-2.4.	License Restrictions. You shall not (and shall not allow any third party to): (a) decompile, disassemble, or otherwise reverse engineer the Software or attempt to reconstruct or discover any source code, underlying ideas, algorithms, file formats or programming interfaces of the Software by any means whatsoever (except and only to the extent that applicable law prohibits or restricts reverse engineering restrictions);(b) distribute, sell, sublicense, rent, lease or use the Software (or any portion thereof) for time sharing, hosting, service provider or like purposes; (c) remove any product identification, proprietary, copyright or other notices contained in the Software; or (d) modify any part of the Software, create a derivative work of any part of the Software, or incorporate the Software into or with other software, except to the extent expressly authorized in writing by Akiban.
+For example, a Contributor might include the Program in a commercial product
+offering, Product X. That Contributor is then a Commercial Contributor. If that
+Commercial Contributor then makes performance claims, or offers warranties
+related to Product X, those performance claims and warranties are such
+Commercial Contributor's responsibility alone. Under this section, the
+Commercial Contributor would have to defend claims against the other
+Contributors related to those performance claims and warranties, and if a court
+requires any other Contributor to pay any damages as a result, the Commercial
+Contributor must pay those damages.
 
-2.5	Subscription Term. Unless otherwise designated in the Order Form, each Subscription Term is for a twelve (12) month period only and shall automatically renew for subsequent periods of the same length at the then-current price unless either party provides the other with notice of cancellation thirty (30) days or more prior to expiration of the then-current term.
+5. NO WARRANTY
 
-2.6	Special Note Regarding Akiban Open Source Projects. Akiban may elect to release certain software under open source licenses (the “Akiban Open Source Licenses”) which may be the same as or similar to components of the Software. Nothing in the Akiban Open Source Licenses grants any right to use the Software and this Agreement alone shall govern any use of the Software.
+EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, THE PROGRAM IS PROVIDED ON AN
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR
+IMPLIED INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE,
+NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each
+Recipient is solely responsible for determining the appropriateness of using and
+distributing the Program and assumes all risks associated with its exercise of
+rights under this Agreement , including but not limited to the risks and costs
+of program errors, compliance with applicable laws, damage to or loss of data,
+programs or equipment, and unavailability or interruption of operations.
 
-3.	OWNERSHIP.
+6. DISCLAIMER OF LIABILITY
 
-Notwithstanding anything to the contrary contained herein, except for the limited license rights expressly provided herein, Akiban and its suppliers have and will retain all rights, title and interest (including, without limitation, all patent, copyright, trademark, trade secret and other intellectual property rights) in and to the Software and all copies, modifications and derivative works thereof (including any changes which incorporate any of your ideas, feedback or suggestions). You acknowledge that you are obtaining only a limited license right to the Software and that irrespective of any use of the words “purchase”, “sale” or like terms hereunder no ownership rights are being conveyed to you under this Agreement or otherwise.
+EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, NEITHER RECIPIENT NOR ANY
+CONTRIBUTORS SHALL HAVE ANY LIABILITY FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING WITHOUT LIMITATION LOST
+PROFITS), HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS
+GRANTED HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
-4.	PAYMENT.
+7. GENERAL
 
-You shall pay all fees associated with the Software licensed and any services purchased hereunder as set forth in the applicable Order Form. The rates for any Subscription Term renewals shall be Akiban’s then-current Subscription rates. All payments shall be made in U.S. dollars within thirty (30) days of your receipt of the applicable invoice, unless otherwise specified in writing by Akiban. Except as expressly set forth herein, all fees are non-refundable once paid. You shall be responsible for all taxes, withholdings, duties and levies arising from the order (excluding taxes based on the net income of Akiban). Any late payments shall be subject to a service charge equal to 1.5% per month of the amount due or the maximum amount allowed by law, whichever is less.
+If any provision of this Agreement is invalid or unenforceable under applicable
+law, it shall not affect the validity or enforceability of the remainder of the
+terms of this Agreement, and without further action by the parties hereto, such
+provision shall be reformed to the minimum extent necessary to make such
+provision valid and enforceable.
 
-5.	TERM OF AGREEMENT.
+If Recipient institutes patent litigation against any entity (including a
+cross-claim or counterclaim in a lawsuit) alleging that the Program itself
+(excluding combinations of the Program with other software or hardware)
+infringes such Recipient's patent(s), then such Recipient's rights granted under
+Section 2(b) shall terminate as of the date such litigation is filed.
 
-5.1	Term. This Agreement is effective as of the Effective Date and expires at such time as all license and service subscriptions hereunder have expired in accordance with their own terms (the “Term”). Either party may terminate this Agreement (including all related Order Forms) if the other party: (a) fails to cure any material breach of this Agreement within thirty (30) days after written notice of such breach; (b) ceases operation without a successor; or (c) seeks protection under any bankruptcy, receivership, trust deed, creditors arrangement, composition or comparable proceeding, or if any such proceeding is instituted against such party (and not dismissed within sixty (60) days)). Termination is not an exclusive remedy and the exercise by either party of any remedy under this Agreement will be without prejudice to any other remedies it may have under this Agreement, by law, or otherwise.
+All Recipient's rights under this Agreement shall terminate if it fails to
+comply with any of the material terms or conditions of this Agreement and does
+not cure such failure in a reasonable period of time after becoming aware of
+such noncompliance. If all Recipient's rights under this Agreement terminate,
+Recipient agrees to cease use and distribution of the Program as soon as
+reasonably practicable. However, Recipient's obligations under this Agreement
+and any licenses granted by Recipient relating to the Program shall continue and
+survive.
 
-5.2	Termination. Upon any expiration or termination of this Agreement, you shall cease any and all use of any Software and destroy all copies thereof and so certify to Akiban in writing.
+Everyone is permitted to copy and distribute copies of this Agreement, but in
+order to avoid inconsistency the Agreement is copyrighted and may only be
+modified in the following manner. The Agreement Steward reserves the right to
+publish new versions (including revisions) of this Agreement from time to time.
+No one other than the Agreement Steward has the right to modify this Agreement.
+The Eclipse Foundation is the initial Agreement Steward. The Eclipse Foundation
+may assign the responsibility to serve as the Agreement Steward to a suitable
+separate entity. Each new version of the Agreement will be given a
+distinguishing version number. The Program (including Contributions) may always
+be distributed subject to the version of the Agreement under which it was
+received. In addition, after a new version of the Agreement is published,
+Contributor may elect to distribute the Program (including its Contributions)
+under the new version. Except as expressly stated in Sections 2(a) and 2(b)
+above, Recipient receives no rights or licenses to the intellectual property of
+any Contributor under this Agreement, whether expressly, by implication,
+estoppel or otherwise. All rights in the Program not expressly granted under
+this Agreement are reserved.
 
-5.3	Survival. Sections 2.4 (License Restrictions), 3 (Ownership), 4 (Payment), 5 (Term of Agreement), 6.3 (Disclaimer of Warranties), 9 (Limitation of Remedies and Damages), 11 (Confidential Information), 13 (Export Compliance) and 14 (General) shall survive any termination or expiration of this Agreement.
-
-6.	LIMITED WARRANTY AND DISCLAIMER.
-
-6.1	Limited Warranty. Akiban warrants to you that for a period of ninety (90) days from the Effective Date (the “Warranty Period”) the Software shall operate in substantial conformity with the Documentation. Akiban does not warrant that your use of the Software will be uninterrupted or error-free or that any security mechanisms implemented by the Software will not have inherent limitations. Akiban’s sole liability (and your exclusive remedy) for any breach of this warranty shall be, in Akiban’s sole discretion, to use commercially reasonable efforts to provide you with an error-correction or work-around which corrects the reported non-conformity, or if Akiban determines such remedies to be impracticable within a reasonable period of time, to refund the license fee paid for the Software. Akiban shall have no obligation with respect to a warranty claim unless notified of such claim within the Warranty Period.
-
-6.2	 Exclusions. The above warranty shall not apply: (i) if the Software is used with hardware or software not specified in the Documentation; (ii) if any modifications are made to the Software by you or any third party; (iii) to defects in the Software due to accident, abuse or improper use by you; or (iv) to Software provided on a no charge or evaluation basis.
-
-6.3	Disclaimer of Warranties. THIS SECTION 6 IS A LIMITED WARRANTY AND, EXCEPT AS EXPRESSLY SET FORTH IN THIS SECTION 6, THE SOFTWARE AND ALL SERVICES ARE PROVIDED “AS IS”. NEITHER AKIBAN NOR ITS SUPPLIERS MAKES ANY OTHER WARRANTIES, CONDITIONS OR UNDERTAKINGS, EXPRESS OR IMPLIED, STATUTORY OR OTHERWISE, INCLUDING BUT NOT LIMITED TO WARRANTIES OF TITLE, MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT. YOU MAY HAVE OTHER STATUTORY RIGHTS. HOWEVER, TO THE FULL EXTENT PERMITTED BY LAW, THE DURATION OF STATUTORILY REQUIRED WARRANTIES, IF ANY, SHALL BE LIMITED TO THE LIMITED WARRANTY PERIOD.
-
-7.	SUPPORT & MAINTENANCE.
-
-Akiban shall provide the support and maintenance services, if any, as separately purchased by you and specified in the applicable Order Form. All support & maintenance shall be provided pursuant to Akiban’s standard service terms which are available upon request from Akiban.
-
-8.	PROFESSIONAL SERVICES.
-
-Akiban shall provide the number of person-days, if any, of professional consulting services (“Professional Services”) purchased in the applicable Order Form and related Statement of Work. All Professional Services shall be provided pursuant to Akiban’s standard service terms which are available upon request from Akiban.
-
-9.	LIMITATION OF REMEDIES AND DAMAGES.
-
-9.1	NEITHER YOU NOR AKIBAN (INCLUDING AKIBAN’S SUPPLIERS) SHALL BE LIABLE FOR ANY LOSS OF USE, LOST DATA, FAILURE OF SECURITY MECHANISMS, INTERRUPTION OF BUSINESS, OR ANY INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY KIND (INCLUDING LOST PROFITS), REGARDLESS OF THE FORM OF ACTION, WHETHER IN CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY OR OTHERWISE, EVEN IF INFORMED OF THE POSSIBILITY OF SUCH DAMAGES IN ADVANCE. THIS SECTION 9.1 SHALL NOT APPLY TO YOU WITH RESPECT TO ANY CLAIM ARISING UNDER THE SECTIONS TITLED “GRANT OF LICENSE,” “LICENSE RESTRICTIONS” OR “CONFIDENTIAL INFORMATION”.
-
-9.2 NOTWITHSTANDING ANY OTHER PROVISION OF THIS AGREEMENT, AKIBAN AND ITS SUPPLIERS’ ENTIRE LIABILITY TO YOU UNDER THIS AGREEMENT SHALL NOT EXCEED THE AMOUNT ACTUALLY PAID BY YOU TO AKIBAN UNDER THIS AGREEMENT.
-
-9.3	The parties agree that the limitations specified in this Section 9 will survive and apply even if any limited remedy specified in this Agreement is found to have failed of its essential purpose.
-
-10.	INDEMNIFICATION.
-
-Akiban shall indemnify and hold you harmless from and against any claim of infringement of a U.S. patent, U.S. copyright, or U.S. trademark asserted against you by a third party based upon your authorized use of the Software, provided that Akiban shall have received from you: (i) prompt notice of such claim (but in any event notice in sufficient time for Akiban to respond without prejudice); (ii) the exclusive right to control and direct the investigation, defense, and settlement of such claim; and (iii) all reasonable necessary cooperation. If your use of any of the Software is, or in Akiban’s opinion is likely to be, enjoined due to the type of infringement specified above, or if required by settlement, Akiban may, in its sole discretion: (a) substitute for the Software substantially functionally similar programs and documentation; (b) procure for you the right to continue using the Software; or if (a) and (b) are commercially impracticable, (c) terminate the Agreement and refund the license fee paid by you as reduced to reflect a five (5) year straight-line depreciation from the applicable license purchase date. The foregoing indemnification obligation of Akiban shall not apply: (1) if the Software is modified by any party other than Akiban, but solely to the extent the alleged infringement is caused by such modification; (2) the Software is combined with other non-Akiban products or process not authorized by Akiban, but solely to the extent the alleged infringement is caused by such combination; (3) to any unauthorized use of the Software; or (4) to any third-party code contained within the Software. THIS SECTION 10 SETS FORTH AKIBAN’S SOLE LIABILITY AND YOUR SOLE AND EXCLUSIVE REMEDY WITH RESPECT TO ANY CLAIM OF INTELLECTUAL PROPERTY INFRINGEMENT.
-
-11.	CONFIDENTIAL INFORMATION.
-
-Any software, documentation or technical information provided by Akiban (or its agents) shall be deemed “Akiban Confidential Information” without any marking or further designation. Except as expressly authorized herein, you will hold in confidence and not use or disclose any Akiban Confidential Information. You acknowledge that disclosure of Akiban Confidential Information would cause substantial harm to Akiban that could not be remedied by the payment of damages alone and therefore that upon any such disclosure by you, Akiban shall be entitled to appropriate equitable relief in addition to whatever remedies it might have at law.
-
-12.	CUSTOMER ACKNOWLEDGEMENT.
-
-You agree that Akiban may disclose you as a customer of Akiban.
-
-13.	EXPORT COMPLIANCE.
-
-You acknowledge that the Software is subject to export restrictions by the United States government and import restrictions by certain foreign governments. You shall not, and shall not allow any third-party to, remove or export from the United States or allow the export or re-export of any part of the Software or any direct product thereof: (i) into (or to a national or resident of) any embargoed or terrorist-supporting country; (ii) to anyone on the U.S. Commerce Department’s Table of Denial Orders or U.S. Treasury Department’s list of Specially Designated Nationals; (iii) to any country to which such export or re-export is restricted or prohibited, or as to which the United States government or any agency thereof requires an export license or other governmental approval at the time of export or re-export without first obtaining such license or approval; or (iv) otherwise in violation of any export or import restrictions, laws or regulations of any United States or foreign agency or authority. You agree to the foregoing and warrant that you are not located in, under the control of, or a national or resident of any such prohibited country or on any such prohibited party list. The Software is further restricted from being used for the design or development of nuclear, chemical, or biological weapons or missile technology, or for terrorist activity, without the prior permission of the United States government.
-
-14. GENERAL.
-
-14.1	Assignment. This Agreement will bind and inure to the benefit of each party’s permitted successors and assigns. Akiban may assign this Agreement to any affiliate or in connection with a merger, reorganization, acquisition or other transfer of all or substantially all of Akiban’s assets or voting securities. You may not assign or transfer this Agreement, in whole or in part, without Akiban’s written consent. Any attempt to transfer or assign this Agreement without such written consent will be null and void.
-
-14.2	Severability. If any provision of this Agreement shall be adjudged by any court of competent jurisdiction to be unenforceable or invalid, that provision shall be limited to the minimum extent necessary so that this Agreement shall otherwise remain in effect.
-
-14.3	Governing Law; Jurisdiction and Venue. This Agreement shall be governed by the laws of the Commonwealth of Massachusetts and the United States without regard to conflicts of laws provisions thereof, and without regard to the United Nations Convention on the International Sale of Goods. The jurisdiction and venue for actions related to the subject matter hereof shall be the Massachusetts state and United States federal courts located in Boston, Massachusetts, and both parties hereby submit to the personal jurisdiction of such courts.
-
-14.4	Attorneys’ Fees and Costs. The prevailing party in any action to enforce this Agreement will be entitled to recover its attorneys’ fees and costs in connection with such action.
-
-14.5	Notices and Reports. Any notice or report hereunder shall be in writing. If to Akiban, such notice or report shall be sent to Akiban at the address above to the attention of “Legal Department”. If to you, such notice or report shall be sent to the address you provided upon placing your order. Notices and reports shall be deemed given: (i) upon receipt if by personal delivery; (ii) upon receipt if sent by certified or registered U.S. mail (return receipt requested); or (iii) one day after it is sent if by next day delivery by a major commercial delivery service.
-
-14.6	Amendments; Waivers. No supplement, modification, or amendment of this Agreement shall be binding, unless executed in writing by a duly authorized representative of each party to this Agreement. No waiver will be implied from conduct or failure to enforce or exercise rights under this Agreement, nor will any waiver be effective unless in a writing signed by a duly authorized representative on behalf of the party claimed to have waived.
-
-14.7	Entire Agreement. This Agreement is the complete and exclusive statement of the mutual understanding of the parties and supersedes and cancels all previous written and oral agreements and communications relating to the subject matter of this Agreement. No provision of any purchase order or in any other business form employed by you will supersede the terms and conditions of this Agreement, and any such document issued by a party hereto relating to this Agreement shall be for administrative purposes only and shall have no legal effect. Notwithstanding the foregoing, if you have entered into a separate written license agreement signed by Akiban for use of the Software, the terms and conditions of such other agreement shall prevail over any conflicting terms or conditions in this Agreement.
-
-14.8	Independent Contractors. The parties to this Agreement are independent contractors. There is no relationship of partnership, joint venture, employment, franchise or agency created hereby between the parties. Neither party will have the power to bind the other or incur obligations on the other party’s behalf without the other party’s prior written consent.
-
-14.9	Force Majeure. Neither party shall be liable to the other for any delay or failure to perform any obligation under this Agreement (except for a failure to pay fees) if the delay or failure is due to unforeseen events, which occur after the signing of this Agreement and which are beyond the reasonable control of the parties, such as strikes, blockade, war, terrorism, riots, natural disasters, refusal of license by the government or other governmental agencies, in so far as such an event prevents or delays the affected party from fulfilling its obligations and such party is not able to prevent or remove the force majeure at reasonable cost.
-
-14.10	Government End-Users. The Software is commercial computer software. If the user or licensee of the Software is an agency, department, or other entity of the United States Government, the use, duplication, reproduction, release, modification, disclosure, or transfer of the Software, or any related documentation of any kind, including technical data and manuals, is restricted by a license agreement or by the terms of this Agreement in accordance with Federal Acquisition Regulation 12.212 for civilian purposes and Defense Federal Acquisition Regulation Supplement 227.7202 for military purposes. The Software was developed fully at private expense. All other use is prohibited.
-
-14.11	Third-Party Code. If designated in the Documentation, the Software may contain or be provided with certain third-party code (including code which may be made available to you in source code form). Ownership, use, warranty and modification rights with respect to any such designated code shall be as expressly set forth in the Documentation.
+This Agreement is governed by the laws of the State of New York and the
+intellectual property laws of the United States of America. No party to this
+Agreement will bring a legal action under this Agreement more than one year
+after the cause of action arose. Each party waives its rights to a jury trial in
+any resulting litigation.
