@@ -2879,22 +2879,25 @@ Statement() throws StandardException :
 void
 StatementList(List<StatementNode> list) throws StandardException :
 {
+    Token[] tokenHolder = new Token[1];
 }
 {
-    statementListElement(list)
-    ( <SEMICOLON> [ statementListElement(list) ] )*
+    statementListElement(list, tokenHolder)
+    ( <SEMICOLON> [ statementListElement(list, tokenHolder) ] )*
     <EOF>
 }
 
 void
-statementListElement(List<StatementNode> list) throws StandardException :
+statementListElement(List<StatementNode> list, Token[] tokenHolder) throws StandardException :
 {
     StatementNode statementNode;
     parameterNumber = 0;
 }
 {
-    statementNode = StatementPart(null)
+    statementNode = StatementPart(tokenHolder)
     {
+        statementNode.setBeginOffset(tokenHolder[0].beginOffset);
+        statementNode.setEndOffset(getToken(0).endOffset);
         list.add(statementNode);
     }
 }
