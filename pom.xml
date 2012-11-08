@@ -169,6 +169,9 @@
                         <exclude>.bzrignore</exclude>
                         <exclude>.idea/**</exclude>
                         <exclude>LICENSE.txt</exclude>
+                        <exclude>README.rst</exclude>
+                        <exclude>NOTICE</exclude>
+                        <exclude>build_release.sh</exclude>
                     </excludes>
                     <mapping>
                         <g>JAVADOC_STYLE</g>
