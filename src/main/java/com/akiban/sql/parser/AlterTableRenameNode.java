@@ -17,11 +17,29 @@
 
 package com.akiban.sql.parser;
 
+import com.akiban.sql.StandardException;
+
 public class AlterTableRenameNode extends TableElementNode
 {
+    private TableName newName;
+    
     @Override
     public void init(Object newTableName)
     {
-        super.init(newTableName, ElementType.AT_RENAME);
+        newName = (TableName)newTableName;
+        super.init(newName.getFullTableName(), ElementType.AT_RENAME);
+    }
+
+    @Override
+    public void copyFrom(QueryTreeNode node) throws StandardException
+    {
+        super.copyFrom(node);
+        
+        newName = ((AlterTableRenameNode)node).newName;
+    }
+    
+    public TableName newName()
+    {
+        return newName;
     }
 }

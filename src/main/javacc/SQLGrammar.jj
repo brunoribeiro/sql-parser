@@ -13116,6 +13116,7 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
     DataTypeDescriptor  typeDescriptor;
     Token tok = null;
     String name;
+    TableName newName;
     long[] autoIncrementInfo = new long[4];
 }
 {
@@ -13163,11 +13164,11 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
         return lockGranularity;
     }
 |
-    <RENAME> [<TO> | <AS>] name = identifier()
+    <RENAME> [<TO> | <AS>] newName = qualifiedName()
     {
         changeType[0] = DDLStatementNode.MODIFY_TYPE;
         tableElement = (TableElementNode)nodeFactory.getNode(NodeTypes.AT_RENAME_NODE,
-                                                             name,
+                                                             newName,
                                                              parserContext);
         tableElementList.addTableElement(tableElement);
         return lockGranularity;
