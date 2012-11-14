@@ -13309,13 +13309,6 @@ dropBehavior(int[] behavior) :
     }
 }
 
-/*
-
-<LEFT_PAREN> tableElement(tableElementList)
-    ( <COMMA> tableElement(tableElementList) )* 
-    <RIGHT_PAREN>
-
-*/
 boolean
 addColumnDefinition(TableElementList tableElementList) throws StandardException :
 {
