@@ -13301,15 +13301,15 @@ boolean
 addColumnDefinition(TableElementList tableElementList) throws StandardException :
 {
     boolean autoIncre;
-    boolean mutableAuto[] = new boolean[]{false};
+    boolean hasAutoIncre;
 }
 {
     [ <COLUMN> ]
-    <LEFT_PAREN> mutableAuto[0] = columnDefinition(tableElementList)
-    ( <COMMA> autoIncre = columnDefinition(tableElementList) { mutableAuto[0] |= autoIncre;})*
+    <LEFT_PAREN> hasAutoIncre = columnDefinition(tableElementList)
+    ( <COMMA> autoIncre = columnDefinition(tableElementList) { hasAutoIncre |= autoIncre;})*
     <RIGHT_PAREN>
     {
-        return mutableAuto[0];
+        return hasAutoIncre;
     }
 |
     [ <COLUMN> ] autoIncre = columnDefinition(tableElementList)
