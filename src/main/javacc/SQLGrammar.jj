@@ -3750,14 +3750,9 @@ tableElement(TableElementList tableElementList) throws StandardException :
 {
 }
 {
-    columnDefinition(tableElementList)
+    columnDefinition(tableElementList) | tableConstraintDefinition(tableElementList)
     {
-        //tableElementList.addTableElement(tableElement);
-    }
-|
-    tableConstraintDefinition(tableElementList)
-    {
-        //tableElementList.addTableElement(tableElement);
+        return ;
     }
 }
 
@@ -3791,10 +3786,21 @@ columnDefinition(TableElementList tableElementList) throws StandardException :
                                                             typeDescriptor[0],
                                                             autoIncrementInfo,
                                                             parserContext));
-        return autoIncrementInfo == null;
+        return autoIncrementInfo != null;
     }
 }
 
+void
+columnDefinition2(TableElementList tableElementList, boolean hasAutoIncr[]) throws StandardException :
+{
+    boolean hasAuto;
+}
+{
+    hasAuto = columnDefinition(tableElementList)
+    {
+        hasAutoIncr[0] |= hasAuto;
+    }
+}
 
 ValueNode
 defaultAndConstraints(DataTypeDescriptor[] typeDescriptor,
@@ -13314,19 +13320,21 @@ boolean
 addColumnDefinition(TableElementList tableElementList) throws StandardException :
 {
     boolean autoIncre;
+    boolean mutableAuto[] = new boolean[]{false};
 }
 {
+    [ <COLUMN> ] <LEFT_PAREN> columnDefinition2(tableElementList, mutableAuto)
+    ( <COMMA> columnDefinition2(tableElementList, mutableAuto) )*
+    <RIGHT_PAREN>
+    {
+        return mutableAuto[0];
+    }
+|
     [ <COLUMN> ] autoIncre = columnDefinition(tableElementList)
     {
         return autoIncre;
     }
-|
-    [ <COLUMN> ] <LEFT_PAREN> autoIncre = columnDefinition(tableElementList)
-    ( <COMMA> autoIncre = autoIncrement || columnDefinition(tableElementList) )*
-    <RIGHT_PAREN>
-    {
-        return autoIncre;
-    }
+
 }
 
 /*
