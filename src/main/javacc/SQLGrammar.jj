@@ -3790,18 +3790,6 @@ columnDefinition(TableElementList tableElementList) throws StandardException :
     }
 }
 
-void
-columnDefinition2(TableElementList tableElementList, boolean hasAutoIncr[]) throws StandardException :
-{
-    boolean hasAuto;
-}
-{
-    hasAuto = columnDefinition(tableElementList)
-    {
-        hasAutoIncr[0] |= hasAuto;
-    }
-}
-
 ValueNode
 defaultAndConstraints(DataTypeDescriptor[] typeDescriptor,
                       TableElementList tableElementList,
@@ -13316,8 +13304,9 @@ addColumnDefinition(TableElementList tableElementList) throws StandardException 
     boolean mutableAuto[] = new boolean[]{false};
 }
 {
-    [ <COLUMN> ] <LEFT_PAREN> columnDefinition2(tableElementList, mutableAuto)
-    ( <COMMA> columnDefinition2(tableElementList, mutableAuto) )*
+    [ <COLUMN> ]
+    <LEFT_PAREN> mutableAuto[0] = columnDefinition(tableElementList)
+    ( <COMMA> autoIncre = columnDefinition(tableElementList) { mutableAuto[0] |= autoIncre;})*
     <RIGHT_PAREN>
     {
         return mutableAuto[0];
