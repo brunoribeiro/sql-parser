@@ -1756,7 +1756,6 @@ class SQLGrammar
         StatementList(result);
         return result;
     }
-
 }
 
 PARSER_END(SQLGrammar)
@@ -13304,19 +13303,19 @@ addColumnDefinition(TableElementList tableElementList) throws StandardException 
     boolean hasAutoIncre;
 }
 {
+
     [ <COLUMN> ]
-    <LEFT_PAREN> hasAutoIncre = columnDefinition(tableElementList)
-    ( <COMMA> autoIncre = columnDefinition(tableElementList) { hasAutoIncre |= autoIncre;})*
-    <RIGHT_PAREN>
+(
+    ( <LEFT_PAREN> hasAutoIncre = columnDefinition(tableElementList)
+      ( <COMMA> autoIncre = columnDefinition(tableElementList) { hasAutoIncre |= autoIncre;})*
+      <RIGHT_PAREN>
+    )
+|
+    ( hasAutoIncre = columnDefinition(tableElementList) )
+)
     {
         return hasAutoIncre;
     }
-|
-    [ <COLUMN> ] autoIncre = columnDefinition(tableElementList)
-    {
-        return autoIncre;
-    }
-
 }
 
 /*
