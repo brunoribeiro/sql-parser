@@ -13166,12 +13166,6 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
         tableElementList.addTableElement(tableElement);
         return lockGranularity;
     }
-|
-    lockGranularity = DB2lockGranularityClause()
-    {
-        changeType[0] = DDLStatementNode.LOCKING_TYPE;
-        return lockGranularity;
-    }
 }
 
 /*
@@ -13296,24 +13290,23 @@ dropBehavior(int[] behavior) :
     }
 }
 
+
 boolean
 addColumnDefinition(TableElementList tableElementList) throws StandardException :
 {
+    boolean hasOddParen = false;
     boolean autoIncre;
     boolean hasAutoIncre;
 }
 {
 
     [ <COLUMN> ]
-(
-    ( <LEFT_PAREN> hasAutoIncre = columnDefinition(tableElementList)
-      ( <COMMA> autoIncre = columnDefinition(tableElementList) { hasAutoIncre |= autoIncre;})*
-      <RIGHT_PAREN>
-    )
-|
-    ( hasAutoIncre = columnDefinition(tableElementList) )
-)
+    [<LEFT_PAREN> {hasOddParen = true; }] hasAutoIncre = columnDefinition(tableElementList)
+    ( <COMMA> (autoIncre = columnDefinition(tableElementList) { hasAutoIncre |= autoIncre;}))*
+    [<RIGHT_PAREN> {hasOddParen = !hasOddParen;}]
     {
+        if (hasOddParen)
+            throw new ParseException();
         return hasAutoIncre;
     }
 }
