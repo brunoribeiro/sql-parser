@@ -51,6 +51,7 @@ import com.akiban.sql.types.AliasInfo;
 public class DropAliasNode extends DDLStatementNode
 {
     private AliasInfo.Type aliasType;
+    private ExistenceCheck existenceCheck;
 
     /**
      * Initializer for a DropAliasNode
@@ -60,10 +61,11 @@ public class DropAliasNode extends DDLStatementNode
      *
      * @exception StandardException
      */
-    public void init(Object dropAliasName, Object aliasType) throws StandardException {
+    public void init(Object dropAliasName, Object aliasType, Object existenceCheck) throws StandardException {
         TableName dropItem = (TableName)dropAliasName;
         initAndCheck(dropItem);
         this.aliasType = (AliasInfo.Type)aliasType;
+        this.existenceCheck = (ExistenceCheck)existenceCheck;
     }
 
     /**
@@ -74,10 +76,27 @@ public class DropAliasNode extends DDLStatementNode
 
         DropAliasNode other = (DropAliasNode)node;
         this.aliasType = other.aliasType;
+        this.existenceCheck = other.existenceCheck;
     }
 
     public AliasInfo.Type getAliasType() { 
         return aliasType; 
+    }
+
+    public ExistenceCheck getExistenceCheck()
+    {
+        return existenceCheck;
+    }
+
+    /**
+     * Convert this object to a String.  See comments in QueryTreeNode.java
+     * for how this should be done for tree printing.
+     *
+     * @return This object as a String
+     */
+    public String toString() {
+        return super.toString() +
+            "existenceCheck: " + existenceCheck + "\n";
     }
 
     public String statementToString() {
