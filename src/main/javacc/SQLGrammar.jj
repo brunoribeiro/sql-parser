@@ -1426,11 +1426,12 @@ class SQLGrammar
     }
 
     /** Create a node for the drop alias/procedure call. */
-    StatementNode dropAliasNode(Object aliasName, AliasInfo.Type type) throws StandardException {
+    StatementNode dropAliasNode(TableName aliasName, AliasInfo.Type type, ExistenceCheck cond) throws StandardException {
 
         StatementNode stmt = (StatementNode)nodeFactory.getNode(NodeTypes.DROP_ALIAS_NODE,
                                                                 aliasName,
                                                                 type,
+                                                                cond,
                                                                 parserContext);
 
         return stmt;
@@ -13530,27 +13531,28 @@ dropIndexStatement() throws StandardException :
 StatementNode
 dropAliasStatement() throws StandardException :
 {
-    Object aliasName;
+    TableName aliasName;
+    ExistenceCheck cond;
 }
 {
-    <PROCEDURE> aliasName = qualifiedName() 
+    <PROCEDURE> cond = dropCondition() aliasName = qualifiedName() 
     {
-        return dropAliasNode(aliasName, AliasInfo.Type.PROCEDURE);
+        return dropAliasNode(aliasName, AliasInfo.Type.PROCEDURE, cond);
     }    
 |        
-    <FUNCTION> aliasName = qualifiedName() 
+    <FUNCTION> cond = dropCondition() aliasName = qualifiedName() 
     {
-        return dropAliasNode(aliasName, AliasInfo.Type.FUNCTION);
+        return dropAliasNode(aliasName, AliasInfo.Type.FUNCTION, cond);
     }    
 |    
-    <SYNONYM> aliasName = qualifiedName()
+    <SYNONYM> cond = dropCondition() aliasName = qualifiedName()
     {
-        return dropAliasNode(aliasName, AliasInfo.Type.SYNONYM);
+        return dropAliasNode(aliasName, AliasInfo.Type.SYNONYM, cond);
     }
 |    
-    <TYPE> aliasName = qualifiedName() <RESTRICT>
+    <TYPE> cond = dropCondition() aliasName = qualifiedName() <RESTRICT>
     {
-        return dropAliasNode(aliasName, AliasInfo.Type.UDT);
+        return dropAliasNode(aliasName, AliasInfo.Type.UDT, cond);
     }
 }
 
