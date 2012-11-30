@@ -45,7 +45,7 @@ copies of the software in your possession immediately.
 Working with the Akiban SQL Parser
 ==================================
 
-Add the jar file (e.g. ``akiban-sql-parser-1.0.10.jar``), found in the root
+Add the jar file (e.g. ``akiban-sql-parser-1.0.12.jar``), found in the root
 directory of the distribution kit, to your project's classpath. For example,
 copy it to ``jre/lib/ext`` in your Java Runtime Environment, or add it to
 your classpath environment variable..
