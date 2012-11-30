@@ -1735,6 +1735,25 @@ class SQLGrammar
         }
     }
 
+    /**
+     * check if the next token  is an alter-table action
+     * (ie., ADD, DROP, ALTER, UPDATE, RENAME
+     */
+    boolean notAlterActionFollows()
+    {
+        switch(getToken(1).kind)
+        {
+            case ADD:
+            case DROP:
+            case ALTER:
+            case UPDATE:
+            case RENAME:
+                return false;
+            default:
+                return true;
+         }
+    }
+
     void setParserContext(SQLParserContext parserContext) {
         this.parserContext = parserContext;
         this.nodeFactory = parserContext.getNodeFactory();
@@ -13051,15 +13070,15 @@ alterTableBody(TableName tableName) throws StandardException :
                                                   parserContext);
     }
 |
-    lockGranularity = alterTableAction(tableElementList, changeType, behavior)
+    alterTableAction(tableElementList, changeType, behavior)
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_TABLE_NODE,
                                                   tableName,
                                                   tableElementList,
-                                                  new Character(lockGranularity),
-                                                  changeType,
-                                                  behavior,
-                                                  parserContext);
+                                                  new Character(lockGranularity), // Not used, but we kind of nned it
+                                                  changeType,                     // to make the method take 5 args
+                                                  behavior,                       // The one that takes 4 args does
+                                                  parserContext);                 // something else!
     }
 }
 
@@ -13103,12 +13122,11 @@ sequentialCompress(TableName tableName) throws StandardException :
 }
 
 
-char
+void
 alterTableAction(TableElementList tableElementList, int[] changeType, int[] behavior) 
         throws StandardException :
 {
     TableElementNode tableElement;
-    char lockGranularity = '\0';
     boolean hasAutoIncrement = false;
     DataTypeDescriptor  typeDescriptor;
     Token tok = null;
@@ -13131,7 +13149,6 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
             throw new StandardException("Auto increment column not allowed in ALTER TABLE");
 
         changeType[0] = DDLStatementNode.ADD_TYPE;
-        return lockGranularity;
     }
 |
     <ALTER> [ <COLUMN> ] name = identifier() 
@@ -13139,7 +13156,6 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
     {
         changeType[0] = DDLStatementNode.MODIFY_TYPE;
         tableElementList.addTableElement(tableElement);
-        return lockGranularity;
     }
 |
     <DROP>
@@ -13154,7 +13170,6 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
     {
         changeType[0] = DDLStatementNode.DROP_TYPE;
         tableElementList.addTableElement(tableElement);
-        return lockGranularity;
     }
 |
     <RENAME> [<TO> | <AS>] name = identifier()
@@ -13164,7 +13179,6 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
                                                              name,
                                                              parserContext);
         tableElementList.addTableElement(tableElement);
-        return lockGranularity;
     }
 }
 
@@ -13302,7 +13316,10 @@ addColumnDefinition(TableElementList tableElementList) throws StandardException 
 
     [ <COLUMN> ]
     [<LEFT_PAREN> {hasOddParen = true; }] hasAutoIncre = columnDefinition(tableElementList)
-    ( <COMMA> (autoIncre = columnDefinition(tableElementList) { hasAutoIncre |= autoIncre;}))*
+    ( <COMMA>
+     LOOKAHEAD ( { notAlterActionFollows() } )
+     (autoIncre = columnDefinition(tableElementList) { hasAutoIncre |= autoIncre;})
+    )*
     [<RIGHT_PAREN> {hasOddParen = !hasOddParen;}]
     {
         if (hasOddParen)

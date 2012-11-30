@@ -51,7 +51,6 @@ public class AlterTableNode extends DDLStatementNode
 {
     // The alter table action
     public TableElementList tableElementList = null;
-    public char lockGranularity;
 
     /**
      * updateStatistics will indicate that we are here for updating the
@@ -174,13 +173,11 @@ public class AlterTableNode extends DDLStatementNode
      * @exception StandardException Thrown on error
      */
 
-    public void init(Object objectName, Object tableElementList, Object lockGranularity, 
+    public void init(Object objectName, Object tableElementList, Object lockGranularity,
                      Object changeType, Object behavior) 
             throws StandardException {
         initAndCheck(objectName);
         this.tableElementList = (TableElementList)tableElementList;
-        this.lockGranularity = ((Character)lockGranularity).charValue();
-
         int[] ct = (int[])changeType, bh = (int[])behavior;
         this.changeType = ct[0];
         this.behavior = bh[0];
@@ -205,7 +202,7 @@ public class AlterTableNode extends DDLStatementNode
         AlterTableNode other = (AlterTableNode)node;
         this.tableElementList = (TableElementList)
             getNodeFactory().copyNode(other.tableElementList, getParserContext());
-        this.lockGranularity = other.lockGranularity;
+       // this.lockGranularity = other.lockGranularity;
         this.updateStatistics = other.updateStatistics;
         this.updateStatisticsAll = other.updateStatisticsAll;
         this.indexNameForUpdateStatistics = other.indexNameForUpdateStatistics;
