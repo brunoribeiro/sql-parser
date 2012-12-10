@@ -13308,22 +13308,17 @@ dropBehavior(int[] behavior) :
 boolean
 addColumnDefinition(TableElementList tableElementList) throws StandardException :
 {
-    boolean hasOddParen = false;
     boolean autoIncre;
     boolean hasAutoIncre;
 }
 {
-
     [ <COLUMN> ]
-    [<LEFT_PAREN> {hasOddParen = true; }] hasAutoIncre = columnDefinition(tableElementList)
+    hasAutoIncre = columnDefinition(tableElementList)
     ( <COMMA>
-     LOOKAHEAD ( { notAlterActionFollows() } )
-     (autoIncre = columnDefinition(tableElementList) { hasAutoIncre |= autoIncre;})
+      LOOKAHEAD ( { notAlterActionFollows() } )
+      (autoIncre = columnDefinition(tableElementList) { hasAutoIncre |= autoIncre;})
     )*
-    [<RIGHT_PAREN> {hasOddParen = !hasOddParen;}]
     {
-        if (hasOddParen)
-            throw new ParseException();
         return hasAutoIncre;
     }
 }

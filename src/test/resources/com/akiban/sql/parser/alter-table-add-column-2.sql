@@ -1,1 +1,1 @@
-ALTER TABLE t add (c double)
+ALTER TABLE t add c double
