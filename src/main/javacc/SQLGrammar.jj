@@ -3796,7 +3796,6 @@ columnDefinition(TableElementList tableElementList) throws StandardException :
             autoIncrementInfo = null;
         }
         
-        //tableElementList.addTableElement((TableElementNode)
         tableElementList.addTableElement((TableElementNode) nodeFactory.getNode(
                                                             NodeTypes.COLUMN_DEFINITION_NODE,
                                                             columnName,
