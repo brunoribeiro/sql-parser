@@ -1736,6 +1736,25 @@ class SQLGrammar
         }
     }
 
+    /**
+     * check if the next token  is an alter-table action
+     * (ie., ADD, DROP, ALTER, UPDATE, RENAME
+     */
+    boolean notAlterActionFollows()
+    {
+        switch(getToken(1).kind)
+        {
+            case ADD:
+            case DROP:
+            case ALTER:
+            case UPDATE:
+            case RENAME:
+                return false;
+            default:
+                return true;
+         }
+    }
+
     void setParserContext(SQLParserContext parserContext) {
         this.parserContext = parserContext;
         this.nodeFactory = parserContext.getNodeFactory();
@@ -1757,7 +1776,6 @@ class SQLGrammar
         StatementList(result);
         return result;
     }
-
 }
 
 PARSER_END(SQLGrammar)
@@ -3749,21 +3767,15 @@ tableElementList() throws StandardException :
 void
 tableElement(TableElementList tableElementList) throws StandardException :
 {
-    TableElementNode tableElement;
 }
 {
-    tableElement = columnDefinition(tableElementList)
+    columnDefinition(tableElementList) | tableConstraintDefinition(tableElementList)
     {
-        tableElementList.addTableElement(tableElement);
-    }
-|
-    tableElement = tableConstraintDefinition()
-    {
-        tableElementList.addTableElement(tableElement);
+        return ;
     }
 }
 
-TableElementNode
+boolean
 columnDefinition(TableElementList tableElementList) throws StandardException :
 {
     DataTypeDescriptor[] typeDescriptor = new DataTypeDescriptor[1];
@@ -3784,16 +3796,17 @@ columnDefinition(TableElementList tableElementList) throws StandardException :
         if (autoIncrementInfo[QueryTreeNode.AUTOINCREMENT_IS_AUTOINCREMENT_INDEX] == 0) {
             autoIncrementInfo = null;
         }
-
-        return (TableElementNode)nodeFactory.getNode(NodeTypes.COLUMN_DEFINITION_NODE,
-                                                     columnName,
-                                                     defaultNode,
-                                                     typeDescriptor[0],
-                                                     autoIncrementInfo,
-                                                     parserContext);
+        
+        tableElementList.addTableElement((TableElementNode) nodeFactory.getNode(
+                                                            NodeTypes.COLUMN_DEFINITION_NODE,
+                                                            columnName,
+                                                            defaultNode,
+                                                            typeDescriptor[0],
+                                                            autoIncrementInfo,
+                                                            parserContext));
+        return autoIncrementInfo != null;
     }
 }
-
 
 ValueNode
 defaultAndConstraints(DataTypeDescriptor[] typeDescriptor,
@@ -12432,8 +12445,8 @@ thenElseExpression() throws StandardException :
     }
 }
 
-TableElementNode
-tableConstraintDefinition() throws StandardException :
+void
+tableConstraintDefinition(TableElementList tableElementList) throws StandardException :
 {
     Properties properties = null;
     ConstraintDefinitionNode tcdn;
@@ -12447,7 +12460,8 @@ tableConstraintDefinition() throws StandardException :
         if (properties != null) {
             tcdn.setProperties(properties);
         }
-        return tcdn;
+
+        tableElementList.addTableElement((TableElementNode)tcdn);
     }
 }
 
@@ -13056,15 +13070,15 @@ alterTableBody(TableName tableName) throws StandardException :
                                                   parserContext);
     }
 |
-    lockGranularity = alterTableAction(tableElementList, changeType, behavior)
+    alterTableAction(tableElementList, changeType, behavior)
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.ALTER_TABLE_NODE,
                                                   tableName,
                                                   tableElementList,
-                                                  new Character(lockGranularity),
-                                                  changeType,
-                                                  behavior,
-                                                  parserContext);
+                                                  new Character(lockGranularity), // Not used, but we kind of nned it
+                                                  changeType,                     // to make the method take 5 args
+                                                  behavior,                       // The one that takes 4 args does
+                                                  parserContext);                 // something else!
     }
 }
 
@@ -13108,12 +13122,12 @@ sequentialCompress(TableName tableName) throws StandardException :
 }
 
 
-char
+void
 alterTableAction(TableElementList tableElementList, int[] changeType, int[] behavior) 
         throws StandardException :
 {
-    char lockGranularity = '\0';
-    TableElementNode    tableElement;
+    TableElementNode tableElement;
+    boolean hasAutoIncrement = false;
     DataTypeDescriptor  typeDescriptor;
     Token tok = null;
     String name;
@@ -13124,22 +13138,18 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
     <ADD>
     (
         LOOKAHEAD ( {getToken(1).kind == UNIQUE && getToken(2).kind == INDEX || getToken(1).kind == INDEX} )
-        tableElement = addIndex()
+        addIndex(tableElementList)
     |
-        tableElement = addColumnDefinition(tableElementList)
+        hasAutoIncrement = addColumnDefinition(tableElementList)
     |
-        tableElement = tableConstraintDefinition()
+        tableConstraintDefinition(tableElementList)
     )
     {
-        if (tableElement instanceof ColumnDefinitionNode) {
+        if (hasAutoIncrement)
             //bug 5724 - auto increment columns not allowed in ALTER TABLE statement
-            ColumnDefinitionNode cdn = (ColumnDefinitionNode)tableElement;
-            if (cdn.isAutoincrementColumn())
-                throw new StandardException("Auto increment column not allowed in ALTER TABLE");
-        }
+            throw new StandardException("Auto increment column not allowed in ALTER TABLE");
+
         changeType[0] = DDLStatementNode.ADD_TYPE;
-        tableElementList.addTableElement(tableElement);
-        return lockGranularity;
     }
 |
     <ALTER> [ <COLUMN> ] name = identifier() 
@@ -13147,7 +13157,6 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
     {
         changeType[0] = DDLStatementNode.MODIFY_TYPE;
         tableElementList.addTableElement(tableElement);
-        return lockGranularity;
     }
 |
     <DROP>
@@ -13162,7 +13171,6 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
     {
         changeType[0] = DDLStatementNode.DROP_TYPE;
         tableElementList.addTableElement(tableElement);
-        return lockGranularity;
     }
 |
     <RENAME> [<TO> | <AS>] newName = qualifiedName()
@@ -13172,13 +13180,6 @@ alterTableAction(TableElementList tableElementList, int[] changeType, int[] beha
                                                              newName,
                                                              parserContext);
         tableElementList.addTableElement(tableElement);
-        return lockGranularity;
-    }
-|
-    lockGranularity = DB2lockGranularityClause()
-    {
-        changeType[0] = DDLStatementNode.LOCKING_TYPE;
-        return lockGranularity;
     }
 }
 
@@ -13236,8 +13237,8 @@ getLocation() throws StandardException :
     }
 }
 
-TableElementNode
-addIndex() throws StandardException :
+void
+addIndex(TableElementList tableElementList) throws StandardException :
 {
     boolean groupFormat = hasFeature(SQLParserFeature.GROUPING);
 
@@ -13269,15 +13270,16 @@ addIndex() throws StandardException :
     [ <AS> location = getLocation() ]
     {
         
-        return (TableElementNode)nodeFactory.getNode(NodeTypes.AT_ADD_INDEX_NODE,
-                                                  cond,
-                                                  unique,
-                                                  indexName,
-                                                  indexColumnList,
-                                                  joinType,
-                                                  properties,
-                                                  location,
-                                                  parserContext);
+        tableElementList.addTableElement((TableElementNode)nodeFactory.getNode
+                                                                (NodeTypes.AT_ADD_INDEX_NODE,
+                                                                 cond,
+                                                                 unique,
+                                                                 indexName,
+                                                                 indexColumnList,
+                                                                 joinType,
+                                                                 properties,
+                                                                 location,
+                                                                 parserContext));
     }
 }
 
@@ -13303,15 +13305,22 @@ dropBehavior(int[] behavior) :
     }
 }
 
-TableElementNode
+
+boolean
 addColumnDefinition(TableElementList tableElementList) throws StandardException :
 {
-    TableElementNode tableElement;
+    boolean autoIncre;
+    boolean hasAutoIncre;
 }
 {
-    [ <COLUMN> ] tableElement = columnDefinition(tableElementList)
+    [ <COLUMN> ]
+    hasAutoIncre = columnDefinition(tableElementList)
+    ( <COMMA>
+      LOOKAHEAD ( { notAlterActionFollows() } )
+      (autoIncre = columnDefinition(tableElementList) { hasAutoIncre |= autoIncre;})
+    )*
     {
-        return tableElement;
+        return hasAutoIncre;
     }
 }
 
