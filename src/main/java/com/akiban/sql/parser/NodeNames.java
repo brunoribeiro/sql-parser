@@ -168,8 +168,6 @@ public interface NodeNames
 
     static final String DROP_VIEW_NODE_NAME = "com.akiban.sql.parser.DropViewNode";
 
-    static final String EXEC_SPS_NODE_NAME = "com.akiban.sql.parser.ExecSPSNode";
-
     static final String EXPLAIN_STATEMENT_NODE_NAME = "com.akiban.sql.parser.ExplainStatementNode";
 
     static final String EXPLICIT_COLLATE_NODE_NAME = "com.akiban.sql.parser.ExplicitCollateNode";

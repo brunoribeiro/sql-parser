@@ -2995,8 +2995,6 @@ StatementPart(Token[] tokenHolder) throws StandardException :
 |
     statementNode = revokeStatement()
 |
-    statementNode = execStatement()
-|
     statementNode = explainStatement()
 |
     statementNode = transactionControlStatement()
@@ -11914,20 +11912,6 @@ lockMode() :
     <SHARE>
     {
         return Boolean.FALSE;
-    }
-}
-
-StatementNode
-execStatement() throws StandardException :
-{
-    TableName stmtName;
-}
-{
-    <EXECUTE> <STATEMENT> stmtName = qualifiedName() 
-    {
-        return (StatementNode)nodeFactory.getNode(NodeTypes.EXEC_SPS_NODE,
-                                                  stmtName,
-                                                  parserContext);
     }
 }
 

@@ -166,7 +166,7 @@ public interface NodeTypes
     public static final int AGGREGATE_NODE = 115;
     public static final int COLUMN_DEFINITION_NODE = 116;
     public static final int EXPLAIN_STATEMENT_NODE = 117;
-    public static final int EXEC_SPS_NODE = 118;
+    // 118 available
     public static final int FK_CONSTRAINT_DEFINITION_NODE = 119;
     public static final int FROM_VTI = 120;
     public static final int MATERIALIZE_RESULT_SET_NODE = 121;

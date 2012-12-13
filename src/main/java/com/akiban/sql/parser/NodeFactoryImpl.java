@@ -403,9 +403,6 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.COLUMN_DEFINITION_NODE:
             return NodeNames.COLUMN_DEFINITION_NODE_NAME;
 
-        case NodeTypes.EXEC_SPS_NODE:
-            return NodeNames.EXEC_SPS_NODE_NAME;
-
         case NodeTypes.FK_CONSTRAINT_DEFINITION_NODE:
             return NodeNames.FK_CONSTRAINT_DEFINITION_NODE_NAME;
 
