@@ -2983,11 +2983,11 @@ StatementPart(Token[] tokenHolder) throws StandardException :
 |
     statementNode = spsAlterStatement()
 |
-    statementNode = globalTemporaryTableDeclaration()
-|
     statementNode = preparableSQLDataStatement()
 |
     statementNode = cursorStatement()
+|
+    statementNode = executeStatement()
 |
     statementNode = spsSetStatement()
 |
