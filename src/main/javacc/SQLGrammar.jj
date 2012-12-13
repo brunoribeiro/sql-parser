@@ -2987,6 +2987,8 @@ StatementPart(Token[] tokenHolder) throws StandardException :
 |
     statementNode = preparableSQLDataStatement()
 |
+    statementNode = cursorStatement()
+|
     statementNode = spsSetStatement()
 |
     statementNode = truncateStatement()
@@ -14108,13 +14110,107 @@ roleRevokeStatement() throws StandardException :
 }
 
 StatementNode
+cursorStatement() throws StandardException :
+{
+    String name;
+    StatementNode stmt;
+    int count = 1;
+    Token[] tokenHolder = new Token[1];
+}
+{
+    <DECLARE> name = identifier() [<NO> <SCROLL>] <CURSOR>
+    <FOR> stmt = declarableStatement(tokenHolder)
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.DECLARE_STATEMENT_NODE,
+                                                  name, stmt,
+                                                  parserContext);
+    }
+|
+    <FETCH>
+    [ 
+      <NEXT>
+    |
+      count = uint_value()
+    |
+      <ALL> { count = -1; }
+    ]
+    name = identifier()
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.FETCH_STATEMENT_NODE,
+                                                  name, count,
+                                                  parserContext);
+    }
+|
+    <CLOSE>
+    name = identifier()
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.CLOSE_STATEMENT_NODE,
+                                                  name,
+                                                  parserContext);
+    }
+|
+    <PREPARE> name = identifier()
+    <AS> stmt = proceduralStatement(tokenHolder)
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.PREPARE_STATEMENT_NODE,
+                                                  name, stmt,
+                                                  parserContext);
+    }
+|
+    <DEALLOCATE>
+    name = identifier()
+    {
+        return (StatementNode)nodeFactory.getNode(NodeTypes.DEALLOCATE_STATEMENT_NODE,
+                                                  name,
+                                                  parserContext);
+    }
+}
+
+StatementNode
+declarableStatement(Token[] tokenHolder) throws StandardException :
+{
+    StatementNode stmt;
+}
+{
+    stmt = proceduralStatement(tokenHolder)
+    {
+        return stmt;
+    }
+|
+    stmt = executeStatement()
+    {
+        return stmt;
+    }
+}
+
+StatementNode
+executeStatement() throws StandardException :
+{
+    String name;
+    List<ValueNode> params = new ArrayList<ValueNode>();
+}
+{
+    <EXECUTE> name = identifier() [ methodCallParameterList(params) ]
+    {
+        ValueNodeList parameterList = (ValueNodeList)
+            nodeFactory.getNode(NodeTypes.VALUE_NODE_LIST, 
+                                parserContext);
+        for (ValueNode param : params)
+            parameterList.add(param);
+        return (StatementNode)nodeFactory.getNode(NodeTypes.EXECUTE_STATEMENT_NODE,
+                                                  name, parameterList,
+                                                  parserContext);
+    }
+}
+
+StatementNode
 explainStatement() throws StandardException :
 {
     StatementNode stmt;
     Token[] tokenHolder = new Token[1];
 }
 {
-    <EXPLAIN> stmt = proceduralStatement(tokenHolder)
+    <EXPLAIN> stmt = declarableStatement(tokenHolder)
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.EXPLAIN_STATEMENT_NODE,
                                                   stmt,
