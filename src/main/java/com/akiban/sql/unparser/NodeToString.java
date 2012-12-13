@@ -211,6 +211,18 @@ public class NodeToString
             return callStatementNode((CallStatementNode)node);
         case NodeTypes.INDEX_CONSTRAINT_NODE:
             return indexConstraint((IndexConstraintDefinitionNode)node);
+        case NodeTypes.DECLARE_STATEMENT_NODE:
+            return declareStatementNode((DeclareStatementNode)node);
+        case NodeTypes.FETCH_STATEMENT_NODE:
+            return fetchStatementNode((FetchStatementNode)node);
+        case NodeTypes.CLOSE_STATEMENT_NODE:
+            return closeStatementNode((CloseStatementNode)node);
+        case NodeTypes.PREPARE_STATEMENT_NODE:
+            return prepareStatementNode((PrepareStatementNode)node);
+        case NodeTypes.EXECUTE_STATEMENT_NODE:
+            return executeStatementNode((ExecuteStatementNode)node);
+        case NodeTypes.DEALLOCATE_STATEMENT_NODE:
+            return deallocateStatementNode((DeallocateStatementNode)node);
         default:
             return "**UNKNOWN(" + node.getNodeType() +")**";
         }
@@ -1014,8 +1026,41 @@ public class NodeToString
         return bd.substring(0, bd.length() -2); // delete the last (<COMMA> <SPACE>)
     }
     
+    protected String declareStatementNode(DeclareStatementNode node) 
+            throws StandardException {
+        return "DECLARE " + node.getName() + " CURSOR FOR " +
+            toString(node.getStatement());
+    }
+
+    protected String fetchStatementNode(FetchStatementNode node)
+            throws StandardException {
+        return "FETCH " + 
+            ((node.getCount() < 0) ? "ALL" : Integer.toString(node.getCount())) +
+            " FROM " + node.getName();
+    }
+
+    protected String closeStatementNode(CloseStatementNode node)
+            throws StandardException {
+        return "CLOSE " + node.getName();
+    }
+
+    protected String prepareStatementNode(PrepareStatementNode node)
+            throws StandardException {
+        return "PREPARE " + node.getName() + " AS " +
+            toString(node.getStatement());
+    }
+
+    protected String executeStatementNode(ExecuteStatementNode node)
+            throws StandardException {
+        return "EXECUTE " + node.getName() + 
+            "(" + nodeList(node.getParameterList(), true) + ")";
+    }
+
+    protected String deallocateStatementNode(DeallocateStatementNode node)
+            throws StandardException {
+        return "DEALLOCATE " + node.getName();
+    }
      
-    
     protected void doPrint(QueryTreeNode node, StringBuilder bd) throws StandardException
     {
         if (node instanceof RowConstructorNode)
