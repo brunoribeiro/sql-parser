@@ -20,22 +20,33 @@ package com.akiban.sql.parser;
 import com.akiban.sql.StandardException;
 
 /**
- * An ExplainStatementNode represents the EXPLAIN command.
- *
+ * EXECUTE a previously prepare statement.
  */
 
-public class ExplainStatementNode extends StatementNode
+public class ExecuteStatementNode extends StatementNode
 {
-    private StatementNode statement;
+    private String name;
+    private ValueNodeList parameterList;
 
     /**
-     * Initializer for an ExplainStatementNode
+     * Initializer for an ExecuteStatementNode
      *
-     * @param statement The statement to be explained.
+     * @param name The name of the prepared statement.
+     * @param parameterList Any parameter values to be bound.
      */
 
-    public void init(Object statement) {
-        this.statement = (StatementNode)statement;
+    public void init(Object name,
+                     Object parameterList) {
+        this.name = (String)name;
+        this.parameterList = (ValueNodeList)parameterList;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ValueNodeList getParameterList() {
+        return parameterList;
     }
 
     /**
@@ -44,9 +55,10 @@ public class ExplainStatementNode extends StatementNode
     public void copyFrom(QueryTreeNode node) throws StandardException {
         super.copyFrom(node);
         
-        ExplainStatementNode other = (ExplainStatementNode)node;
-        this.statement = (StatementNode)getNodeFactory().copyNode(other.statement,
-                                                                  getParserContext());
+        ExecuteStatementNode other = (ExecuteStatementNode)node;
+        this.name = other.name;
+        this.parameterList = (ValueNodeList)
+            getNodeFactory().copyNode(other.parameterList, getParserContext());
     }
 
     /**
@@ -57,11 +69,12 @@ public class ExplainStatementNode extends StatementNode
      */
 
     public String toString() {
-        return super.toString();
+        return "name: " + name + "\n" +
+            super.toString();
     }
 
     public String statementToString() {
-        return "EXPLAIN";
+        return "EXECUTE";
     }
 
     /**
@@ -74,25 +87,20 @@ public class ExplainStatementNode extends StatementNode
     public void printSubNodes(int depth) {
         super.printSubNodes(depth);
 
-        printLabel(depth, "statement: ");
-        statement.treePrint(depth + 1);
+        printLabel(depth, "parameterList: ");
+        parameterList.treePrint(depth + 1);
     }
 
     /**
      * Accept the visitor for all visitable children of this node.
-     * 
-     * @param v the visitor
      *
-     * @exception StandardException on error
+     * @param v the visitor
+     * @throws StandardException on error in the visitor
      */
     void acceptChildren(Visitor v) throws StandardException {
         super.acceptChildren(v);
 
-        statement = (StatementNode)statement.accept(v);
-    }
-
-    public StatementNode getStatement() {
-        return statement;
+        parameterList = (ValueNodeList)parameterList.accept(v);
     }
 
 }

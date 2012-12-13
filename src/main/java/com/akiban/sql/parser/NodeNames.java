@@ -104,6 +104,8 @@ public interface NodeNames
 
     static final String CHAR_CONSTANT_NODE_NAME = "com.akiban.sql.parser.CharConstantNode";
 
+    static final String CLOSE_STATEMENT_NODE_NAME = "com.akiban.sql.parser.CloseStatementNode";
+
     static final String COALESCE_FUNCTION_NODE_NAME = "com.akiban.sql.parser.CoalesceFunctionNode";
 
     static final String COLUMN_DEFINITION_NODE_NAME = "com.akiban.sql.parser.ColumnDefinitionNode";
@@ -142,6 +144,10 @@ public interface NodeNames
 
     static final String OCTET_LENGTH_OPERATOR_NODE_NAME = "com.akiban.sql.parser.OctetLengthOperatorNode";
 
+    static final String DEALLOCATE_STATEMENT_NODE_NAME = "com.akiban.sql.parser.DeallocateStatementNode";
+
+    static final String DECLARE_STATEMENT_NODE_NAME = "com.akiban.sql.parser.DeclareStatementNode";
+
     static final String DEFAULT_NODE_NAME = "com.akiban.sql.parser.DefaultNode";
 
     static final String DELETE_NODE_NAME = "com.akiban.sql.parser.DeleteNode";
@@ -168,11 +174,15 @@ public interface NodeNames
 
     static final String DROP_VIEW_NODE_NAME = "com.akiban.sql.parser.DropViewNode";
 
+    static final String EXECUTE_STATEMENT_NODE_NAME = "com.akiban.sql.parser.ExecuteStatementNode";
+
     static final String EXPLAIN_STATEMENT_NODE_NAME = "com.akiban.sql.parser.ExplainStatementNode";
 
     static final String EXPLICIT_COLLATE_NODE_NAME = "com.akiban.sql.parser.ExplicitCollateNode";
 
     static final String EXTRACT_OPERATOR_NODE_NAME = "com.akiban.sql.parser.ExtractOperatorNode";
+
+    static final String FETCH_STATEMENT_NODE_NAME = "com.akiban.sql.parser.FetchStatementNode";
 
     static final String FK_CONSTRAINT_DEFINITION_NODE_NAME = "com.akiban.sql.parser.FKConstraintDefinitionNode";
 
@@ -267,6 +277,8 @@ public interface NodeNames
     static final String PREDICATE_LIST_NAME = "com.akiban.sql.parser.PredicateList";
 
     static final String PREDICATE_NAME = "com.akiban.sql.parser.Predicate";
+
+    static final String PREPARE_STATEMENT_NODE_NAME = "com.akiban.sql.parser.PrepareStatementNode";
 
     static final String PRIVILEGE_NAME = "com.akiban.sql.parser.PrivilegeNode";
 
