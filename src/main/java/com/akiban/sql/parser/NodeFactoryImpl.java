@@ -626,6 +626,25 @@ public final class NodeFactoryImpl extends NodeFactory
 
         case NodeTypes.AT_RENAME_NODE:
             return NodeNames.AT_RENAME_NODE_NAME;
+
+        case NodeTypes.DECLARE_STATEMENT_NODE:
+            return NodeNames.DECLARE_STATEMENT_NODE_NAME;
+
+        case NodeTypes.FETCH_STATEMENT_NODE:
+            return NodeNames.FETCH_STATEMENT_NODE_NAME;
+
+        case NodeTypes.CLOSE_STATEMENT_NODE:
+            return NodeNames.CLOSE_STATEMENT_NODE_NAME;
+
+        case NodeTypes.PREPARE_STATEMENT_NODE:
+            return NodeNames.PREPARE_STATEMENT_NODE_NAME;
+
+        case NodeTypes.EXECUTE_STATEMENT_NODE:
+            return NodeNames.EXECUTE_STATEMENT_NODE_NAME;
+
+        case NodeTypes.DEALLOCATE_STATEMENT_NODE:
+            return NodeNames.DEALLOCATE_STATEMENT_NODE_NAME;
+
         default:
             throw new StandardException("Not implemented");
         }

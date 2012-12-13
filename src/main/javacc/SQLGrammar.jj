@@ -14134,6 +14134,7 @@ cursorStatement() throws StandardException :
     |
       <ALL> { count = -1; }
     ]
+    [ <FROM> ]
     name = identifier()
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.FETCH_STATEMENT_NODE,
