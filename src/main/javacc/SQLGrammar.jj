@@ -2367,6 +2367,7 @@ TOKEN [IGNORE_CASE] :
 | <CALL: "call">
 | <CURDATE: "curdate">
 | <CURRENT_ROLE: "current_role">
+| <CURRENT_SCHEMA: "current_schema">
 | <CURTIME: "curtime">
 | <DATABASE: "database">
 | <GET_CURRENT_CONNECTION: "getCurrentConnection">
@@ -7347,6 +7348,11 @@ generalValueSpecification() throws StandardException :
     {
         return parm;
     }
+|
+    parm = currentSchemaNode()
+    {
+        return parm;
+    }
 }
 
 ValueNode
@@ -7381,6 +7387,18 @@ currentRoleNode() throws StandardException :
     <CURRENT_ROLE>
     {
         return (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_ROLE_NODE,
+                                              parserContext);
+    }
+}
+
+ValueNode
+currentSchemaNode() throws StandardException :
+{}
+{
+    <CURRENT_SCHEMA>
+    {
+        checkOptionalParens();
+        return (ValueNode)nodeFactory.getNode(NodeTypes.CURRENT_SCHEMA_NODE,
                                               parserContext);
     }
 }
@@ -14430,6 +14448,7 @@ reservedKeyword() :
 | tok = <BOOLEAN>
 | tok = <CALL>
 | tok = <CURRENT_ROLE>
+| tok = <CURRENT_SCHEMA>
 | tok = <EXPLAIN>
 | tok = <GROUPING>
 | tok = <LONGINT>
