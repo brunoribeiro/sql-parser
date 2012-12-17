@@ -166,7 +166,7 @@ public interface NodeTypes
     public static final int AGGREGATE_NODE = 115;
     public static final int COLUMN_DEFINITION_NODE = 116;
     public static final int EXPLAIN_STATEMENT_NODE = 117;
-    public static final int EXEC_SPS_NODE = 118;
+    // 118 available
     public static final int FK_CONSTRAINT_DEFINITION_NODE = 119;
     public static final int FROM_VTI = 120;
     public static final int MATERIALIZE_RESULT_SET_NODE = 121;
@@ -277,8 +277,16 @@ public interface NodeTypes
     public static final int WINDOW_REFERENCE_NODE = 229;
     public static final int WINDOW_RESULTSET_NODE = 230;
 
+    // Cursors
+    public static final int DECLARE_STATEMENT_NODE = 233;
+    public static final int FETCH_STATEMENT_NODE = 234;
+    public static final int CLOSE_STATEMENT_NODE = 235;
+    public static final int PREPARE_STATEMENT_NODE = 236;
+    public static final int EXECUTE_STATEMENT_NODE = 237;
+    public static final int DEALLOCATE_STATEMENT_NODE = 238;
+
     // Final value in set, keep up to date!
-    public static final int FINAL_VALUE = CURRENT_SEQUENCE_NODE;
+    public static final int FINAL_VALUE = DEALLOCATE_STATEMENT_NODE;
 
     /**
      * Extensions to this interface can use nodetypes > MAX_NODE_TYPE with out fear of collision

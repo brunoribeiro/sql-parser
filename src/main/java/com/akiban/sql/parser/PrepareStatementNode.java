@@ -20,22 +20,33 @@ package com.akiban.sql.parser;
 import com.akiban.sql.StandardException;
 
 /**
- * An ExplainStatementNode represents the EXPLAIN command.
- *
+ * PREPARE a statement for later execution.
  */
 
-public class ExplainStatementNode extends StatementNode
+public class PrepareStatementNode extends StatementNode
 {
+    private String name;
     private StatementNode statement;
 
     /**
-     * Initializer for an ExplainStatementNode
+     * Initializer for an PrepareStatementNode
      *
-     * @param statement The statement to be explained.
+     * @param name The name of the statement
+     * @param statement The statement to be executed
      */
 
-    public void init(Object statement) {
+    public void init(Object name,
+                     Object statement) {
+        this.name = (String)name;
         this.statement = (StatementNode)statement;
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public StatementNode getStatement() {
+        return statement;
     }
 
     /**
@@ -44,7 +55,7 @@ public class ExplainStatementNode extends StatementNode
     public void copyFrom(QueryTreeNode node) throws StandardException {
         super.copyFrom(node);
         
-        ExplainStatementNode other = (ExplainStatementNode)node;
+        PrepareStatementNode other = (PrepareStatementNode)node;
         this.statement = (StatementNode)getNodeFactory().copyNode(other.statement,
                                                                   getParserContext());
     }
@@ -57,11 +68,12 @@ public class ExplainStatementNode extends StatementNode
      */
 
     public String toString() {
-        return super.toString();
+        return "name: " + name + "\n" +
+            super.toString();
     }
 
     public String statementToString() {
-        return "EXPLAIN";
+        return "PREPARE";
     }
 
     /**
@@ -89,10 +101,6 @@ public class ExplainStatementNode extends StatementNode
         super.acceptChildren(v);
 
         statement = (StatementNode)statement.accept(v);
-    }
-
-    public StatementNode getStatement() {
-        return statement;
     }
 
 }
