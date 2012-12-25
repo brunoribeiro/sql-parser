@@ -27,12 +27,14 @@ import com.akiban.sql.StandardException;
 public class CopyStatementNode extends StatementNode
 {
     public static enum Mode { TO_TABLE, FROM_TABLE, FROM_SUBQUERY };
+    public static enum Format { CSV };
     private Mode mode;
     private TableName tableName;
     private ResultColumnList columnList;
     private SubqueryNode subquery;
     private String filename;
-    private String format, delimiter, nullString, quote, escape, encoding;
+    private Format format;
+    private String delimiter, nullString, quote, escape, encoding;
     private boolean header;
     
     /**
@@ -81,10 +83,10 @@ public class CopyStatementNode extends StatementNode
         return filename;
     }
 
-    public String getFormat() {
+    public Format getFormat() {
         return format;
     }
-    public void setFormat(String format) {
+    public void setFormat(Format format) {
         this.format = format;
     }
     public String getDelimiter() {

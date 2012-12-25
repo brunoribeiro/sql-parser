@@ -2412,6 +2412,7 @@ TOKEN [IGNORE_CASE] :
 | <CONTENT: "content">
 | <COPY: "copy">
 | <CS: "cs">
+| <CSV: "csv">
 | <CURSORS: "cursors">
 | <DAY_HOUR: "day_hour">
 | <DAY_MICROSECOND: "day_microsecond">
@@ -14292,11 +14293,12 @@ void
 copyOption(CopyStatementNode stmt) throws StandardException :
 {
     String value;
+    CopyStatementNode.Format format;
 }
 {
-    <FORMAT> value = identifier()
+    <FORMAT> format = copyFormat()
     {
-        stmt.setFormat(value);
+        stmt.setFormat(format);
     }
 |
     <DELIMITER> value = string()
@@ -14328,6 +14330,14 @@ copyOption(CopyStatementNode stmt) throws StandardException :
     {
         stmt.setEncoding(value);
     }
+}
+
+CopyStatementNode.Format
+copyFormat() throws StandardException :
+{
+}
+{
+    <CSV> { return CopyStatementNode.Format.CSV; }
 }
 
 String
@@ -14696,6 +14706,7 @@ nonReservedKeyword() :
 | tok = <COPY>
 | tok = <COUNT>
 | tok = <CS>
+| tok = <CSV>
 | tok = <CURDATE>
 | tok = <CURTIME>
 | tok = <D>
