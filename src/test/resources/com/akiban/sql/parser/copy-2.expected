@@ -1,0 +1,38 @@
+com.akiban.sql.parser.CopyStatementNode@44c9d92c
+mode: FROM_TABLE
+tableName: t2
+filename: /tmp/t2.csv
+format: null
+delimiter: null
+nullString: null
+quote: null
+escape: null
+encoding: null
+statementType: COPY
+columnList: 	
+	com.akiban.sql.parser.ResultColumnList@1fd0fafc
+
+	[0]:	
+	com.akiban.sql.parser.ResultColumn@510dc6b5
+	exposedName: c1
+	name: c1
+	tableName: null
+	isDefaultColumn: false
+	type: null
+	reference: 		
+		com.akiban.sql.parser.ColumnReference@5f70bea5
+		columnName: c1
+		tableName: null
+		type: null
+	[1]:	
+	com.akiban.sql.parser.ResultColumn@62f47396
+	exposedName: c2
+	name: c2
+	tableName: null
+	isDefaultColumn: false
+	type: null
+	reference: 		
+		com.akiban.sql.parser.ColumnReference@1ed0af9b
+		columnName: c2
+		tableName: null
+		type: null

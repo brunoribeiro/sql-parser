@@ -14266,7 +14266,7 @@ copyStatementBase() throws StandardException :
     { mode = CopyStatementNode.Mode.FROM_SUBQUERY; }
 |
     tableName = qualifiedName()
-    <LEFT_PAREN> columnList = insertColumnList() <RIGHT_PAREN>
+    [ <LEFT_PAREN> columnList = insertColumnList() <RIGHT_PAREN> ]
     ( <TO> ( filename = string() | <STDOUT> )
        { mode = CopyStatementNode.Mode.FROM_TABLE; }
     | <FROM> ( filename = string() | <STDIN> )
