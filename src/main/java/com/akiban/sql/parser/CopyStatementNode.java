@@ -210,4 +210,53 @@ public class CopyStatementNode extends StatementNode
         }
     }
 
+    /** Turn the source portion into a regular Select query. */
+    public CursorNode asQuery() throws StandardException {
+        NodeFactory nodeFactory = getNodeFactory();
+        SQLParserContext parserContext = getParserContext();
+
+        ResultSetNode resultSet;
+        OrderByList orderBy = null;
+        ValueNode offset = null, limit = null;
+        if (subquery != null) {
+            // Easy case: already specified as a subquery.
+            resultSet = subquery.getResultSet();
+            orderBy = subquery.getOrderByList();
+            offset = subquery.getOffset();
+            limit = subquery.getFetchFirst();
+        }
+        else {
+            // Table case.
+            FromList fromList = (FromList)nodeFactory.getNode(NodeTypes.FROM_LIST,
+                                                              parserContext);
+            FromTable fromTable = (FromTable)nodeFactory.getNode(NodeTypes.FROM_BASE_TABLE,
+                                                                 tableName,
+                                                                 null, null,
+                                                                 parserContext);
+            fromList.addFromTable(fromTable);
+            ResultColumnList selectList = columnList;
+            if (selectList == null) {
+                selectList = (ResultColumnList)nodeFactory.getNode(NodeTypes.RESULT_COLUMN_LIST,
+                                                                   parserContext);
+                ResultColumn star = (ResultColumn)nodeFactory.getNode(NodeTypes.ALL_RESULT_COLUMN,
+                                                                      Boolean.FALSE,
+                                                                      parserContext);
+                selectList.addResultColumn(star);
+            }
+            resultSet = (SelectNode)nodeFactory.getNode(NodeTypes.SELECT_NODE,
+                                                        selectList,
+                                                        null,
+                                                        fromList,
+                                                        null, null, null, null,
+                                                        parserContext);
+        }
+        return (CursorNode)nodeFactory.getNode(NodeTypes.CURSOR_NODE,
+                                               "SELECT",
+                                               resultSet,
+                                               null,
+                                               orderBy, offset, limit,
+                                               null, null,
+                                               parserContext);
+    }
+
 }
