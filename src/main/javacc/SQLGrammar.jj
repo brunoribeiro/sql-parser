@@ -14293,6 +14293,7 @@ void
 copyOption(CopyStatementNode stmt) throws StandardException :
 {
     String value;
+    long lvalue;
     CopyStatementNode.Format format;
 }
 {
@@ -14329,6 +14330,11 @@ copyOption(CopyStatementNode stmt) throws StandardException :
     <ENCODING> value = string()
     {
         stmt.setEncoding(value);
+    }
+|
+    <COMMIT> lvalue = exactNumber() [<ROWS>]
+    {
+        stmt.setCommitFrequency(lvalue);
     }
 }
 

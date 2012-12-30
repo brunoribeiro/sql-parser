@@ -8,6 +8,7 @@ nullString: null
 quote: null
 escape: null
 encoding: null
+commitFrequency: 0
 statementType: COPY
 subquery: 	
 	com.akiban.sql.parser.SubqueryNode@13f6ba0f

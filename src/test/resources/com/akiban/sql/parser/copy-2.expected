@@ -8,6 +8,7 @@ nullString: null
 quote: null
 escape: null
 encoding: null
+commitFrequency: 0
 statementType: COPY
 columnList: 	
 	com.akiban.sql.parser.ResultColumnList@1fd0fafc

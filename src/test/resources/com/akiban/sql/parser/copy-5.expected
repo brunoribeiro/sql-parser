@@ -8,4 +8,5 @@ nullString: null
 quote: null
 escape: null
 encoding: null
+commitFrequency: 0
 statementType: COPY

@@ -1121,6 +1121,9 @@ public class NodeToString
         if (node.getEncoding() != null) {
             options = copyOptionString(str, "ENCODING", node.getEncoding(), options);
         }
+        if (node.getCommitFrequency() != 0) {
+            options = copyOption(str, "COMMIT", node.getCommitFrequency() + " ROWS", options);
+        }
         if (options) {
             str.append(")");
         }

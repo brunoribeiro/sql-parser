@@ -36,6 +36,7 @@ public class CopyStatementNode extends StatementNode
     private Format format;
     private String delimiter, nullString, quote, escape, encoding;
     private boolean header;
+    private long commitFrequency;
     
     /**
      * Initializer for an CopyStatementNode
@@ -125,6 +126,12 @@ public class CopyStatementNode extends StatementNode
     public void setEncoding(String encoding) {
         this.encoding = encoding;
     }
+    public long getCommitFrequency() {
+        return commitFrequency;
+    }
+    public void setCommitFrequency(long commitFrequency) {
+        this.commitFrequency = commitFrequency;
+    }
 
     /**
      * Fill this node with a deep copy of the given node.
@@ -165,6 +172,7 @@ public class CopyStatementNode extends StatementNode
             "quote: " + quote + "\n" +
             "escape: " + escape + "\n" +
             "encoding: " + encoding + "\n" +
+            "commitFrequency: " + commitFrequency + "\n" +
             super.toString();
     }
 
