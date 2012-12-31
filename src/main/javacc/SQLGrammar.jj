@@ -2449,6 +2449,7 @@ TOKEN [IGNORE_CASE] :
 | <MINUTE_MICROSECOND: "minute_microsecond">
 | <MINUTE_SECOND: "minute_second">
 | <MODE: "mode">
+| <MYSQL_DUMP: "mysql_dump">
 | <NEW: "new">
 | <NEW_TABLE: "new_table">
 | <NVARCHAR: "nvarchar"> 
@@ -14344,6 +14345,8 @@ copyFormat() throws StandardException :
 }
 {
     <CSV> { return CopyStatementNode.Format.CSV; }
+|
+    <MYSQL_DUMP> { return CopyStatementNode.Format.MYSQL_DUMP; }
 }
 
 String
@@ -14782,6 +14785,7 @@ nonReservedKeyword() :
 | tok = <MONTH>
 | tok = <_MORE>
 | tok = <MUMPS>
+| tok = <MYSQL_DUMP>
 | tok = <NAME>
 | tok = <NCLOB>
 | tok = <NEW>

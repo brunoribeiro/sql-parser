@@ -27,7 +27,7 @@ import com.akiban.sql.StandardException;
 public class CopyStatementNode extends StatementNode
 {
     public static enum Mode { TO_TABLE, FROM_TABLE, FROM_SUBQUERY };
-    public static enum Format { CSV };
+    public static enum Format { CSV, MYSQL_DUMP };
     private Mode mode;
     private TableName tableName;
     private ResultColumnList columnList;
