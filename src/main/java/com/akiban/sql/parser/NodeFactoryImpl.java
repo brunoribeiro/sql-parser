@@ -593,6 +593,9 @@ public final class NodeFactoryImpl extends NodeFactory
         case NodeTypes.EXPLAIN_STATEMENT_NODE:
             return NodeNames.EXPLAIN_STATEMENT_NODE_NAME;
 
+        case NodeTypes.COPY_STATEMENT_NODE:
+            return NodeNames.COPY_STATEMENT_NODE_NAME;
+
         case NodeTypes.INDEX_COLUMN:
             return NodeNames.INDEX_COLUMN_NAME;
         

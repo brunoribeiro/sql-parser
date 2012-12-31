@@ -2410,7 +2410,9 @@ TOKEN [IGNORE_CASE] :
 | <CLASS: "class">
 | <COMPRESS: "compress">
 | <CONTENT: "content">
+| <COPY: "copy">
 | <CS: "cs">
+| <CSV: "csv">
 | <CURSORS: "cursors">
 | <DAY_HOUR: "day_hour">
 | <DAY_MICROSECOND: "day_microsecond">
@@ -2418,13 +2420,17 @@ TOKEN [IGNORE_CASE] :
 | <DAY_SECOND: "day_second">
 | <DB2SQL: "db2sql">
 | <DEFRAGMENT: "defragment">
+| <DELIMITER: "delimiter">
 | <DIRTY: "dirty">
 | <DOCUMENT: "document">
 | <EACH: "each">
 | <EMPTY: "empty">
+| <ENCODING: "encoding">
 | <EXCLUSIVE: "exclusive">
 | <FN: "fn">
 | <FORCE: "force">
+| <FORMAT: "format">
+| <HEADER: "header">
 | <HOUR_MICROSECOND: "hour_microsecond">
 | <HOUR_MINUTE: "hour_minute">
 | <HOUR_SECOND: "hour_second">
@@ -2456,6 +2462,7 @@ TOKEN [IGNORE_CASE] :
 | <PROPERTIES: "properties">
 | <PURGE: "purge">
 | <QUARTER: "quarter">
+| <_QUOTE: "quote">
 | <READS: "reads">
 | <REF: "ref">
 | <REFERENCING: "referencing">
@@ -2477,6 +2484,8 @@ TOKEN [IGNORE_CASE] :
 | <SQRT: "sqrt">
 | <STABILITY: "stability">
 | <STATISTICS: "statistics">
+| <STDIN: "stdin">
+| <STDOUT: "stdout">
 | <STRIP: "strip">
 | <STYLE: "style">
 | <TRIGGER: "trigger">
@@ -3000,6 +3009,8 @@ StatementPart(Token[] tokenHolder) throws StandardException :
     statementNode = explainStatement()
 |
     statementNode = transactionControlStatement()
+|
+    statementNode = copyStatement()
 )
     {
         return statementNode;
@@ -14223,6 +14234,118 @@ explainStatement() throws StandardException :
     }
 }
 
+StatementNode
+copyStatement() throws StandardException :
+{
+    CopyStatementNode stmt;
+}
+{
+    <COPY> stmt = copyStatementBase()
+    [ [<WITH>] <LEFT_PAREN> copyOption(stmt)
+      ( <COMMA> copyOption(stmt) )* 
+      <RIGHT_PAREN> ]
+    {
+        return stmt;
+    }
+}
+
+CopyStatementNode
+copyStatementBase() throws StandardException :
+{
+    CopyStatementNode.Mode mode;
+    TableName tableName = null;
+    ResultColumnList columnList = null;
+    SubqueryNode subquery = null;
+    String filename = null;
+}
+{
+(
+    LOOKAHEAD( { getToken(1).kind == LEFT_PAREN && getToken(2).kind == SELECT } )
+    subquery = derivedTable()
+    <TO> ( filename = string() | <STDOUT> )
+    { mode = CopyStatementNode.Mode.FROM_SUBQUERY; }
+|
+    tableName = qualifiedName()
+    [ <LEFT_PAREN> columnList = insertColumnList() <RIGHT_PAREN> ]
+    ( <TO> ( filename = string() | <STDOUT> )
+       { mode = CopyStatementNode.Mode.FROM_TABLE; }
+    | <FROM> ( filename = string() | <STDIN> )
+       { mode = CopyStatementNode.Mode.TO_TABLE; }
+    )
+)
+    {
+        if (subquery != null)
+            return (CopyStatementNode)nodeFactory.getNode(NodeTypes.COPY_STATEMENT_NODE,
+                                                          mode, 
+                                                          subquery, 
+                                                          filename,
+                                                          parserContext);
+        else
+            return (CopyStatementNode)nodeFactory.getNode(NodeTypes.COPY_STATEMENT_NODE,
+                                                          mode, 
+                                                          tableName, columnList, 
+                                                          filename,
+                                                          parserContext);
+    }
+}
+
+void
+copyOption(CopyStatementNode stmt) throws StandardException :
+{
+    String value;
+    long lvalue;
+    CopyStatementNode.Format format;
+}
+{
+    <FORMAT> format = copyFormat()
+    {
+        stmt.setFormat(format);
+    }
+|
+    <DELIMITER> value = string()
+    {
+        stmt.setDelimiter(value);
+    }
+|
+    <NULL> value = string()
+    {
+        stmt.setNullString(value);
+    }
+|
+    <HEADER> token = booleanLiteral()
+    {
+        stmt.setHeader(token.kind == TRUE);
+    }
+|
+    <_QUOTE> value = string()
+    {
+        stmt.setQuote(value);
+    }
+|
+    <ESCAPE> value = string()
+    {
+        stmt.setEscape(value);
+    }
+|
+    <ENCODING> value = string()
+    {
+        stmt.setEncoding(value);
+    }
+|
+    <COMMIT> lvalue = exactNumber() [<ROWS>]
+    {
+        stmt.setCommitFrequency(lvalue);
+    }
+}
+
+CopyStatementNode.Format
+copyFormat() throws StandardException :
+{
+}
+{
+    <CSV> { return CopyStatementNode.Format.CSV; }
+}
+
 String
 internalIdentifier() throws StandardException :
 {
@@ -14586,8 +14709,10 @@ nonReservedKeyword() :
 | tok = <CONCAT>
 | tok = <CONTAINS>
 | tok = <CONTENT>
+| tok = <COPY>
 | tok = <COUNT>
 | tok = <CS>
+| tok = <CSV>
 | tok = <CURDATE>
 | tok = <CURTIME>
 | tok = <D>
@@ -14600,6 +14725,7 @@ nonReservedKeyword() :
 | tok = <DAY_MINUTE>
 | tok = <DAY_SECOND>
 | tok = <DEFRAGMENT>
+| tok = <DELIMITER>
 | tok = <DIRTY>
 | tok = <DIV>
 | tok = <DUMMY>
@@ -14609,12 +14735,15 @@ nonReservedKeyword() :
 | tok = <DOCUMENT>
 | tok = <EACH>
 | tok = <EMPTY>
+| tok = <ENCODING>
 | tok = <EXCLUSIVE>
 | tok = <EXTRACT>
 | tok = <FN>
 | tok = <FORCE>
+| tok = <FORMAT>
 | tok = <FORTRAN>
 | tok = <GENERATED>
+| tok = <HEADER>
 | tok = <HOUR_MICROSECOND>
 | tok = <HOUR_MINUTE>
 | tok = <HOUR_SECOND>
@@ -14676,6 +14805,7 @@ nonReservedKeyword() :
 | tok = <PROPERTIES>
 | tok = <PURGE>
 | tok = <QUARTER>
+| tok = <_QUOTE>
 | tok = <READS>
 | tok = <REF>
 // SQL92 says RELEASE is reserved, but we want it to be non-reserved.
@@ -14723,6 +14853,8 @@ nonReservedKeyword() :
 | tok = <START>
 | tok = <STATEMENT>
 | tok = <STATISTICS>
+| tok = <STDIN>
+| tok = <STDOUT>
 | tok = <STRIP>
 | tok = <SYNONYM>
 | tok = <STYLE>

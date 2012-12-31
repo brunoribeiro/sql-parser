@@ -223,6 +223,8 @@ public class NodeToString
             return executeStatementNode((ExecuteStatementNode)node);
         case NodeTypes.DEALLOCATE_STATEMENT_NODE:
             return deallocateStatementNode((DeallocateStatementNode)node);
+        case NodeTypes.COPY_STATEMENT_NODE:
+            return copyStatementNode((CopyStatementNode)node);
         default:
             return "**UNKNOWN(" + node.getNodeType() +")**";
         }
@@ -1061,6 +1063,90 @@ public class NodeToString
         return "DEALLOCATE " + node.getName();
     }
      
+    protected String copyStatementNode(CopyStatementNode node) 
+            throws StandardException {
+        StringBuilder str = new StringBuilder("COPY ");
+        if (node.getSubquery() != null) {
+            str.append("(");
+            str.append(toString(node.getSubquery()));
+            str.append(")");
+        }
+        else {
+            str.append(node.getTableName());
+            if (node.getColumnList() != null) {
+                str.append("(");
+                str.append(toString(node.getColumnList()));
+                str.append(")");
+            }
+        }
+        switch (node.getMode()) {
+        case FROM_TABLE:
+        case FROM_SUBQUERY:
+            str.append(" TO ");
+            break;
+        case TO_TABLE:
+            str.append(" FROM ");
+            break;
+        }
+        if (node.getFilename() != null) {
+            str.append("'");
+            str.append(node.getFilename());
+            str.append("'");
+        } 
+        else if (node.getMode() == CopyStatementNode.Mode.TO_TABLE) {
+            str.append("STDIN");
+        }
+        else {
+            str.append("STDOUT");
+        }
+        boolean options = false;
+        if (node.getFormat() != null) {
+            options = copyOption(str, "FORMAT", node.getFormat().name(), options);
+        }
+        if (node.getDelimiter() != null) {
+            options = copyOptionString(str, "DELIMITER", node.getDelimiter(), options);
+        }
+        if (node.getNullString() != null) {
+            options = copyOptionString(str, "NULL", node.getNullString(), options);
+        }
+        if (node.isHeader()) {
+            options = copyOption(str, "HEADER", "TRUE", options);
+        }
+        if (node.getQuote() != null) {
+            options = copyOptionString(str, "QUOTE", node.getQuote(), options);
+        }
+        if (node.getEscape() != null) {
+            options = copyOptionString(str, "ESCAPE", node.getEscape(), options);
+        }
+        if (node.getEncoding() != null) {
+            options = copyOptionString(str, "ENCODING", node.getEncoding(), options);
+        }
+        if (node.getCommitFrequency() != 0) {
+            options = copyOption(str, "COMMIT", node.getCommitFrequency() + " ROWS", options);
+        }
+        if (options) {
+            str.append(")");
+        }
+        return str.toString();
+    }
+
+    protected boolean copyOptionString(StringBuilder str, String keyword, String value, boolean options) {
+        return copyOption(str, keyword, "'" + value + "'", options);
+    }
+
+    protected boolean copyOption(StringBuilder str, String keyword, String value, boolean options) {
+        if (!options) {
+            str.append(" WITH (");
+        }
+        else {
+            str.append(", ");
+        }
+        str.append(keyword);
+        str.append(" " );
+        str.append(value);
+        return true;
+    }
+
     protected void doPrint(QueryTreeNode node, StringBuilder bd) throws StandardException
     {
         if (node instanceof RowConstructorNode)

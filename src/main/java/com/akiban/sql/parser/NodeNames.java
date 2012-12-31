@@ -118,6 +118,8 @@ public interface NodeNames
 
     static final String CONSTRAINT_DEFINITION_NODE_NAME = "com.akiban.sql.parser.ConstraintDefinitionNode";
 
+    static final String COPY_STATEMENT_NODE_NAME = "com.akiban.sql.parser.CopyStatementNode";
+
     static final String CREATE_ALIAS_NODE_NAME = "com.akiban.sql.parser.CreateAliasNode";
 
     static final String CREATE_INDEX_NODE_NAME = "com.akiban.sql.parser.CreateIndexNode";
