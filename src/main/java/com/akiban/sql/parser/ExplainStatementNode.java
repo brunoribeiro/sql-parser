@@ -26,16 +26,24 @@ import com.akiban.sql.StandardException;
 
 public class ExplainStatementNode extends StatementNode
 {
+    public enum Detail {
+        BRIEF, NORMAL, VERBOSE
+    }
+    
     private StatementNode statement;
+    private Detail detail;
 
     /**
      * Initializer for an ExplainStatementNode
      *
      * @param statement The statement to be explained.
+     * @param detail Level of detail.
      */
 
-    public void init(Object statement) {
+    public void init(Object statement,
+                     Object detail) {
         this.statement = (StatementNode)statement;
+        this.detail = (Detail)detail;
     }
 
     /**
@@ -47,6 +55,7 @@ public class ExplainStatementNode extends StatementNode
         ExplainStatementNode other = (ExplainStatementNode)node;
         this.statement = (StatementNode)getNodeFactory().copyNode(other.statement,
                                                                   getParserContext());
+        this.detail = other.detail;
     }
 
     /**
@@ -93,6 +102,10 @@ public class ExplainStatementNode extends StatementNode
 
     public StatementNode getStatement() {
         return statement;
+    }
+
+    public Detail getDetail() {
+        return detail;
     }
 
 }
