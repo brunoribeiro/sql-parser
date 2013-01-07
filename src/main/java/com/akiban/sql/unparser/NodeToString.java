@@ -981,7 +981,20 @@ public class NodeToString
 
     protected String explainStatementNode(ExplainStatementNode node) 
             throws StandardException {
-        return "EXPLAIN " + toString(node.getStatement());
+        String detail;
+        switch (node.getDetail()) {
+        case BRIEF:
+            detail = "BRIEF ";
+            break;
+        case VERBOSE:
+            detail = "VERBOSE ";
+            break;
+        case NORMAL:
+        default:
+            detail = "";
+            break;
+        }
+        return "EXPLAIN " + detail + toString(node.getStatement());
     }
 
     protected String transactionControlNode(TransactionControlNode node)

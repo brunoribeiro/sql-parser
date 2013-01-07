@@ -2406,6 +2406,7 @@ TOKEN [IGNORE_CASE] :
 { /* Additional non-SQL92 non-reserved keywords */
   <AFTER: "after">
 | <BEFORE: "before">
+| <BRIEF: "brief">
 | <BTREE: "btree">
 | <CLASS: "class">
 | <COMPRESS: "compress">
@@ -2495,6 +2496,7 @@ TOKEN [IGNORE_CASE] :
 | <UNSIGNED: "unsigned">
 | <UR: "ur">
 | <USE: "use">
+| <VERBOSE: "verbose">
 | <WEEK: "week">
 | <WHITESPACE: "whitespace">
 | <YEAR_MONTH: "year_month">
@@ -14225,14 +14227,29 @@ explainStatement() throws StandardException :
 {
     StatementNode stmt;
     Token[] tokenHolder = new Token[1];
+    ExplainStatementNode.Detail detail = ExplainStatementNode.Detail.NORMAL;
 }
 {
-    <EXPLAIN> stmt = declarableStatement(tokenHolder)
+    <EXPLAIN> 
+    [ detail = explainDetail() ]
+    stmt = declarableStatement(tokenHolder)
     {
         return (StatementNode)nodeFactory.getNode(NodeTypes.EXPLAIN_STATEMENT_NODE,
-                                                  stmt,
+                                                  stmt, detail,
                                                   parserContext);
     }
+}
+
+ExplainStatementNode.Detail
+explainDetail() throws StandardException :
+{
+}
+{
+    <BRIEF>
+    { return ExplainStatementNode.Detail.BRIEF; }
+|        
+    <VERBOSE>
+    { return ExplainStatementNode.Detail.VERBOSE; }
 }
 
 StatementNode
@@ -14699,6 +14716,7 @@ nonReservedKeyword() :
 | tok = <BEFORE>
 | tok = <BINARY>
 | tok = <BLOB>
+| tok = <BRIEF>
 | tok = <BTREE>
 | tok = <C>
 | tok = <CALLED>
@@ -14883,6 +14901,7 @@ nonReservedKeyword() :
 | tok = <VALUE>
 | tok = <VARBINARY>
 | tok = <PARAMETER>
+| tok = <VERBOSE>
 | tok = <WEEK>
 | tok = <WHEN>
 | tok = <WHITESPACE>
