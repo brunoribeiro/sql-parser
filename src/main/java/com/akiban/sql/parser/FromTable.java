@@ -97,6 +97,13 @@ public abstract class FromTable extends ResultSetNode
     }
 
     /**
+     * Set this table's correlation name.
+     */
+    public void setCorrelationName(String correlationName) { 
+        this.correlationName = correlationName; 
+    }
+
+    /**
      * Convert this object to a String.  See comments in QueryTreeNode.java
      * for how this should be done for tree printing.
      *
