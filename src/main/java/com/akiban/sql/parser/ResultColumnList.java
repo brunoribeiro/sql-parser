@@ -197,7 +197,7 @@ public class ResultColumnList extends QueryTreeNodeList<ResultColumn>
         for (int index = 0; index < size; index++) {
             ResultColumn resultColumn = get(index);
 
-            if (columnName.equals(resultColumn.getName())) {
+            if (columnName.equalsIgnoreCase(resultColumn.getName())) {
                 return resultColumn;
             }
         }
